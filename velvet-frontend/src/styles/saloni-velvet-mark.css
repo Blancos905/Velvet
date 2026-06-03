@@ -1,0 +1,70 @@
+/* Logo + wordmark Saloni Velvet (pagine interne B2B / piani) */
+
+.saloni-velvet-mark {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 3vw, 20px);
+  margin: 0.5rem 0 1.15rem;
+}
+
+.saloni-velvet-mark__logo {
+  width: clamp(72px, 18vw, 96px);
+  height: clamp(72px, 18vw, 96px);
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 237, 213, 0.35);
+  box-shadow:
+    0 0 24px rgba(249, 115, 22, 0.35),
+    0 8px 28px rgba(45, 16, 6, 0.45);
+}
+
+.saloni-velvet-mark__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  gap: 4px;
+  padding: 8px 14px 10px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff7ed 0%, #ffedd5 100%);
+  border: 1px solid rgba(234, 88, 12, 0.22);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+}
+
+.saloni-velvet-mark__saloni {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #ea580c;
+  text-transform: uppercase;
+}
+
+.saloni-velvet-mark__velvet {
+  font-size: clamp(1.35rem, 4vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #0a0a0a;
+}
+
+.saloni-velvet-mark--hero {
+  justify-content: center;
+  margin: 0 auto 1rem;
+  max-width: 520px;
+}
+
+.saloni-velvet-mark--hero .saloni-velvet-mark__text {
+  text-align: left;
+}
+
+@media (max-width: 380px) {
+  .saloni-velvet-mark {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .saloni-velvet-mark--hero {
+    align-items: center;
+  }
+}

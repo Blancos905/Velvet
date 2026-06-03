@@ -1,0 +1,410 @@
+/**
+ * Account → Recensioni (`/account/feedback-velvet`): hero pagina + sezioni storico / in arrivo.
+ * Le card singole restano in velvet-surfaces.css; qui shell, stagger e stati espansi.
+ */
+
+.velvet-feedback-page {
+  max-width: min(42rem, 100%);
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 1.5rem;
+}
+
+.velvet-feedback-page__hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 20px 20px;
+  margin-left: clamp(-0.25rem, -0.5vw, 0);
+  margin-right: clamp(-0.25rem, -0.5vw, 0);
+  margin-bottom: 1.15rem;
+  padding: clamp(1rem, 3vw, 1.4rem) clamp(0.85rem, 2vw, 1.15rem) clamp(1.05rem, 2.5vw, 1.35rem);
+  border: 1px solid rgba(63, 63, 70, 0.55);
+  border-top: none;
+  background:
+    radial-gradient(100% 80% at 10% 0%, rgba(249, 115, 22, 0.13) 0%, transparent 52%),
+    radial-gradient(75% 50% at 95% 15%, rgba(56, 189, 248, 0.1) 0%, transparent 48%),
+    linear-gradient(180deg, rgba(39, 39, 42, 0.52) 0%, rgba(24, 24, 27, 0.2) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 20px 44px rgba(0, 0, 0, 0.26);
+}
+
+.velvet-feedback-page__hero-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: -36% -14% auto -14%;
+  height: 112%;
+  background: radial-gradient(ellipse 52% 40% at 50% 0%, rgba(251, 191, 36, 0.12) 0%, transparent 60%);
+  opacity: 0.88;
+}
+
+.velvet-feedback-page__hero-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.velvet-feedback-page .velvet-page-title {
+  margin: 0 0 0.45rem;
+  font-size: clamp(1.65rem, 4.5vw, 2.1rem);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  color: #fafafa;
+  text-shadow:
+    0 0 26px rgba(250, 250, 250, 0.06),
+    0 2px 14px rgba(0, 0, 0, 0.3);
+}
+
+.velvet-feedback-page .velvet-page-title .velvet-feedback-page__title-accent {
+  background: linear-gradient(
+    105deg,
+    #fde68a 0%,
+    #fb923c 28%,
+    #7dd3fc 58%,
+    #38bdf8 100%
+  );
+  background-size: 165% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: velvet-feedback-page-title-shimmer 8s ease-in-out infinite;
+}
+
+@keyframes velvet-feedback-page-title-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.velvet-feedback-page .velvet-page-title::after {
+  content: "";
+  display: block;
+  width: min(8.5rem, 52%);
+  height: 3px;
+  margin-top: 0.5rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.95) 0%, rgba(56, 189, 248, 0.72) 72%, transparent 100%);
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.22);
+}
+
+.velvet-feedback-page__hero-sub {
+  margin: 0;
+  max-width: 38rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(161, 161, 170, 0.96);
+}
+
+.velvet-feedback-page__panel {
+  margin-top: 1rem;
+  padding: 1.05rem 1.15rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 237, 213, 0.14);
+  background:
+    linear-gradient(165deg, rgba(40, 14, 6, 0.5) 0%, rgba(18, 6, 2, 0.55) 100%);
+  box-shadow:
+    0 10px 32px rgba(45, 16, 6, 0.22),
+    inset 0 1px 0 rgba(255, 247, 237, 0.05);
+}
+
+.velvet-feedback-page__panel > p {
+  margin: 0;
+}
+
+.velvet-feedback-page__section-title {
+  margin: 1.35rem 0 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(253, 186, 116, 0.82);
+}
+
+.velvet-feedback-page__section-title:first-of-type {
+  margin-top: 0.25rem;
+}
+
+.velvet-feedback-page--client .velvet-feedback-reviews-list,
+.velvet-feedback-page--salon .velvet-feedback-reviews-list {
+  margin-top: 0.85rem;
+}
+
+.velvet-feedback-page--salon .velvet-feedback-review-card {
+  animation: velvet-feedback-card-enter 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.velvet-feedback-page--salon .velvet-feedback-review-card:nth-child(1) {
+  animation-delay: 0.04s;
+}
+
+.velvet-feedback-page--salon .velvet-feedback-review-card:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.velvet-feedback-page--salon .velvet-feedback-review-card:nth-child(3) {
+  animation-delay: 0.12s;
+}
+
+.velvet-feedback-page--salon .velvet-feedback-review-card:nth-child(4) {
+  animation-delay: 0.16s;
+}
+
+.velvet-feedback-page--salon .velvet-feedback-review-card:nth-child(5) {
+  animation-delay: 0.2s;
+}
+
+.velvet-feedback-page--salon .velvet-feedback-review-card:nth-child(6) {
+  animation-delay: 0.24s;
+}
+
+.velvet-feedback-page--client .velvet-feedback-invite-card {
+  animation: velvet-feedback-card-enter 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.velvet-feedback-page--client .velvet-feedback-invite-card:nth-child(1) {
+  animation-delay: 0.04s;
+}
+
+.velvet-feedback-page--client .velvet-feedback-invite-card:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.velvet-feedback-page--client .velvet-feedback-invite-card:nth-child(3) {
+  animation-delay: 0.12s;
+}
+
+.velvet-feedback-page--client .velvet-feedback-invite-card:nth-child(4) {
+  animation-delay: 0.16s;
+}
+
+@keyframes velvet-feedback-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.velvet-feedback-invite-card--expanded {
+  border: 2px solid #000000 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(224, 242, 254, 0.18),
+    0 0 0 2px rgba(56, 189, 248, 0.35),
+    0 20px 42px rgba(8, 47, 73, 0.38) !important;
+  transform: translateY(-2px);
+}
+
+.velvet-feedback-invite-card--expanded::before {
+  width: 4px;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.45);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .velvet-feedback-review-card:hover .velvet-feedback-review-card__rating {
+    transform: scale(1.02);
+    text-shadow: 0 0 20px rgba(253, 186, 116, 0.35);
+  }
+}
+
+.velvet-feedback-review-card__rating {
+  transition: transform 0.22s ease, text-shadow 0.22s ease;
+}
+
+.velvet-feedback-page__upcoming-hint {
+  margin: 0 0 0.65rem;
+  max-width: 36rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(255, 251, 235, 0.58);
+}
+
+.velvet-feedback-page__invite-comment-label {
+  margin-top: 0.75rem;
+}
+
+.velvet-feedback-page__upcoming-list {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.velvet-feedback-invite-card--upcoming {
+  border-color: rgba(113, 113, 122, 0.45) !important;
+  background:
+    linear-gradient(180deg, rgba(39, 39, 42, 0.45) 0%, rgba(24, 24, 27, 0.35) 100%),
+    var(--velvet-glass-dark) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 8px 22px rgba(0, 0, 0, 0.2) !important;
+  opacity: 0.92;
+}
+
+.velvet-feedback-invite-card--upcoming::before {
+  background: linear-gradient(180deg, rgba(161, 161, 170, 0.85) 0%, rgba(82, 82, 91, 0.9) 100%) !important;
+}
+
+.velvet-feedback-invite-card--upcoming:hover {
+  transform: translateY(-1px);
+  opacity: 1;
+}
+
+.velvet-feedback-invite-card__countdown {
+  margin: 0.65rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(224, 242, 254, 0.78);
+}
+
+.velvet-feedback-page__history {
+  margin-top: 1.5rem;
+  padding: 1rem 1.1rem 1.1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 237, 213, 0.12);
+  background: linear-gradient(165deg, rgba(24, 8, 3, 0.42) 0%, rgba(12, 4, 2, 0.38) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 247, 237, 0.04);
+}
+
+.velvet-feedback-page__history-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.velvet-feedback-page__history-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #fffbeb;
+}
+
+.velvet-feedback-page__history-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(255, 251, 235, 0.48);
+}
+
+.velvet-feedback-page__history-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.velvet-feedback-page__history-item {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 2px solid #000000;
+  background: rgba(15, 23, 42, 0.35);
+  transition:
+    border-color 0.2s ease,
+    transform 0.22s cubic-bezier(0.34, 1.45, 0.64, 1),
+    box-shadow 0.22s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .velvet-feedback-page__history-item:hover {
+    border-color: #000000;
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 24px rgba(45, 16, 6, 0.2),
+      0 0 0 1px rgba(251, 191, 36, 0.22);
+  }
+}
+
+.velvet-feedback-page__history-item-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+}
+
+.velvet-feedback-page__history-salon {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 251, 235, 0.92);
+}
+
+.velvet-feedback-page__history-stars {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fdba74;
+}
+
+.velvet-feedback-page__history-meta {
+  margin: 0;
+  font-size: 0.72rem;
+  color: rgba(148, 163, 184, 0.88);
+}
+
+.velvet-feedback-page__history-comment {
+  margin: 0.25rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: rgba(255, 251, 235, 0.78);
+}
+
+.velvet-feedback-page__notice {
+  margin-top: 0.85rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: rgba(255, 251, 235, 0.62);
+  border: 1px dashed rgba(253, 186, 116, 0.25);
+  background: rgba(12, 4, 2, 0.25);
+}
+
+.velvet-feedback-page--denied .velvet-btn {
+  margin-top: 1rem;
+}
+
+.velvet-feedback-invite-card__cta:focus-visible,
+.velvet-feedback-invite-card__cancel:focus-visible {
+  outline: 2px solid rgba(125, 211, 252, 0.75);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .velvet-feedback-page .velvet-page-title .velvet-feedback-page__title-accent {
+    animation: none;
+    background-position: 50% 50%;
+  }
+
+  .velvet-feedback-page--salon .velvet-feedback-review-card,
+  .velvet-feedback-page--client .velvet-feedback-invite-card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .velvet-feedback-review-card__rating,
+  .velvet-feedback-page__history-item,
+  .velvet-feedback-invite-card--expanded {
+    transition: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .velvet-feedback-review-card:hover .velvet-feedback-review-card__rating,
+    .velvet-feedback-page__history-item:hover {
+      transform: none;
+    }
+  }
+}

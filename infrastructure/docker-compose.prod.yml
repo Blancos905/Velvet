@@ -1,0 +1,163 @@
+# =============================================================================
+# Stack di PRODUZIONE — Salon Platform
+#
+# Principi di hardening:
+#  - DB PostgreSQL/PostGIS e Redis NON espongono porte all'host: vivono solo
+#    nella rete interna "backplane" e sono raggiungibili solo dall'API.
+#  - Solo Nginx è esposto al pubblico (80/443).
+#  - Limiti di CPU/RAM per ogni servizio (deploy.resources).
+#  - Container con filesystem read-only dove possibile, no-new-privileges,
+#    utente non-root, healthcheck e restart automatico.
+#  - Segreti iniettati da file .env (non committare il .env reale!).
+# =============================================================================
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  restart: unless-stopped
+  logging: *default-logging
+
+networks:
+  # Rete pubblica: solo edge (nginx) e api ci si affacciano per il traffico HTTP.
+  edge:
+    driver: bridge
+  # Rete interna isolata: DB + Redis. "internal: true" = nessun accesso a/da Internet.
+  backplane:
+    driver: bridge
+    internal: true
+
+volumes:
+  pg_data:
+  redis_data:
+
+services:
+  # ---------------------------------------------------------------------------
+  # Reverse proxy / TLS termination / security headers
+  # ---------------------------------------------------------------------------
+  nginx:
+    image: nginx:1.27-alpine
+    <<: *hardening
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certs:/etc/nginx/certs:ro      # fullchain.pem + privkey.pem (Let's Encrypt)
+      - ./frontend-web-dist:/usr/share/nginx/html:ro
+    networks:
+      - edge
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 128M
+
+  # ---------------------------------------------------------------------------
+  # API Spring Boot (Java 21)
+  # ---------------------------------------------------------------------------
+  api:
+    build:
+      context: ../velvet
+      dockerfile: Dockerfile
+    <<: *hardening
+    environment:
+      # Profilo PostgreSQL del backend (vedi application-docker.properties).
+      SPRING_PROFILES_ACTIVE: docker
+      # Datasource: nomi attesi dal backend (NON DB_HOST/DB_NAME generici).
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      # Segreti firma token/JWT (HS256).
+      VELVET_TOKEN_SECRET: ${JWT_SECRET}
+      VELVET_AUTH_JWT_SECRET: ${JWT_SECRET}
+      # URL pubblico del sito (link "Gestisci"/"Recensione", SEO).
+      VELVET_PUBLIC_FRONTEND_URL: ${SITE_BASE_URL}
+      # CORS: origini frontend autorizzate (mappa su velvet.cors.allowed-origins).
+      VELVET_CORS_ALLOWED_ORIGINS: ${CORS_ORIGINS}
+      # Super admin: prima installazione via setup-token (UI). Opzionali.
+      VELVET_SUPER_ADMIN_USERNAME: ${VELVET_SUPER_ADMIN_USERNAME:-}
+      VELVET_SUPER_ADMIN_PASSWORD: ${VELVET_SUPER_ADMIN_PASSWORD:-}
+      VELVET_SUPER_ADMIN_SETUP_TOKEN: ${VELVET_SUPER_ADMIN_SETUP_TOKEN:-}
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75.0"
+    volumes:
+      # Stessa build SPA montata anche qui: il backend legge index.html per il SSR dell'head.
+      - ./frontend-web-dist:/app/web:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - edge        # raggiungibile da nginx
+      - backplane   # raggiunge db + redis
+    expose:
+      - "8080"      # NON pubblicato sull'host: solo rete interna
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.50"
+          memory: 1024M
+        reservations:
+          memory: 512M
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL + PostGIS (ISOLATO: nessuna porta sull'host)
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgis/postgis:16-3.4
+    <<: *hardening
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - backplane    # SOLO rete interna -> non raggiungibile da Internet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 1024M
+
+  # ---------------------------------------------------------------------------
+  # Redis (ISOLATO) — refresh token rotation, cache
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7.4-alpine
+    <<: *hardening
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--save", "60", "1", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - backplane    # SOLO rete interna
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M

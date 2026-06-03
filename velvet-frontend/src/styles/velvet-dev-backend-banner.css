@@ -1,0 +1,20 @@
+.velvet-dev-backend-banner {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  margin: 0;
+  padding: 0.65rem 1rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #fffbeb;
+  background: linear-gradient(90deg, #b45309 0%, #c2410c 100%);
+  border-bottom: 2px solid #0a0a0a;
+  box-shadow: 0 4px 16px rgba(124, 45, 18, 0.35);
+}
+
+.velvet-dev-backend-banner code {
+  font-size: 0.78rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.22);
+}

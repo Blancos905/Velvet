@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Dopo `flutter create`: cleartext HTTP in dev (Android) e ATS locale (iOS).
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# iOS build fuori da iCloud Desktop (vedi run-dev-ios.sh).
+IOS_BUILD_LINK="build/ios"
+IOS_BUILD_TMP="${VELVET_IOS_BUILD_DIR:-/tmp/velvet-app-build-ios}"
+mkdir -p "$IOS_BUILD_TMP"
+if [[ ! -L "$IOS_BUILD_LINK" ]]; then
+  rm -rf "$IOS_BUILD_LINK"
+  ln -s "$IOS_BUILD_TMP" "$IOS_BUILD_LINK"
+fi
+
+ANDROID_MANIFEST="android/app/src/main/AndroidManifest.xml"
+if [[ -f "$ANDROID_MANIFEST" ]]; then
+  if ! grep -q 'usesCleartextTraffic' "$ANDROID_MANIFEST"; then
+    perl -0pi -e 's/<application/<application android:usesCleartextTraffic="true"/' "$ANDROID_MANIFEST"
+    echo "Android: usesCleartextTraffic abilitato per dev HTTP (10.0.2.2:5173, LAN)."
+  fi
+fi
+
+IOS_PLIST="ios/Runner/Info.plist"
+if [[ -f "$IOS_PLIST" ]]; then
+  if ! grep -q 'NSAllowsLocalNetworking' "$IOS_PLIST"; then
+    /usr/libexec/PlistBuddy -c "Add :NSAppTransportSecurity dict" "$IOS_PLIST" 2>/dev/null || true
+    /usr/libexec/PlistBuddy -c "Add :NSAppTransportSecurity:NSAllowsLocalNetworking bool true" "$IOS_PLIST" 2>/dev/null || \
+      /usr/libexec/PlistBuddy -c "Set :NSAppTransportSecurity:NSAllowsLocalNetworking true" "$IOS_PLIST"
+    echo "iOS: NSAllowsLocalNetworking abilitato per dev HTTP (127.0.0.1:5173)."
+  fi
+fi

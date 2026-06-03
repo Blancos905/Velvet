@@ -1,0 +1,1634 @@
+/* Pagina piani salone — Free / Premium */
+
+.velvet-plans-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 3.5rem;
+}
+
+.velvet-plans-hero {
+  text-align: center;
+  padding: clamp(1.5rem, 4vw, 2.75rem) 0 clamp(1.25rem, 3vw, 2rem);
+  position: relative;
+}
+
+.velvet-plans-hero::after {
+  content: "";
+  display: block;
+  width: min(420px, 80%);
+  height: 1px;
+  margin: 1.5rem auto 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(253, 186, 116, 0.55),
+    rgba(249, 115, 22, 0.85),
+    rgba(253, 186, 116, 0.55),
+    transparent
+  );
+}
+
+.velvet-plans-kicker {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(253, 186, 116, 0.85);
+  margin: 0 0 0.65rem;
+}
+
+.velvet-plans-title {
+  font-size: clamp(1.65rem, 4.2vw, 2.35rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: #fffbeb;
+  margin: 0;
+  line-height: 1.12;
+  text-shadow: 0 2px 24px rgba(45, 16, 6, 0.55);
+}
+
+.velvet-plans-lead {
+  margin: 1rem auto 0;
+  max-width: 36em;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: rgba(255, 251, 235, 0.78);
+}
+
+.velvet-plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  align-items: stretch;
+  margin-top: 0.5rem;
+}
+
+@keyframes velvet-plan-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Card piani: stessa famiglia di .velvet-search-card + micro-interazioni */
+.velvet-plans-grid > .velvet-plan-card {
+  animation: velvet-plan-card-enter 0.62s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.velvet-plans-grid > .velvet-plan-card:nth-child(1) {
+  animation-delay: 0.04s;
+}
+
+.velvet-plans-grid > .velvet-plan-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.velvet-plans-grid > .velvet-plan-card:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.velvet-plans-grid > .velvet-plan-card:nth-child(n + 4) {
+  animation-delay: 0.22s;
+}
+
+.velvet-plan-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1.35rem 1.35rem 1.5rem;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.04) 0%, transparent 42%),
+    linear-gradient(165deg, #0a0a0a 0%, #141414 42%, #0c0c0c 100%);
+  border: 2px solid #000000;
+  box-shadow:
+    0 1px 0 rgba(255, 247, 237, 0.06) inset,
+    0 4px 0 rgba(0, 0, 0, 0.55),
+    0 22px 48px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 0, 0, 0.65);
+  transition:
+    transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.28s ease,
+    box-shadow 0.32s ease,
+    background 0.4s ease,
+    filter 0.32s ease;
+}
+
+/* Striscia laterale (card non in evidenza: la featured usa ::before per il badge) */
+.velvet-plan-card:not(.velvet-plan-card--featured)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14%;
+  bottom: 14%;
+  width: 3px;
+  border-radius: 0 5px 5px 0;
+  background: linear-gradient(180deg, rgba(253, 186, 116, 0.95) 0%, rgba(249, 115, 22, 0.55) 45%, rgba(234, 88, 12, 0.2) 100%);
+  box-shadow: 0 0 14px rgba(249, 115, 22, 0.35);
+  opacity: 0.75;
+  pointer-events: none;
+  z-index: 0;
+  transform: scaleY(0.92);
+  transform-origin: center;
+  transition:
+    opacity 0.3s ease,
+    transform 0.35s cubic-bezier(0.34, 1.46, 0.64, 1),
+    filter 0.3s ease;
+}
+
+.velvet-plan-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background:
+    radial-gradient(120% 85% at 100% 0%, rgba(243, 112, 33, 0.28), transparent 55%),
+    radial-gradient(90% 60% at 0% 100%, rgba(251, 146, 60, 0.08), transparent 50%);
+}
+
+.velvet-plan-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (hover: hover) {
+  .velvet-plan-card:hover {
+    transform: translateY(-6px) scale(1.015);
+    border-color: rgba(251, 146, 60, 0.35);
+    filter: brightness(1.04);
+    background:
+      linear-gradient(155deg, rgba(255, 255, 255, 0.07) 0%, transparent 48%),
+      linear-gradient(165deg, #121212 0%, #1a1a1a 40%, #101010 100%);
+    box-shadow:
+      0 1px 0 rgba(255, 247, 237, 0.1) inset,
+      0 7px 0 rgba(0, 0, 0, 0.52),
+      0 32px 68px rgba(0, 0, 0, 0.58),
+      0 0 0 1px rgba(251, 146, 60, 0.42),
+      0 0 56px rgba(243, 112, 33, 0.22);
+  }
+
+  .velvet-plan-card:hover::after {
+    opacity: 1;
+  }
+
+  .velvet-plan-card:not(.velvet-plan-card--featured):hover::before {
+    opacity: 1;
+    transform: scaleY(1);
+    filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.5));
+  }
+}
+
+.velvet-plan-card:active {
+  transform: translateY(-2px) scale(1.008);
+  filter: brightness(0.98);
+  transition-duration: 0.1s;
+}
+
+.velvet-plan-card:focus-within {
+  border-color: rgba(251, 146, 60, 0.45);
+  outline: none;
+  box-shadow:
+    0 1px 0 rgba(255, 247, 237, 0.08) inset,
+    0 4px 0 rgba(0, 0, 0, 0.55),
+    0 22px 52px rgba(0, 0, 0, 0.52),
+    0 0 0 1px rgba(251, 146, 60, 0.45),
+    0 0 0 3px rgba(249, 115, 22, 0.22),
+    0 0 48px rgba(243, 112, 33, 0.18);
+}
+
+/* Come .velvet-search-card--page-lead: alone arancio un po’ più marcato */
+.velvet-plan-card--featured {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+    linear-gradient(165deg, #000000 0%, #121212 48%, #0a0a0a 100%);
+  border: 2px solid #000000;
+  box-shadow:
+    inset 4px 0 0 rgba(249, 115, 22, 0.65),
+    0 1px 0 rgba(255, 247, 237, 0.06) inset,
+    0 4px 0 rgba(0, 0, 0, 0.6),
+    0 26px 56px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(251, 146, 60, 0.22),
+    0 0 40px rgba(243, 112, 33, 0.14);
+}
+
+@media (hover: hover) {
+  /* Stessa specificità del blocco statico: altrimenti l’ombra “featured” vince sul :hover generico */
+  .velvet-plan-card--featured:hover {
+    border-color: rgba(251, 146, 60, 0.38);
+    filter: brightness(1.05);
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, transparent 38%),
+      linear-gradient(165deg, #070707 0%, #161616 48%, #0a0a0a 100%);
+    box-shadow:
+      inset 5px 0 0 rgba(251, 146, 60, 0.82),
+      0 1px 0 rgba(255, 247, 237, 0.1) inset,
+      0 7px 0 rgba(0, 0, 0, 0.52),
+      0 32px 70px rgba(0, 0, 0, 0.58),
+      0 0 0 1px rgba(251, 146, 60, 0.42),
+      0 0 56px rgba(243, 112, 33, 0.26);
+  }
+}
+
+.velvet-plan-card--featured::before {
+  content: "Consigliato";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: linear-gradient(165deg, #fdba74, #fb923c 55%, #ea580c);
+  color: #0a0a0a;
+  border: 1px solid #0a0a0a;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    0 6px 18px rgba(243, 112, 33, 0.35);
+  cursor: default;
+  transition:
+    transform 0.28s cubic-bezier(0.34, 1.46, 0.64, 1),
+    box-shadow 0.3s ease,
+    filter 0.25s ease;
+}
+
+@media (hover: hover) {
+  .velvet-plan-card--featured:hover::before {
+    transform: scale(1.06);
+    filter: brightness(1.05);
+    box-shadow:
+      0 2px 0 rgba(0, 0, 0, 0.35),
+      0 8px 22px rgba(243, 112, 33, 0.45);
+  }
+}
+
+.velvet-plan-card__name {
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--sv-orange, #f37021);
+  margin: 0 0 0.2rem;
+  transition:
+    transform 0.32s cubic-bezier(0.34, 1.46, 0.64, 1),
+    letter-spacing 0.35s ease,
+    filter 0.35s ease,
+    color 0.28s ease;
+}
+
+@media (hover: hover) {
+  .velvet-plan-card:hover .velvet-plan-card__name {
+    transform: translateX(3px);
+    letter-spacing: -0.025em;
+    filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.35));
+    color: #fdba74;
+  }
+}
+
+/* —— Prezzo: piani a pagamento (hero number) —— */
+.velvet-plan-card__price-block {
+  position: relative;
+  align-self: stretch;
+  margin: 0.15rem 0 1rem;
+  padding: 0.85rem 1rem 0.75rem;
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(165deg, #101010 0%, #0a0a0a 55%, #080808 100%);
+  border: 2px solid #000000;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 12px 28px rgba(45, 16, 6, 0.35),
+    0 0 36px rgba(249, 115, 22, 0.12);
+  transition:
+    transform 0.32s cubic-bezier(0.34, 1.46, 0.64, 1),
+    border-color 0.28s ease,
+    box-shadow 0.35s ease;
+}
+
+.velvet-plan-card__price-orbit {
+  position: absolute;
+  inset: -40%;
+  border-radius: 50%;
+  z-index: 0;
+  opacity: 0.35;
+  background: conic-gradient(
+    from 210deg,
+    rgba(249, 115, 22, 0.45),
+    rgba(253, 186, 116, 0.08),
+    rgba(251, 146, 60, 0.35),
+    rgba(249, 115, 22, 0.45)
+  );
+  filter: blur(28px);
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  transition:
+    opacity 0.4s ease,
+    transform 0.45s ease;
+}
+
+.velvet-plan-card[data-tier="PREMIUM"] .velvet-plan-card__price-orbit {
+  background: conic-gradient(
+    from 120deg,
+    rgba(249, 115, 22, 0.42),
+    rgba(253, 186, 116, 0.12),
+    rgba(251, 146, 60, 0.35),
+    rgba(249, 115, 22, 0.42)
+  );
+}
+
+.velvet-plan-card[data-tier="BASE"] .velvet-plan-card__price-orbit {
+  background: conic-gradient(
+    from 200deg,
+    rgba(249, 115, 22, 0.36),
+    rgba(253, 186, 116, 0.1),
+    rgba(251, 146, 60, 0.28),
+    rgba(249, 115, 22, 0.36)
+  );
+}
+
+.velvet-plan-card__price-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.12rem 0.35rem;
+  line-height: 0.85;
+}
+
+.velvet-plan-card__price-value {
+  font-size: clamp(2.35rem, 7vw, 2.85rem);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 0.95;
+  background: linear-gradient(165deg, #fffbeb 0%, #fde68a 35%, #fb923c 72%, #ea580c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 14px rgba(234, 88, 12, 0.35));
+  transition:
+    filter 0.35s ease,
+    transform 0.32s cubic-bezier(0.34, 1.46, 0.64, 1);
+}
+
+.velvet-plan-card[data-tier="PREMIUM"] .velvet-plan-card__price-value {
+  background: linear-gradient(165deg, #fffbeb 0%, #fde68a 32%, #fb923c 68%, #ea580c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 2px 14px rgba(234, 88, 12, 0.35));
+}
+
+.velvet-plan-card__price-value--label {
+  font-size: clamp(2rem, 6vw, 2.65rem);
+  letter-spacing: -0.045em;
+  text-transform: none;
+}
+
+.velvet-plan-card__price-euro {
+  font-size: clamp(1.15rem, 3.5vw, 1.45rem);
+  font-weight: 800;
+  color: rgba(255, 251, 235, 0.88);
+  transform: translateY(-0.35em);
+  text-shadow: 0 1px 0 rgba(45, 16, 6, 0.5);
+  transition:
+    color 0.25s ease,
+    transform 0.3s cubic-bezier(0.34, 1.46, 0.64, 1);
+}
+
+.velvet-plan-card__price-period {
+  position: relative;
+  z-index: 1;
+  margin: 0.55rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(253, 186, 116, 0.72);
+  transition:
+    color 0.28s ease,
+    letter-spacing 0.35s ease;
+}
+
+.velvet-plan-card--featured .velvet-plan-card__price-block {
+  border-color: rgba(249, 115, 22, 0.38);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 237, 0.08) inset,
+    0 14px 36px rgba(234, 88, 12, 0.2),
+    0 0 32px rgba(249, 115, 22, 0.1);
+}
+
+.velvet-plan-card[data-tier="PREMIUM"] .velvet-plan-card__price-block {
+  border-color: rgba(251, 146, 60, 0.35);
+}
+
+.velvet-plan-card[data-tier="BASE"] .velvet-plan-card__price-block {
+  border-color: rgba(255, 237, 213, 0.16);
+}
+
+@media (hover: hover) {
+  .velvet-plan-card:hover .velvet-plan-card__price-block {
+    transform: translateY(-3px) scale(1.02);
+    border-color: rgba(253, 186, 116, 0.42);
+    box-shadow:
+      0 1px 0 rgba(255, 247, 237, 0.1) inset,
+      0 16px 36px rgba(45, 16, 6, 0.42),
+      0 0 44px rgba(249, 115, 22, 0.22);
+  }
+
+  .velvet-plan-card:hover .velvet-plan-card__price-orbit {
+    opacity: 0.52;
+    transform: rotate(18deg) scale(1.04);
+  }
+
+  .velvet-plan-card:hover .velvet-plan-card__price-value,
+  .velvet-plan-card:hover .velvet-plan-card__price-value--label {
+    filter: drop-shadow(0 4px 22px rgba(249, 115, 22, 0.5));
+    transform: translateY(-1px);
+  }
+
+  .velvet-plan-card:hover .velvet-plan-card__price-euro {
+    color: #fffbeb;
+    transform: translateY(-0.45em) scale(1.05);
+  }
+
+  .velvet-plan-card:hover .velvet-plan-card__price-period {
+    color: rgba(254, 215, 170, 0.95);
+    letter-spacing: 0.2em;
+  }
+}
+
+.velvet-plan-card__tagline {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: rgba(255, 251, 235, 0.68);
+  margin: 0 0 1rem;
+  min-height: 2.8em;
+  transition:
+    color 0.28s ease,
+    transform 0.3s cubic-bezier(0.34, 1.46, 0.64, 1);
+}
+
+@media (hover: hover) {
+  .velvet-plan-card:hover .velvet-plan-card__tagline {
+    color: rgba(255, 251, 235, 0.82);
+    transform: translateY(-1px);
+  }
+}
+
+.velvet-plan-card__list {
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  flex: 1 1 auto;
+  color: rgba(255, 251, 235, 0.88);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.velvet-plan-card__list li {
+  margin-bottom: 0.45rem;
+  transition:
+    color 0.22s ease,
+    transform 0.22s ease;
+  transform: translateX(0);
+}
+
+.velvet-plan-card__list li::marker {
+  color: rgba(249, 115, 22, 0.75);
+  transition: color 0.22s ease;
+}
+
+@media (hover: hover) {
+  .velvet-plan-card:hover .velvet-plan-card__list li {
+    color: rgba(255, 251, 235, 0.95);
+  }
+
+  .velvet-plan-card:hover .velvet-plan-card__list li::marker {
+    color: rgba(254, 215, 170, 0.95);
+  }
+
+  .velvet-plan-card:hover .velvet-plan-card__list li:nth-child(1) {
+    transform: translateX(3px);
+    transition-delay: 0s;
+  }
+
+  .velvet-plan-card:hover .velvet-plan-card__list li:nth-child(2) {
+    transform: translateX(3px);
+    transition-delay: 0.04s;
+  }
+
+  .velvet-plan-card:hover .velvet-plan-card__list li:nth-child(3) {
+    transform: translateX(3px);
+    transition-delay: 0.08s;
+  }
+
+  .velvet-plan-card:hover .velvet-plan-card__list li:nth-child(n + 4) {
+    transform: translateX(3px);
+    transition-delay: 0.12s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .velvet-plans-grid > .velvet-plan-card {
+    animation: none !important;
+  }
+
+  .velvet-plan-card,
+  .velvet-plan-card:not(.velvet-plan-card--featured)::before,
+  .velvet-plan-card::after,
+  .velvet-plan-card__name,
+  .velvet-plan-card__price-block,
+  .velvet-plan-card__price-orbit,
+  .velvet-plan-card__price-value,
+  .velvet-plan-card__price-value--label,
+  .velvet-plan-card__price-euro,
+  .velvet-plan-card__price-period,
+  .velvet-plan-card__tagline,
+  .velvet-plan-card__list li,
+  .velvet-plan-cta,
+  .velvet-plan-card--featured::before,
+  .velvet-plan-premium-preview,
+  .velvet-plan-premium-preview__chip,
+  .velvet-plan-premium-preview__step,
+  .velvet-plan-premium-preview__step-action {
+    transition-duration: 0.01ms !important;
+  }
+
+  .velvet-plan-card:hover,
+  .velvet-plan-card:active,
+  .velvet-plan-card:focus-within {
+    transform: none;
+  }
+
+  .velvet-plan-card:hover::after {
+    opacity: 0;
+  }
+
+  @media (hover: hover) {
+    .velvet-plan-card--featured:hover {
+      border-color: #000000;
+      filter: none;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+        linear-gradient(165deg, #000000 0%, #121212 48%, #0a0a0a 100%);
+      box-shadow:
+        inset 4px 0 0 rgba(249, 115, 22, 0.65),
+        0 1px 0 rgba(255, 247, 237, 0.06) inset,
+        0 4px 0 rgba(0, 0, 0, 0.6),
+        0 26px 56px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(251, 146, 60, 0.22),
+        0 0 40px rgba(243, 112, 33, 0.14);
+    }
+
+    .velvet-plan-card:hover .velvet-plan-cta:not(:disabled) {
+      transform: none;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+    }
+
+    .velvet-plan-card:hover .velvet-plan-card__price-block,
+    .velvet-plan-card:hover .velvet-plan-card__price-orbit,
+    .velvet-plan-card:hover .velvet-plan-card__price-value,
+    .velvet-plan-card:hover .velvet-plan-card__price-value--label,
+    .velvet-plan-card:hover .velvet-plan-card__price-euro,
+    .velvet-plan-card:hover .velvet-plan-card__list li,
+    .velvet-plan-card:hover .velvet-plan-card__tagline,
+    .velvet-plan-card:hover .velvet-plan-card__name {
+      transform: none;
+    }
+
+    .velvet-plan-card:hover .velvet-plan-card__price-period {
+      letter-spacing: 0.18em;
+    }
+
+    .velvet-plan-card--featured:hover::before {
+      transform: none;
+    }
+
+    .velvet-plan-card[data-tier="PREMIUM"]:hover .velvet-plan-premium-preview,
+    .velvet-plan-card[data-tier="PREMIUM"]:hover .velvet-plan-premium-preview__chip,
+    .velvet-plan-card[data-tier="PREMIUM"]:hover .velvet-plan-premium-preview__step-action {
+      transform: none;
+    }
+  }
+}
+
+.velvet-plan-cta {
+  margin-top: 1.25rem;
+  width: 100%;
+  padding: 0.62rem 1.35rem;
+  font-size: 0.92rem;
+  font-weight: 800;
+  font-family: var(--velvet-font);
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.65);
+  cursor: pointer;
+  color: #0a0a0a;
+  background: linear-gradient(180deg, #fdba74, #fb923c);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35), 0 8px 24px rgba(243, 112, 33, 0.35);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.28s ease,
+    transform 0.28s cubic-bezier(0.34, 1.46, 0.64, 1);
+}
+
+/* Pulsante registrazione sulle card: gerarchia tra «Registrati», «con piano» e nome piano */
+.velvet-plan-card .velvet-plan-card__cta-line {
+  display: inline;
+  line-height: 1.45;
+}
+
+.velvet-plan-card .velvet-plan-card__cta-lead {
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.86em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.velvet-plan-card .velvet-plan-card__cta-mid {
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  font-size: 0.88em;
+  opacity: 0.9;
+}
+
+.velvet-plan-card .velvet-plan-card__cta-plan {
+  font-weight: 950;
+  letter-spacing: 0.05em;
+  font-size: 1.02em;
+  padding: 0.1em 0.42em 0.12em;
+  margin-left: 0.04em;
+  border-radius: 0.4em;
+  background: rgba(0, 0, 0, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.22);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.velvet-plan-card[data-tier="PREMIUM"] .velvet-plan-card__cta-plan {
+  background: rgba(0, 0, 0, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 180, 0.22),
+    0 0 0 1px rgba(0, 0, 0, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.25);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.25),
+    0 0 14px rgba(255, 255, 255, 0.12);
+}
+
+@media (hover: hover) {
+  .velvet-plan-card:hover .velvet-plan-cta:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow:
+      0 4px 0 rgba(0, 0, 0, 0.32),
+      0 12px 28px rgba(249, 115, 22, 0.28);
+  }
+}
+
+.velvet-plan-cta:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35), 0 12px 28px rgba(243, 112, 33, 0.42);
+}
+
+.velvet-plan-cta:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.velvet-plan-cta--secondary {
+  color: rgba(255, 251, 235, 0.92);
+  background: transparent;
+  border-radius: 999px;
+  border: 2px solid rgba(253, 186, 116, 0.45);
+  box-shadow: none;
+}
+
+.velvet-plan-cta--secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(253, 186, 116, 0.75);
+  transform: none;
+  box-shadow: none;
+}
+
+.velvet-plans-footnote {
+  margin-top: 2rem;
+  padding: 1rem 1.2rem;
+  border-radius: 14px;
+  background: rgba(10, 10, 10, 0.28);
+  border: 1px solid rgba(255, 237, 213, 0.12);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: rgba(255, 251, 235, 0.58);
+}
+
+/* —— Modulo registrazione (stessa pagina) —— */
+.velvet-plans-modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vh, 2.5rem) 1rem;
+  overflow: auto;
+  background: rgba(12, 6, 4, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.velvet-plans-modal {
+  box-sizing: border-box;
+  width: min(440px, 100%);
+  margin-top: min(5vh, 2.5rem);
+  margin-bottom: min(5vh, 2.5rem);
+  border-radius: 1.35rem;
+  padding: 1.35rem 1.35rem 1.5rem;
+  background: linear-gradient(180deg, #0a0a0a 0%, #000000 52%, #121212 100%);
+  border: 2px solid rgba(251, 146, 60, 0.55);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.45),
+    0 20px 48px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(251, 146, 60, 0.14);
+}
+
+.velvet-plans-modal--free-notice {
+  width: min(480px, calc(100vw - 1.5rem));
+}
+
+.velvet-plans-modal--free-notice .velvet-plans-modal__title {
+  color: #fb923c;
+  text-shadow: 0 0 28px rgba(249, 115, 22, 0.28);
+}
+
+/* Registrazione titolare (/piani) — titolo a due livelli */
+.velvet-plans-modal--salon-register .velvet-plans-modal__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.45rem;
+}
+
+.velvet-plans-modal--salon-register .velvet-plans-modal__title-kicker {
+  font-size: 0.68em;
+  font-weight: 750;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 237, 213, 0.72);
+  text-shadow: 0 0 18px rgba(251, 146, 60, 0.22);
+}
+
+.velvet-plans-modal--salon-register .velvet-plans-modal__title-sep {
+  font-size: 0.85em;
+  font-weight: 500;
+  color: rgba(255, 251, 235, 0.28);
+  letter-spacing: 0.08em;
+}
+
+.velvet-plans-modal--salon-register:not(.velvet-plans-modal--salon-register-premium) .velvet-plans-modal__title-plan {
+  font-size: 1.06em;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #fff4e6;
+  text-shadow:
+    0 0 28px rgba(249, 115, 22, 0.55),
+    0 0 12px rgba(251, 146, 60, 0.45),
+    0 1px 0 rgba(0, 0, 0, 0.4),
+    0 2px 14px rgba(234, 88, 12, 0.35);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .velvet-plans-modal--salon-register:not(.velvet-plans-modal--salon-register-premium) .velvet-plans-modal__title-plan {
+    background: linear-gradient(105deg, #fffbeb 0%, #fdba74 42%, #fb923c 78%, #f97316 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.35)) drop-shadow(0 0 20px rgba(249, 115, 22, 0.42));
+  }
+}
+
+/* Registrazione Premium: pannello più ricco + arancio più acceso */
+.velvet-plans-modal--salon-register-premium {
+  position: relative;
+  isolation: isolate;
+  border-color: rgba(255, 120, 0, 0.72);
+  background:
+    radial-gradient(115% 65% at 100% -8%, rgba(255, 94, 0, 0.16), transparent 52%),
+    radial-gradient(75% 50% at -5% 102%, rgba(234, 88, 12, 0.12), transparent 55%),
+    linear-gradient(185deg, #120805 0%, #000000 46%, #0f0c0a 100%);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.48),
+    0 26px 58px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 120, 0, 0.28),
+    0 0 52px rgba(255, 94, 0, 0.28),
+    inset 0 1px 0 rgba(255, 160, 90, 0.26),
+    inset 0 -1px 0 rgba(234, 88, 12, 0.08);
+  transition:
+    border-color 0.32s ease,
+    box-shadow 0.38s ease;
+}
+
+.velvet-plans-modal--salon-register-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+  background: linear-gradient(
+    125deg,
+    rgba(255, 120, 0, 0.12) 0%,
+    transparent 38%,
+    transparent 62%,
+    rgba(251, 88, 0, 0.06) 100%
+  );
+}
+
+.velvet-plans-modal--salon-register-premium::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 140, 60, 0.12),
+    inset 0 0 48px rgba(255, 100, 0, 0.06);
+}
+
+.velvet-plans-modal--salon-register-premium > * {
+  position: relative;
+  z-index: 1;
+}
+
+.velvet-plans-modal--salon-register-premium .velvet-plans-modal__title-kicker {
+  color: rgba(255, 228, 200, 0.62);
+  text-shadow: 0 0 22px rgba(255, 100, 0, 0.28);
+}
+
+.velvet-plans-modal--salon-register-premium .velvet-plans-modal__title-sep {
+  color: rgba(255, 200, 150, 0.35);
+}
+
+.velvet-plans-modal--salon-register-premium .velvet-plans-modal__title-plan {
+  font-size: 1.1em;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  color: #fff4e8;
+  text-shadow:
+    0 0 36px rgba(255, 100, 0, 0.55),
+    0 0 14px rgba(255, 140, 80, 0.4),
+    0 1px 0 rgba(0, 0, 0, 0.48),
+    0 2px 18px rgba(255, 94, 0, 0.38);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .velvet-plans-modal--salon-register-premium .velvet-plans-modal__title-plan {
+    background: linear-gradient(102deg, #fffaf0 0%, #ffd8a8 28%, #ff9238 55%, #ff6b18 92%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.42)) drop-shadow(0 0 26px rgba(255, 120, 0, 0.55)) drop-shadow(0 0 10px rgba(255, 180, 100, 0.35));
+  }
+}
+
+.velvet-plans-modal--salon-register-premium .velvet-plans-modal__close:hover:not(:disabled) {
+  background: rgba(255, 100, 0, 0.38);
+  color: #fff7ed;
+}
+
+.velvet-plans-modal--salon-register-premium .velvet-plans-field {
+  color: rgba(255, 186, 120, 0.95);
+}
+
+.velvet-plans-modal--salon-register-premium .velvet-plans-field input:focus,
+.velvet-plans-modal--salon-register-premium .velvet-plans-field .velvet-plans-password-wrap input:focus {
+  border-color: rgba(255, 120, 40, 0.88);
+  box-shadow:
+    0 0 0 3px rgba(255, 100, 0, 0.28),
+    0 0 22px rgba(255, 94, 0, 0.12);
+}
+
+.velvet-plans-modal--salon-register-premium .velvet-plans-password-toggle {
+  color: #ff9238;
+  background: rgba(255, 100, 0, 0.14);
+}
+
+.velvet-plans-modal--salon-register-premium .velvet-plans-password-toggle:hover:not(:disabled) {
+  color: #ffd4a8;
+  background: rgba(255, 100, 0, 0.26);
+}
+
+.velvet-plans-modal--salon-register-premium .velvet-plans-password-toggle:focus-visible {
+  outline-color: #ff7a1a;
+}
+
+.velvet-plans-modal--salon-register-premium.velvet-plans-modal--wide {
+  scrollbar-color: rgba(255, 120, 0, 0.55) transparent;
+}
+
+.velvet-plans-modal--salon-register-premium.velvet-plans-modal--wide::-webkit-scrollbar-thumb {
+  background: rgba(255, 120, 0, 0.42);
+  background-clip: padding-box;
+}
+
+.velvet-plans-modal--salon-register-premium.velvet-plans-modal--wide::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 120, 0, 0.58);
+  background-clip: padding-box;
+}
+
+.velvet-plans-modal--salon-register-premium:focus-within {
+  border-color: rgba(255, 130, 20, 0.88);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.48),
+    0 28px 64px rgba(0, 0, 0, 0.58),
+    0 0 0 1px rgba(255, 130, 40, 0.42),
+    0 0 64px rgba(255, 100, 0, 0.35),
+    inset 0 1px 0 rgba(255, 170, 100, 0.32),
+    inset 0 -1px 0 rgba(234, 88, 12, 0.1);
+}
+
+.velvet-plans-modal--salon-register-premium:focus-within::after {
+  opacity: 1;
+}
+
+.velvet-plans-modal--salon-register-premium .velvet-plans-modal__section-title {
+  color: rgba(255, 186, 130, 0.98);
+  text-shadow: 0 0 20px rgba(255, 100, 0, 0.18);
+}
+
+.velvet-plans-modal--salon-register-premium.velvet-plans-modal--wide .velvet-plans-password-pair::before,
+.velvet-plans-modal--salon-register-premium.velvet-plans-modal--wide label.velvet-plans-field:has(input[name="salonAddressLine1"])::before {
+  color: rgba(255, 186, 120, 0.95);
+}
+
+.velvet-plans-modal--wide {
+  width: min(680px, calc(100vw - 1.25rem));
+  border-radius: 1.35rem;
+  max-height: min(92vh, 900px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 146, 60, 0.45) transparent;
+}
+
+.velvet-plans-modal--wide::-webkit-scrollbar {
+  width: 9px;
+}
+
+.velvet-plans-modal--wide::-webkit-scrollbar-thumb {
+  background: rgba(251, 146, 60, 0.35);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.velvet-plans-modal--wide::-webkit-scrollbar-thumb:hover {
+  background: rgba(251, 146, 60, 0.5);
+  background-clip: padding-box;
+}
+
+/* Modulo largo (BASE / Premium): sezioni come nel resto dei form piani */
+.velvet-plans-modal--salon-register.velvet-plans-modal--wide label.velvet-plans-field:has(input[name="salonAddressLine1"]) {
+  margin-top: 0.35rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 237, 213, 0.14);
+  grid-column: 1 / -1;
+}
+
+.velvet-plans-modal--salon-register.velvet-plans-modal--wide label.velvet-plans-field:has(input[name="salonAddressLine1"])::before {
+  content: "Sede del salone";
+  display: block;
+  margin: 0 0 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(253, 186, 116, 0.88);
+}
+
+/* Password + conferma: stessa riga, allineate (tutti i moduli .velvet-plans-modal__form) */
+.velvet-plans-password-pair {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem 0.95rem;
+  align-items: start;
+}
+
+.velvet-plans-password-pair > .velvet-plans-field {
+  min-width: 0;
+}
+
+.velvet-plans-modal--salon-register.velvet-plans-modal--wide .velvet-plans-password-pair {
+  margin-top: 0.35rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 237, 213, 0.14);
+}
+
+.velvet-plans-modal--salon-register.velvet-plans-modal--wide .velvet-plans-password-pair::before {
+  content: "Credenziali di accesso";
+  display: block;
+  grid-column: 1 / -1;
+  margin: 0 0 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(253, 186, 116, 0.85);
+}
+
+.velvet-plans-modal__section {
+  grid-column: 1 / -1;
+  margin: 0.35rem 0 0.15rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 237, 213, 0.14);
+}
+
+.velvet-plans-modal__section-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(253, 186, 116, 0.92);
+}
+
+.velvet-plans-modal__section-lead {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: rgba(255, 251, 235, 0.62);
+}
+
+.velvet-plans-modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.velvet-plans-modal__title {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.6vw, 1.28rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fffbeb;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.velvet-plans-modal__close {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  color: rgba(255, 251, 235, 0.85);
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.15s ease;
+}
+
+.velvet-plans-modal__close:hover:not(:disabled) {
+  background: rgba(249, 115, 22, 0.35);
+}
+
+.velvet-plans-modal__close:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.velvet-plans-modal__intro {
+  margin: 0 0 1.1rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(255, 251, 235, 0.68);
+}
+
+.velvet-plans-modal__note {
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: rgba(255, 251, 235, 0.72);
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 237, 213, 0.1);
+}
+
+.velvet-plans-modal__alert {
+  margin: 0 0 1rem;
+}
+
+.velvet-plans-modal__form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem 0.95rem;
+}
+
+.velvet-plans-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(253, 186, 116, 0.88);
+}
+
+.velvet-plans-field--full {
+  grid-column: 1 / -1;
+}
+
+/* Tipologie salone (registrazione /piani — selezione multipla) */
+.velvet-plans-fieldset.velvet-plans-salon-types {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.velvet-plans-salon-types__legend {
+  float: none;
+  width: auto;
+  padding: 0;
+  margin: 0 0 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(253, 186, 116, 0.88);
+}
+
+.velvet-plans-salon-types__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.55rem;
+}
+
+.velvet-plans-salon-type-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  color: rgba(255, 251, 235, 0.82);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 237, 213, 0.18);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.22s ease,
+    transform 0.18s ease;
+}
+
+.velvet-plans-salon-type-chip:hover:not(:disabled) {
+  border-color: rgba(251, 146, 60, 0.45);
+  color: #fffbeb;
+  background: rgba(251, 146, 60, 0.1);
+}
+
+.velvet-plans-salon-type-chip:focus-visible {
+  outline: 2px solid rgba(249, 115, 22, 0.75);
+  outline-offset: 2px;
+}
+
+.velvet-plans-salon-type-chip:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.velvet-plans-salon-type-chip--selected {
+  color: #0a0a0a;
+  background: linear-gradient(165deg, #fdba74, #fb923c 55%, #ea580c);
+  border-color: rgba(0, 0, 0, 0.45);
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(251, 146, 60, 0.35),
+    0 6px 18px rgba(243, 112, 33, 0.28);
+}
+
+@media (hover: hover) {
+  .velvet-plans-salon-type-chip--selected:hover:not(:disabled) {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+  }
+}
+
+.velvet-plans-modal--salon-register-premium .velvet-plans-salon-type-chip:hover:not(:disabled) {
+  border-color: rgba(255, 130, 60, 0.55);
+  background: rgba(255, 100, 0, 0.14);
+}
+
+.velvet-plans-modal--salon-register-premium .velvet-plans-salon-type-chip--selected {
+  background: linear-gradient(165deg, #ffc48a, #ff9238 52%, #f97316);
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(255, 140, 80, 0.45),
+    0 8px 22px rgba(255, 100, 0, 0.32);
+}
+
+.velvet-plans-field--check {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-weight: 500;
+  color: rgba(255, 251, 235, 0.78);
+}
+
+.velvet-plans-field--check input {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.velvet-plans-field input[type="text"],
+.velvet-plans-field input[type="email"],
+.velvet-plans-field input[type="tel"],
+.velvet-plans-field input[type="password"],
+.velvet-plans-field .velvet-plans-password-wrap input {
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #fffbeb;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 237, 213, 0.2);
+  background: rgba(0, 0, 0, 0.35);
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.velvet-plans-field .velvet-plans-password-wrap input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 2.75rem;
+}
+
+.velvet-plans-field input:focus,
+.velvet-plans-field .velvet-plans-password-wrap input:focus {
+  border-color: rgba(251, 146, 60, 0.65);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+}
+
+.velvet-plans-field input::placeholder,
+.velvet-plans-field .velvet-plans-password-wrap input::placeholder {
+  color: rgba(255, 251, 235, 0.35);
+}
+
+.velvet-plans-field input:disabled,
+.velvet-plans-field .velvet-plans-password-wrap input:disabled {
+  opacity: 0.55;
+}
+
+.velvet-plans-password-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.velvet-plans-password-toggle {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  color: #fb923c;
+  background: rgba(251, 146, 60, 0.1);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.velvet-plans-password-toggle:hover:not(:disabled) {
+  color: #fdba74;
+  background: rgba(251, 146, 60, 0.22);
+  transform: translateY(-50%);
+}
+
+.velvet-plans-password-toggle:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.velvet-plans-password-toggle:focus-visible {
+  outline: 2px solid #fb923c;
+  outline-offset: 2px;
+}
+
+.velvet-plans-password-toggle:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.velvet-plans-password-toggle__icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.velvet-plans-modal__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: flex-end;
+  margin-top: 0.35rem;
+}
+
+.velvet-plans-modal__actions .velvet-plan-cta,
+.velvet-plans-modal__actions .velvet-plan-cta--secondary {
+  width: auto;
+  min-width: 7.5rem;
+  margin-top: 0;
+}
+
+@media (max-width: 520px) {
+  .velvet-plan-card--featured::before {
+    position: static;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+
+  .velvet-plans-modal__form {
+    grid-template-columns: 1fr;
+  }
+
+  .velvet-plans-password-pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* —— Pagina /piani (pubblica) — coerente con mesh search-page + card partner —— */
+.velvet-plans-page a.velvet-search-back {
+  text-decoration: none;
+}
+
+.velvet-plans-page .velvet-search-hero .saloni-velvet-mark {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 clamp(0.65rem, 2vw, 0.9rem);
+}
+
+.velvet-plans-page__kicker {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 0.55rem;
+  font-size: clamp(0.95rem, 2.6vw, 1.18rem);
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #0a0a0a;
+  text-shadow:
+    0 1px 0 rgba(255, 251, 235, 0.35),
+    0 0 1px rgba(255, 251, 235, 0.2);
+}
+
+.velvet-plans-page .velvet-plans-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.velvet-plans-page .velvet-alert {
+  position: relative;
+  z-index: 1;
+}
+
+.velvet-plan-cta:not(.velvet-plan-cta--secondary):active:not(:disabled) {
+  transform: translateY(0);
+  background: #ea580c;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* —— /registrati (cliente) — pulsante indietro come ricerca / piani —— */
+.velvet-client-signup-page a.velvet-search-back {
+  text-decoration: none;
+}
+
+/* —— Anteprima panoramica nella card Premium (/piani) —— */
+.velvet-plan-premium-preview {
+  flex: 1 1 auto;
+  margin: 0 0 0.5rem;
+  padding: 0.65rem 0.6rem 0.85rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(253, 186, 116, 0.18);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(43, 20, 14, 0.35));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.35) inset;
+  transition:
+    border-color 0.32s ease,
+    box-shadow 0.38s ease,
+    transform 0.32s cubic-bezier(0.34, 1.46, 0.64, 1),
+    background 0.4s ease;
+}
+
+.velvet-plans-modal .velvet-plan-premium-preview--modal-free {
+  flex: none;
+  margin: 0 0 1.1rem;
+  position: relative;
+  z-index: 1;
+  padding: 1.1rem 1rem 1.15rem;
+  border: 1px solid rgba(251, 146, 60, 0.45);
+  border-radius: 14px;
+  background: #0a0a0a;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.6) inset,
+    0 0 24px rgba(249, 115, 22, 0.12);
+}
+
+.velvet-plans-modal__free-body {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  font-weight: 600;
+  font-style: italic;
+  color: #fb923c;
+  text-shadow: 0 0 28px rgba(249, 115, 22, 0.22);
+}
+
+.velvet-plan-card[data-tier="PREMIUM"] .velvet-plan-card__tagline {
+  margin-bottom: 0.65rem;
+  min-height: 0;
+}
+
+.velvet-plan-premium-preview__row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.55rem;
+}
+
+.velvet-plan-premium-preview__chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.12rem 0.5rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(254, 215, 170, 0.95);
+  background: rgba(249, 115, 22, 0.22);
+  border: 1px solid rgba(253, 186, 116, 0.35);
+  transition:
+    transform 0.28s cubic-bezier(0.34, 1.46, 0.64, 1),
+    border-color 0.25s ease,
+    background 0.28s ease,
+    box-shadow 0.32s ease;
+}
+
+.velvet-plan-premium-preview__features {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(255, 251, 235, 0.88);
+}
+
+.velvet-plan-premium-preview__feature {
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.velvet-plan-premium-preview__feature:last-child {
+  border-bottom: none;
+}
+
+.velvet-plan-premium-preview__steps {
+  margin: 0.5rem 0 0.65rem;
+  padding: 0;
+  list-style: none;
+}
+
+.velvet-plan-premium-preview__step {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+  padding: 0.38rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.74rem;
+  color: rgba(255, 251, 235, 0.82);
+  transition: border-color 0.22s ease;
+}
+
+.velvet-plan-premium-preview__step:last-child {
+  border-bottom: none;
+}
+
+.velvet-plan-premium-preview__step-text {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.velvet-plan-premium-preview__step-action {
+  flex-shrink: 0;
+  font-weight: 800;
+  color: rgba(251, 146, 60, 0.95);
+  transition:
+    color 0.22s ease,
+    transform 0.24s cubic-bezier(0.34, 1.46, 0.64, 1);
+}
+
+@media (hover: hover) {
+  .velvet-plan-card[data-tier="PREMIUM"]:hover .velvet-plan-premium-preview {
+    border-color: rgba(253, 186, 116, 0.48);
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.38) inset,
+      0 12px 32px rgba(0, 0, 0, 0.38),
+      0 0 36px rgba(249, 115, 22, 0.2);
+  }
+
+  .velvet-plan-card[data-tier="PREMIUM"]:hover .velvet-plan-premium-preview__chip {
+    transform: scale(1.06);
+    border-color: rgba(253, 186, 116, 0.55);
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.22);
+  }
+
+  .velvet-plan-card[data-tier="PREMIUM"]:hover .velvet-plan-premium-preview__feature {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .velvet-plan-card[data-tier="PREMIUM"]:hover .velvet-plan-premium-preview__step {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .velvet-plan-card[data-tier="PREMIUM"]:hover .velvet-plan-premium-preview__step-action {
+    color: #fdba74;
+    transform: translateX(3px);
+  }
+}
+
+/* Super admin — scelta provider in creazione salone */
+.velvet-plans-fieldset.velvet-plans-provider {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.velvet-plans-provider__hint {
+  margin: 0 0 0.65rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(255, 251, 235, 0.62);
+}
+
+.velvet-plans-provider__options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.velvet-plans-provider__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: rgba(255, 251, 235, 0.88);
+  cursor: pointer;
+}
+
+.velvet-plans-provider__option input {
+  margin-top: 0.15rem;
+  accent-color: #fb923c;
+}

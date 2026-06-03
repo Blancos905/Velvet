@@ -1,0 +1,5 @@
+/**
+ * Utility Tailwind scoped a `.salon-premium-tw-scope` (vedi tailwind.config.js).
+ * Import globale in main.tsx: evita HMR instabile su salon-premium-panorama.css.
+ */
+@tailwind utilities;

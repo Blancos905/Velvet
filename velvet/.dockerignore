@@ -1,0 +1,10 @@
+target/
+.git/
+.idea/
+*.iml
+data/
+deploy/
+scripts/
+spring-dev.local.env
+spring-dev.local.env.example
+HELP.md

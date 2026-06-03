@@ -1,0 +1,132 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --velvet-orange: #f97316;
+  --velvet-orange-dark: #ea580c;
+  --velvet-orange-soft: #fff7ed;
+  --velvet-orange-deep: #7c2d12;
+  --velvet-black: #0a0a0a;
+  --velvet-gray-900: #171717;
+  --velvet-gray-700: #404040;
+  --velvet-gray-500: #737373;
+  --velvet-white: #fafafa;
+  --velvet-surface: #ffffff;
+  --velvet-font: "DM Sans", system-ui, -apple-system, sans-serif;
+  /* Superfici coerenti con sfondo tutto arancio */
+  --velvet-glass-dark: rgba(67, 20, 7, 0.55);
+  --velvet-glass-mid: rgba(124, 45, 18, 0.5);
+  --velvet-glass-light: rgba(255, 247, 237, 0.14);
+  --velvet-link-warm: #ffedd5;
+  --velvet-link-accent: #fdba74;
+  /* Stesso gradiente ovunque (account, ecc.) — niente “fascia” bianca */
+  --velvet-body-gradient: linear-gradient(
+    168deg,
+    #7c2d12 0%,
+    #9a3412 20%,
+    #c2410c 40%,
+    #ea580c 62%,
+    #fb923c 82%,
+    #fdba74 100%
+  );
+}
+
+/*
+ * Sfondo: un solo `background-attachment: fixed` (su html). Più strati fixed su html/body/#root
+ * causano sbalzi di colore durante lo scroll veloce (compositing / repaint).
+ */
+html {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #9a3412;
+  background-image: var(--velvet-body-gradient);
+  background-attachment: fixed;
+}
+
+body {
+  margin: 0;
+  font-family: var(--velvet-font);
+  color: #e5e5e5;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+.velvet-layout-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: transparent;
+}
+
+/* Area /admin: niente padding del layout pubblico (chrome già nascosto in RootLayout). */
+.velvet-layout-main--admin {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--velvet-orange);
+  outline-offset: 2px;
+}
+
+a.velvet-search-hit {
+  color: #fafafa !important;
+}
+
+a.velvet-search-hit:hover {
+  color: #fdba74 !important;
+}
+
+/* Pagine interne (testo chiaro sul gradiente arancio) */
+.velvet-page-main {
+  padding: 2rem 24px 3rem;
+  max-width: 720px;
+  margin: 0 auto;
+  color: rgba(255, 251, 235, 0.88);
+}
+
+.velvet-page-main > h1 {
+  color: #fffbeb;
+}
+
+/* Altezza vetrina /s/…: simmetrico sopra/sotto verso header e footer. */
+:root {
+  --velvet-immersive-chrome-top: clamp(96px, 17vw, 158px);
+  --velvet-immersive-chrome-bottom: clamp(72px, 12vh, 140px);
+}
+
+.velvet-page-main--salon-showcase-immersive {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: clip;
+}
+
+.velvet-page-salon-after-showcase {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px 1.25rem;
+  box-sizing: border-box;
+}
+
+/* Con vetrina: contatti sotto la card (prenotazione spostata altrove). */
+.velvet-page-salon-meta-below-showcase {
+  margin-top: clamp(0.75rem, 2.5vw, 1.35rem);
+  padding-top: clamp(0.65rem, 2vw, 1.1rem);
+  border-top: 1px solid rgba(255, 251, 235, 0.12);
+}

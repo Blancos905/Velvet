@@ -1,0 +1,162 @@
+.velvet-salon-personal-page {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.velvet-salon-personal-page__topbar {
+  margin-bottom: 1rem;
+}
+
+.velvet-salon-personal-page .velvet-link-back--salon-return {
+  --vlb-return-border: rgba(251, 191, 36, 0.55);
+  --vlb-return-shadow:
+    0 6px 22px rgba(0, 0, 0, 0.38),
+    0 0 24px rgba(251, 191, 36, 0.08);
+  --vlb-return-shadow-hover:
+    0 10px 30px rgba(0, 0, 0, 0.42),
+    0 0 32px rgba(251, 191, 36, 0.14),
+    0 0 0 1px rgba(253, 224, 71, 0.22);
+}
+
+.velvet-salon-personal-page .velvet-link-back--salon-return .velvet-link-back__text {
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
+}
+
+.velvet-salon-personal-hero {
+  margin-bottom: 1.25rem;
+  border-radius: 18px;
+  padding: 1.2rem 1.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: radial-gradient(circle at top left, rgba(254, 249, 195, 0.14), rgba(15, 23, 42, 0.92));
+}
+
+.velvet-salon-personal-hero__eyebrow {
+  margin: 0 0 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(251, 191, 36, 0.95);
+}
+
+.velvet-salon-personal-hero__title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.5vw, 1.95rem);
+  color: #fffbeb;
+}
+
+.velvet-salon-personal-hero__subtitle {
+  margin: 0.5rem 0 0;
+  line-height: 1.55;
+  color: rgba(226, 232, 240, 0.92);
+}
+
+.velvet-salon-personal-card--intro {
+  margin-top: 1rem;
+}
+
+.velvet-salon-personal-card__intro {
+  line-height: 1.65;
+}
+
+.velvet-salon-personal-card__booking-note {
+  margin-top: 0.65rem;
+  line-height: 1.55;
+  color: rgba(226, 232, 240, 0.88);
+}
+
+.velvet-salon-personal-card--social {
+  margin-top: 1rem;
+}
+
+.velvet-salon-personal-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.velvet-salon-personal-social__link {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  color: #fde68a;
+  text-decoration: none;
+}
+
+.velvet-salon-personal-social__link:hover {
+  text-decoration: underline;
+}
+
+.velvet-salon-personal-gallery {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.55rem;
+}
+
+.velvet-salon-personal-gallery__thumb {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.35);
+}
+
+.velvet-salon-personal-explore-hint {
+  margin: 1.1rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(148, 163, 184, 0.95);
+}
+
+.velvet-salon-personal-explore-hint a {
+  color: #fde68a;
+  font-weight: 650;
+}
+
+.velvet-salon-personal-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .velvet-salon-personal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .velvet-salon-personal-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.velvet-salon-personal-card {
+  border-radius: 14px;
+  padding: 1rem 1.05rem;
+  border: 2px solid #000000;
+  background: rgba(15, 23, 42, 0.82);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.48);
+}
+
+.velvet-salon-personal-card h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1rem;
+  color: #f8fafc;
+}
+
+.velvet-salon-personal-card p {
+  margin: 0;
+  line-height: 1.6;
+  color: rgba(226, 232, 240, 0.9);
+}
+
+.velvet-salon-personal-card__cta {
+  display: inline-flex;
+  margin-top: 0.8rem;
+  text-decoration: none;
+  font-weight: 700;
+  color: #fde68a;
+}

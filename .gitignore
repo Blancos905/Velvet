@@ -1,0 +1,23 @@
+# Build / dipendenze
+**/node_modules/
+**/dist/
+backend/target/
+velvet/target/
+velvet-app/build/
+velvet-app/.dart_tool/
+**/*.tsbuildinfo
+
+# Segreti e artefatti deploy
+infrastructure/.env
+infrastructure/frontend-web-dist/
+infrastructure/nginx/certs/
+**/.env.local
+velvet/spring-dev.local.env
+velvet/src/main/resources/application-local.properties
+
+# IDE / OS
+.DS_Store
+.idea/
+*.iml
+.cursor/
+

@@ -1,0 +1,513 @@
+package it.velvet.admin.service;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import it.velvet.admin.dto.SuperAdminOverviewDtos.SuperAdminRecentSalonRow;
+import it.velvet.admin.dto.SuperAdminOverviewDtos.SuperAdminSalonStaffRow;
+import it.velvet.admin.dto.SuperAdminOverviewDtos.SuperAdminPlatformReviewRow;
+import it.velvet.review.dto.SuperAdminSalonReviewSummaryRow;
+import it.velvet.appointment.domain.AppointmentRepository;
+import it.velvet.catalog.domain.StaffOperator;
+import it.velvet.catalog.domain.StaffOperatorRepository;
+import it.velvet.common.api.BusinessException;
+import it.velvet.consumer.domain.ConsumerProfile;
+import it.velvet.consumer.domain.ConsumerProfileRepository;
+import it.velvet.consumer.service.SalonOwnerRoleAlignmentService;
+import it.velvet.consumer.service.VelvetAccountRegistrationService;
+import it.velvet.config.VelvetSecurityProperties;
+import it.velvet.notification.domain.ScheduledNotification;
+import it.velvet.notification.domain.ScheduledNotificationRepository;
+import it.velvet.security.auth.VelvetTokenService;
+import it.velvet.publicapi.dto.RegistrationSalonLocation;
+import it.velvet.publicapi.validation.ConsumerRegistrationValidator;
+import it.velvet.review.domain.PlatformReview;
+import it.velvet.review.domain.PlatformReviewRepository;
+import it.velvet.review.domain.ReviewRepository;
+import it.velvet.studio.domain.Location;
+import it.velvet.studio.domain.LocationRepository;
+import it.velvet.studio.domain.StudioGroup;
+import it.velvet.studio.domain.StudioGroupRepository;
+import it.velvet.studio.service.SalonDirectoryProvisioningService;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class SuperAdminOverviewActionsService {
+
+	private final StudioGroupRepository studioGroupRepository;
+	private final LocationRepository locationRepository;
+	private final VelvetAccountRegistrationService accountRegistrationService;
+	private final SalonDirectoryProvisioningService salonDirectoryProvisioningService;
+	private final JdbcTemplate jdbcTemplate;
+	private final ScheduledNotificationRepository scheduledNotificationRepository;
+	private final ConsumerProfileRepository consumerProfileRepository;
+	private final SalonOwnerRoleAlignmentService salonOwnerRoleAlignmentService;
+	private final VelvetTokenService velvetTokenService;
+	private final VelvetSecurityProperties securityProperties;
+	private final ReviewRepository reviewRepository;
+	private final PlatformReviewRepository platformReviewRepository;
+	private final StaffOperatorRepository staffOperatorRepository;
+	private final AppointmentRepository appointmentRepository;
+
+	public SuperAdminOverviewActionsService(
+			StudioGroupRepository studioGroupRepository,
+			LocationRepository locationRepository,
+			VelvetAccountRegistrationService accountRegistrationService,
+			SalonDirectoryProvisioningService salonDirectoryProvisioningService,
+			JdbcTemplate jdbcTemplate,
+			ScheduledNotificationRepository scheduledNotificationRepository,
+			ConsumerProfileRepository consumerProfileRepository,
+			SalonOwnerRoleAlignmentService salonOwnerRoleAlignmentService,
+			VelvetTokenService velvetTokenService,
+			VelvetSecurityProperties securityProperties,
+			ReviewRepository reviewRepository,
+			PlatformReviewRepository platformReviewRepository,
+			StaffOperatorRepository staffOperatorRepository,
+			AppointmentRepository appointmentRepository) {
+		this.studioGroupRepository = studioGroupRepository;
+		this.locationRepository = locationRepository;
+		this.accountRegistrationService = accountRegistrationService;
+		this.salonDirectoryProvisioningService = salonDirectoryProvisioningService;
+		this.jdbcTemplate = jdbcTemplate;
+		this.scheduledNotificationRepository = scheduledNotificationRepository;
+		this.consumerProfileRepository = consumerProfileRepository;
+		this.salonOwnerRoleAlignmentService = salonOwnerRoleAlignmentService;
+		this.velvetTokenService = velvetTokenService;
+		this.securityProperties = securityProperties;
+		this.reviewRepository = reviewRepository;
+		this.platformReviewRepository = platformReviewRepository;
+		this.staffOperatorRepository = staffOperatorRepository;
+		this.appointmentRepository = appointmentRepository;
+	}
+
+	@Transactional(readOnly = true)
+	public Page<SuperAdminRecentSalonRow> listSalons(Pageable pageable, String planTier) {
+		Page<StudioGroup> groups = planTier != null && !planTier.isBlank()
+				? studioGroupRepository.findByPlanTierIgnoreCase(planTier, pageable)
+				: studioGroupRepository.findAll(pageable);
+		List<UUID> pageIds = groups.getContent().stream().map(StudioGroup::getId).toList();
+		Map<UUID, List<SuperAdminSalonStaffRow>> staffByGroup = loadStaffRowsForStudioGroups(pageIds);
+		return groups.map(g -> toRecentSalonRow(g, staffByGroup.getOrDefault(g.getId(), List.of())));
+	}
+
+	private Map<UUID, List<SuperAdminSalonStaffRow>> loadStaffRowsForStudioGroups(List<UUID> studioGroupIds) {
+		if (studioGroupIds.isEmpty()) {
+			return Map.of();
+		}
+		List<StaffOperator> ops = staffOperatorRepository.findFetchedByStudioGroupIdIn(studioGroupIds);
+		return SuperAdminSalonStaffRowMapper.groupByStudioGroupId(ops);
+	}
+
+	private SuperAdminRecentSalonRow toRecentSalonRow(StudioGroup g, List<SuperAdminSalonStaffRow> staff) {
+		List<Location> locations = locationRepository.findByStudioGroup_IdOrderByNameAsc(g.getId());
+		Location first = locations.isEmpty() ? null : locations.get(0);
+		String city = locations.stream()
+				.map(Location::getCity)
+				.filter(Objects::nonNull)
+				.map(String::trim)
+				.filter(s -> !s.isEmpty())
+				.findFirst()
+				.orElse(first != null ? first.getCity() : null);
+		return new SuperAdminRecentSalonRow(
+				g.getId(),
+				g.getName(),
+				g.getOwnerEmail(),
+				g.getPlanTier(),
+				first != null ? first.getSlug() : null,
+				first != null ? first.getName() : null,
+				city,
+				g.getCreatedAt(),
+				g.isProvider(),
+				staff);
+	}
+
+	@Transactional(readOnly = true)
+	public List<SuperAdminSalonStaffRow> listSalonStaff(UUID studioGroupId) {
+		studioGroupRepository
+				.findById(studioGroupId)
+				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Salone non trovato."));
+		List<StaffOperator> ops = staffOperatorRepository.findFetchedByStudioGroupId(studioGroupId);
+		return ops.stream().map(SuperAdminSalonStaffRowMapper::fromOperator).toList();
+	}
+
+	/**
+	 * Elimina un operatore staff del salone (qualsiasi sede dello studio). Stessa regola del titolare: vietato se
+	 * esistono prenotazioni collegate; se c’è account di accesso, viene rimosso anche il {@link ConsumerProfile}.
+	 */
+	@Transactional
+	public void deleteSalonStaff(UUID studioGroupId, UUID operatorId) {
+		studioGroupRepository
+				.findById(studioGroupId)
+				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Salone non trovato."));
+		StaffOperator operator = staffOperatorRepository
+				.findByIdAndStudioGroupId(operatorId, studioGroupId)
+				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Operatore non trovato in questo salone."));
+		if (appointmentRepository.countByOperator_Id(operator.getId()) > 0) {
+			throw new BusinessException(
+					HttpStatus.CONFLICT,
+					"STAFF_HAS_APPOINTMENTS",
+					"Impossibile eliminare: ci sono prenotazioni associate a questo operatore.");
+		}
+		ConsumerProfile login = operator.getConsumerProfile();
+		staffOperatorRepository.delete(operator);
+		if (login != null) {
+			consumerProfileRepository.delete(login);
+		}
+	}
+
+	@Transactional(readOnly = true)
+	public Page<SuperAdminSalonReviewSummaryRow> listReviews(Pageable pageable) {
+		return reviewRepository.findPageSalonReviewSummaries(
+				PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+	}
+
+	@Transactional(readOnly = true)
+	public Page<SuperAdminPlatformReviewRow> listPlatformReviews(Pageable pageable) {
+		Pageable sorted = PageRequest.of(
+				pageable.getPageNumber(),
+				pageable.getPageSize(),
+				Sort.by(Sort.Order.desc("rating"), Sort.Order.desc("createdAt")));
+		return platformReviewRepository.findPageWithAuthors(sorted).map(this::toPlatformReviewRow);
+	}
+
+	private SuperAdminPlatformReviewRow toPlatformReviewRow(PlatformReview p) {
+		String authorKind = p.getAuthorKind().name();
+		String who;
+		if (p.getConsumerProfile() != null) {
+			String em = p.getConsumerProfile().getEmail();
+			who = em != null && !em.isBlank() ? em.trim() : "Cliente";
+		}
+		else if (p.getStudioGroup() != null) {
+			who = p.getStudioGroup().getName();
+		}
+		else {
+			who = "—";
+		}
+		return new SuperAdminPlatformReviewRow(p.getId(), authorKind, who, p.getRating(), p.getComment(), p.getCreatedAt());
+	}
+
+	@Transactional
+	public void createClient(SuperAdminCreateClientRequest body) {
+		accountRegistrationService.registerBookingClient(
+				body.email(),
+				body.password(),
+				body.firstName(),
+				body.lastName(),
+				body.phone(),
+				false,
+				null);
+	}
+
+	@Transactional
+	public void createSalon(SuperAdminCreateSalonRequest body) {
+		String tier = StudioGroup.canonicalPlanTier(body.planTier());
+		RegistrationSalonLocation location = new RegistrationSalonLocation(
+				trimToNull(body.salonAddressLine1()),
+				trimToNull(body.salonPostalCode()),
+				trimToNull(body.salonCity()),
+				trimToNull(body.salonProvince()),
+				"IT",
+				trimToNull(body.salonName()));
+		ConsumerRegistrationValidator.requireSalonLocationForFreePlan(tier, location);
+
+		String ownerEmail = body.email().trim().toLowerCase(Locale.ROOT);
+		String ownerSub = accountRegistrationService.registerSalonOwner(
+				body.email(),
+				body.password(),
+				body.firstName(),
+				body.lastName(),
+				Objects.toString(body.phone(), ""),
+				tier,
+				null);
+		boolean provider = Boolean.TRUE.equals(body.provider());
+		salonDirectoryProvisioningService.provisionAfterPartnerRegistration(
+				ownerEmail,
+				tier,
+				body.salonName(),
+				location,
+				ownerSub,
+				null,
+				null,
+				provider);
+	}
+
+	@Transactional
+	public void deleteSalon(UUID studioGroupId) {
+		StudioGroup group = studioGroupRepository.findById(studioGroupId)
+				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Salone non trovato."));
+
+		jdbcTemplate.update(
+				"""
+				delete from scheduled_notifications
+				where appointment_id in (
+					select id from appointments
+					where location_id in (select id from locations where studio_group_id = ?)
+				)
+				""",
+				group.getId());
+		jdbcTemplate.update("delete from scheduled_notifications where studio_group_id = ?", group.getId());
+		jdbcTemplate.update(
+				"""
+				delete from reviews
+				where appointment_id in (
+					select id from appointments
+					where location_id in (select id from locations where studio_group_id = ?)
+				)
+				""",
+				group.getId());
+		jdbcTemplate.update("delete from platform_reviews where studio_group_id = ?", group.getId());
+		jdbcTemplate.update(
+				"""
+				delete from appointments
+				where location_id in (select id from locations where studio_group_id = ?)
+				""",
+				group.getId());
+		jdbcTemplate.update(
+				"""
+				delete from favorite_locations
+				where location_id in (select id from locations where studio_group_id = ?)
+				""",
+				group.getId());
+		jdbcTemplate.update(
+				"""
+				delete from staff_operators
+				where location_id in (select id from locations where studio_group_id = ?)
+				""",
+				group.getId());
+		jdbcTemplate.update(
+				"""
+				delete from salon_services
+				where location_id in (select id from locations where studio_group_id = ?)
+				""",
+				group.getId());
+		jdbcTemplate.update(
+				"""
+				delete from salon_velvet_chat_messages
+				where salon_client_id in (
+					select id from salon_clients
+					where location_id in (select id from locations where studio_group_id = ?)
+				)
+				""",
+				group.getId());
+		jdbcTemplate.update(
+				"""
+				delete from salon_velvet_chat_read_state
+				where salon_client_id in (
+					select id from salon_clients
+					where location_id in (select id from locations where studio_group_id = ?)
+				)
+				""",
+				group.getId());
+		jdbcTemplate.update(
+				"""
+				delete from salon_clients
+				where location_id in (select id from locations where studio_group_id = ?)
+				""",
+				group.getId());
+		jdbcTemplate.update("delete from locations where studio_group_id = ?", group.getId());
+		jdbcTemplate.update("delete from studio_groups where id = ?", group.getId());
+	}
+
+	/**
+	 * JWT Velvet per il titolare del salone (stesso formato di {@code POST /api/v1/auth/login}), senza password.
+	 * Riservato al super admin autenticato.
+	 */
+	@Transactional
+	public SalonOwnerVelvetSession issueSalonOwnerVelvetSession(UUID studioGroupId) {
+		StudioGroup group = studioGroupRepository.findById(studioGroupId)
+				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Salone non trovato."));
+		String ownerEmail = group.getOwnerEmail();
+		if (ownerEmail == null || ownerEmail.isBlank()) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"SALON_OWNER_EMAIL_MISSING",
+					"Questo salone non ha un’email titolare: impossibile aprire la sessione titolare.");
+		}
+		String normEmail = ownerEmail.trim().toLowerCase(Locale.ROOT);
+		Optional<StudioGroup> byEmail = studioGroupRepository.findByOwnerEmailIgnoreCase(normEmail);
+		if (byEmail.isEmpty() || !byEmail.get().getId().equals(group.getId())) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"SALON_OWNER_MISMATCH",
+					"Dati titolare incoerenti per questo salone.");
+		}
+		ConsumerProfile profile = consumerProfileRepository
+				.findFirstByEmailIgnoreCaseAndDeletedAtIsNullOrderByCreatedAtDesc(normEmail)
+				.orElseThrow(() -> new BusinessException(
+						HttpStatus.BAD_REQUEST,
+						"OWNER_PROFILE_NOT_FOUND",
+						"Nessun account Velvet attivo per l’email titolare del salone. Verifica che il titolare sia registrato con la stessa email."));
+		salonOwnerRoleAlignmentService.alignAfterSuccessfulPasswordLogin(profile);
+		ConsumerProfile forToken = consumerProfileRepository.findById(profile.getId()).orElse(profile);
+		String accessToken = velvetTokenService.createAccessToken(forToken);
+		return new SalonOwnerVelvetSession(accessToken, securityProperties.authJwtTtlHours() * 3600L);
+	}
+
+	@Transactional
+	public void updateSalon(UUID studioGroupId, SuperAdminUpdateSalonRequest body) {
+		StudioGroup group = studioGroupRepository.findById(studioGroupId)
+				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Salone non trovato."));
+
+		String newOwnerEmail = trimToNull(body.ownerEmail());
+		if (newOwnerEmail != null) {
+			group.setOwnerEmail(newOwnerEmail);
+		}
+
+		String newSalonName = trimToNull(body.salonName());
+		if (newSalonName != null) {
+			group.setName(newSalonName);
+		}
+
+		String newCity = trimToNull(body.salonCity());
+		if (newCity != null) {
+			List<Location> locations = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId());
+			if (!locations.isEmpty()) {
+				locations.get(0).setCity(newCity);
+			}
+		}
+	}
+
+	@Transactional
+	public SuperAdminSystemNotificationResult sendSystemNotification(SuperAdminSystemNotificationRequest body) {
+		validateSystemNotificationBody(body);
+		String message = body.message().trim();
+		String subjectRaw = body.subject() != null ? body.subject().trim() : "";
+		String subject = subjectRaw.isEmpty() ? "Messaggio da Velvet" : subjectRaw;
+		List<UUID> ids = parseStudioGroupIdList(body.studioGroupIds());
+		if (ids.size() > 200) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"VALIDATION_ERROR",
+					"Massimo 200 saloni per singolo invio.");
+		}
+		Instant at = Instant.now();
+		int delivered = 0;
+		for (UUID id : ids) {
+			StudioGroup group = studioGroupRepository.findById(id)
+					.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Salone non trovato: " + id));
+			scheduledNotificationRepository.save(ScheduledNotification.adminPlatformInbox(group, subject, message, at));
+			delivered++;
+		}
+		return new SuperAdminSystemNotificationResult(delivered);
+	}
+
+	private static void validateSystemNotificationBody(SuperAdminSystemNotificationRequest body) {
+		if (body == null) {
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Corpo richiesta mancante.");
+		}
+		if (body.message() == null) {
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Il testo del messaggio è obbligatorio.");
+		}
+		String msg = body.message().trim();
+		if (msg.isEmpty()) {
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Il testo del messaggio è obbligatorio.");
+		}
+		if (msg.length() > 4000) {
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Il messaggio supera i 4000 caratteri.");
+		}
+		if (body.subject() != null && body.subject().trim().length() > 200) {
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "L'oggetto supera i 200 caratteri.");
+		}
+	}
+
+	private static List<UUID> parseStudioGroupIdList(List<String> rawIds) {
+		if (rawIds == null || rawIds.isEmpty()) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"VALIDATION_ERROR",
+					"Seleziona almeno un salone destinatario (studioGroupIds).");
+		}
+		List<UUID> out = new ArrayList<>();
+		for (String raw : rawIds) {
+			if (raw == null) {
+				continue;
+			}
+			String t = raw.trim();
+			if (t.isEmpty()) {
+				continue;
+			}
+			try {
+				out.add(UUID.fromString(t));
+			}
+			catch (IllegalArgumentException e) {
+				throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Id salone non valido: " + t);
+			}
+		}
+		if (out.isEmpty()) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"VALIDATION_ERROR",
+					"Seleziona almeno un salone destinatario (nessun id valido).");
+		}
+		return out.stream().distinct().toList();
+	}
+
+	private static String trimToNull(String value) {
+		if (value == null) {
+			return null;
+		}
+		String trimmed = value.trim();
+		return trimmed.isEmpty() ? null : trimmed;
+	}
+
+	public record SuperAdminCreateClientRequest(
+			@NotBlank @Email @Size(max = 320) String email,
+			@NotBlank @Size(min = 8, max = 200) String password,
+			@NotBlank @Size(max = 100) String firstName,
+			@NotBlank @Size(max = 100) String lastName,
+			@Size(max = 40) String phone) {
+	}
+
+	public record SuperAdminCreateSalonRequest(
+			@NotBlank @Email @Size(max = 320) String email,
+			@NotBlank @Size(min = 8, max = 200) String password,
+			@NotBlank @Size(max = 100) String firstName,
+			@NotBlank @Size(max = 100) String lastName,
+			@Size(max = 40) String phone,
+			@NotBlank @Size(max = 200) String salonName,
+			@NotBlank @Pattern(regexp = "BASE|PREMIUM") String planTier,
+			@Size(max = 200) String salonAddressLine1,
+			@Size(max = 12) String salonPostalCode,
+			@Size(max = 100) String salonCity,
+			@Size(max = 5) String salonProvince,
+			Boolean provider) {
+	}
+
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	public record SuperAdminSystemNotificationRequest(
+			/** UUID salone come stringhe; validazione lato {@link #sendSystemNotification}. */
+			List<String> studioGroupIds,
+			String subject,
+			String message) {
+	}
+
+	public record SuperAdminUpdateSalonRequest(
+			@Email @Size(max = 320) String ownerEmail,
+			@Size(max = 200) String salonName,
+			@Size(max = 100) String salonCity) {
+	}
+
+	public record SuperAdminSystemNotificationResult(int deliveredCount) {
+	}
+
+	public record SalonOwnerVelvetSession(String accessToken, long expiresInSeconds) {
+	}
+}

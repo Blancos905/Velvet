@@ -1,0 +1,24 @@
+# Esempio / backup della configurazione «local».
+# Il file effettivo è application-local.properties — aggiorna host, utente, password lì.
+#
+# Attivo: PostgreSQL locale (schema c1velvet su localhost:5432).
+# Disattivato (commentato): MariaDB remota via tunnel SSH / phpMyAdmin — chiedi all'agente per ripristinarla.
+#
+# La password può essere:
+#   - scritta in application-local.properties (solo lab; evita commit su repo pubblico), oppure
+#   - passata con spring-dev.local.env o export SPRING_DATASOURCE_PASSWORD='...'
+#
+# Opzionale: nome e telefono sul consumer del super admin (riallineati a ogni avvio se non vuoti).
+# velvet.super-admin.profile-display-name=Mario Rossi
+# velvet.super-admin.profile-phone=+39...
+#
+# --- Notifiche transazionali ---
+# Le email NON vengono inviate fuori dalla piattaforma: messaggio sempre disponibile in inbox + log backend.
+# Recupero password: il link viene SOLO loggato sul backend.
+#
+# WhatsApp (stessi nomi in prod via env, vedi application-prod.properties):
+# VELVET_NOTIFICATIONS_WHATSAPP_ENABLED=true
+# VELVET_NOTIFICATIONS_WHATSAPP_WEBHOOK_URL=http://127.0.0.1:3099/webhooks/whatsapp
+# VELVET_NOTIFICATIONS_WHATSAPP_BEARER_TOKEN= (opzionale; uguale al bridge deploy/whatsapp-bridge)
+# velvet.notifications.whatsapp-enabled=true
+# velvet.notifications.whatsapp-webhook-url=https://...

@@ -1,0 +1,1050 @@
+.velvet-profile-page {
+  display: grid;
+  gap: clamp(1rem, 2.4vw, 1.8rem);
+}
+
+.velvet-profile-page:not(.velvet-profile-page--shell) {
+  max-width: min(1120px, 100%);
+  margin-inline: auto;
+  padding-bottom: clamp(1.5rem, 3vw, 2.75rem);
+}
+
+.velvet-profile-page--shell {
+  min-height: min(52vh, 440px);
+  place-content: center;
+}
+
+.velvet-profile-page__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1.35rem, 3vw, 2rem);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 237, 213, 0.22);
+  background:
+    radial-gradient(circle at 20% 30%, rgba(253, 186, 116, 0.18) 0%, transparent 45%),
+    linear-gradient(165deg, rgba(67, 20, 7, 0.48) 0%, rgba(24, 8, 3, 0.66) 100%);
+  box-shadow:
+    0 16px 40px rgba(45, 16, 6, 0.26),
+    inset 0 1px 0 rgba(255, 247, 237, 0.06);
+  color: rgba(255, 251, 235, 0.9);
+  font-weight: 600;
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
+}
+
+.velvet-profile-page__loading-dot {
+  flex-shrink: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ffedd5, #ea580c);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.55);
+  animation: velvet-profile-pulse 1.05s ease-in-out infinite;
+}
+
+.velvet-profile-page__loading-text {
+  letter-spacing: 0.02em;
+}
+
+.velvet-profile-page__error {
+  margin: 0 auto;
+  max-width: 38rem;
+  padding: 1rem 1.2rem;
+  border-radius: 14px;
+}
+
+@keyframes velvet-profile-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes velvet-profile-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes velvet-profile-insert-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes velvet-profile-insert-ambient {
+  0%,
+  100% {
+    opacity: 0.68;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.98;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes velvet-profile-insert-title-shine {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.velvet-profile-page__super-admin-callout {
+  margin: 0;
+  padding: clamp(0.95rem, 2vw, 1.25rem) clamp(1rem, 2.2vw, 1.4rem);
+  border-radius: 16px;
+  border: 1px solid rgba(253, 186, 116, 0.45);
+  background:
+    linear-gradient(145deg, rgba(234, 88, 12, 0.35) 0%, rgba(67, 20, 7, 0.55) 55%, rgba(24, 8, 3, 0.72) 100%);
+  box-shadow: 0 14px 32px rgba(45, 16, 6, 0.28);
+}
+
+.velvet-profile-page__super-admin-callout-title {
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(254, 215, 170, 0.95);
+}
+
+.velvet-profile-page__super-admin-callout-body {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.9vw, 1.05rem);
+  line-height: 1.55;
+  color: rgba(255, 251, 235, 0.9);
+}
+
+.velvet-profile-page__super-admin-callout-body strong {
+  font-weight: 700;
+  color: #fffbeb;
+}
+
+/* Hero profilo: stile in velvet-account-page-shell.css */
+
+.velvet-profile-page__plan-pill {
+  padding: 0.55rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(253, 186, 116, 0.45);
+  background: linear-gradient(140deg, rgba(253, 186, 116, 0.24), rgba(234, 88, 12, 0.3));
+  color: #fff7ed;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 14px rgba(45, 16, 6, 0.2);
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.45, 0.64, 1),
+    border-color 0.2s ease,
+    box-shadow 0.22s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .velvet-profile-page__plan-pill:hover {
+    transform: translateY(-2px);
+    border-color: rgba(253, 186, 116, 0.65);
+    box-shadow: 0 10px 24px rgba(45, 16, 6, 0.28);
+  }
+}
+
+.velvet-profile-page__privacy-card {
+  display: grid;
+  gap: 0.18rem;
+  margin-top: 0.7rem;
+  min-width: 11.5rem;
+  padding: 0.72rem 0.9rem;
+  border-radius: 14px;
+  border: 2px solid #000000;
+  background: linear-gradient(168deg, #020202 0%, #000000 52%, #050505 100%);
+  color: #ffedd5;
+  text-decoration: none;
+  text-align: left;
+  box-shadow:
+    0 0 0 1px #000 inset,
+    0 4px 0 #000,
+    0 16px 30px rgba(0, 0, 0, 0.34),
+    0 0 48px rgba(249, 115, 22, 0.12);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .velvet-profile-page__privacy-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(253, 186, 116, 0.55);
+    box-shadow:
+      0 0 0 1px #000 inset,
+      0 6px 0 #000,
+      0 20px 36px rgba(0, 0, 0, 0.38),
+      0 0 56px rgba(249, 115, 22, 0.18);
+  }
+}
+
+.velvet-profile-page__privacy-card-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fdba74;
+}
+
+.velvet-profile-page__privacy-card-value {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #fff7ed;
+}
+
+.velvet-profile-grid {
+  display: grid;
+  gap: clamp(0.95rem, 2vw, 1.25rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Evita che la card più bassa (es. salone) si allunghi come la colonna account: altrimenti il «Salva» si stirava in verticale. */
+  align-items: start;
+}
+
+.velvet-profile-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.85rem;
+  padding: clamp(1rem, 2.2vw, 1.5rem);
+  padding-top: clamp(1.15rem, 2.4vw, 1.65rem);
+  border-radius: 16px;
+  border: 2px solid #000000;
+  background: linear-gradient(160deg, rgba(67, 20, 7, 0.42), rgba(24, 8, 3, 0.64));
+  box-shadow:
+    0 14px 30px rgba(45, 16, 6, 0.2),
+    inset 0 1px 0 rgba(255, 247, 237, 0.05);
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.22s ease;
+}
+
+.velvet-profile-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: clamp(0.75rem, 2vw, 1.2rem);
+  right: clamp(0.75rem, 2vw, 1.2rem);
+  height: 3px;
+  border-radius: 0 0 6px 6px;
+  background: linear-gradient(90deg, #9a3412 0%, #ea580c 45%, #fdba74 100%);
+  opacity: 0.95;
+}
+
+.velvet-profile-card--salon::before {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.45) 0%, #ea580c 48%, #fdba74 100%);
+}
+
+/* Pannello inserimento dati — stessa famiglia visiva delle card in Clienti (zinc + accento arancio). */
+.velvet-profile-insert-panel {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.85rem;
+  padding: clamp(1rem, 2.1vw, 1.3rem);
+  border-radius: 18px;
+  border: 1px solid rgba(63, 63, 70, 0.65);
+  background: linear-gradient(165deg, rgba(30, 30, 33, 0.96) 0%, rgba(24, 24, 27, 0.98) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 18px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  transition:
+    border-color 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: velvet-profile-insert-enter 0.58s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.velvet-profile-insert-panel::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: -42% -22% auto -22%;
+  height: 78%;
+  transform-origin: 50% 0%;
+  background: radial-gradient(ellipse 55% 45% at 50% 0%, rgba(249, 115, 22, 0.26) 0%, rgba(249, 115, 22, 0.06) 42%, transparent 64%);
+  opacity: 0.88;
+  animation: velvet-profile-insert-ambient 8s ease-in-out infinite;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.velvet-profile-insert-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.velvet-profile-insert-panel > .velvet-profile-card__title {
+  animation: velvet-profile-fade-in 0.48s cubic-bezier(0.22, 1, 0.36, 1) 0.06s backwards;
+}
+
+.velvet-profile-insert-panel > .velvet-profile-form,
+.velvet-profile-insert-panel > .velvet-profile-salon-form {
+  animation: velvet-profile-fade-in 0.52s cubic-bezier(0.22, 1, 0.36, 1) 0.12s backwards;
+}
+
+.velvet-profile-insert-panel > .velvet-profile-page__salon-loading,
+.velvet-profile-insert-panel > .velvet-alert {
+  animation: velvet-profile-fade-in 0.45s ease 0.08s backwards;
+}
+
+.velvet-profile-insert-panel > .velvet-profile-salon-static-row,
+.velvet-profile-insert-panel > .velvet-profile-salon-audience-panel,
+.velvet-profile-insert-panel > .velvet-btn {
+  animation: velvet-profile-fade-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.18s backwards;
+}
+
+.velvet-profile-insert-panel:focus-within {
+  border-color: rgba(249, 115, 22, 0.42);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 22px 52px rgba(0, 0, 0, 0.48),
+    0 0 0 1px rgba(249, 115, 22, 0.12),
+    0 0 36px rgba(249, 115, 22, 0.14);
+}
+
+.velvet-profile-insert-panel:focus-within::before {
+  animation: none;
+  opacity: 1;
+  transform: scale(1.07);
+}
+
+.velvet-profile-insert-panel .velvet-profile-card__title::after {
+  width: min(12rem, 55%);
+  height: 4px;
+  margin-top: 0.55rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(249, 115, 22, 0.95) 0%,
+    rgba(251, 191, 36, 0.9) 22%,
+    rgba(249, 115, 22, 0.95) 44%,
+    rgba(251, 191, 36, 0.45) 70%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.35);
+  animation: velvet-profile-insert-title-shine 7s ease-in-out infinite;
+}
+
+.velvet-profile-insert-panel .velvet-profile-salon-static-row {
+  border-color: rgba(63, 63, 70, 0.55);
+  background: rgba(24, 24, 27, 0.48);
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.velvet-profile-insert-panel .velvet-profile-salon-static-label {
+  color: rgba(161, 161, 170, 0.98);
+}
+
+.velvet-profile-insert-panel .velvet-profile-salon-static-value {
+  color: #fafafa;
+}
+
+.velvet-profile-insert-panel .velvet-profile-page__public-link {
+  color: rgba(251, 191, 36, 0.95);
+  text-underline-offset: 0.2em;
+  transition:
+    color 0.2s ease,
+    text-underline-offset 0.2s ease,
+    filter 0.2s ease,
+    transform 0.2s ease;
+}
+
+.velvet-profile-insert-panel .velvet-profile-page__public-link:hover {
+  color: #fef3c7;
+  text-underline-offset: 0.28em;
+  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.35));
+}
+
+.velvet-profile-insert-panel .velvet-profile-page__public-link:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .velvet-profile-insert-panel:hover {
+    border-color: rgba(249, 115, 22, 0.38);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.055) inset,
+      0 26px 54px rgba(0, 0, 0, 0.46),
+      0 0 24px rgba(249, 115, 22, 0.08);
+    transform: translateY(-3px);
+  }
+
+  .velvet-profile-insert-panel:hover::before {
+    opacity: 0.95;
+  }
+
+  .velvet-profile-insert-panel .velvet-profile-salon-static-row:hover {
+    border-color: rgba(249, 115, 22, 0.32);
+    background: rgba(39, 39, 42, 0.72);
+    box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.08);
+    transform: translateX(3px);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .velvet-profile-card:hover {
+    border-color: #000000;
+    box-shadow:
+      0 18px 38px rgba(45, 16, 6, 0.26),
+      inset 0 1px 0 rgba(255, 247, 237, 0.07);
+    transform: translateY(-2px);
+  }
+}
+
+.velvet-profile-card__title {
+  margin: 0;
+  position: relative;
+  padding-bottom: 0.35rem;
+}
+
+.velvet-profile-card__title::after {
+  content: "";
+  display: block;
+  width: min(148px, 42%);
+  height: 2px;
+  margin-top: 0.4rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #ea580c, rgba(253, 186, 116, 0.25));
+}
+
+.velvet-profile-card__email {
+  margin: 0;
+  color: rgba(255, 251, 235, 0.8);
+}
+
+.velvet-profile-card__email strong {
+  color: rgba(255, 251, 235, 0.96);
+}
+
+.velvet-profile-form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.velvet-profile-form--password {
+  margin-top: 0.25rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid rgba(255, 237, 213, 0.12);
+}
+
+.velvet-profile-password__title {
+  margin: 0.15rem 0 0;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: rgba(255, 251, 235, 0.94);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 237, 213, 0.1);
+}
+
+.velvet-profile-password-recovery {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.65rem 0 1rem;
+}
+
+.velvet-profile-password-recovery__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 0.85rem;
+}
+
+.velvet-profile-password-field__wrap {
+  position: relative;
+  display: block;
+}
+
+.velvet-profile-password-input {
+  width: 100%;
+  padding-right: 3.1rem !important;
+  box-sizing: border-box;
+}
+
+.velvet-profile-password-toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.65rem;
+  height: 2.35rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  color: rgba(253, 186, 116, 0.92);
+  background: rgba(24, 8, 3, 0.35);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.velvet-profile-password-toggle:hover {
+  color: #ffedd5;
+  background: rgba(249, 115, 22, 0.22);
+}
+
+.velvet-profile-password-toggle:focus-visible {
+  outline: none;
+  color: #fffbeb;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.45);
+}
+
+.velvet-profile-password-toggle__icon {
+  display: block;
+  flex-shrink: 0;
+}
+
+.velvet-profile-form .velvet-form-label {
+  margin-top: 0;
+}
+
+.velvet-profile-card .velvet-form-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(253, 186, 116, 0.9);
+}
+
+.velvet-profile-card .velvet-soft-field {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 237, 213, 0.26);
+  background: rgba(8, 5, 3, 0.45);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.velvet-profile-card .velvet-soft-field:hover:not(:disabled):not(:focus) {
+  border-color: rgba(253, 186, 116, 0.4);
+  background: rgba(12, 8, 5, 0.52);
+}
+
+.velvet-profile-card .velvet-soft-field:focus {
+  outline: none;
+  border-color: rgba(249, 115, 22, 0.68);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+}
+
+/* Campi nel pannello inserimento: stile Clienti (zinc), dopo le regole generiche della card. */
+.velvet-profile-card .velvet-profile-insert-panel .velvet-form-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(161, 161, 170, 0.96);
+  transition:
+    color 0.22s ease,
+    letter-spacing 0.22s ease,
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.velvet-profile-card .velvet-profile-insert-panel .velvet-form-label:has(.velvet-soft-field:focus) {
+  color: rgba(253, 186, 116, 0.98);
+  letter-spacing: 0.1em;
+}
+
+.velvet-profile-card .velvet-profile-insert-panel .velvet-soft-field {
+  color: #fafafa;
+  background: rgba(24, 24, 27, 0.85);
+  border: 1px solid rgba(63, 63, 70, 0.75);
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.22s ease,
+    transform 0.28s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+.velvet-profile-card .velvet-profile-insert-panel .velvet-soft-field::placeholder {
+  color: rgba(113, 113, 122, 0.95);
+  transition: opacity 0.2s ease;
+}
+
+.velvet-profile-card .velvet-profile-insert-panel .velvet-soft-field:hover:not(:disabled):not(:focus) {
+  border-color: rgba(82, 82, 91, 0.95);
+  background: rgba(24, 24, 27, 0.92);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+}
+
+.velvet-profile-card .velvet-profile-insert-panel .velvet-soft-field:focus {
+  outline: none;
+  border-color: rgba(249, 115, 22, 0.62);
+  box-shadow:
+    0 0 0 3px rgba(249, 115, 22, 0.14),
+    0 8px 28px rgba(249, 115, 22, 0.12);
+  transform: translateY(-1px) scale(1.008);
+}
+
+.velvet-profile-card .velvet-profile-insert-panel .velvet-soft-field:focus::placeholder {
+  opacity: 0.72;
+}
+
+.velvet-profile-card .velvet-btn--primary {
+  min-width: 11.5rem;
+  padding: 0.68rem 1.4rem;
+  border-radius: 12px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  background: linear-gradient(165deg, #ea580c 0%, #c2410c 100%);
+  border: none;
+  box-shadow: 0 4px 20px rgba(194, 65, 12, 0.42);
+  transition:
+    filter 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.12s ease;
+}
+
+.velvet-profile-card .velvet-btn--primary:hover:not(:disabled) {
+  filter: brightness(1.07);
+  box-shadow: 0 6px 26px rgba(194, 65, 12, 0.5);
+}
+
+.velvet-profile-card .velvet-btn--primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.velvet-profile-card .velvet-profile-insert-panel .velvet-btn--primary {
+  transition:
+    filter 0.22s ease,
+    box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.28s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .velvet-profile-card .velvet-profile-insert-panel .velvet-btn--primary:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.03);
+    filter: brightness(1.09);
+    box-shadow:
+      0 8px 28px rgba(194, 65, 12, 0.55),
+      0 0 24px rgba(249, 115, 22, 0.22);
+  }
+
+  .velvet-profile-card .velvet-profile-insert-panel .velvet-btn--primary:active:not(:disabled) {
+    transform: translateY(0) scale(1.01);
+  }
+}
+
+.velvet-profile-card .velvet-alert {
+  margin: 0.25rem 0 0;
+  padding: 0.7rem 0.95rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  animation: velvet-profile-fade-in 0.38s ease;
+}
+
+.velvet-profile-form__submit {
+  justify-self: flex-start;
+  align-self: start;
+  margin-top: 0.35rem;
+  width: auto;
+}
+
+.velvet-profile-reviews {
+  margin-top: 0.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 237, 213, 0.12);
+  display: grid;
+  gap: 0.65rem;
+}
+
+.velvet-profile-reviews__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.62rem;
+}
+
+.velvet-profile-reviews__item {
+  padding: 0.62rem 0.68rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 237, 213, 0.16);
+  background: rgba(24, 8, 3, 0.3);
+}
+
+.velvet-profile-reviews__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.velvet-profile-reviews__rating {
+  margin: 0.35rem 0 0;
+  font-size: 0.94rem;
+}
+
+.velvet-profile-page__salon-loading {
+  margin: 0;
+  padding: 0.6rem 0 0.2rem;
+}
+
+.velvet-profile-salon-dl {
+  margin: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.velvet-profile-salon-dl > div {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.52rem 0.62rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 237, 213, 0.16);
+  background: rgba(24, 8, 3, 0.28);
+}
+
+.velvet-profile-salon-dl dt {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 251, 235, 0.58);
+}
+
+.velvet-profile-salon-dl dd {
+  margin: 0;
+  color: rgba(255, 251, 235, 0.95);
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.velvet-profile-page__public-link {
+  color: #fdba74;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.velvet-profile-page__public-link:hover {
+  color: #ffedd5;
+  text-decoration: underline;
+  text-decoration-color: rgba(253, 186, 116, 0.6);
+}
+
+.velvet-profile-salon-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.velvet-profile-salon-form {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.velvet-profile-salon-form .velvet-form-label {
+  margin-top: 0;
+}
+
+.velvet-profile-salon-audience-panel {
+  display: grid;
+  gap: 0.62rem;
+  padding: clamp(0.85rem, 1.8vw, 1.05rem);
+  border-radius: 14px;
+  border: 1px solid rgba(63, 63, 70, 0.72);
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 0%, rgba(249, 115, 22, 0.08) 0%, transparent 58%),
+    rgba(18, 18, 20, 0.82);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.velvet-profile-salon-audience-panel__title {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #fff7ed;
+}
+
+.velvet-profile-salon-audience-panel__chips {
+  margin-top: 0.1rem;
+}
+
+.velvet-profile-salon-audience-panel__submit {
+  justify-self: flex-start;
+  margin-top: 0.15rem;
+}
+
+.velvet-profile-salon-audience-panel .velvet-alert {
+  margin: 0;
+}
+
+.velvet-profile-salon-static-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.58rem 0.68rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 237, 213, 0.16);
+  background: rgba(24, 8, 3, 0.32);
+}
+
+.velvet-profile-salon-static-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 251, 235, 0.62);
+}
+
+.velvet-profile-salon-static-value {
+  color: #ffedd5;
+}
+
+.velvet-profile-close {
+  margin-top: 0.35rem;
+  padding: clamp(1.1rem, 2.2vw, 1.5rem) clamp(1rem, 2.2vw, 1.4rem);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 237, 213, 0.18);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(248, 113, 113, 0.08) 0%, transparent 55%),
+    linear-gradient(165deg, rgba(55, 22, 10, 0.38) 0%, rgba(24, 8, 3, 0.55) 100%);
+  box-shadow:
+    0 12px 32px rgba(45, 16, 6, 0.2),
+    inset 0 1px 0 rgba(255, 247, 237, 0.04);
+}
+
+.velvet-profile-close .velvet-profile-card__title::after {
+  background: linear-gradient(90deg, rgba(248, 113, 113, 0.85), rgba(253, 186, 116, 0.25));
+}
+
+.velvet-profile-close .velvet-text-muted {
+  margin: 0.35rem 0 0;
+  max-width: 40rem;
+  line-height: 1.55;
+}
+
+.velvet-profile-close__first-action {
+  margin-top: 0.85rem;
+}
+
+.velvet-profile-close__danger-btn {
+  border: 1px solid rgba(248, 113, 113, 0.58);
+  background: linear-gradient(165deg, rgba(127, 29, 29, 0.42), rgba(69, 10, 10, 0.62));
+  color: #fecaca;
+  font-weight: 700;
+}
+
+.velvet-profile-close__danger-btn:hover:not(:disabled) {
+  background: linear-gradient(165deg, rgba(153, 27, 27, 0.56), rgba(91, 12, 12, 0.72));
+  border-color: rgba(252, 165, 165, 0.72);
+  color: #fee2e2;
+}
+
+.velvet-profile-close__confirm-box {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.8rem;
+  border-radius: 12px;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(69, 10, 10, 0.22);
+}
+
+.velvet-profile-close__confirm-text {
+  margin: 0;
+  color: #fecaca;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.velvet-profile-close__confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.velvet-profile-close__confirm-actions .velvet-btn--secondary {
+  border-color: rgba(255, 237, 213, 0.35);
+}
+
+/* Staff: foto operatore (Profilo) */
+.velvet-profile-staff-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.velvet-profile-staff-photo__preview-wrap {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid rgba(251, 146, 60, 0.42);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.velvet-profile-staff-photo__preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.velvet-profile-staff-photo__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.75rem;
+}
+
+.velvet-profile-hidden-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .velvet-profile-page__loading-dot {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .velvet-profile-card .velvet-alert {
+    animation: none;
+  }
+
+  .velvet-profile-card {
+    transition: none;
+  }
+
+  .velvet-profile-insert-panel {
+    animation: none;
+    transition: none;
+  }
+
+  .velvet-profile-insert-panel::before {
+    animation: none;
+    opacity: 0.85;
+    transform: none;
+  }
+
+  .velvet-profile-insert-panel:focus-within::before {
+    transform: none;
+  }
+
+  .velvet-profile-insert-panel .velvet-profile-card__title::after {
+    animation: none;
+    background-position: 50% 50%;
+  }
+
+  .velvet-profile-insert-panel > .velvet-profile-card__title,
+  .velvet-profile-insert-panel > .velvet-profile-form,
+  .velvet-profile-insert-panel > .velvet-profile-salon-form,
+  .velvet-profile-insert-panel > .velvet-profile-page__salon-loading,
+  .velvet-profile-insert-panel > .velvet-alert,
+  .velvet-profile-insert-panel > .velvet-profile-salon-static-row,
+  .velvet-profile-insert-panel > .velvet-profile-salon-audience-panel,
+  .velvet-profile-insert-panel > .velvet-btn {
+    animation: none;
+  }
+
+  .velvet-profile-card .velvet-profile-insert-panel .velvet-soft-field,
+  .velvet-profile-card .velvet-profile-insert-panel .velvet-form-label,
+  .velvet-profile-insert-panel .velvet-profile-salon-static-row {
+    transition: none;
+  }
+
+  .velvet-profile-card .velvet-profile-insert-panel .velvet-soft-field:focus {
+    transform: none;
+  }
+
+  .velvet-profile-insert-panel .velvet-profile-page__public-link {
+    transition: none;
+  }
+
+  .velvet-profile-insert-panel .velvet-profile-page__public-link:active {
+    transform: none;
+  }
+
+  .velvet-profile-card .velvet-profile-insert-panel .velvet-btn--primary {
+    transition: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .velvet-profile-card:hover {
+      transform: none;
+    }
+
+    .velvet-profile-insert-panel:hover {
+      transform: none;
+    }
+
+    .velvet-profile-insert-panel .velvet-profile-salon-static-row:hover {
+      transform: none;
+    }
+
+    .velvet-profile-card .velvet-profile-insert-panel .velvet-btn--primary:hover:not(:disabled),
+    .velvet-profile-card .velvet-profile-insert-panel .velvet-btn--primary:active:not(:disabled) {
+      transform: none;
+    }
+
+    .velvet-profile-page__plan-pill:hover {
+      transform: none;
+    }
+  }
+
+  .velvet-profile-page__plan-pill {
+    transition: none;
+  }
+}
+
+@media (max-width: 920px) {
+  .velvet-profile-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,964 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { type FormEvent, Fragment, useEffect, useState, type ReactNode } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { apiJson } from "../../api/client";
+import type { SuperAdminRecentSalonRowDto } from "../../api/types";
+import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
+import { SalonPremiumOwnerInfoPrivacyModal } from "../../components/salon/SalonPremiumOwnerInfoPrivacyModal";
+import { partnerContactEmail } from "../../config/env";
+import { formatSalonCityForDisplay } from "../../lib/formatSalonCityForDisplay";
+import { DEFAULT_IT_PHONE_PREFIX, optionalPhoneForRegisterApi } from "../../lib/itPhoneDefaults";
+import { velvetPostConsumerSessionPath } from "../../lib/velvetPostConsumerSessionPath";
+
+const SALON_PLAN_PAGE_SIZE = 10;
+
+type PageResponse<T> = {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  number: number;
+  size: number;
+};
+
+type SalonOwnerSessionResponse = {
+  accessToken: string;
+  tokenType: string;
+  expiresInSeconds: number;
+};
+
+export type AdminSalonPlanApiTier = "PREMIUM" | "BASE";
+
+function validateRequiredSalonLocation(s: {
+  salonAddressLine1: string;
+  salonPostalCode: string;
+  salonCity: string;
+  salonProvince: string;
+}): string | null {
+  const t = (x: string) => x.trim();
+  if (!t(s.salonAddressLine1) || !t(s.salonPostalCode) || !t(s.salonCity) || !t(s.salonProvince)) {
+    return "Indica l’indirizzo della sede (via, CAP, città e provincia) così i clienti possono trovarti in ricerca e in vetrina.";
+  }
+  return null;
+}
+
+function formatDate(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  try {
+    return new Date(iso).toLocaleDateString("it-IT");
+  } catch {
+    return "—";
+  }
+}
+
+export type AdminSalonPlanSectionProps = {
+  accessToken: string;
+  /** Filtro `GET .../salons?planTier=` e `planTier` nel body di creazione. */
+  apiPlanTier: AdminSalonPlanApiTier;
+  /** Prefisso per id/aria (es. `${baseId}-premium`). */
+  idPrefix: string;
+  /** Valore di `id` sull’`h2` titolo sezione. */
+  headingId: string;
+  title: string;
+  loadingSalonsLabel: string;
+  createOpenLabel: string;
+  createCloseLabel: string;
+  paginationAriaLabel: string;
+  modalCreateTitle: string;
+  modalCreateIntro: ReactNode;
+  createSuccessMessage: string;
+  createErrorDefault: string;
+  onEditSalon: (row: SuperAdminRecentSalonRowDto) => void;
+};
+
+export function AdminSalonPlanSection({
+  accessToken,
+  apiPlanTier,
+  idPrefix,
+  headingId,
+  title,
+  loadingSalonsLabel,
+  createOpenLabel,
+  createCloseLabel,
+  paginationAriaLabel,
+  modalCreateTitle,
+  modalCreateIntro,
+  createSuccessMessage,
+  createErrorDefault,
+  onEditSalon,
+}: AdminSalonPlanSectionProps) {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const { signInWithIssuedToken } = useVelvetAuth();
+
+  const [page, setPage] = useState(0);
+  const [salonSearch, setSalonSearch] = useState("");
+  const [expandedSalonId, setExpandedSalonId] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [privacyNoticeOpen, setPrivacyNoticeOpen] = useState(false);
+  const [showNotificationForm, setShowNotificationForm] = useState(false);
+  const [notificationSubject, setNotificationSubject] = useState("Messaggio da Luxury");
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [selectedSalonIds, setSelectedSalonIds] = useState<string[]>([]);
+  const [createSalonForm, setCreateSalonForm] = useState({
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    phone: DEFAULT_IT_PHONE_PREFIX,
+    salonName: "",
+    salonAddressLine1: "",
+    salonPostalCode: "",
+    salonCity: "",
+    salonProvince: "",
+    salonCountry: "IT",
+    confirmPassword: "",
+    acceptTerms: false,
+    provider: false,
+  });
+  const [createErrorHint, setCreateErrorHint] = useState<string | null>(null);
+
+  const salonsQ = useQuery({
+    queryKey: ["admin", "overview", "salons", apiPlanTier, accessToken, page],
+    enabled: Boolean(accessToken),
+    queryFn: () =>
+      apiJson<PageResponse<SuperAdminRecentSalonRowDto>>(
+        `/api/v1/admin/overview/salons?planTier=${encodeURIComponent(apiPlanTier)}&page=${page}&size=${SALON_PLAN_PAGE_SIZE}&sort=createdAt,desc`,
+        { accessToken },
+      ),
+  });
+
+  const totalPages = Math.max(1, salonsQ.data?.totalPages ?? 1);
+  const pageSafe = Math.min(page, totalPages - 1);
+  const slice = salonsQ.data?.content ?? [];
+  const filteredSlice = slice.filter((row) => row.name.toLowerCase().includes(salonSearch.trim().toLowerCase()));
+  const filteredIds = filteredSlice.map((row) => row.studioGroupId);
+  const allFilteredSelected = filteredIds.length > 0 && filteredIds.every((id) => selectedSalonIds.includes(id));
+
+  const createSalonM = useMutation({
+    mutationFn: async () => {
+      const { phone, acceptTerms: _acceptTerms, ...salonFormRest } = createSalonForm;
+      const phoneOpt = optionalPhoneForRegisterApi(phone);
+      return apiJson<void>("/api/v1/admin/overview/salons", {
+        method: "POST",
+        accessToken,
+        body: JSON.stringify({
+          ...salonFormRest,
+          ...(phoneOpt !== undefined ? { phone: phoneOpt } : {}),
+          planTier: apiPlanTier,
+          salonAddressLine1: createSalonForm.salonAddressLine1.trim(),
+          salonPostalCode: createSalonForm.salonPostalCode.trim(),
+          salonCity: createSalonForm.salonCity.trim(),
+          salonProvince: createSalonForm.salonProvince.trim(),
+          provider: createSalonForm.provider,
+        }),
+      });
+    },
+    onSuccess: async () => {
+      setCreateSalonForm({
+        email: "",
+        password: "",
+        firstName: "",
+        lastName: "",
+        phone: DEFAULT_IT_PHONE_PREFIX,
+        salonName: "",
+        salonAddressLine1: "",
+        salonPostalCode: "",
+        salonCity: "",
+        salonProvince: "",
+        salonCountry: "IT",
+        confirmPassword: "",
+        acceptTerms: false,
+        provider: false,
+      });
+      setCreateErrorHint(null);
+      setShowCreateForm(false);
+      await qc.invalidateQueries({ queryKey: ["admin", "overview", "salons"] });
+      await qc.invalidateQueries({ queryKey: ["admin", "overview"] });
+    },
+  });
+
+  const deleteSalonM = useMutation({
+    mutationFn: async (studioGroupId: string) =>
+      apiJson<void>(`/api/v1/admin/overview/salons/${studioGroupId}`, {
+        method: "DELETE",
+        accessToken,
+      }),
+    onSuccess: async (_data, studioGroupId) => {
+      setExpandedSalonId((open) => (open === studioGroupId ? null : open));
+      await qc.invalidateQueries({ queryKey: ["admin", "overview", "salons"] });
+      await qc.invalidateQueries({ queryKey: ["admin", "overview"] });
+    },
+  });
+
+  const deleteStaffOperatorM = useMutation({
+    mutationFn: async (vars: { studioGroupId: string; operatorId: string }) =>
+      apiJson<void>(`/api/v1/admin/overview/salons/${vars.studioGroupId}/staff/${vars.operatorId}`, {
+        method: "DELETE",
+        accessToken,
+      }),
+    onSuccess: async () => {
+      deleteStaffOperatorM.reset();
+      await qc.invalidateQueries({ queryKey: ["admin", "overview", "salons"] });
+      await qc.invalidateQueries({ queryKey: ["admin", "overview"] });
+    },
+  });
+
+  const salonOwnerLoginM = useMutation({
+    mutationFn: (studioGroupId: string) =>
+      apiJson<SalonOwnerSessionResponse>(`/api/v1/admin/overview/salons/${studioGroupId}/owner-session`, {
+        method: "POST",
+        accessToken,
+      }),
+    onSuccess: async (body) => {
+      await signInWithIssuedToken(body.accessToken);
+      navigate(velvetPostConsumerSessionPath(body.accessToken));
+    },
+  });
+
+  const sendNotificationM = useMutation({
+    mutationFn: async () =>
+      apiJson<{ deliveredCount: number }>("/api/v1/admin/overview/system-notifications", {
+        method: "POST",
+        accessToken,
+        body: JSON.stringify({
+          studioGroupIds: selectedSalonIds,
+          subject: notificationSubject.trim() || "Messaggio da Luxury",
+          message: notificationMessage.trim(),
+        }),
+      }),
+    onSuccess: () => {
+      setNotificationMessage("");
+      setNotificationSubject("Messaggio da Luxury");
+      setShowNotificationForm(false);
+    },
+  });
+
+  useEffect(() => {
+    if (page > totalPages - 1) {
+      setPage(Math.max(0, totalPages - 1));
+    }
+  }, [page, totalPages]);
+
+  useEffect(() => {
+    setSelectedSalonIds((prev) => prev.filter((id) => filteredIds.includes(id)));
+  }, [page, salonSearch, filteredIds.join(",")]);
+
+  useEffect(() => {
+    if (expandedSalonId && !filteredIds.includes(expandedSalonId)) {
+      setExpandedSalonId(null);
+    }
+  }, [expandedSalonId, filteredIds.join(",")]);
+
+  const submitCreateSalon = (ev: FormEvent<HTMLFormElement>) => {
+    ev.preventDefault();
+    setCreateErrorHint(null);
+    if (!createSalonForm.firstName.trim() || !createSalonForm.lastName.trim() || !createSalonForm.email.trim()) {
+      setCreateErrorHint("Compila nome, cognome ed email.");
+      return;
+    }
+    if (createSalonForm.password.length < 8) {
+      setCreateErrorHint("La password deve avere almeno 8 caratteri.");
+      return;
+    }
+    if (createSalonForm.password !== createSalonForm.confirmPassword) {
+      setCreateErrorHint("Le password non coincidono.");
+      return;
+    }
+    if (!createSalonForm.acceptTerms) {
+      setCreateErrorHint("Per proseguire accetta i termini del servizio.");
+      return;
+    }
+    if (!createSalonForm.salonName.trim()) {
+      setCreateErrorHint("Indica il nome del salone (come lo vedono i clienti in ricerca e in vetrina).");
+      return;
+    }
+    const salonErr = validateRequiredSalonLocation(createSalonForm);
+    if (salonErr) {
+      setCreateErrorHint(salonErr);
+      return;
+    }
+    createSalonM.mutate();
+  };
+
+  return (
+    <>
+      <section className="velvet-admin-panel velvet-admin-premium-card" aria-labelledby={headingId}>
+        <h2 id={headingId} className="velvet-admin-section-title">
+          {title}
+        </h2>
+        <div className="velvet-admin-subchips velvet-admin-premium-card__toolbar">
+          <button
+            type="button"
+            className="velvet-admin-btn"
+            onClick={() =>
+              setShowCreateForm((v) => {
+                const next = !v;
+                if (next) {
+                  setCreateErrorHint(null);
+                }
+                return next;
+              })
+            }
+          >
+            {showCreateForm ? createCloseLabel : createOpenLabel}
+          </button>
+          <button
+            type="button"
+            className="velvet-admin-btn"
+            onClick={() =>
+              setShowNotificationForm((v) => {
+                const next = !v;
+                if (next) {
+                  sendNotificationM.reset();
+                }
+                return next;
+              })
+            }
+          >
+            {showNotificationForm ? "Chiudi notifica" : "Invia notifica"}
+          </button>
+          <button
+            type="button"
+            className="velvet-admin-subchip"
+            onClick={() => setSelectedSalonIds([])}
+            disabled={selectedSalonIds.length === 0}
+          >
+            Deseleziona ({selectedSalonIds.length})
+          </button>
+        </div>
+        {showNotificationForm ? (
+          <div className="velvet-admin-actions velvet-admin-premium-card__notify-box">
+            <p className="velvet-admin-premium-card__notify-hint">
+              Seleziona i saloni con le checkbox nella tabella, poi invia: il messaggio compare nel centro notifiche del
+              titolare (sezione «Messaggi Luxury»).
+            </p>
+            <input
+              type="text"
+              className="velvet-admin-input"
+              aria-label="Oggetto messaggio"
+              placeholder="Oggetto (titolo breve)"
+              value={notificationSubject}
+              onChange={(e) => setNotificationSubject(e.target.value)}
+            />
+            <textarea
+              className="velvet-admin-input"
+              placeholder="Testo del messaggio per i titolari selezionati…"
+              value={notificationMessage}
+              onChange={(e) => setNotificationMessage(e.target.value)}
+            />
+            <button
+              type="button"
+              className="velvet-admin-btn velvet-admin-premium-card__notify-send"
+              disabled={
+                sendNotificationM.isPending || !notificationMessage.trim() || selectedSalonIds.length === 0
+              }
+              onClick={() => sendNotificationM.mutate()}
+            >
+              {sendNotificationM.isPending ? "Invio…" : `Invia a ${selectedSalonIds.length} salone/i`}
+            </button>
+          </div>
+        ) : null}
+        {sendNotificationM.isError ? (
+          <p className="velvet-alert velvet-alert--error" role="alert">
+            {sendNotificationM.error instanceof Error ? sendNotificationM.error.message : "Invio messaggio fallito."}
+          </p>
+        ) : null}
+        {sendNotificationM.isSuccess ? (
+          <p className="velvet-alert" role="status">
+            Messaggio inviato nel centro notifiche di {sendNotificationM.data?.deliveredCount ?? 0} salone/i
+            selezionato/i.
+          </p>
+        ) : null}
+        {salonOwnerLoginM.isError ? (
+          <p className="velvet-alert velvet-alert--error" role="alert">
+            {salonOwnerLoginM.error instanceof Error ? salonOwnerLoginM.error.message : "Login titolare non riuscito."}
+          </p>
+        ) : null}
+        <div className="velvet-admin-subreveal is-open">
+          <div className="velvet-admin-premium-card__search-panel">
+            <label className="velvet-admin-premium-card__search-label" htmlFor={`${idPrefix}-search`}>
+              Cerca per nome salone
+            </label>
+            <div className="velvet-admin-premium-card__search-row">
+              <input
+                id={`${idPrefix}-search`}
+                type="search"
+                className="velvet-admin-input velvet-admin-premium-card__search-input"
+                placeholder="Es. Luxury, Bologna…"
+                value={salonSearch}
+                onChange={(e) => setSalonSearch(e.target.value)}
+                autoComplete="off"
+                spellCheck={false}
+              />
+              {salonSearch.trim() ? (
+                <button type="button" className="velvet-admin-premium-card__search-clear" onClick={() => setSalonSearch("")}>
+                  Azzera
+                </button>
+              ) : null}
+            </div>
+          </div>
+          <div className="velvet-admin-table-wrap velvet-admin-premium-card__table-wrap">
+            <table className="velvet-admin-table velvet-admin-table--compact velvet-admin-premium-card__table velvet-admin-premium-card__table--accordion">
+              <thead>
+                <tr>
+                  <th>
+                    <input
+                      type="checkbox"
+                      aria-label="Seleziona tutti i saloni visibili"
+                      checked={allFilteredSelected}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedSalonIds((prev) => Array.from(new Set([...prev, ...filteredIds])));
+                        } else {
+                          setSelectedSalonIds((prev) => prev.filter((id) => !filteredIds.includes(id)));
+                        }
+                      }}
+                    />
+                  </th>
+                  <th scope="col">Salone</th>
+                </tr>
+              </thead>
+              <tbody>
+                {salonsQ.isLoading ? (
+                  <tr>
+                    <td colSpan={2}>{loadingSalonsLabel}</td>
+                  </tr>
+                ) : filteredSlice.length === 0 ? (
+                  <tr>
+                    <td colSpan={2}>Nessun risultato con i filtri correnti.</td>
+                  </tr>
+                ) : (
+                  filteredSlice.map((row) => {
+                    const isOpen = expandedSalonId === row.studioGroupId;
+                    return (
+                      <Fragment key={row.studioGroupId}>
+                        <tr
+                          className={[
+                            "velvet-admin-premium-card__salon-row",
+                            selectedSalonIds.includes(row.studioGroupId) ? "is-selected" : "",
+                            isOpen ? "velvet-admin-premium-card__salon-row--open" : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                        >
+                          <td>
+                            <input
+                              type="checkbox"
+                              aria-label={`Seleziona salone ${row.name}`}
+                              checked={selectedSalonIds.includes(row.studioGroupId)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedSalonIds((prev) => Array.from(new Set([...prev, row.studioGroupId])));
+                                } else {
+                                  setSelectedSalonIds((prev) => prev.filter((id) => id !== row.studioGroupId));
+                                }
+                              }}
+                            />
+                          </td>
+                          <td>
+                            <div className="velvet-admin-premium-card__salon-row-main">
+                              <button
+                                type="button"
+                                className="velvet-admin-premium-card__salon-name-btn"
+                                aria-expanded={isOpen}
+                                aria-controls={`${idPrefix}-detail-${row.studioGroupId}`}
+                                id={`${idPrefix}-toggle-${row.studioGroupId}`}
+                                onClick={() =>
+                                  setExpandedSalonId((id) => (id === row.studioGroupId ? null : row.studioGroupId))
+                                }
+                              >
+                                <span className="velvet-admin-premium-card__salon-name-text">{row.name}</span>
+                                <span
+                                  className={`velvet-admin-premium-card__salon-chevron${isOpen ? " is-open" : ""}`}
+                                  aria-hidden
+                                >
+                                  {isOpen ? "▲" : "▼"}
+                                </span>
+                              </button>
+                              {apiPlanTier === "BASE" ? (
+                                <>
+                                  <button
+                                    type="button"
+                                    className="velvet-admin-btn velvet-admin-premium-card__action-btn velvet-admin-premium-card__salon-row-login"
+                                    title={
+                                      row.ownerEmail
+                                        ? "Apri l’account titolare nell’area salone (sessione Luxury)"
+                                        : "Email titolare assente: impossibile aprire la sessione"
+                                    }
+                                    disabled={!row.ownerEmail || salonOwnerLoginM.isPending || deleteSalonM.isPending}
+                                    onClick={() => salonOwnerLoginM.mutate(row.studioGroupId)}
+                                  >
+                                    {salonOwnerLoginM.isPending && salonOwnerLoginM.variables === row.studioGroupId
+                                      ? "Login…"
+                                      : "Login"}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="velvet-admin-btn velvet-admin-btn--danger velvet-admin-premium-card__action-btn velvet-admin-premium-card__salon-row-login"
+                                    disabled={deleteSalonM.isPending || salonOwnerLoginM.isPending}
+                                    onClick={() => {
+                                      if (window.confirm(`Eliminare il salone ${row.name}?`)) {
+                                        deleteSalonM.mutate(row.studioGroupId);
+                                      }
+                                    }}
+                                  >
+                                    {deleteSalonM.isPending && deleteSalonM.variables === row.studioGroupId
+                                      ? "Eliminazione…"
+                                      : "Elimina"}
+                                  </button>
+                                </>
+                              ) : null}
+                            </div>
+                          </td>
+                        </tr>
+                        {isOpen ? (
+                          <tr
+                            className={[
+                              "velvet-admin-premium-card__salon-detail-row",
+                              selectedSalonIds.includes(row.studioGroupId) ? "is-selected" : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                          >
+                            <td colSpan={2}>
+                              <div
+                                className="velvet-admin-premium-card__detail-panel"
+                                id={`${idPrefix}-detail-${row.studioGroupId}`}
+                                role="region"
+                                aria-labelledby={`${idPrefix}-toggle-${row.studioGroupId}`}
+                              >
+                                <div className="velvet-admin-premium-card__detail-grid">
+                                  <div>
+                                    <span className="velvet-admin-premium-card__detail-label">Titolare</span>
+                                    <span className="velvet-admin-premium-card__detail-value">{row.ownerEmail ?? "—"}</span>
+                                  </div>
+                                  <div>
+                                    <span className="velvet-admin-premium-card__detail-label">Città</span>
+                                    <span className="velvet-admin-premium-card__detail-value">
+                                      {row.primaryLocationCity
+                                        ? formatSalonCityForDisplay(row.primaryLocationCity) ?? row.primaryLocationCity
+                                        : "—"}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="velvet-admin-premium-card__detail-label">Sede</span>
+                                    <span className="velvet-admin-premium-card__detail-value">
+                                      {row.primaryLocationName ?? "—"}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="velvet-admin-premium-card__detail-label">Creato</span>
+                                    <span className="velvet-admin-premium-card__detail-value">{formatDate(row.createdAt)}</span>
+                                  </div>
+                                  {row.planTier ? (
+                                    <div>
+                                      <span className="velvet-admin-premium-card__detail-label">Piano</span>
+                                      <span className="velvet-admin-premium-card__detail-value">{row.planTier}</span>
+                                    </div>
+                                  ) : null}
+                                  <div>
+                                    <span className="velvet-admin-premium-card__detail-label">Provider</span>
+                                    <span className="velvet-admin-premium-card__detail-value">
+                                      {row.provider ? "Sì — senza pagamento" : "No — a pagamento"}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="velvet-admin-premium-card__actions-cell">
+                                  <button
+                                    type="button"
+                                    className="velvet-admin-btn velvet-admin-premium-card__action-btn"
+                                    onClick={() => onEditSalon(row)}
+                                  >
+                                    Modifica
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="velvet-admin-btn velvet-admin-btn--danger velvet-admin-premium-card__action-btn"
+                                    disabled={deleteSalonM.isPending || salonOwnerLoginM.isPending}
+                                    onClick={() => {
+                                      if (window.confirm(`Eliminare il salone ${row.name}?`)) {
+                                        deleteSalonM.mutate(row.studioGroupId);
+                                      }
+                                    }}
+                                  >
+                                    Cancella
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="velvet-admin-btn velvet-admin-premium-card__action-btn"
+                                    title={
+                                      row.ownerEmail
+                                        ? "Apri l’account titolare nell’area salone (sessione Luxury)"
+                                        : "Email titolare assente: impossibile aprire la sessione"
+                                    }
+                                    disabled={!row.ownerEmail || salonOwnerLoginM.isPending || deleteSalonM.isPending}
+                                    onClick={() => salonOwnerLoginM.mutate(row.studioGroupId)}
+                                  >
+                                    {salonOwnerLoginM.isPending && salonOwnerLoginM.variables === row.studioGroupId
+                                      ? "Login…"
+                                      : "Login"}
+                                  </button>
+                                </div>
+                                <div className="velvet-admin-premium-card__staff-block">
+                                  <h3 className="velvet-admin-premium-card__staff-title">Staff (operatori)</h3>
+                                  {deleteStaffOperatorM.isError ? (
+                                    <p className="velvet-alert velvet-alert--error" role="alert">
+                                      {deleteStaffOperatorM.error instanceof Error
+                                        ? deleteStaffOperatorM.error.message
+                                        : "Eliminazione staff non riuscita."}
+                                    </p>
+                                  ) : null}
+                                  {row.staff === undefined ? (
+                                    <p className="velvet-admin-premium-card__staff-muted">
+                                      Lo staff non è incluso nella risposta del backend. Ricompila e riavvia Spring con la
+                                      versione di Luxury che aggiunge il campo <code>staff</code> a{" "}
+                                      <code>GET /api/v1/admin/overview/salons</code>.
+                                    </p>
+                                  ) : !row.staff.length ? (
+                                    <p className="velvet-admin-premium-card__staff-muted">Nessun operatore in elenco.</p>
+                                  ) : (
+                                    <ul className="velvet-admin-premium-card__staff-list">
+                                      {row.staff.map((op) => (
+                                        <li key={op.operatorId} className="velvet-admin-premium-card__staff-item">
+                                          <div className="velvet-admin-premium-card__staff-item-main">
+                                            <strong>{op.displayName}</strong>
+                                            {op.role ? ` · ${op.role}` : ""} · {op.locationName}
+                                            {op.accountLinked ? (
+                                              <>
+                                                {" "}
+                                                <span className="velvet-admin-muted">— account: {op.staffEmail ?? "—"}</span>
+                                              </>
+                                            ) : (
+                                              <span className="velvet-admin-muted"> — senza account di accesso</span>
+                                            )}
+                                          </div>
+                                          <button
+                                            type="button"
+                                            className="velvet-admin-btn velvet-admin-btn--danger velvet-admin-premium-card__staff-remove"
+                                            disabled={
+                                              deleteStaffOperatorM.isPending ||
+                                              deleteSalonM.isPending ||
+                                              salonOwnerLoginM.isPending
+                                            }
+                                            onClick={() => {
+                                              if (
+                                                !window.confirm(
+                                                  `Eliminare l’operatore «${op.displayName}» da questo salone? L’account di accesso collegato verrà rimosso se presente.`,
+                                                )
+                                              ) {
+                                                return;
+                                              }
+                                              deleteStaffOperatorM.mutate({
+                                                studioGroupId: row.studioGroupId,
+                                                operatorId: op.operatorId,
+                                              });
+                                            }}
+                                          >
+                                            {deleteStaffOperatorM.isPending &&
+                                            deleteStaffOperatorM.variables?.operatorId === op.operatorId
+                                              ? "Eliminazione…"
+                                              : "Elimina"}
+                                          </button>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : null}
+                      </Fragment>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+          {totalPages > 1 ? (
+            <div className="velvet-admin-subchips velvet-admin-premium-card__pagination" aria-label={paginationAriaLabel}>
+              <button
+                type="button"
+                className="velvet-admin-subchip"
+                disabled={pageSafe === 0}
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+              >
+                ← Precedente
+              </button>
+              <span className="velvet-admin-muted">
+                Pagina {pageSafe + 1} di {totalPages}
+              </span>
+              <button
+                type="button"
+                className="velvet-admin-subchip"
+                disabled={pageSafe >= totalPages - 1}
+                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              >
+                Successiva →
+              </button>
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      {showCreateForm ? (
+        <div
+          className="velvet-plans-modal-root"
+          role="presentation"
+          onMouseDown={(ev) => {
+            if (ev.target === ev.currentTarget && !createSalonM.isPending) {
+              setShowCreateForm(false);
+            }
+          }}
+        >
+          <div
+            className="velvet-plans-modal velvet-plans-modal--wide"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`${idPrefix}-create-title`}
+          >
+            <div className="velvet-plans-modal__head">
+              <h2 id={`${idPrefix}-create-title`} className="velvet-plans-modal__title">
+                {modalCreateTitle}
+              </h2>
+              <button
+                type="button"
+                className="velvet-plans-modal__close"
+                onClick={() => setShowCreateForm(false)}
+                disabled={createSalonM.isPending}
+                aria-label="Chiudi"
+              >
+                ×
+              </button>
+            </div>
+            {modalCreateIntro}
+            <p className="velvet-plans-modal__note" role="note">
+              <strong>Backend:</strong> account e password sono gestiti da Luxury (Spring Security).
+            </p>
+            {createErrorHint ? (
+              <p className="velvet-alert velvet-alert--error velvet-plans-modal__alert" role="alert">
+                {createErrorHint}
+              </p>
+            ) : createSalonM.isError ? (
+              <p className="velvet-alert velvet-alert--error velvet-plans-modal__alert" role="alert">
+                {createSalonM.error instanceof Error ? createSalonM.error.message : createErrorDefault}
+              </p>
+            ) : null}
+            {createSalonM.isSuccess ? (
+              <p className="velvet-alert velvet-alert--success velvet-plans-modal__alert" role="status">
+                {createSuccessMessage}
+              </p>
+            ) : null}
+            <form className="velvet-plans-modal__form" noValidate onSubmit={submitCreateSalon}>
+              <label className="velvet-plans-field">
+                <span>Nome</span>
+                <input
+                  value={createSalonForm.firstName}
+                  onChange={(e) => setCreateSalonForm((s) => ({ ...s, firstName: e.target.value }))}
+                  disabled={createSalonM.isPending}
+                  required
+                  maxLength={100}
+                />
+              </label>
+              <label className="velvet-plans-field">
+                <span>Cognome</span>
+                <input
+                  value={createSalonForm.lastName}
+                  onChange={(e) => setCreateSalonForm((s) => ({ ...s, lastName: e.target.value }))}
+                  disabled={createSalonM.isPending}
+                  required
+                  maxLength={100}
+                />
+              </label>
+              <label className="velvet-plans-field velvet-plans-field--full">
+                <span>Email</span>
+                <input
+                  type="email"
+                  value={createSalonForm.email}
+                  onChange={(e) => setCreateSalonForm((s) => ({ ...s, email: e.target.value }))}
+                  disabled={createSalonM.isPending}
+                  required
+                  maxLength={320}
+                />
+              </label>
+              <label className="velvet-plans-field velvet-plans-field--full">
+                <span>Telefono</span>
+                <input
+                  value={createSalonForm.phone}
+                  onChange={(e) => setCreateSalonForm((s) => ({ ...s, phone: e.target.value }))}
+                  disabled={createSalonM.isPending}
+                  maxLength={40}
+                />
+              </label>
+              <fieldset className="velvet-plans-fieldset velvet-plans-field--full velvet-plans-provider">
+                <legend className="velvet-plans-salon-types__legend">Salone provider</legend>
+                <p className="velvet-plans-provider__hint">
+                  I saloni provider non effettuano alcun pagamento abbonamento a Luxury (anche se creati come Premium) e
+                  sono esclusi dai conteggi «a pagamento» nelle statistiche.
+                </p>
+                <div className="velvet-plans-provider__options">
+                  <label className="velvet-plans-provider__option">
+                    <input
+                      type="radio"
+                      name={`${idPrefix}-provider`}
+                      checked={!createSalonForm.provider}
+                      onChange={() => setCreateSalonForm((s) => ({ ...s, provider: false }))}
+                      disabled={createSalonM.isPending}
+                    />
+                    <span>No — salone standard</span>
+                  </label>
+                  <label className="velvet-plans-provider__option">
+                    <input
+                      type="radio"
+                      name={`${idPrefix}-provider`}
+                      checked={createSalonForm.provider}
+                      onChange={() => setCreateSalonForm((s) => ({ ...s, provider: true }))}
+                      disabled={createSalonM.isPending}
+                    />
+                    <span>Sì — salone provider</span>
+                  </label>
+                </div>
+              </fieldset>
+              <label className="velvet-plans-field velvet-plans-field--full">
+                <span>Nome del salone</span>
+                <input
+                  value={createSalonForm.salonName}
+                  onChange={(e) => setCreateSalonForm((s) => ({ ...s, salonName: e.target.value }))}
+                  disabled={createSalonM.isPending}
+                  required
+                  maxLength={200}
+                />
+              </label>
+              <label className="velvet-plans-field velvet-plans-field--full">
+                <span>Indirizzo sede (via e civico)</span>
+                <input
+                  value={createSalonForm.salonAddressLine1}
+                  onChange={(e) => setCreateSalonForm((s) => ({ ...s, salonAddressLine1: e.target.value }))}
+                  disabled={createSalonM.isPending}
+                  required
+                  maxLength={200}
+                />
+              </label>
+              <label className="velvet-plans-field">
+                <span>CAP</span>
+                <input
+                  value={createSalonForm.salonPostalCode}
+                  onChange={(e) => setCreateSalonForm((s) => ({ ...s, salonPostalCode: e.target.value }))}
+                  disabled={createSalonM.isPending}
+                  required
+                  maxLength={12}
+                />
+              </label>
+              <label className="velvet-plans-field">
+                <span>Città</span>
+                <input
+                  value={createSalonForm.salonCity}
+                  onChange={(e) => setCreateSalonForm((s) => ({ ...s, salonCity: e.target.value }))}
+                  disabled={createSalonM.isPending}
+                  required
+                  maxLength={100}
+                />
+              </label>
+              <label className="velvet-plans-field">
+                <span>Provincia (sigla)</span>
+                <input
+                  value={createSalonForm.salonProvince}
+                  onChange={(e) => setCreateSalonForm((s) => ({ ...s, salonProvince: e.target.value }))}
+                  disabled={createSalonM.isPending}
+                  required
+                  maxLength={5}
+                  placeholder="es. MI"
+                />
+              </label>
+              <label className="velvet-plans-field">
+                <span>Paese (ISO)</span>
+                <input
+                  value={createSalonForm.salonCountry}
+                  onChange={(e) => setCreateSalonForm((s) => ({ ...s, salonCountry: e.target.value.toUpperCase() }))}
+                  disabled={createSalonM.isPending}
+                  maxLength={2}
+                  placeholder="IT"
+                />
+              </label>
+              <div className="velvet-plans-password-pair">
+                <label className="velvet-plans-field">
+                  <span>Password</span>
+                  <input
+                    type="password"
+                    value={createSalonForm.password}
+                    onChange={(e) => setCreateSalonForm((s) => ({ ...s, password: e.target.value }))}
+                    disabled={createSalonM.isPending}
+                    required
+                    minLength={8}
+                    maxLength={200}
+                  />
+                </label>
+                <label className="velvet-plans-field">
+                  <span>Ripeti password</span>
+                  <input
+                    type="password"
+                    value={createSalonForm.confirmPassword}
+                    onChange={(e) => setCreateSalonForm((s) => ({ ...s, confirmPassword: e.target.value }))}
+                    disabled={createSalonM.isPending}
+                    required
+                    minLength={8}
+                    maxLength={200}
+                  />
+                </label>
+              </div>
+              <div className="velvet-plans-privacy-terms velvet-plans-field--full">
+                <label className="velvet-plans-field velvet-plans-field--check">
+                  <input
+                    type="checkbox"
+                    checked={createSalonForm.acceptTerms}
+                    onChange={(e) => setCreateSalonForm((s) => ({ ...s, acceptTerms: e.target.checked }))}
+                    disabled={createSalonM.isPending}
+                  />
+                  <span>
+                    Dichiaro di aver letto e accetto i{" "}
+                    <Link to="/termini" className="velvet-link-inline" target="_blank" rel="noopener noreferrer">
+                      termini di servizio
+                    </Link>{" "}
+                    e l&apos;
+                    <Link to="/privacy" className="velvet-link-inline" target="_blank" rel="noopener noreferrer">
+                      informativa privacy
+                    </Link>
+                    .
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  className="velvet-plans-privacy-open"
+                  onClick={() => setPrivacyNoticeOpen(true)}
+                  disabled={createSalonM.isPending}
+                >
+                  Leggi info e privacy
+                </button>
+              </div>
+              <div className="velvet-plans-modal__actions">
+                <button
+                  type="button"
+                  className="velvet-plan-cta velvet-plan-cta--secondary"
+                  onClick={() => setShowCreateForm(false)}
+                  disabled={createSalonM.isPending}
+                >
+                  Annulla
+                </button>
+                <button type="submit" className="velvet-plan-cta" disabled={createSalonM.isPending}>
+                  {createSalonM.isPending ? "Creazione account…" : "Crea account e continua"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
+      <SalonPremiumOwnerInfoPrivacyModal
+        open={privacyNoticeOpen}
+        onClose={() => setPrivacyNoticeOpen(false)}
+        salonName={createSalonForm.salonName.trim() || null}
+        supportEmail={partnerContactEmail || null}
+        showAccountActions={false}
+      />
+    </>
+  );
+}

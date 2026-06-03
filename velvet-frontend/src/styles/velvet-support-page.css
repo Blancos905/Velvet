@@ -1,0 +1,225 @@
+.velvet-support-page {
+  display: grid;
+  gap: clamp(1.15rem, 2.8vw, 2rem);
+}
+
+/* Intestazione pagina: velvet-account-page-shell__hero */
+
+.velvet-support-page__grid {
+  display: grid;
+  gap: 1.15rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.velvet-support-card {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 0.95rem;
+  padding: clamp(1.05rem, 2.4vw, 1.7rem);
+  border-radius: 18px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(253, 186, 116, 0.14), transparent 40%),
+    linear-gradient(160deg, rgba(67, 20, 7, 0.48), rgba(24, 8, 3, 0.7));
+  box-shadow:
+    0 18px 34px rgba(45, 16, 6, 0.28),
+    inset 0 1px 0 rgba(255, 247, 237, 0.05);
+  transition:
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.22s ease,
+    box-shadow 0.24s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .velvet-support-card:hover {
+    transform: translateY(-3px);
+    border-color: #000000;
+    box-shadow:
+      0 22px 42px rgba(45, 16, 6, 0.34),
+      inset 0 1px 0 rgba(255, 247, 237, 0.08),
+      0 0 28px rgba(249, 115, 22, 0.08);
+  }
+}
+
+.velvet-support-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12%;
+  bottom: 12%;
+  width: 4px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(253, 186, 116, 0.95), rgba(234, 88, 12, 0.72));
+}
+
+.velvet-support-card__badge {
+  margin: 0;
+  justify-self: start;
+  padding: 0.34rem 0.62rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  color: rgba(24, 8, 3, 0.92);
+  border: 1px solid rgba(255, 247, 237, 0.62);
+  background: linear-gradient(140deg, #fff7ed, #fdba74);
+}
+
+.velvet-support-card__logo {
+  margin: 0 0 0.25rem;
+}
+
+.velvet-support-card__logo .saloni-velvet-mark {
+  margin: 0;
+}
+
+.velvet-support-card__logo .saloni-velvet-mark__logo {
+  width: clamp(62px, 10vw, 84px);
+  height: clamp(62px, 10vw, 84px);
+}
+
+.velvet-support-card__logo .saloni-velvet-mark__text {
+  padding: 0.5rem 0.72rem 0.58rem;
+}
+
+.velvet-support-card__logo .saloni-velvet-mark__saloni {
+  font-size: clamp(0.66rem, 1.2vw, 0.82rem);
+}
+
+.velvet-support-card__logo .saloni-velvet-mark__velvet {
+  font-size: clamp(1.2rem, 2.2vw, 1.58rem);
+}
+
+.velvet-support-card__title {
+  margin: 0;
+}
+
+.velvet-support-card__text {
+  margin: 0;
+  line-height: 1.58;
+}
+
+.velvet-support-card__contacts {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.velvet-support-contact {
+  display: grid;
+  gap: 0.16rem;
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 0.78rem 0.9rem;
+  border: 1px solid rgba(253, 186, 116, 0.3);
+  background: linear-gradient(165deg, rgba(24, 8, 3, 0.38), rgba(67, 20, 7, 0.34));
+  color: #ffedd5;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.velvet-support-contact:hover {
+  border-color: rgba(253, 186, 116, 0.7);
+  background: linear-gradient(165deg, rgba(67, 20, 7, 0.45), rgba(124, 45, 18, 0.35));
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(45, 16, 6, 0.24);
+}
+
+.velvet-support-contact__label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: rgba(255, 251, 235, 0.62);
+}
+
+.velvet-support-contact--muted {
+  color: rgba(255, 251, 235, 0.68);
+}
+
+.velvet-support-contact__value-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0.55rem 0.65rem;
+  min-width: 0;
+}
+
+.velvet-support-contact__tel {
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+}
+
+.velvet-support-contact__tel:hover strong {
+  text-decoration: underline;
+}
+
+.velvet-support-contact__whatsapp {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.55rem;
+  height: 2.55rem;
+  border-radius: 12px;
+  color: #fff;
+  background: #25d366;
+  box-shadow: 0 2px 10px rgba(37, 211, 102, 0.35);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.velvet-support-contact__whatsapp:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45);
+  filter: brightness(1.06);
+}
+
+.velvet-support-card__footnote {
+  margin: 0.25rem 0 0;
+  font-size: 0.86rem;
+  color: rgba(255, 251, 235, 0.62);
+  line-height: 1.5;
+}
+
+.velvet-support-request-form {
+  margin-top: 0.4rem;
+  display: grid;
+  gap: 0.78rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(255, 237, 213, 0.12);
+}
+
+.velvet-support-request-form__textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+@media (max-width: 860px) {
+  .velvet-support-page__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .velvet-support-card::before {
+    width: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .velvet-support-card {
+    transition: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .velvet-support-card:hover {
+      transform: none;
+    }
+  }
+}
