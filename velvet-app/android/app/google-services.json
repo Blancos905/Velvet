@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "944065741904",
+    "project_id": "saloniluxury",
+    "storage_bucket": "saloniluxury.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944065741904:android:d9a5b50b59609272affd55",
+        "android_client_info": {
+          "package_name": "it.saloniluxury.velvet_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0yWG_Lg-XGdUWYHNJ4OIIMOm1QImWQQk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

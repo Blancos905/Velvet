@@ -67,6 +67,14 @@ public class Location {
 	@Column(nullable = false)
 	private int workEndMinuteOfDay = 1140;
 
+	/** Fine fascia mattutina (es. 13:00); con {@link #workAfternoonStartMinuteOfDay} definisce la pausa pranzo. */
+	@Column(name = "work_morning_end_minute_of_day")
+	private Integer workMorningEndMinuteOfDay;
+
+	/** Inizio fascia pomeridiana (es. 14:30); slot non prenotabili tra mattina e pomeriggio. */
+	@Column(name = "work_afternoon_start_minute_of_day")
+	private Integer workAfternoonStartMinuteOfDay;
+
 	@Column(length = 2000)
 	private String welcomeMessage;
 
@@ -206,6 +214,22 @@ public class Location {
 
 	public void setWorkEndMinuteOfDay(int workEndMinuteOfDay) {
 		this.workEndMinuteOfDay = workEndMinuteOfDay;
+	}
+
+	public Integer getWorkMorningEndMinuteOfDay() {
+		return workMorningEndMinuteOfDay;
+	}
+
+	public void setWorkMorningEndMinuteOfDay(Integer workMorningEndMinuteOfDay) {
+		this.workMorningEndMinuteOfDay = workMorningEndMinuteOfDay;
+	}
+
+	public Integer getWorkAfternoonStartMinuteOfDay() {
+		return workAfternoonStartMinuteOfDay;
+	}
+
+	public void setWorkAfternoonStartMinuteOfDay(Integer workAfternoonStartMinuteOfDay) {
+		this.workAfternoonStartMinuteOfDay = workAfternoonStartMinuteOfDay;
 	}
 
 	public String getWelcomeMessage() {

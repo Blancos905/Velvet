@@ -19,7 +19,7 @@ import {
   SALON_PREMIUM_PANORAMA_PLAN_SUBLINE,
   SALON_PREMIUM_PANORAMA_STEPS,
 } from "../../data/salonPremiumPanoramaContent";
-import { SaloniVelvetLogoMark } from "../SaloniVelvetLogoMark";
+import { SaloniLuxuryLogoMark } from "../SaloniLuxuryLogoMark";
 import "../../styles/salon-premium-panorama.css";
 
 const HUB_BODY_PAD_X = "clamp(0.35rem, 1.2vw, 0.65rem)";
@@ -292,7 +292,7 @@ export function SalonPremiumPanorama({
             <header className="space-y-4">
               <div className="salon-premium-panorama__brand-head flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="salon-premium-panorama__brand-mark min-w-0">
-                  <SaloniVelvetLogoMark />
+                  <SaloniLuxuryLogoMark />
                 </div>
                 {layoutVariant !== "public" ? (
                   <span className="salon-premium-panorama__plan-badge shrink-0 self-start sm:mt-2">{planLabel}</span>

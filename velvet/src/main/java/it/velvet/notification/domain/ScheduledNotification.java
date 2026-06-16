@@ -40,7 +40,8 @@ public class ScheduledNotification {
 	@JoinColumn(name = "studio_group_id")
 	private StudioGroup studioGroup;
 
-	/** Per {@link NotificationType#SUPPORT_REQUEST_TO_VELVET}: profilo consumer del super admin che riceve l'inbox. */
+	/** Per {@link NotificationType#SUPPORT_REQUEST_TO_VELVET}: profilo consumer del super admin che riceve l'inbox.
+	 *  Per {@link NotificationType#ADMIN_PLATFORM_MESSAGE} senza appuntamento: profilo cliente destinatario. */
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "recipient_consumer_id")
 	private ConsumerProfile recipientConsumer;
@@ -88,7 +89,7 @@ public class ScheduledNotification {
 	@Column(name = "consumer_deleted_at")
 	private Instant consumerDeletedAt;
 
-	/** Impostato dopo invio WhatsApp riuscito via webhook. */
+	/** Colonna legacy (ex invio WhatsApp via webhook); non più popolata. */
 	@Column(name = "whatsapp_sent_at")
 	private Instant whatsappSentAt;
 
@@ -117,6 +118,23 @@ public class ScheduledNotification {
 		ScheduledNotification n = new ScheduledNotification();
 		n.studioGroup = group;
 		n.appointment = null;
+		n.type = NotificationType.ADMIN_PLATFORM_MESSAGE;
+		n.scheduledAt = at;
+		n.status = QueuedNotificationStatus.SENT;
+		n.sentAt = at;
+		String s = subject != null ? subject.trim() : "";
+		n.platformMessageSubject = s.isEmpty() ? "Messaggio da Velvet" : s.substring(0, Math.min(s.length(), 200));
+		n.platformMessageBody = body != null ? body.trim() : "";
+		return n;
+	}
+
+	/** Messaggio centro notifiche cliente (bucket «Messaggi Luxury» / SYSTEM): già consegnato in-app. */
+	public static ScheduledNotification adminPlatformInboxForConsumer(
+			ConsumerProfile consumer, String subject, String body, Instant at) {
+		ScheduledNotification n = new ScheduledNotification();
+		n.recipientConsumer = consumer;
+		n.appointment = null;
+		n.studioGroup = null;
 		n.type = NotificationType.ADMIN_PLATFORM_MESSAGE;
 		n.scheduledAt = at;
 		n.status = QueuedNotificationStatus.SENT;

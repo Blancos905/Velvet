@@ -25,19 +25,19 @@ public class MeSalonSummaryService {
 	private final StudioGroupRepository studioGroupRepository;
 	private final LocationRepository locationRepository;
 	private final MeSalonOwnerOrphanRepairService meSalonOwnerOrphanRepairService;
-	private final SalonLocationGeocodingService salonLocationGeocodingService;
+	private final SalonLocationGeocodingAsyncService salonLocationGeocodingAsyncService;
 
 	public MeSalonSummaryService(
 			StudioGroupOwnerResolver studioGroupOwnerResolver,
 			StudioGroupRepository studioGroupRepository,
 			LocationRepository locationRepository,
 			MeSalonOwnerOrphanRepairService meSalonOwnerOrphanRepairService,
-			SalonLocationGeocodingService salonLocationGeocodingService) {
+			SalonLocationGeocodingAsyncService salonLocationGeocodingAsyncService) {
 		this.studioGroupOwnerResolver = studioGroupOwnerResolver;
 		this.studioGroupRepository = studioGroupRepository;
 		this.locationRepository = locationRepository;
 		this.meSalonOwnerOrphanRepairService = meSalonOwnerOrphanRepairService;
-		this.salonLocationGeocodingService = salonLocationGeocodingService;
+		this.salonLocationGeocodingAsyncService = salonLocationGeocodingAsyncService;
 	}
 
 	public MeSalonSummaryDto resolve(VelvetUserPrincipal principal) {
@@ -45,18 +45,19 @@ public class MeSalonSummaryService {
 			return MeSalonSummaryDto.notProvisioned();
 		}
 		return studioGroupOwnerResolver.resolveStudioGroupForOwner(principal)
-				.map(this::toDto)
+				.map(g -> toDto(g, principal))
 				.orElseGet(() -> resolveAfterOrphanRepair(principal));
 	}
 
 	private MeSalonSummaryDto resolveAfterOrphanRepair(VelvetUserPrincipal principal) {
 		meSalonOwnerOrphanRepairService.tryRepairIfOwnerWithNoStudio(principal);
 		return studioGroupOwnerResolver.resolveStudioGroupForOwner(principal)
-				.map(this::toDto)
+				.map(g -> toDto(g, principal))
 				.orElseGet(MeSalonSummaryDto::notProvisioned);
 	}
 
-	private MeSalonSummaryDto toDto(StudioGroup g) {
+	private MeSalonSummaryDto toDto(StudioGroup g, VelvetUserPrincipal principal) {
+		meSalonOwnerOrphanRepairService.tryRepairIfOwnerWithNoLocation(principal);
 		List<Location> locs = locationRepository.findByStudioGroup_IdOrderByNameAsc(g.getId());
 		Location loc = locs.isEmpty() ? null : locs.get(0);
 		String salonLabel = firstNonBlank(
@@ -76,6 +77,8 @@ public class MeSalonSummaryService {
 				salonClientGendersFromLocation(loc),
 				loc != null ? loc.getWorkStartMinuteOfDay() : null,
 				loc != null ? loc.getWorkEndMinuteOfDay() : null,
+				loc != null ? loc.getWorkMorningEndMinuteOfDay() : null,
+				loc != null ? loc.getWorkAfternoonStartMinuteOfDay() : null,
 				statisticsPinRequired(g));
 	}
 
@@ -149,12 +152,30 @@ public class MeSalonSummaryService {
 			loc.setWorkStartMinuteOfDay(open);
 			loc.setWorkEndMinuteOfDay(close);
 		}
-
-		salonLocationGeocodingService.tryApplyCoordinates(loc);
+		if (body.primaryLocationMorningEndMinuteOfDay() != null && body.primaryLocationAfternoonStartMinuteOfDay() != null) {
+			int morningEnd = validateMinuteOfDay(body.primaryLocationMorningEndMinuteOfDay(), "chiusura mattina");
+			int afternoonStart = validateMinuteOfDay(body.primaryLocationAfternoonStartMinuteOfDay(), "apertura pomeriggio");
+			int open = loc.getWorkStartMinuteOfDay();
+			int close = loc.getWorkEndMinuteOfDay();
+			if (morningEnd <= open || afternoonStart >= close || morningEnd >= afternoonStart) {
+				throw new BusinessException(
+						HttpStatus.BAD_REQUEST,
+						"VALIDATION_ERROR",
+						"Gli orari mattina/pomeriggio devono essere: apertura < chiusura mattina < apertura pomeriggio < chiusura.");
+			}
+			loc.setWorkMorningEndMinuteOfDay(morningEnd);
+			loc.setWorkAfternoonStartMinuteOfDay(afternoonStart);
+		}
+		else if (body.primaryLocationMorningEndMinuteOfDay() == null && body.primaryLocationAfternoonStartMinuteOfDay() == null
+				&& (body.primaryLocationOpeningMinuteOfDay() != null || body.primaryLocationClosingMinuteOfDay() != null)) {
+			loc.setWorkMorningEndMinuteOfDay(null);
+			loc.setWorkAfternoonStartMinuteOfDay(null);
+		}
 
 		studioGroupRepository.save(group);
-		locationRepository.save(loc);
-		return toDto(group);
+		Location saved = locationRepository.save(loc);
+		salonLocationGeocodingAsyncService.scheduleGeocode(saved.getId());
+		return toDto(group, principal);
 	}
 
 	private static String firstNonBlank(String... parts) {

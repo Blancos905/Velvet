@@ -11,7 +11,11 @@ public record MeSalonStaffDto(
 		String displayName,
 		String role,
 		String photoDataUrl,
-		boolean loginEnabled) {
+		boolean loginEnabled,
+		Integer workMorningStartMinuteOfDay,
+		Integer workMorningEndMinuteOfDay,
+		Integer workAfternoonStartMinuteOfDay,
+		Integer workAfternoonEndMinuteOfDay) {
 
 	public static MeSalonStaffDto from(StaffOperator o) {
 		String firstName = normalize(o.getFirstName());
@@ -25,7 +29,11 @@ public record MeSalonStaffDto(
 				displayName,
 				role.isBlank() ? "Staff" : role,
 				normalizeNullable(o.getPhotoDataUrl()),
-				o.getConsumerProfile() != null);
+				o.getConsumerProfile() != null,
+				o.getWorkMorningStartMinuteOfDay(),
+				o.getWorkMorningEndMinuteOfDay(),
+				o.getWorkAfternoonStartMinuteOfDay(),
+				o.getWorkAfternoonEndMinuteOfDay());
 	}
 
 	private static String normalize(String v) {

@@ -18,7 +18,7 @@ class VelvetSuperAdminAuthServiceTest {
 	void login_plaintext_password_ok() {
 		var props = new VelvetSuperAdminProperties("admin", "secret", "", "", "", "");
 		var enc = new BCryptPasswordEncoder();
-		var sec = new VelvetSecurityProperties("tok", null, 72, 15, 30, false, 30, 72, 30);
+		var sec = new VelvetSecurityProperties("tok", null, 72, 15, 30, false, 30, 30);
 		var tokenService = new VelvetTokenService(sec);
 		PlatformSuperAdminCredentialSource noDb = Optional::empty;
 		var svc = new VelvetSuperAdminAuthService(props, noDb, enc, tokenService, sec);
@@ -33,7 +33,7 @@ class VelvetSuperAdminAuthServiceTest {
 		var enc = new BCryptPasswordEncoder();
 		String hash = enc.encode("xxyyzz");
 		var props = new VelvetSuperAdminProperties("root", "", hash, "", "", "");
-		var sec = new VelvetSecurityProperties("tok", null, 72, 15, 30, false, 30, 72, 30);
+		var sec = new VelvetSecurityProperties("tok", null, 72, 15, 30, false, 30, 30);
 		var tokenService = new VelvetTokenService(sec);
 		PlatformSuperAdminCredentialSource noDb = Optional::empty;
 		var svc = new VelvetSuperAdminAuthService(props, noDb, enc, tokenService, sec);
@@ -45,7 +45,7 @@ class VelvetSuperAdminAuthServiceTest {
 	void login_wrong_password() {
 		var props = new VelvetSuperAdminProperties("admin", "secret", "", "", "", "");
 		var enc = new BCryptPasswordEncoder();
-		var sec = new VelvetSecurityProperties("tok", null, 72, 15, 30, false, 30, 72, 30);
+		var sec = new VelvetSecurityProperties("tok", null, 72, 15, 30, false, 30, 30);
 		var tokenService = new VelvetTokenService(sec);
 		PlatformSuperAdminCredentialSource noDb = Optional::empty;
 		var svc = new VelvetSuperAdminAuthService(props, noDb, enc, tokenService, sec);

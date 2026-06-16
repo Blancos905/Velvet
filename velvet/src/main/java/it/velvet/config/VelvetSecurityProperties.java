@@ -11,7 +11,6 @@ public record VelvetSecurityProperties(
 		Integer refreshTokenTtlDays,
 		Boolean rateLimitEnabled,
 		Integer rateLimitRequestsPerMinute,
-		int manageTokenTtlHours,
 		int reviewTokenTtlDays) {
 
 	public VelvetSecurityProperties {
@@ -35,9 +34,6 @@ public record VelvetSecurityProperties(
 		}
 		if (rateLimitRequestsPerMinute == null || rateLimitRequestsPerMinute <= 0) {
 			rateLimitRequestsPerMinute = 30;
-		}
-		if (manageTokenTtlHours <= 0) {
-			manageTokenTtlHours = 72;
 		}
 		if (reviewTokenTtlDays <= 0) {
 			reviewTokenTtlDays = 30;

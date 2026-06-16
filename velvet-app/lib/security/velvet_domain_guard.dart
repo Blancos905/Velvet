@@ -22,7 +22,7 @@ class VelvetDomainGuard {
 
   static Set<String> allowedHosts(String webBaseUrl) {
     final baseHost = Uri.tryParse(webBaseUrl)?.host.toLowerCase();
-    const defaults = {'salonivelvet.it', 'www.salonivelvet.it'};
+    const defaults = {'saloniluxury.it', 'www.saloniluxury.it'};
     if (baseHost == null || baseHost.isEmpty) {
       return defaults;
     }

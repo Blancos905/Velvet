@@ -203,6 +203,20 @@
     0 0 40px rgba(249, 115, 22, 0.12);
 }
 
+.velvet-account-hub__salon-name {
+  margin: 0.2rem 0 0;
+  font-size: clamp(1.02rem, 2.1vw, 1.15rem);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(253, 186, 116, 0.95);
+}
+
+.velvet-account-hub__salon-name strong {
+  font-weight: 700;
+  color: inherit;
+}
+
 /* --- Blocco 2: azioni (pulsanti ben distanziati) --- */
 
 .velvet-account-hub__nav {

@@ -1,11 +1,16 @@
 import { Link } from "react-router-dom";
 import {
-  LEGAL_ENTITY_ADDRESS_TODO,
-  LEGAL_ENTITY_LEGAL_NAME_TODO,
-  LEGAL_ENTITY_VAT_TODO,
-  legalEntityName,
+  companyAddress,
+  companyLegalName,
+  companyName,
+  companyVat,
 } from "../../content/legalEntity";
 import { GDPR_CITATIONS, LEGAL_CONTACT_EMAIL } from "../../content/legalReferences";
+import {
+  LEGAL_ART28_SUBPROCESSORS_PARAGRAPH,
+  LEGAL_PUSH_NOTIFICATIONS_PARAGRAPH,
+  LEGAL_REVIEW_MODERATION_PARAGRAPH,
+} from "../../content/legalSharedCopy";
 import { LegalCitationList } from "./LegalDocumentLayout";
 import {
   LegalPrivacyAccordion,
@@ -21,8 +26,14 @@ export function PrivacyPolicyConsumerLayeredContent() {
 
       <LegalPrivacyAccordion title="Chi tratta i dati (Titolari del Trattamento)" defaultOpen>
         <p className="velvet-legal-public__text">
-          <strong>{legalEntityName}</strong> (<em>{LEGAL_ENTITY_LEGAL_NAME_TODO}</em>, con sede in{" "}
-          <em>{LEGAL_ENTITY_ADDRESS_TODO}</em>, P.IVA <em>{LEGAL_ENTITY_VAT_TODO}</em>) è{" "}
+          <strong>{companyName}</strong> (<em>{companyLegalName}</em>, con sede in{" "}
+          <em>{companyAddress}</em>
+          {companyVat ? (
+            <>
+              , P.IVA <em>{companyVat}</em>
+            </>
+          ) : null}
+          ) è{" "}
           <strong>Titolare del Trattamento</strong> per i dati necessari a creare e gestire il tuo account cliente sulla
           piattaforma Luxury (sito web, area account, app mobile <code>velvet-app</code>): credenziali, profilo, preferiti,
           notifiche di piattaforma e pubblicazione delle recensioni che rilasci.
@@ -30,7 +41,7 @@ export function PrivacyPolicyConsumerLayeredContent() {
         <p className="velvet-legal-public__text">
           <strong>Il salone che prenoti</strong> diventa <strong>Titolare autonomo del trattamento</strong> nel momento in cui
           confermi un appuntamento: lo staff del negozio deve visualizzare in agenda nome, cognome e telefono per erogare il
-          servizio e gestire imprevisti. In quel flusso {legalEntityName} agisce esclusivamente come{" "}
+          servizio e gestire imprevisti. In quel flusso {companyName} agisce esclusivamente come{" "}
           <strong>Responsabile del Trattamento (Art. 28 GDPR)</strong>, fornendo il software di prenotazione secondo le istruzioni
           del salone.
         </p>
@@ -72,8 +83,12 @@ export function PrivacyPolicyConsumerLayeredContent() {
             <code>/s/{"{slug}"}</code>).
           </li>
           <li>
-            <strong>Dati tecnici:</strong> Indirizzo IP e log di sicurezza (sessioni JWT con refresh token su cache Redis) per
-            prevenire attacchi brute-force sul login e garantire integrità del servizio.
+            <strong>Dati tecnici:</strong> Indirizzo IP e log di sicurezza (sessioni JWT con refresh token) per prevenire attacchi
+            brute-force sul login e garantire integrità del servizio.
+          </li>
+          <li>
+            <strong>Notifiche push (app mobile):</strong> Token tecnico del dispositivo (FCM), piattaforma (iOS/Android) e timestamp
+            di registrazione per promemoria appuntamento e comunicazioni operative, se autorizzi le notifiche dal dispositivo.
           </li>
         </ul>
         <LegalCitationList citations={[GDPR_CITATIONS.regulation, GDPR_CITATIONS.art13]} />
@@ -91,7 +106,7 @@ export function PrivacyPolicyConsumerLayeredContent() {
             <Link to="/privacy/scelte" className="velvet-legal-public__inline-link">
               Scelte privacy
             </Link>
-            ).
+            ), nonché per le notifiche push se le attivi dall&apos;app.
           </li>
           <li>
             <strong>Legittimo interesse (Art. 6, par. 1, lett. f, GDPR):</strong> Per la sicurezza dei server, la prevenzione delle
@@ -115,16 +130,21 @@ export function PrivacyPolicyConsumerLayeredContent() {
             sedi) e cache Redis (sessioni e sicurezza).
           </li>
           <li>
-            <strong>Google Maps API:</strong> Solo se utilizzi funzioni di mappa per calcolare il percorso verso il salone o per
-            geocodificare indirizzi in ricerca; non è obbligatorio per prenotare.
+            <strong>OpenStreetMap Nominatim / Google Maps:</strong> Geocodifica server-side e mappe facoltative (con consenso
+            cookie) per ricerca e indicazioni verso il salone.
           </li>
           <li>
             <strong>Invio email transazionali:</strong> Conferme prenotazione, promemoria e reset password.
+          </li>
+          <li>
+            <strong>Google Firebase Cloud Messaging:</strong> Infrastruttura push per l&apos;app mobile (token dispositivo e consegna
+            notifiche operative), ove l&apos;utente abiliti le notifiche.
           </li>
         </ol>
         <p className="velvet-legal-public__text">
           I fornitori tecnici agiscono come Responsabili del Trattamento vincolati da accordi Art. 28 GDPR.
         </p>
+        <p className="velvet-legal-public__text">{LEGAL_ART28_SUBPROCESSORS_PARAGRAPH}</p>
         <LegalCitationList citations={[GDPR_CITATIONS.art13, GDPR_CITATIONS.art14]} />
       </LegalPrivacyAccordion>
 
@@ -151,24 +171,33 @@ export function PrivacyPolicyConsumerLayeredContent() {
         <LegalCitationList citations={[GDPR_CITATIONS.art13]} />
       </LegalPrivacyAccordion>
 
+      <LegalPrivacyAccordion title="Recensioni e moderazione contenuti">
+        <p className="velvet-legal-public__text">{LEGAL_REVIEW_MODERATION_PARAGRAPH}</p>
+        <LegalCitationList citations={[GDPR_CITATIONS.regulation]} />
+      </LegalPrivacyAccordion>
+
+      <LegalPrivacyAccordion title="Notifiche push">
+        <p className="velvet-legal-public__text">{LEGAL_PUSH_NOTIFICATIONS_PARAGRAPH}</p>
+        <LegalCitationList citations={[GDPR_CITATIONS.art13]} />
+      </LegalPrivacyAccordion>
+
       <LegalPrivacyAccordion title="Diritti dell'utente e rimozione account (App Store / Google Play)">
         <p className="velvet-legal-public__text">
           Puoi esercitare i diritti di accesso, rettifica, cancellazione, limitazione, portabilità e opposizione scrivendo a{" "}
           <LegalPrivacyMailLink />. Rispondiamo nei termini dell&apos;art. 12 GDPR.
         </p>
         <p className="velvet-legal-public__text">
-          <strong>Funzione Elimina Account (diritto all&apos;oblio):</strong> Dal sito ({" "}
+          <strong>Funzione Elimina account (diritto all&apos;oblio):</strong> Da{" "}
           <Link to="/account/profilo" className="velvet-legal-public__inline-link">
             Profilo account
           </Link>
           ,{" "}
           <Link to="/privacy/elimina-account" className="velvet-legal-public__inline-link">
             Elimina account
-          </Link>
-          ) o dall&apos;app mobile Flutter <code>velvet-app</code> (sezione <code>Account &gt; Elimina Account</code>) puoi
-          richiedere la rimozione <strong>immediata, self-service e definitiva</strong> del profilo. L&apos;azione invoca l&apos;endpoint
-          sicuro <code>DELETE /api/v1/me/account</code>, che elimina i dati personali dell&apos;utente, invalida i refresh token su
-          Redis e anonimizza le recensioni pubbliche come descritto sopra.
+          </Link>{" "}
+          o dall&apos;app mobile (stessa area Profilo in WebView) puoi chiudere l&apos;account in autonomia. L&apos;azione invoca{" "}
+          <code>DELETE /api/v1/me/account</code>: revoca sessioni, rimuove token dispositivo e anonimizza il profilo; le recensioni
+          pubbliche restano senza identificazione personale come descritto sopra.
         </p>
         <p className="velvet-legal-public__text">
           Puoi proporre reclamo al <em>Garante per la protezione dei dati personali</em> (Italia).

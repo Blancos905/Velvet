@@ -37,11 +37,18 @@ export type BookingHoursWindow = {
   timeZone: string;
 };
 
+export type BookingHoursSplit = BookingHoursWindow & {
+  morningEndMinute: number | null;
+  afternoonStartMinute: number | null;
+};
+
 export function resolveBookingHoursWindow(
   openMinute: number | null | undefined,
   closeMinute: number | null | undefined,
   timeZone: string | null | undefined,
-): BookingHoursWindow | null {
+  morningEndMinute?: number | null,
+  afternoonStartMinute?: number | null,
+): BookingHoursSplit | null {
   if (
     openMinute == null ||
     closeMinute == null ||
@@ -52,7 +59,31 @@ export function resolveBookingHoursWindow(
     return null;
   }
   const tz = timeZone?.trim() || "Europe/Rome";
-  return { openMinute, closeMinute, timeZone: tz };
+  let morningEnd: number | null = null;
+  let afternoonStart: number | null = null;
+  if (
+    morningEndMinute != null &&
+    afternoonStartMinute != null &&
+    Number.isFinite(morningEndMinute) &&
+    Number.isFinite(afternoonStartMinute) &&
+    morningEndMinute > openMinute &&
+    afternoonStartMinute < closeMinute &&
+    morningEndMinute < afternoonStartMinute
+  ) {
+    morningEnd = morningEndMinute;
+    afternoonStart = afternoonStartMinute;
+  }
+  return { openMinute, closeMinute, timeZone: tz, morningEndMinute: morningEnd, afternoonStartMinute: afternoonStart };
+}
+
+export function bookingHoursSegments(window: BookingHoursSplit): Array<{ startMinute: number; endMinute: number }> {
+  if (window.morningEndMinute != null && window.afternoonStartMinute != null) {
+    return [
+      { startMinute: window.openMinute, endMinute: window.morningEndMinute },
+      { startMinute: window.afternoonStartMinute, endMinute: window.closeMinute },
+    ];
+  }
+  return [{ startMinute: window.openMinute, endMinute: window.closeMinute }];
 }
 
 /** Minuti da mezzanotte nel fuso della sede. */
@@ -70,12 +101,25 @@ export function minuteOfDayInTimeZone(iso: string, timeZone: string): number {
 
 export function isSlotWithinBookingWindow(
   iso: string,
-  window: BookingHoursWindow,
+  window: BookingHoursWindow | BookingHoursSplit,
   durationMinutes: number,
 ): boolean {
   const startMinute = minuteOfDayInTimeZone(iso, window.timeZone);
   const endMinute = startMinute + Math.max(0, durationMinutes);
-  return startMinute >= window.openMinute && endMinute <= window.closeMinute;
+  const segments =
+    "morningEndMinute" in window && "afternoonStartMinute" in window
+      ? bookingHoursSegments(window as BookingHoursSplit)
+      : [{ startMinute: window.openMinute, endMinute: window.closeMinute }];
+  return segments.some((segment) => startMinute >= segment.startMinute && endMinute <= segment.endMinute);
+}
+
+export function formatSalonSplitOpeningHours(
+  morningStart: number,
+  morningEnd: number,
+  afternoonStart: number,
+  afternoonEnd: number,
+): string {
+  return `${minuteOfDayToTimeValue(morningStart)} – ${minuteOfDayToTimeValue(morningEnd)} · ${minuteOfDayToTimeValue(afternoonStart)} – ${minuteOfDayToTimeValue(afternoonEnd)}`;
 }
 
 export function formatAvailabilitySlotInTimeZone(iso: string, timeZone: string): string {

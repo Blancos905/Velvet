@@ -18,6 +18,15 @@ export const LEGAL_AUTOMATED_DECISIONS_PARAGRAPH =
 export const LEGAL_MINORS_PARAGRAPH =
   "Il servizio non è destinato a minori di 16 anni. Non raccogliamo consapevolmente dati di minori senza idonea base giuridica e autorizzazione ove richiesta dalla legge applicabile.";
 
+export const LEGAL_REVIEW_MODERATION_PARAGRAPH =
+  "Le recensioni pubblicate sulla piattaforma possono essere moderate da Saloni Luxury per contrastare contenuti manifestamente illeciti, offensivi, spam o in violazione dei termini di servizio. In tali casi la recensione può essere nascosta dalla vetrina pubblica e non concorrere alle medie visibili. Puoi segnalare contenuti inappropriate scrivendo a privacy@saloniluxury.it indicando il salone, la data e il motivo della segnalazione; valuteremo la richiesta nei tempi ragionevoli.";
+
+export const LEGAL_PUSH_NOTIFICATIONS_PARAGRAPH =
+  "Se attivi le notifiche push dall'app mobile, registriamo il token tecnico del dispositivo (FCM), la piattaforma (iOS/Android) e l'orario di registrazione/aggiornamento per inviarti promemoria di appuntamento, conferme e altre comunicazioni operative della piattaforma. Puoi disattivare le notifiche dalle impostazioni del dispositivo o disinstallando l'app; alla chiusura account i token registrati vengono rimossi. Il servizio push è erogato tramite Google Firebase Cloud Messaging quale responsabile/sub-responsabile tecnico.";
+
+export const LEGAL_ART28_SUBPROCESSORS_PARAGRAPH =
+  "Saloni Luxury può avvalersi di sub-responsabili tecnici (hosting cloud, database, cache, geocodifica, invio email transazionali, messaggistica push) vincolati da accordi Art. 28 GDPR o clausole equivalenti. L'elenco aggiornato dei principali fornitori è descritto nelle informative privacy e può essere richiesto a privacy@saloniluxury.it. Il salone partner resta titolare verso la propria clientela; Saloni Luxury assiste il salone, nei limiti contrattuali, nell'evadere richieste degli interessati relative ai dati trattati tramite la piattaforma.";
+
 export const LEGAL_RIGHTS_RESPONSE_PARAGRAPH =
   "Le richieste per l’esercizio dei diritti vanno inviate a " +
   LEGAL_PRIVACY_EMAIL +

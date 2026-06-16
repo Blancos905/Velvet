@@ -40,6 +40,7 @@ class PublicClientRegistrationControllerTest {
 								"password", "Password1!",
 								"firstName", "Ann",
 								"lastName", "Bee",
+								"country", "IT",
 								"acceptedTermsAndPrivacy", true))))
 				.andExpect(status().isCreated());
 
@@ -55,6 +56,7 @@ class PublicClientRegistrationControllerTest {
 								"password", "Password1!",
 								"firstName", "Ann",
 								"lastName", "Bee",
+								"country", "IT",
 								"acceptedTermsAndPrivacy", true))))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
@@ -69,6 +71,7 @@ class PublicClientRegistrationControllerTest {
 								"password", "short",
 								"firstName", "Ann",
 								"lastName", "Bee",
+								"country", "IT",
 								"acceptedTermsAndPrivacy", true))))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));

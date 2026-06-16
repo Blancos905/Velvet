@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class MeSupportService {
 
-	private static final String DEFAULT_SUPPORT_EMAIL = "assistenza@salonivelvet.it";
+	private static final String DEFAULT_SUPPORT_EMAIL = "assistenza@saloniluxury.it";
 
 	private final ConsumerProfileRepository consumerProfileRepository;
 	private final ConsumerProfileService consumerProfileService;

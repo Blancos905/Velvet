@@ -38,6 +38,9 @@ class AppointmentNotificationServiceTest {
 	@Mock
 	private AppointmentRepository appointmentRepository;
 
+	@Mock
+	private FcmPushDispatchService fcmPushDispatchService;
+
 	@Captor
 	private ArgumentCaptor<ScheduledNotification> scheduledCaptor;
 
@@ -49,7 +52,7 @@ class AppointmentNotificationServiceTest {
 		notificationProperties = new VelvetNotificationProperties();
 		notificationProperties.setEnabled(true);
 		service = new AppointmentNotificationService(
-				scheduledNotificationRepository, appointmentRepository, notificationProperties);
+				scheduledNotificationRepository, appointmentRepository, notificationProperties, fcmPushDispatchService);
 	}
 
 	private void stubSavePassthrough() {

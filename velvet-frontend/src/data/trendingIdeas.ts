@@ -1,3 +1,5 @@
+import { TRENDING_GROUPS_NATIVE_APP } from "./trendingIdeasNativeApp";
+
 export type TrendIdeaCard = {
   id: string;
   title: string;
@@ -109,10 +111,18 @@ export const TRENDING_GROUPS: TrendingGroup[] = [
 export function findTrendIdea(
   groupId: string,
   itemId: string,
+  options?: { nativeApp?: boolean },
 ): { group: TrendingGroup; card: TrendIdeaCard } | null {
-  const group = TRENDING_GROUPS.find((g) => g.id === groupId);
+  const groups =
+    options?.nativeApp === true ? trendIdeaGroupsForNativeApp() : TRENDING_GROUPS;
+  const group = groups.find((g) => g.id === groupId);
   if (!group) return null;
   const card = group.items.find((i) => i.id === itemId);
   if (!card) return null;
   return { group, card };
+}
+
+/** Gruppi idee home nell'app mobile (4 card × 4 verticali). */
+export function trendIdeaGroupsForNativeApp(): TrendingGroup[] {
+  return TRENDING_GROUPS_NATIVE_APP;
 }

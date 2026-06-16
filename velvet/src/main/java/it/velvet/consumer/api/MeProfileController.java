@@ -8,6 +8,7 @@ import it.velvet.consumer.service.ConsumerProfileService;
 import it.velvet.security.auth.VelvetUserPrincipal;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,6 +48,7 @@ public class MeProfileController {
 				body.email(),
 				body.displayName(),
 				body.phone(),
+				body.country(),
 				body.preferredLocale());
 		return ProfileDto.from(p);
 	}
@@ -71,6 +73,7 @@ public class MeProfileController {
 			String email,
 			String displayName,
 			String phone,
+			String country,
 			String preferredLocale) {
 		public static ProfileDto from(ConsumerProfile p) {
 			return new ProfileDto(
@@ -78,6 +81,7 @@ public class MeProfileController {
 					p.getEmail(),
 					p.getDisplayName(),
 					p.getPhone(),
+					p.getCountry(),
 					p.getPreferredLocale());
 		}
 	}
@@ -86,6 +90,7 @@ public class MeProfileController {
 			@Email @Size(max = 320) String email,
 			@Size(max = 200) String displayName,
 			@Size(max = 40) String phone,
+			@Pattern(regexp = "^[A-Z]{2}$", message = "Paese: usa codice ISO a 2 lettere (es. IT)") String country,
 			@Size(max = 16) String preferredLocale) {
 	}
 

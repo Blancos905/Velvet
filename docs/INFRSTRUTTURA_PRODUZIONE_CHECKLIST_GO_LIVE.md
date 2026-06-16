@@ -3,7 +3,7 @@
 **Progetto:** Salon Platform (Velvet) — monorepo `my-salon-platform`  
 **Data analisi:** 3 giugno 2026  
 **Ambiente target:** Ubuntu Linux + Docker Compose (`infrastructure/docker-compose.prod.yml`)  
-**Domini di riferimento nel repo:** `salonivelvet.it`, `www.salonivelvet.it`
+**Domini di riferimento nel repo:** `saloniluxury.it`, `www.saloniluxury.it`
 
 ---
 
@@ -12,10 +12,10 @@
 | Area | Stato nel codice oggi | Azione go-live |
 |------|----------------------|----------------|
 | Stack Docker prod | Definito (Nginx + API + PostGIS + Redis) | Build SPA, `.env` reale, TLS, `docker compose up` |
-| Email SMTP | **Non implementato** | Notifiche in-app + log; password reset solo in log |
+| Email SMTP | Implementato (`TransactionalEmailDispatchService`) | `VELVET_MAIL_*` + `SPRING_MAIL_*` in `.env`; Aruba `noreply@saloniluxury.it` |
 | Redis nel compose | Container presente | **Non usato** da Spring (refresh token su **PostgreSQL**) |
 | CORS | Opzionale se API e SPA stesso host | Valorizzare solo se origini diverse |
-| App Flutter | Shell WebView → sito | `VELVET_WEB_BASE_URL=https://salonivelvet.it`; firma release Android/iOS |
+| App Flutter | Shell WebView → sito | `VELVET_WEB_BASE_URL=https://saloniluxury.it`; firma release Android/iOS |
 | Deploy alternativo | `application-prod` + MariaDB ISPConfig | Percorso parallelo, non Docker |
 
 **Percorsi di deploy supportati dal codice:**
@@ -98,7 +98,7 @@
 
 **Config:** `infrastructure/nginx/conf.d/app.conf`
 
-- `server_name salonivelvet.it www.salonivelvet.it`
+- `server_name saloniluxury.it www.saloniluxury.it`
 - Certificati montati: `./nginx/certs/fullchain.pem` + `privkey.pem`
 - HTTP-01: `location /.well-known/acme-challenge/` → `root /var/www/certbot` (path **non** montato nel compose attuale)
 
@@ -111,13 +111,13 @@ sudo mkdir -p /var/www/certbot
 # Aggiungere volume al servizio nginx in compose, es.:
 #   - /var/www/certbot:/var/www/certbot:ro
 sudo certbot certonly --webroot -w /var/www/certbot \
-  -d salonivelvet.it -d www.salonivelvet.it
-sudo cp /etc/letsencrypt/live/salonivelvet.it/fullchain.pem infrastructure/nginx/certs/
-sudo cp /etc/letsencrypt/live/salonivelvet.it/privkey.pem infrastructure/nginx/certs/
+  -d saloniluxury.it -d www.saloniluxury.it
+sudo cp /etc/letsencrypt/live/saloniluxury.it/fullchain.pem infrastructure/nginx/certs/
+sudo cp /etc/letsencrypt/live/saloniluxury.it/privkey.pem infrastructure/nginx/certs/
 # Cron rinnovo + reload nginx
 ```
 
-**Attenzione CSP:** in `app.conf`, `connect-src` include `https://api.salonivelvet.it`, mentre l’architettura Docker serve l’API su **stesso host** via `/api/` (`connect-src 'self'` è sufficiente). Se non esiste un sottodominio API reale, aggiornare la CSP per evitare blocchi browser su chiamate `fetch` verso host inesistente quando `VITE_API_BASE_URL` punta altrove.
+**Attenzione CSP:** in `app.conf`, `connect-src` include `https://api.saloniluxury.it`, mentre l’architettura Docker serve l’API su **stesso host** via `/api/` (`connect-src 'self'` è sufficiente). Se non esiste un sottodominio API reale, aggiornare la CSP per evitare blocchi browser su chiamate `fetch` verso host inesistente quando `VITE_API_BASE_URL` punta altrove.
 
 ### 1.3 Build e deploy pipeline
 
@@ -136,7 +136,7 @@ cp .env.example .env              # segreti reali, NO localhost
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-**Verifica:** `curl -sf https://www.salonivelvet.it/actuator/health` non è esposto pubblicamente (solo rete interna); usare `https://www.salonivelvet.it/api/...` o health via `docker compose exec api wget -qO- http://localhost:8080/actuator/health`.
+**Verifica:** `curl -sf https://www.saloniluxury.it/actuator/health` non è esposto pubblicamente (solo rete interna); usare `https://www.saloniluxury.it/api/...` o health via `docker compose exec api wget -qO- http://localhost:8080/actuator/health`.
 
 ### 1.4 Percorso alternativo: VM ISPConfig (MariaDB)
 
@@ -153,7 +153,7 @@ L’app **non chiama direttamente** l’API Spring: è una **WebView** su `velve
 
 ```
 Flutter (velvet-app)
-  └── WebView → VELVET_WEB_BASE_URL (default https://salonivelvet.it)
+  └── WebView → VELVET_WEB_BASE_URL (default https://saloniluxury.it)
         └── React SPA
               └── /api/v1/... (path relativi se VITE_API_BASE_URL vuoto)
                     └── nginx → Spring Boot
@@ -174,8 +174,8 @@ Flutter (velvet-app)
 | `DB_PASSWORD` | `.env.example` | Password ≥ 20 caratteri casuali | `SPRING_DATASOURCE_PASSWORD` |
 | `REDIS_PASSWORD` | `.env.example` | Password forte | `redis-server --requirepass` (container; **API non connessa**) |
 | `JWT_SECRET` | `.env.example` | `openssl rand -base64 48` | `VELVET_TOKEN_SECRET`, `VELVET_AUTH_JWT_SECRET` |
-| `CORS_ORIGINS` | `.env.example` | `https://www.salonivelvet.it,https://salonivelvet.it` (virgola, no spazi superflui) | `VELVET_CORS_ALLOWED_ORIGINS` |
-| `SITE_BASE_URL` | `.env.example` | URL canonico HTTPS, es. `https://www.salonivelvet.it` | `VELVET_PUBLIC_FRONTEND_URL` |
+| `CORS_ORIGINS` | `.env.example` | `https://www.saloniluxury.it,https://saloniluxury.it` (virgola, no spazi superflui) | `VELVET_CORS_ALLOWED_ORIGINS` |
+| `SITE_BASE_URL` | `.env.example` | URL canonico HTTPS, es. `https://www.saloniluxury.it` | `VELVET_PUBLIC_FRONTEND_URL` |
 | `VELVET_SUPER_ADMIN_USERNAME` | `docker-compose.prod.yml` | Email admin | Bootstrap super admin |
 | `VELVET_SUPER_ADMIN_PASSWORD` | compose (opz.) | Password forte **oppure** usare hash | Solo prima installazione; preferire BCrypt hash in prod |
 | `VELVET_SUPER_ADMIN_SETUP_TOKEN` | compose (opz.) | Token lungo monouso | `POST /api/v1/admin/auth/register` — **revocare dopo setup** |
@@ -210,12 +210,12 @@ Stesse variabili `VELVET_*` + `SPRING_DATASOURCE_*` per MariaDB + `SERVER_PORT=8
 
 | Chiave | Tipo valore | Obbligatorietà go-live |
 |--------|-------------|------------------------|
-| `VITE_API_BASE_URL` | Vuoto **oppure** `https://www.salonivelvet.it` | Vuoto = `/api` same-origin (consigliato con nginx attuale) |
+| `VITE_API_BASE_URL` | Vuoto **oppure** `https://www.saloniluxury.it` | Vuoto = `/api` same-origin (consigliato con nginx attuale) |
 | `VITE_LEGAL_ENTITY_NAME` | Ragione commerciale | Obbligatorio (no `[TODO_LEGAL]`) |
 | `VITE_LEGAL_ENTITY_LEGAL_NAME` | Ragione sociale completa | Obbligatorio |
 | `VITE_LEGAL_ENTITY_ADDRESS` | Indirizzo sede | Obbligatorio |
 | `VITE_LEGAL_ENTITY_VAT` | P.IVA | Obbligatorio |
-| `VITE_LEGAL_ENTITY_DPO_EMAIL` | es. `privacy@salonivelvet.it` | Consigliato |
+| `VITE_LEGAL_ENTITY_DPO_EMAIL` | es. `privacy@saloniluxury.it` | Consigliato |
 | `VITE_GOOGLE_MAPS_EMBED_API_KEY` | Chiave Google Cloud | Se usi embed mappa in dashboard |
 | `VITE_PLAY_STORE_URL` | URL listing Play | Footer / CTA |
 | `VITE_APP_STORE_URL` | URL App Store con `id` | Sostituire placeholder ricerca generica |
@@ -227,7 +227,7 @@ Stesse variabili `VELVET_*` + `SPRING_DATASOURCE_*` per MariaDB + `SERVER_PORT=8
 
 | Chiave | Default nel codice | Produzione |
 |--------|-------------------|------------|
-| `VELVET_WEB_BASE_URL` | `https://salonivelvet.it` | **HTTPS** dominio live (con o senza `www`, coerente con certificato) |
+| `VELVET_WEB_BASE_URL` | `https://saloniluxury.it` | **HTTPS** dominio live (con o senza `www`, coerente con certificato) |
 | `VELVET_WEB_INITIAL_PATH` | `/` | Opzionale, es. `/ricerca` |
 | `VELVET_WEB_USER_AGENT` | Chrome Mobile UA | Raramente da cambiare |
 
@@ -236,30 +236,35 @@ Stesse variabili `VELVET_*` + `SPRING_DATASOURCE_*` per MariaDB + `SERVER_PORT=8
 ```bash
 cd velvet-app
 flutter build appbundle --release \
-  --dart-define=VELVET_WEB_BASE_URL=https://www.salonivelvet.it
+  --dart-define=VELVET_WEB_BASE_URL=https://www.saloniluxury.it
 flutter build ipa --release \
-  --dart-define=VELVET_WEB_BASE_URL=https://www.salonivelvet.it
+  --dart-define=VELVET_WEB_BASE_URL=https://www.saloniluxury.it
 ```
 
 ### 2.6 Email / SMTP — stato attuale
 
-**Non esistono** variabili `spring.mail.*`, `SMTP_*`, né integrazione JavaMail nel backend.
+Integrazione JavaMail attiva: `VelvetMailProperties`, `TransactionalEmailDispatchService`, env in `application-docker.properties` e `infrastructure/.env.example`.
 
-| Funzione | Implementazione | Env necessarie per “email reale” |
-|----------|-----------------|----------------------------------|
-| Conferme / promemoria prenotazione | Inbox in-app + `ScheduledNotificationProcessor` log | **Da integrare** (SMTP o provider API) |
-| Reset password | `VelvetPasswordResetService` — link **solo in log** | **Da integrare** + `VELVET_PUBLIC_FRONTEND_URL` già usato per costruire URL |
+| Funzione | Implementazione | Env |
+|----------|-----------------|-----|
+| Conferme / promemoria prenotazione | Inbox in-app + push FCM + **SMTP** (`BOOKING_CONFIRMATION`, `REMINDER_24H`, `REMINDER_1H`) | `VELVET_MAIL_ENABLED=true` + `SPRING_MAIL_*` |
+| Reset password | `VelvetPasswordResetService` — link **solo in log** | **Da integrare** (SMTP separato) |
 | Messaggi super admin | Solo in-app | N/A |
 
-**Se si aggiunge SMTP in futuro (non nel repo oggi), tipicamente:**
+**Aruba (produzione `saloniluxury.it`):**
 
-| Chiave (proposta) | Esempio |
-|-------------------|---------|
-| `SPRING_MAIL_HOST` | `smtp.sendgrid.net` |
-| `SPRING_MAIL_PORT` | `587` |
-| `SPRING_MAIL_USERNAME` | `apikey` |
-| `SPRING_MAIL_PASSWORD` | segreto provider |
-| `VELVET_MAIL_FROM` | `noreply@salonivelvet.it` |
+| Chiave | Valore |
+|--------|--------|
+| `VELVET_MAIL_ENABLED` | `true` |
+| `VELVET_MAIL_FROM` | `noreply@saloniluxury.it` |
+| `SPRING_MAIL_HOST` | `smtps.aruba.it` |
+| `SPRING_MAIL_PORT` | `465` |
+| `SPRING_MAIL_SMTP_SSL` | `true` |
+| `SPRING_MAIL_SMTP_STARTTLS` | `false` |
+| `SPRING_MAIL_USERNAME` | `noreply@saloniluxury.it` (casella SMTP, **non** l’username del pannello Aruba) |
+| `SPRING_MAIL_PASSWORD` | password della casella `noreply@` |
+
+**Login area clienti Aruba** (gestione dominio/caselle): username **`19867967@aruba.it`** — la Gmail personale è solo contatto fatturazione, non username di login.
 
 ### 2.7 WhatsApp bridge (opzionale) — `velvet/deploy/whatsapp-bridge/env.example`
 
@@ -274,7 +279,7 @@ flutter build ipa --release \
 
 ## 3. Configurazione DNS & Mail
 
-### 3.1 Record DNS (dominio `salonivelvet.it`)
+### 3.1 Record DNS (dominio `saloniluxury.it`)
 
 | Tipo | Host | Valore | Scopo |
 |------|------|--------|-------|
@@ -288,20 +293,20 @@ flutter build ipa --release \
 
 ### 3.2 Email — SPF, DKIM, DMARC
 
-Allineare i domini nelle informative (`legalReferences.ts` oggi cita `saloniluxury.it`; infrastruttura e compose usano `salonivelvet.it`) **prima** di pubblicare SPF.
+Domini allineati su `saloniluxury.it` (informative, infrastruttura e compose). Configurare SPF/DKIM/DMARC sul provider mail **prima** del go-live.
 
 **Caselle tipiche go-live** (da attivare sul provider mail):
 
-- `privacy@salonivelvet.it` — DPO / diritti interessato  
-- `assistenza@salonivelvet.it` — supporto e store  
-- `noreply@salonivelvet.it` — futuro SMTP transazionale  
+- `privacy@saloniluxury.it` — DPO / diritti interessato  
+- `assistenza@saloniluxury.it` — supporto e store  
+- `noreply@saloniluxury.it` — SMTP transazionale backend (conferme, promemoria)  
 
-| Tipo | Esempio (provider SMTP `mail.salonivelvet.it`) |
+| Tipo | Esempio (provider SMTP `mail.saloniluxury.it`) |
 |------|-----------------------------------------------|
 | **MX** | Priorità 10 → hostname provider (Google Workspace, Aruba, ecc.) |
 | **TXT (SPF)** | `v=spf1 include:_spf.google.com ~all` (adattare al provider) |
 | **TXT (DKIM)** | Record `selector._domainkey` fornito dal provider |
-| **TXT (DMARC)** | `_dmarc` → `v=DMARC1; p=quarantine; rua=mailto:dmarc@salonivelvet.it` |
+| **TXT (DMARC)** | `_dmarc` → `v=DMARC1; p=quarantine; rua=mailto:dmarc@saloniluxury.it` |
 
 Finché **non** c’è invio SMTP dal backend, SPF/DKIM sono comunque necessari per le caselle **umane** (assistenza/privacy) e per eventuali `mailto:` nel sito.
 
@@ -309,8 +314,8 @@ Finché **non** c’è invio SMTP dal backend, SPF/DKIM sono comunque necessari 
 
 | Scenario | `CORS_ORIGINS` / `velvet.cors.allowed-origins` |
 |----------|-----------------------------------------------|
-| SPA e API su **stesso** `https://www.salonivelvet.it`, `VITE_API_BASE_URL` vuoto | CORS **non necessario** per il browser (same-origin) |
-| SPA su `www` e API su `api.salonivelvet.it` | Obbligatorio: entrambe le origini HTTPS esatte |
+| SPA e API su **stesso** `https://www.saloniluxury.it`, `VITE_API_BASE_URL` vuoto | CORS **non necessario** per il browser (same-origin) |
+| SPA su `www` e API su `api.saloniluxury.it` | Obbligatorio: entrambe le origini HTTPS esatte |
 | Dev Vite `localhost:5173` → API diretta | `http://localhost:5173` (solo lab) |
 
 Implementazione: `VelvetCorsConfiguration.java` — attivo solo se `velvet.cors.allowed-origins` non vuoto; path `/api/**`; `allowCredentials=false`.
@@ -327,7 +332,7 @@ Refresh token: cookie `velvet_rt`, path `/api/v1/auth`, `Secure` in produzione. 
 
 | Componente | URL produzione | Note |
 |------------|----------------|------|
-| Sito / WebView | `https://salonivelvet.it` o `https://www.salonivelvet.it` | `--dart-define=VELVET_WEB_BASE_URL=...` |
+| Sito / WebView | `https://saloniluxury.it` o `https://www.saloniluxury.it` | `--dart-define=VELVET_WEB_BASE_URL=...` |
 | API REST | `https://<stesso-host>/api/v1/...` | Gestita dal frontend, **non** dall’app nativa |
 | Legal embed | `{WEB_BASE}/privacy/clienti?embed=1` ecc. | `velvetLegalPanelPaths.ts` |
 
@@ -337,8 +342,8 @@ Refresh token: cookie `velvet_rt`, path `/api/v1/auth`, `Secure` in produzione. 
 
 | Piattaforma | Identificativo nel repo | Azione |
 |-------------|-------------------------|--------|
-| Android | `applicationId` = `it.salonivelvet.velvet_app` | Deve coincidere con Play Console |
-| iOS | `PRODUCT_BUNDLE_IDENTIFIER` = `it.salonivelvet.velvetApp` | **Diverso da Android** — registrare bundle Apple corretto |
+| Android | `applicationId` = `it.saloniluxury.velvet_app` | Deve coincidere con Play Console |
+| iOS | `PRODUCT_BUNDLE_IDENTIFIER` = `it.saloniluxury.velvetApp` | **Diverso da Android** — registrare bundle Apple corretto |
 | Versione | `pubspec.yaml` `1.0.0+1` | Incrementare `version` per ogni upload |
 
 ### 4.3 Android — build produzione
@@ -348,7 +353,7 @@ Refresh token: cookie `velvet_rt`, path `/api/v1/auth`, `Secure` in produzione. 
 | Keystore release | Creare `upload-keystore.jks`; configurare `signingConfigs` in `android/app/build.gradle.kts` (**oggi firma debug in release — da correggere**) |
 | Cleartext | `AndroidManifest.xml` ha `usesCleartextTraffic="true"` — per prod usare solo HTTPS; collegare `network_security_config.xml` nel manifest |
 | Permessi | `INTERNET` in debug/profile; geolocalizzazione **non** a livello nativo (Web API nel browser/WebView) |
-| AAB Play Store | `flutter build appbundle --release --dart-define=VELVET_WEB_BASE_URL=https://www.salonivelvet.it` |
+| AAB Play Store | `flutter build appbundle --release --dart-define=VELVET_WEB_BASE_URL=https://www.saloniluxury.it` |
 | APK sideload | `flutter build apk --release` (stesso define) |
 
 ### 4.4 iOS — build produzione
@@ -359,12 +364,12 @@ Refresh token: cookie `velvet_rt`, path `/api/v1/auth`, `Secure` in produzione. 
 | Display name | `Info.plist` → `Velvet App` (allineare branding store) |
 | ATS | `NSAllowsLocalNetworking` = true (utile dev); produzione solo HTTPS |
 | Geolocalizzazione | **Nessuna** `NSLocationWhenInUseUsageDescription` oggi — se in futuro si espone GPS nativo, aggiungere stringa |
-| IPA / TestFlight | `flutter build ipa --release --dart-define=VELVET_WEB_BASE_URL=https://www.salonivelvet.it` |
+| IPA / TestFlight | `flutter build ipa --release --dart-define=VELVET_WEB_BASE_URL=https://www.saloniluxury.it` |
 | Upload | Xcode Organizer o `xcrun altool` / Transporter |
 
 ### 4.5 Sicurezza WebView
 
-- `VelvetDomainGuard` — navigazione limitata a `salonivelvet.it`, `www.salonivelvet.it` + host dev se `isLocalDev`
+- `VelvetDomainGuard` — navigazione limitata a `saloniluxury.it`, `www.saloniluxury.it` + host dev se `isLocalDev`
 - Link esterni `tel:`, `mailto:`, `whatsapp:` → `url_launcher`
 
 ### 4.6 Console store — URL obbligatori
@@ -380,7 +385,7 @@ Pubblicare su Play Console / App Store Connect (coerenti con deploy):
 | Termini | `/termini` |
 | Hub legale | `/legale` |
 
-Base: `https://www.salonivelvet.it` + path (con `?embed=1` solo in-app, non richiesto dalle console).
+Base: `https://www.saloniluxury.it` + path (con `?embed=1` solo in-app, non richiesto dalle console).
 
 ### 4.7 Checklist pre-upload
 
@@ -401,8 +406,8 @@ Base: `https://www.salonivelvet.it` + path (con `?embed=1` solo in-app, non rich
 | **P0** | `infrastructure/.env` con `localhost` / placeholder | Link e CORS errati |
 | **P0** | Firma Android release (debug keys) | Play Store rifiuta o rischio sicurezza |
 | **P1** | SMTP / invio email reale | UX reset password e notifiche esterne |
-| **P1** | Allineamento domini email (`saloniluxury.it` vs `salonivelvet.it`) | SPF e fiducia utente |
-| **P1** | CSP `api.salonivelvet.it` vs same-origin | Possibili errori runtime frontend |
+| **P1** | SPF/DKIM/DMARC su `saloniluxury.it` (caselle privacy/assistenza) | Deliverability e fiducia utente |
+| **P1** | CSP `api.saloniluxury.it` vs same-origin | Possibili errori runtime frontend |
 | **P2** | Redis nel compose non usato dall’API | Costo risorse o futuro uso cache |
 | **P2** | `ddl-auto=update` in docker | Usare `validate` + migrazioni Flyway/Liquibase per prod madura |
 | **P2** | Servizio Certbot / volume webroot in compose | Automazione rinnovo TLS |

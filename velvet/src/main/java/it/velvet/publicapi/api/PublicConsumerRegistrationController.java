@@ -2,6 +2,7 @@ package it.velvet.publicapi.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import it.velvet.billing.service.BillingRegistrationPlanPolicy;
 import it.velvet.consumer.service.VelvetAccountRegistrationService;
 import it.velvet.publicapi.dto.ConsumerRegistrationRequest;
 import it.velvet.publicapi.dto.RegistrationSalonLocation;
@@ -27,12 +28,15 @@ public class PublicConsumerRegistrationController {
 
 	private final VelvetAccountRegistrationService velvetAccountRegistrationService;
 	private final SalonDirectoryProvisioningService salonDirectoryProvisioningService;
+	private final BillingRegistrationPlanPolicy billingRegistrationPlanPolicy;
 
 	public PublicConsumerRegistrationController(
 			VelvetAccountRegistrationService velvetAccountRegistrationService,
-			SalonDirectoryProvisioningService salonDirectoryProvisioningService) {
+			SalonDirectoryProvisioningService salonDirectoryProvisioningService,
+			BillingRegistrationPlanPolicy billingRegistrationPlanPolicy) {
 		this.velvetAccountRegistrationService = velvetAccountRegistrationService;
 		this.salonDirectoryProvisioningService = salonDirectoryProvisioningService;
+		this.billingRegistrationPlanPolicy = billingRegistrationPlanPolicy;
 	}
 
 	@PostMapping
@@ -49,6 +53,9 @@ public class PublicConsumerRegistrationController {
 				ConsumerRegistrationValidator.normalizeSalonClientGendersOrThrow(body.salonClientGenders());
 		ConsumerRegistrationValidator.requireSalonClientGendersForPartnerPlans(body.planTier(), clientGenders);
 
+		String requestedPlan = body.planTier();
+		String provisionPlan = billingRegistrationPlanPolicy.effectiveProvisionPlanTier(requestedPlan);
+
 		String ownerEmail = body.email().trim().toLowerCase(Locale.ROOT);
 		String ownerSub = velvetAccountRegistrationService.registerSalonOwner(
 				body.email(),
@@ -56,11 +63,11 @@ public class PublicConsumerRegistrationController {
 				body.firstName(),
 				body.lastName(),
 				body.phone() != null ? body.phone() : "",
-				body.planTier(),
+				provisionPlan,
 				body.legalDocumentVersion());
 		String publicName = Objects.toString(body.salonName(), "").trim();
 		salonDirectoryProvisioningService.provisionAfterPartnerRegistration(
-				ownerEmail, body.planTier(), publicName, salon, ownerSub, businessTypes, clientGenders);
+				ownerEmail, provisionPlan, publicName, salon, ownerSub, businessTypes, clientGenders);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 

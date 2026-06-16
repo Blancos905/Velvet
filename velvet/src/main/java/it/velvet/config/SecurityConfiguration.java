@@ -49,9 +49,13 @@ public class SecurityConfiguration {
 				.requestMatchers("/api/v1/admin/status").permitAll()
 				.requestMatchers("/api/v1/admin/**").hasAuthority("ROLE_ADMIN")
 				.requestMatchers("/api/v1/auth/**").permitAll()
+				.requestMatchers("/api/v1/public/health", "/api/v1/public/health/**").permitAll()
+				.requestMatchers("/api/v1/webhooks/stripe").permitAll()
 				// Basta JWT valido: i ruoli sono controllati con @PreAuthorize sui singoli endpoint (evita 403 globale
 				// se il token ha claim `roles` malformato ma l’utente è comunque autenticato).
 				.requestMatchers("/api/v1/me/**").authenticated()
+				.requestMatchers("/api/v1/services", "/api/v1/operators").authenticated()
+				.requestMatchers("/api/v1/clients", "/api/v1/clients/**").authenticated()
 				.anyRequest().permitAll());
 		return http.build();
 	}

@@ -7,6 +7,8 @@ export type ClientRegistrationPayload = {
   password: string;
   firstName: string;
   lastName: string;
+  /** ISO 3166-1 alpha-2 (es. IT, FR). */
+  country: string;
   phone?: string;
   /** Solo prima installazione: vedi backend `VelvetAccountRegistrationService`. */
   bootstrapSuperAdmin?: boolean;
@@ -21,6 +23,7 @@ export async function registerClientApi(payload: ClientRegistrationPayload): Pro
     password: payload.password,
     firstName: payload.firstName.trim(),
     lastName: payload.lastName.trim(),
+    country: payload.country.trim().toUpperCase(),
     acceptedTermsAndPrivacy: true,
     legalDocumentVersion: LEGAL_DOCUMENT_VERSION,
   };

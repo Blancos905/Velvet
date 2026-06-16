@@ -10,7 +10,7 @@ if ! command -v flutter >/dev/null 2>&1; then
 fi
 
 flutter --version
-flutter create . --org it.salonivelvet --project-name velvet_app --platforms=android,ios
+flutter create . --org it.saloniluxury --project-name velvet_app --platforms=android,ios
 flutter pub get
 ./scripts/patch-platforms.sh
 echo "OK. Dev completo (Vite + app): ./scripts/dev-with-frontend.sh ios"

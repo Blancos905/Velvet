@@ -76,7 +76,11 @@ public final class PublicDtos {
 			String contactPhone,
 			/** Fascia oraria prenotabile (minuti da mezzanotte locale sede). */
 			int bookingOpeningMinuteOfDay,
-			int bookingClosingMinuteOfDay) {
+			int bookingClosingMinuteOfDay,
+			/** Fine mattina (pausa pranzo); {@code null} se fascia continua. */
+			Integer bookingMorningEndMinuteOfDay,
+			/** Inizio pomeriggio (pausa pranzo); {@code null} se fascia continua. */
+			Integer bookingAfternoonStartMinuteOfDay) {
 		public static OrganizationDetailDto from(Location loc, String contactEmail, String contactPhone) {
 			return new OrganizationDetailDto(
 					loc.getId(),
@@ -91,7 +95,9 @@ public final class PublicDtos {
 					contactEmail,
 					contactPhone,
 					loc.getWorkStartMinuteOfDay(),
-					loc.getWorkEndMinuteOfDay());
+					loc.getWorkEndMinuteOfDay(),
+					loc.getWorkMorningEndMinuteOfDay(),
+					loc.getWorkAfternoonStartMinuteOfDay());
 		}
 	}
 

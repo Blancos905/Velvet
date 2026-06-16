@@ -4,6 +4,7 @@ import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { apiJson } from "../api/client";
 import type { OrganizationSummary } from "../api/types";
 import { findTrendIdea } from "../data/trendingIdeas";
+import { useVelvetNativeAppShell } from "../hooks/useVelvetNativeAppShell";
 import { SearchHitLogoAvatar } from "../components/SearchHitLogoAvatar";
 import { StarRatingDisplay } from "../components/StarRatingDisplay";
 import { formatSalonCityForDisplay } from "../lib/formatSalonCityForDisplay";
@@ -61,10 +62,14 @@ function PinIcon() {
 export default function MonthlyIdeaPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const isNativeApp = useVelvetNativeAppShell();
   const { groupId, itemId } = useParams<{ groupId: string; itemId: string }>();
   const resolved = useMemo(
-    () => (groupId && itemId ? findTrendIdea(groupId, itemId) : null),
-    [groupId, itemId],
+    () =>
+      groupId && itemId
+        ? findTrendIdea(groupId, itemId, { nativeApp: isNativeApp })
+        : null,
+    [groupId, itemId, isNativeApp],
   );
 
   if (!resolved) {

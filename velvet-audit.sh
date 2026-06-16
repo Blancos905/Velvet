@@ -298,10 +298,10 @@ if [[ "$RUN_FLOWS" -eq 1 ]]; then
 
   assert_grep fail flows "Profilo salone pubblico BE" '/api/v1/public/organizations' \
     "$ROOT_DIR/velvet/src/main/java"
-  assert_grep fail flows "Gestione prenotazione pubblica BE" '/api/v1/public/appointments' \
-    "$ROOT_DIR/velvet/src/main/java"
-  assert_grep fail flows "Manage booking FE" '/api/v1/public/appointments' \
-    "$ROOT_DIR/velvet-frontend/src/pages/ManageBookingPage.tsx"
+  assert_grep fail flows "Link email prenotazione BE" 'consumer-appointments-path|buildConsumerAppointmentUrl' \
+    "$ROOT_DIR/velvet/src/main/java/it/velvet/notification/service/ScheduledNotificationProcessor.java"
+  assert_grep fail flows "Dettaglio prenotazione FE" '/account/prenotazioni/' \
+    "$ROOT_DIR/velvet-frontend/src/pages/account/AppointmentDetailPage.tsx"
 
   assert_grep fail flows "Eliminazione account BE (DELETE)" \
     '@DeleteMapping|deleteMapping|/api/v1/me/account' \

@@ -1,11 +1,16 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { VelvetEuropeanContactFields } from "../components/VelvetEuropeanContactFields";
 import { registerClientApi } from "../api/registerClient";
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
+import {
+  DEFAULT_EUROPEAN_COUNTRY_CODE,
+  europeanCountryByCode,
+} from "../data/europeanPhonePrefixes";
 import { velvetJwtHintsFromAccessToken } from "../lib/velvetJwtHintsFromAccessToken";
+import { optionalEuropeanPhoneForRegisterApi } from "../lib/europeanPhone";
 import { setPostLoginReturnPath } from "../lib/postLoginReturnPath";
-import { DEFAULT_IT_PHONE_PREFIX, optionalPhoneForRegisterApi } from "../lib/itPhoneDefaults";
 import { humanizeOidcNetworkError, humanizePostRegistrationAuthError } from "../utils/oidcErrors";
 import "../styles/velvet-plans.css";
 import "../styles/velvet-search-page.css";
@@ -27,10 +32,15 @@ export default function ClientSignupPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState(DEFAULT_IT_PHONE_PREFIX);
+  const [countryCode, setCountryCode] = useState(DEFAULT_EUROPEAN_COUNTRY_CODE);
+  const [phoneDialCode, setPhoneDialCode] = useState(
+    () => europeanCountryByCode(DEFAULT_EUROPEAN_COUNTRY_CODE)?.dialCode ?? "+39",
+  );
+  const [phoneLocal, setPhoneLocal] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [confirmAdult16, setConfirmAdult16] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorHint, setErrorHint] = useState<string | null>(null);
   const [infoHint, setInfoHint] = useState<string | null>(null);
@@ -56,6 +66,10 @@ export default function ClientSignupPage() {
       setErrorHint("Per proseguire accetta i termini del servizio.");
       return;
     }
+    if (!confirmAdult16) {
+      setErrorHint("Per registrarti devi confermare di avere almeno 16 anni.");
+      return;
+    }
 
     setSubmitting(true);
     void (async () => {
@@ -66,7 +80,8 @@ export default function ClientSignupPage() {
           password,
           firstName: firstName.trim(),
           lastName: lastName.trim(),
-          phone: optionalPhoneForRegisterApi(phone),
+          country: countryCode,
+          phone: optionalEuropeanPhoneForRegisterApi(phoneDialCode, phoneLocal),
           bootstrapSuperAdmin: superAdminIntent,
         });
         try {
@@ -114,7 +129,7 @@ export default function ClientSignupPage() {
         </Link>
       </div>
 
-      <header className="velvet-plans-hero velvet-client-signup-hero" style={{ marginBottom: "1.25rem" }}>
+      <header className="velvet-plans-hero velvet-client-signup-hero">
         {superAdminIntent ? <p className="velvet-plans-kicker">Prima installazione</p> : null}
         <h1 id={titleId} className="velvet-plans-title">
           {superAdminIntent ? "Registrati come super admin" : "Registrati come cliente"}
@@ -178,18 +193,18 @@ export default function ClientSignupPage() {
                 disabled={submitting}
               />
             </label>
-            <label className="velvet-plans-field velvet-plans-field--full">
-              <span>Telefono</span>
-              <input
-                name="phone"
-                type="tel"
-                autoComplete="tel"
-                maxLength={40}
-                value={phone}
-                onChange={(ev) => setPhone(ev.target.value)}
-                disabled={submitting}
-              />
-            </label>
+            <VelvetEuropeanContactFields
+              countryCode={countryCode}
+              onCountryCodeChange={setCountryCode}
+              dialCode={phoneDialCode}
+              onDialCodeChange={setPhoneDialCode}
+              phoneLocal={phoneLocal}
+              onPhoneLocalChange={setPhoneLocal}
+              disabled={submitting}
+              countrySelectId={`${formId}-country`}
+              prefixSelectId={`${formId}-phone-prefix`}
+              phoneInputId={`${formId}-phone-local`}
+            />
             <div className="velvet-plans-password-pair">
               <label className="velvet-plans-field">
                 <span>Password</span>
@@ -238,6 +253,15 @@ export default function ClientSignupPage() {
                 </Link>
                 .
               </span>
+            </label>
+            <label className="velvet-plans-field velvet-plans-field--full velvet-plans-field--check">
+              <input
+                type="checkbox"
+                checked={confirmAdult16}
+                onChange={(ev) => setConfirmAdult16(ev.target.checked)}
+                disabled={submitting}
+              />
+              <span>Confermo di avere almeno 16 anni.</span>
             </label>
             <div className="velvet-plans-modal__actions">
               <button type="submit" className="velvet-plan-cta" disabled={submitting}>

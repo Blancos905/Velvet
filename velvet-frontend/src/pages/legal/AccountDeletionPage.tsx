@@ -26,7 +26,7 @@ export default function AccountDeletionPage() {
         {
           heading: "2. Eliminazione dall’area account",
           paragraphs: [
-            "Accedi al sito con le tue credenziali, apri Profilo e scorri fino alla sezione «Chiudi account». Conferma la richiesta nel passaggio successivo: l’account viene disattivato e i dati personali sono trattati secondo l’informativa privacy (anonimizzazione o cancellazione nei limiti di legge).",
+            "Accedi al sito con le tue credenziali, apri Profilo e scorri fino alla sezione «Chiudi account». Conferma la richiesta: l’accesso viene disattivato, le sessioni revocate e i dati identificativi del profilo anonimizzati secondo l’informativa privacy.",
           ],
           citations: [GDPR_CITATIONS.art17, STORE_LEGAL_CITATIONS.googleUserData],
         },

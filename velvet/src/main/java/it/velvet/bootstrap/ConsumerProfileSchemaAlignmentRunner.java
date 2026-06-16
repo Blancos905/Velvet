@@ -46,6 +46,7 @@ public class ConsumerProfileSchemaAlignmentRunner implements ApplicationRunner {
 					c,
 					"notification_inbox_ack_support_request_at",
 					"ALTER TABLE " + TABLE + " ADD COLUMN notification_inbox_ack_support_request_at TIMESTAMP NULL");
+			ensureColumn(c, "country", "ALTER TABLE " + TABLE + " ADD COLUMN country VARCHAR(2) NULL");
 		}
 	}
 

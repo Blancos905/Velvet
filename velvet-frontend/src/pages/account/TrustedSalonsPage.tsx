@@ -1,9 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { apiJson } from "../../api/client";
 import type { SalonClientMembershipDto } from "../../api/types";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
 import { formatSalonCityForDisplay } from "../../lib/formatSalonCityForDisplay";
+import { notifySalonCatalogClientsChanged } from "../../lib/salonCatalogClientsSync";
 import "../../styles/velvet-consumer-bookings-page.css";
 import "../../styles/velvet-trusted-salons-page.css";
 
@@ -19,11 +21,42 @@ function formatTrustedSince(iso: string): { day: string; month: string; full: st
 
 export default function TrustedSalonsPage() {
   const { accessToken, isSalonTitolare, isSalonStaff, isVelvetSuperAdmin } = useVelvetAuth();
+  const queryClient = useQueryClient();
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [feedbackIsError, setFeedbackIsError] = useState(false);
+  const [leavingOrganizationId, setLeavingOrganizationId] = useState<string | null>(null);
 
   const q = useQuery({
     queryKey: ["me", "salon-clients", accessToken],
     queryFn: () => apiJson<SalonClientMembershipDto[]>("/api/v1/me/salon-clients", { accessToken }),
     enabled: Boolean(accessToken),
+  });
+
+  const leaveSalonClientM = useMutation({
+    mutationFn: (organizationId: string) =>
+      apiJson<void>(`/api/v1/me/salon-clients/${encodeURIComponent(organizationId)}/leave`, {
+        method: "POST",
+        accessToken,
+      }),
+    onMutate: (organizationId) => {
+      setLeavingOrganizationId(organizationId);
+    },
+    onSuccess: (_, organizationId) => {
+      setFeedbackIsError(false);
+      queryClient.setQueryData<SalonClientMembershipDto[]>(["me", "salon-clients", accessToken], (current) =>
+        (current ?? []).filter((item) => item.organizationId !== organizationId),
+      );
+      void queryClient.invalidateQueries({ queryKey: ["catalog", "clients"] });
+      notifySalonCatalogClientsChanged();
+      setFeedback("Hai scollegato il tuo profilo da questo salone.");
+    },
+    onError: (error) => {
+      setFeedbackIsError(true);
+      setFeedback(error instanceof Error ? error.message : "Impossibile completare la richiesta.");
+    },
+    onSettled: () => {
+      setLeavingOrganizationId(null);
+    },
   });
 
   if (isVelvetSuperAdmin || isSalonStaff) {
@@ -78,6 +111,15 @@ export default function TrustedSalonsPage() {
           </p>
         ) : null}
 
+        {feedback ? (
+          <p
+            className={`velvet-trusted-salons-feedback${feedbackIsError ? " velvet-trusted-salons-feedback--error" : ""}`}
+            role={feedbackIsError ? "alert" : "status"}
+          >
+            {feedback}
+          </p>
+        ) : null}
+
         {!q.isLoading && !q.error && rows.length === 0 ? (
           <div className="velvet-trusted-salons-empty velvet-consumer-bookings-dash__empty" role="status">
             <p className="velvet-trusted-salons-empty__title">Ancora nessun salone di fiducia</p>
@@ -115,13 +157,31 @@ export default function TrustedSalonsPage() {
                       {m.city ? `${formatSalonCityForDisplay(m.city) ?? m.city} · ` : ""}
                       Salone collegato al tuo profilo.
                     </p>
-                    <div className="velvet-consumer-agenda__actions">
+                    <div className="velvet-consumer-agenda__actions velvet-trusted-salons-page__actions">
                       <Link
                         to={`/account/chat?salonClientId=${encodeURIComponent(m.id)}`}
                         className="velvet-consumer-agenda__manage-link"
                       >
                         Apri chat
                       </Link>
+                      <button
+                        type="button"
+                        className="velvet-trusted-salons-page__leave-btn"
+                        disabled={leaveSalonClientM.isPending && leavingOrganizationId === m.organizationId}
+                        onClick={() => {
+                          setFeedback(null);
+                          setFeedbackIsError(false);
+                          const ok = window.confirm(
+                            `Vuoi smettere di risultare cliente di ${m.name}? Lo storico delle prenotazioni resta lato salone dove necessario.`,
+                          );
+                          if (!ok) return;
+                          leaveSalonClientM.mutate(m.organizationId);
+                        }}
+                      >
+                        {leaveSalonClientM.isPending && leavingOrganizationId === m.organizationId
+                          ? "Scollegamento…"
+                          : "Non essere più cliente"}
+                      </button>
                     </div>
                   </div>
                 </li>

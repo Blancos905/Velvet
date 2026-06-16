@@ -94,7 +94,7 @@ export const googleMapsEmbedApiKey = (import.meta.env.VITE_GOOGLE_MAPS_EMBED_API
 /** Google Play — footer e CTA download app (override con VITE_PLAY_STORE_URL). */
 export const playStoreUrl = (
   import.meta.env.VITE_PLAY_STORE_URL ??
-  "https://play.google.com/store/apps/details?id=it.salonivelvet.velvet_app"
+  "https://play.google.com/store/apps/details?id=it.saloniluxury.velvet_app"
 ).trim();
 
 /**

@@ -15,6 +15,16 @@
   align-items: start;
 }
 
+.velvet-salon-free-page__layout--promo-only {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+
+.velvet-salon-free-page__layout--promo-only .velvet-salon-free-page__promo {
+  max-width: min(328px, 100%);
+  margin-inline: auto;
+}
+
 @media (min-width: 900px) {
   .velvet-salon-free-page__layout {
     grid-template-columns: minmax(0, 1fr) minmax(248px, 340px);

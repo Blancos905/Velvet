@@ -6,6 +6,9 @@ import type { OrganizationDetail, PublicSalonReview, SalonClientMembershipDto, S
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
 import { formatPriceEUR } from "../lib/format";
 import { formatSalonCityForDisplay } from "../lib/formatSalonCityForDisplay";
+import { useMapsCookieAllowed } from "../hooks/useCookieConsent";
+import { googleMapsEmbedSrc } from "../lib/salonMap";
+import { googleMapsEmbedApiKey } from "../config/env";
 import { parseInlineBold } from "../lib/parseInlineBold";
 import {
   emptySalonPersonalPageData,
@@ -132,6 +135,7 @@ export default function SalonExplorePage() {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
   const queryClient = useQueryClient();
+  const mapsAllowed = useMapsCookieAllowed();
   const { accessToken, isAuthenticated, signIn } = useVelvetAuth();
   const s = slug ?? "";
   const [showcase, setShowcase] = useState<SalonShowcaseStored>(() => emptySalonShowcase());
@@ -392,9 +396,7 @@ export default function SalonExplorePage() {
   }, [detail]);
 
   const mapEmbedSrc =
-    mapQuery.length > 0
-      ? `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=16&output=embed`
-      : null;
+    mapQuery.length > 0 ? googleMapsEmbedSrc(`${mapQuery}, Italia`, googleMapsEmbedApiKey) : null;
 
   const addressLineFull = useMemo(() => {
     const a = detail?.addressLine?.trim();
@@ -750,7 +752,7 @@ export default function SalonExplorePage() {
                   </div>
                 </div>
                 <div className="velvet-salon-explore__map-col">
-                  {mapEmbedSrc ? (
+                  {mapEmbedSrc && mapsAllowed ? (
                     <iframe
                       title={`Mappa — ${detail.name}`}
                       className="velvet-salon-explore__map-iframe"
@@ -758,6 +760,17 @@ export default function SalonExplorePage() {
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
                     />
+                  ) : mapEmbedSrc ? (
+                    <div className="velvet-salon-explore__map-fallback">
+                      {addressLineFull ? <p>{addressLineFull}</p> : null}
+                      <p>
+                        Per visualizzare la mappa interattiva attiva le preferenze «Mappe e geocodifica» in{" "}
+                        <Link to="/privacy/scelte" className="velvet-link-inline">
+                          Scelte privacy
+                        </Link>
+                        .
+                      </p>
+                    </div>
                   ) : (
                     <div className="velvet-salon-explore__map-fallback">Indirizzo non disponibile per la mappa.</div>
                   )}

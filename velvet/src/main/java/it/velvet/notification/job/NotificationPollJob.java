@@ -13,7 +13,9 @@ public class NotificationPollJob {
 		this.scheduledNotificationProcessor = scheduledNotificationProcessor;
 	}
 
-	@Scheduled(fixedDelayString = "${velvet.notifications.poll-interval-ms:15000}")
+	@Scheduled(
+			fixedDelayString = "${velvet.notifications.poll-interval-ms:15000}",
+			initialDelayString = "${velvet.notifications.poll-initial-delay-ms:30000}")
 	public void poll() {
 		scheduledNotificationProcessor.processDue();
 	}

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { apiJson } from "../../api/client";
 import type { SupportInfo } from "../../api/types";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
-import { SaloniVelvetLogoMark } from "../../components/SaloniVelvetLogoMark";
+import { SaloniLuxuryLogoMark } from "../../components/SaloniLuxuryLogoMark";
 import "../../styles/velvet-consumer-bookings-page.css";
 import "../../styles/velvet-account-page-shell.css";
 import "../../styles/velvet-support-page.css";
@@ -107,7 +107,7 @@ export default function SupportPage() {
       <section className="velvet-support-page__grid" aria-label="Contatti assistenza Saloni Luxury">
         <article className="velvet-support-card">
           <div className="velvet-support-card__logo">
-            <SaloniVelvetLogoMark />
+            <SaloniLuxuryLogoMark />
           </div>
           <p className="velvet-support-card__badge">Supporto diretto</p>
           <h2 className="velvet-section-title velvet-support-card__title">Team Saloni Luxury</h2>

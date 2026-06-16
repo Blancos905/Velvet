@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
+import "../styles/velvet-legal-site-footnote.css";
 
 type LegalSiteFootnoteProps = {
   className?: string;
@@ -7,28 +8,36 @@ type LegalSiteFootnoteProps = {
 };
 
 export function LegalSiteFootnote({ className, style }: LegalSiteFootnoteProps) {
+  const rootClass = ["velvet-legal-site-footnote", className].filter(Boolean).join(" ");
+
   return (
-    <p
-      className={className ?? "velvet-text-muted"}
-      style={{ marginTop: "1rem", fontSize: "0.92rem", ...style }}
+    <aside
+      className={rootClass}
+      style={style}
+      aria-label="Informativa privacy e documenti legali"
     >
-      Trattiamo i dati secondo l&apos;
-      <Link to="/privacy/clienti" className="velvet-link-inline">
-        informativa privacy clienti
-      </Link>
-      , i{" "}
-      <Link to="/termini" className="velvet-link-inline">
-        termini di servizio
-      </Link>{" "}
-      e l&apos;
-      <Link to="/privacy/cookie" className="velvet-link-inline">
-        informativa cookie
-      </Link>
-      . Per diritti e cancellazione:{" "}
-      <Link to="/privacy/scelte" className="velvet-link-inline">
-        Scelte privacy
-      </Link>
-      .
-    </p>
+      <p className="velvet-legal-site-footnote__kicker">Privacy e dati</p>
+      <p className="velvet-legal-site-footnote__lead">
+        Trattiamo i dati secondo i documenti legali del servizio.
+      </p>
+      <nav className="velvet-legal-site-footnote__chips" aria-label="Collegamenti legali">
+        <Link to="/privacy/clienti" className="velvet-legal-site-footnote__chip">
+          Privacy clienti
+        </Link>
+        <Link to="/termini" className="velvet-legal-site-footnote__chip">
+          Termini
+        </Link>
+        <Link to="/privacy/cookie" className="velvet-legal-site-footnote__chip">
+          Cookie
+        </Link>
+      </nav>
+      <p className="velvet-legal-site-footnote__footer-line">
+        Per diritti e cancellazione:{" "}
+        <Link to="/privacy/scelte" className="velvet-legal-site-footnote__link">
+          Scelte privacy
+        </Link>
+        .
+      </p>
+    </aside>
   );
 }

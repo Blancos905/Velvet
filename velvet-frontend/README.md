@@ -1,6 +1,6 @@
-# velvet-frontend — SaloniVelvet (web)
+# velvet-frontend — SaloniLuxury (web)
 
-SPA **React 18**, **TypeScript**, **Vite 5** per il sito pubblico **SaloniVelvet**: ricerca saloni, vetrina, registrazione/login, area account consumatore e **area titolare** (piano salone, brand, layout, servizi) quando il JWT contiene il ruolo realm **`OWNER`**.
+SPA **React 18**, **TypeScript**, **Vite 5** per il sito pubblico **SaloniLuxury**: ricerca saloni, vetrina, registrazione/login, area account consumatore e **area titolare** (piano salone, brand, layout, servizi) quando il JWT contiene il ruolo realm **`OWNER`**.
 
 ## Avvio
 
@@ -35,13 +35,13 @@ Config letta da `src/config/env.ts`.
 
 | Path | Note |
 |------|------|
-| `/` | Home SaloniVelvet, ricerca (anche CAP → locate). |
+| `/` | Home SaloniLuxury, ricerca (anche CAP → locate). |
 | `/search` | Lista ricerca; preferiti in cima se loggato. |
 | `/s/:slug` | Vetrina / mini-sito salone, prenotazione consumatore. |
 | `/piani` | Piani Free / Premium e onboarding titolare (registrazione salone). |
 | `/partner` | Landing B2B partner (override URL con `VITE_PARTNER_SIGNUP_URL`). |
 | `/registrati` | Registrazione cliente. |
-| `/prenotazione/gestisci` | Gestione prenotazione con **token** (query). |
+| `/account/prenotazioni/:id` | Dettaglio prenotazione consumatore (link dalle email di conferma). |
 | `/recensione` | Recensione con **token** (query). |
 | `/account/*` | **Protetto:** layout account; redirect index → `/account/home` (cliente) o `/account/salone` (titolare). Sottoroute: prenotazioni, profilo, preferiti, assistenza; per **OWNER**: salone (home, servizi, brand, layout catalogo, strumenti Standard). |
 

@@ -3,6 +3,7 @@ package it.velvet.studio.service;
 import it.velvet.consumer.domain.ConsumerProfileRepository;
 import it.velvet.publicapi.dto.RegistrationSalonLocation;
 import it.velvet.security.auth.VelvetUserPrincipal;
+import it.velvet.studio.domain.LocationRepository;
 import it.velvet.studio.domain.SalonBusinessType;
 import it.velvet.studio.domain.SalonClientGender;
 import it.velvet.studio.domain.StudioGroup;
@@ -26,14 +27,20 @@ public class MeSalonOwnerOrphanRepairService {
 	private static final Logger log = LoggerFactory.getLogger(MeSalonOwnerOrphanRepairService.class);
 
 	private final StudioGroupRepository studioGroupRepository;
+	private final LocationRepository locationRepository;
+	private final StudioGroupOwnerResolver studioGroupOwnerResolver;
 	private final SalonDirectoryProvisioningService salonDirectoryProvisioningService;
 	private final ConsumerProfileRepository consumerProfileRepository;
 
 	public MeSalonOwnerOrphanRepairService(
 			StudioGroupRepository studioGroupRepository,
+			LocationRepository locationRepository,
+			StudioGroupOwnerResolver studioGroupOwnerResolver,
 			SalonDirectoryProvisioningService salonDirectoryProvisioningService,
 			ConsumerProfileRepository consumerProfileRepository) {
 		this.studioGroupRepository = studioGroupRepository;
+		this.locationRepository = locationRepository;
+		this.studioGroupOwnerResolver = studioGroupOwnerResolver;
 		this.salonDirectoryProvisioningService = salonDirectoryProvisioningService;
 		this.consumerProfileRepository = consumerProfileRepository;
 	}
@@ -95,5 +102,56 @@ public class MeSalonOwnerOrphanRepairService {
 		salonDirectoryProvisioningService.provisionAfterPartnerRegistration(
 				email, "BASE", salonName, loc, sub, List.of(SalonBusinessType.HAIR),
 				List.of(SalonClientGender.MALE, SalonClientGender.FEMALE));
+	}
+
+	/**
+	 * Titolare con {@code studio_groups} ma zero sedi (provisioning interrotto): crea sede di default idempotente.
+	 */
+	@Transactional
+	public void tryRepairIfOwnerWithNoLocation(VelvetUserPrincipal principal) {
+		if (principal == null || principal.getSubject() == null || principal.getSubject().isBlank()) {
+			return;
+		}
+		if (!principal.hasAppRole("OWNER")) {
+			return;
+		}
+		Optional<StudioGroup> groupOpt = studioGroupOwnerResolver.resolveStudioGroupForOwner(principal);
+		if (groupOpt.isEmpty()) {
+			return;
+		}
+		StudioGroup group = groupOpt.get();
+		if (!locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId()).isEmpty()) {
+			return;
+		}
+		String salonName = firstNonBlank(group.getName(), "Salone");
+		RegistrationSalonLocation loc = new RegistrationSalonLocation(
+				"Indirizzo da completare in area account",
+				"00000",
+				"Non indicata",
+				"EE",
+				"IT",
+				salonName);
+		log.warn(
+				"Riparazione directory: creo prima sede per titolare senza location groupId={} email={}",
+				group.getId(),
+				group.getOwnerEmail());
+		salonDirectoryProvisioningService.ensurePrimaryLocationIfMissing(
+				group,
+				salonName,
+				loc,
+				List.of(SalonBusinessType.HAIR),
+				List.of(SalonClientGender.MALE, SalonClientGender.FEMALE));
+	}
+
+	private static String firstNonBlank(String... parts) {
+		if (parts == null) {
+			return "Salone";
+		}
+		for (String p : parts) {
+			if (p != null && !p.isBlank()) {
+				return p.trim();
+			}
+		}
+		return "Salone";
 	}
 }

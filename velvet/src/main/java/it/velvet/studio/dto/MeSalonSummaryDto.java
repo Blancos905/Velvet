@@ -27,10 +27,14 @@ public record MeSalonSummaryDto(
 		Integer primaryLocationOpeningMinuteOfDay,
 		/** Chiusura sede (minuti da mezzanotte locale). */
 		Integer primaryLocationClosingMinuteOfDay,
+		/** Fine fascia mattutina (pausa pranzo); opzionale. */
+		Integer primaryLocationMorningEndMinuteOfDay,
+		/** Inizio fascia pomeridiana (pausa pranzo); opzionale. */
+		Integer primaryLocationAfternoonStartMinuteOfDay,
 		/** {@code true} se piano Premium e PIN statistiche configurato in registrazione. */
 		boolean statisticsPinRequired) {
 
 	public static MeSalonSummaryDto notProvisioned() {
-		return new MeSalonSummaryDto(false, null, null, null, null, null, null, null, null, null, null, false);
+		return new MeSalonSummaryDto(false, null, null, null, null, null, null, null, null, null, null, null, null, false);
 	}
 }

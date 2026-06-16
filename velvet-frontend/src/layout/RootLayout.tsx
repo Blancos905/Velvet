@@ -3,6 +3,7 @@ import { AppFooter } from "../components/AppFooter";
 import { AppHeader } from "../components/AppHeader";
 import { CookieConsentBanner } from "../components/CookieConsentBanner";
 import { PendingBookingResume } from "../components/PendingBookingResume";
+import { ScrollToTop } from "../components/ScrollToTop";
 import { VelvetDevBackendBanner } from "../components/VelvetDevBackendBanner";
 import { useVelvetNativeAppDocumentClass } from "../hooks/useVelvetNativeAppShell";
 
@@ -19,6 +20,7 @@ export function RootLayout() {
 
   return (
     <>
+      <ScrollToTop />
       {!hideSiteChrome ? <VelvetDevBackendBanner /> : null}
       {!hideSiteChrome ? <AppHeader /> : null}
       {!hideSiteChrome ? <PendingBookingResume /> : null}

@@ -1,7 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { downloadMeDataExport } from "../../api/meDataExport";
 import { apiFetch, apiJson } from "../../api/client";
+import { fetchBillingStatus, openBillingPortal } from "../../api/billing";
+import { isNativePremiumBillingBlocked } from "../../lib/nativePremiumUpgradePolicy";
 import type { MeStaffOperatorSelf, ProfileDto } from "../../api/types";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
 import { LEGAL_CONTACT_EMAIL } from "../../content/legalReferences";
@@ -53,6 +56,13 @@ export default function ProfilePage() {
   const canSelfDeleteAccount = isSalonTitolare || (!isSalonStaff && !isVelvetSuperAdmin);
   const qc = useQueryClient();
   const meSalon = useMeSalonSummaryQuery();
+  const billingStatus = useQuery({
+    queryKey: ["me", "billing", "status", accessToken],
+    queryFn: () => fetchBillingStatus(accessToken),
+    enabled: Boolean(isSalonTitolare && accessToken),
+    staleTime: 60_000,
+  });
+  const [portalBusy, setPortalBusy] = useState(false);
 
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -62,6 +72,8 @@ export default function ProfilePage() {
   const [salonMsg, setSalonMsg] = useState<string | null>(null);
   const [salonAudienceMsg, setSalonAudienceMsg] = useState<string | null>(null);
   const [deleteArmed, setDeleteArmed] = useState(false);
+  const [exportBusy, setExportBusy] = useState(false);
+  const [exportMsg, setExportMsg] = useState<string | null>(null);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -326,6 +338,26 @@ export default function ProfilePage() {
                 <span className="velvet-profile-page__privacy-card-label">Privacy</span>
                 <span className="velvet-profile-page__privacy-card-value">Info e privacy</span>
               </Link>
+            ) : null}
+            {isSalonTitolare && billingStatus.data?.configured && !isNativePremiumBillingBlocked() ? (
+              <button
+                type="button"
+                className="velvet-profile-page__privacy-card"
+                disabled={portalBusy}
+                onClick={() => {
+                  setPortalBusy(true);
+                  void openBillingPortal(accessToken)
+                    .catch(() => {
+                      setMsg("Impossibile aprire il portale fatturazione Stripe.");
+                    })
+                    .finally(() => setPortalBusy(false));
+                }}
+              >
+                <span className="velvet-profile-page__privacy-card-label">Fatturazione</span>
+                <span className="velvet-profile-page__privacy-card-value">
+                  {portalBusy ? "Apertura…" : "Pagamenti e fatture"}
+                </span>
+              </button>
             ) : null}
           </div>
         ) : null}
@@ -790,11 +822,46 @@ export default function ProfilePage() {
         ) : null}
       </section>
 
+      <section className="velvet-profile-close" aria-labelledby="velvet-profile-data-export-title">
+        <h2 id="velvet-profile-data-export-title" className="velvet-section-title velvet-profile-card__title">
+          I tuoi dati
+        </h2>
+        <p className="velvet-text-muted">
+          Scarica una copia dei dati del tuo account in formato JSON (diritto alla portabilità, art. 20 GDPR).
+        </p>
+        {exportMsg ? (
+          <p className="velvet-alert velvet-alert--success" role="status">
+            {exportMsg}
+          </p>
+        ) : null}
+        <button
+          type="button"
+          className="velvet-btn velvet-btn--secondary"
+          disabled={exportBusy || !accessToken}
+          onClick={() => {
+            if (!accessToken) return;
+            setExportMsg(null);
+            setExportBusy(true);
+            void downloadMeDataExport(accessToken)
+              .then(() => setExportMsg("Export scaricato."))
+              .catch((err: unknown) =>
+                setExportMsg(err instanceof Error ? err.message : "Impossibile scaricare l'export."),
+              )
+              .finally(() => setExportBusy(false));
+          }}
+        >
+          {exportBusy ? "Preparazione export…" : "Scarica export JSON"}
+        </button>
+      </section>
+
       <section className="velvet-profile-close">
         <h2 className="velvet-section-title velvet-profile-card__title">Chiudi account</h2>
         {canSelfDeleteAccount ? (
           <>
-            <p className="velvet-text-muted">Operazione irreversibile.</p>
+            <p className="velvet-text-muted">
+              L&apos;account verrà disattivato; i dati identificativi del profilo saranno anonimizzati secondo l&apos;informativa
+              privacy.
+            </p>
             {!deleteArmed ? (
               <button
                 type="button"
@@ -810,7 +877,7 @@ export default function ProfilePage() {
             ) : (
               <div className="velvet-profile-close__confirm-box">
                 <p className="velvet-profile-close__confirm-text" role="alert">
-                  Conferma finale: l&apos;account verrà chiuso definitivamente.
+                  Conferma finale: chiuderemo l&apos;account e anonimizzeremo i dati personali del profilo.
                 </p>
                 <div className="velvet-profile-close__confirm-actions">
                   <button

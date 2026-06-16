@@ -26,16 +26,19 @@ public class MeSalonCatalogService {
 	private final LocationRepository locationRepository;
 	private final SalonServiceRepository salonServiceRepository;
 	private final StaffOperatorRepository staffOperatorRepository;
+	private final MeSalonOwnerOrphanRepairService meSalonOwnerOrphanRepairService;
 
 	public MeSalonCatalogService(
 			StudioGroupOwnerResolver studioGroupOwnerResolver,
 			LocationRepository locationRepository,
 			SalonServiceRepository salonServiceRepository,
-			StaffOperatorRepository staffOperatorRepository) {
+			StaffOperatorRepository staffOperatorRepository,
+			MeSalonOwnerOrphanRepairService meSalonOwnerOrphanRepairService) {
 		this.studioGroupOwnerResolver = studioGroupOwnerResolver;
 		this.locationRepository = locationRepository;
 		this.salonServiceRepository = salonServiceRepository;
 		this.staffOperatorRepository = staffOperatorRepository;
+		this.meSalonOwnerOrphanRepairService = meSalonOwnerOrphanRepairService;
 	}
 
 	public List<MeSalonServiceDto> list(VelvetUserPrincipal principal) {
@@ -73,12 +76,20 @@ public class MeSalonCatalogService {
 	}
 
 	private Location requirePrimaryLocation(VelvetUserPrincipal principal) {
-		StudioGroup group = studioGroupOwnerResolver.resolveStudioGroupForOwner(principal)
-				.orElseThrow(() -> new BusinessException(
-						HttpStatus.NOT_FOUND,
-						"SALON_NOT_PROVISIONED",
-						"Nessun salone collegato a questo account. Completa la registrazione titolare."));
+		java.util.Optional<StudioGroup> groupOpt = studioGroupOwnerResolver.resolveStudioGroupForOwner(principal);
+		if (groupOpt.isEmpty()) {
+			meSalonOwnerOrphanRepairService.tryRepairIfOwnerWithNoStudio(principal);
+			groupOpt = studioGroupOwnerResolver.resolveStudioGroupForOwner(principal);
+		}
+		StudioGroup group = groupOpt.orElseThrow(() -> new BusinessException(
+				HttpStatus.NOT_FOUND,
+				"SALON_NOT_PROVISIONED",
+				"Nessun salone collegato a questo account. Completa la registrazione titolare."));
 		List<Location> locs = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId());
+		if (locs.isEmpty()) {
+			meSalonOwnerOrphanRepairService.tryRepairIfOwnerWithNoLocation(principal);
+			locs = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId());
+		}
 		if (locs.isEmpty()) {
 			throw new BusinessException(
 					HttpStatus.CONFLICT,

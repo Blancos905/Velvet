@@ -33,4 +33,13 @@ describe("salonOpeningHours", () => {
     expect(isSlotWithinBookingWindow(iso, window!, 30)).toBe(true);
     expect(isSlotWithinBookingWindow("2026-05-20T15:30:00.000Z", window!, 31)).toBe(false);
   });
+
+  it("excludes lunch break from bookable slots", () => {
+    const window = resolveBookingHoursWindow(510, 1140, "Europe/Rome", 780, 870);
+    expect(window?.morningEndMinute).toBe(780);
+    expect(window?.afternoonStartMinute).toBe(870);
+    expect(isSlotWithinBookingWindow("2026-06-11T10:00:00.000Z", window!, 30)).toBe(true);
+    expect(isSlotWithinBookingWindow("2026-06-11T11:30:00.000Z", window!, 30)).toBe(false);
+    expect(isSlotWithinBookingWindow("2026-06-11T13:30:00.000Z", window!, 30)).toBe(true);
+  });
 });

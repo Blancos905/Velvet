@@ -33,6 +33,10 @@ for _ in $(seq 1 30); do
   sleep 1
 done
 
+"$APP_DIR/scripts/wait-for-vite-proxy.sh"
+
+export VELVET_STACK_READY=1
+
 PLATFORM="${1:-ios}"
 shift || true
 case "$PLATFORM" in

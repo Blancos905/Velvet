@@ -35,7 +35,7 @@ export function AppFooter() {
         <section className="velvet-footer-app-block velvet-footer-app-block--interactive" aria-labelledby="velvet-footer-app-heading">
           <div className="velvet-footer-app-logo-wrap">
             <img
-              src="/logo-saloni-velvet.png"
+              src="/logo-saloni-luxury.png"
               alt=""
               className="velvet-footer-app-logo"
               width={128}

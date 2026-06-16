@@ -1,0 +1,38 @@
+/*
+ * Hub account in WebView Flutter (/account/home, /account/salone, /account/staff):
+ * niente masthead duplicato sotto AppHeader, corpo senza flex-grow vuoto.
+ */
+
+html.velvet-native-app .velvet-layout-main:has(.velvet-account-hub--native-hub) {
+  flex: 0 0 auto;
+  justify-content: flex-start;
+}
+
+html.velvet-native-app .velvet-account-hub--native-hub {
+  flex: 0 0 auto;
+  padding-top: 0.5rem;
+  gap: 0.65rem;
+  padding-bottom: 1rem;
+}
+
+/* Premium: hero panoramica nel corpo — nascondi masthead duplicato. Free: mantieni benvenuto. */
+html.velvet-native-app[data-velvet-path="/account/salone"]:not(.velvet-native-app-free)
+  .velvet-account-hub__masthead {
+  display: none !important;
+}
+
+html.velvet-native-app .velvet-account-hub--native-hub .velvet-account-hub__body {
+  flex: 0 0 auto;
+}
+
+html.velvet-native-app .velvet-account-hub--native-hub .velvet-salon-free-page {
+  flex: 0 0 auto;
+}
+
+html.velvet-native-app .velvet-account-hub--native-hub .velvet-salon-free-page__primary {
+  min-height: 0;
+}
+
+html.velvet-native-app[data-velvet-path^="/account"] .velvet-site-footer {
+  display: none !important;
+}

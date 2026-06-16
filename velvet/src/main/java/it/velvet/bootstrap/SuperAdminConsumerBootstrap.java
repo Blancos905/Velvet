@@ -7,22 +7,23 @@ import it.velvet.consumer.domain.ConsumerProfile;
 import it.velvet.consumer.domain.ConsumerProfileRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.annotation.Order;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 import java.util.Optional;
 
+import static it.velvet.config.VelvetAsyncConfiguration.BOOTSTRAP_EXECUTOR;
+
 /**
  * Allinea un {@link ConsumerProfile} in database con le credenziali {@code velvet.super-admin.*} così il login
  * standard {@code POST /api/v1/auth/login} (email + password) funziona oltre a {@code /api/v1/admin/auth/login}.
  */
 @Component
-@Order(0)
-public class SuperAdminConsumerBootstrap implements ApplicationRunner {
+public class SuperAdminConsumerBootstrap {
 
 	private static final Logger log = LoggerFactory.getLogger(SuperAdminConsumerBootstrap.class);
 
@@ -63,8 +64,9 @@ public class SuperAdminConsumerBootstrap implements ApplicationRunner {
 		}
 	}
 
-	@Override
-	public void run(ApplicationArguments args) {
+	@EventListener(ApplicationReadyEvent.class)
+	@Async(BOOTSTRAP_EXECUTOR)
+	public void onApplicationReady() {
 		var stored = platformSuperAdminCredentialRepository.findById(PlatformSuperAdminCredential.SINGLETON_ID);
 		if (stored.isPresent()) {
 			syncConsumerFromStoredCredential(stored.get());

@@ -330,6 +330,64 @@
     filter 0.22s ease;
 }
 
+/* CTA secondaria — anteprima vetrina pubblica */
+.velvet-personal-builder__actions .velvet-personal-builder__btn-public {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.85rem;
+  padding: 0.72rem 1.55rem;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  text-decoration: none !important;
+  text-align: center;
+  color: #fff7ed !important;
+  border: 2px solid rgba(251, 146, 60, 0.8) !important;
+  background:
+    linear-gradient(165deg, rgba(251, 146, 60, 0.28) 0%, rgba(234, 88, 12, 0.18) 42%, rgba(24, 8, 3, 0.65) 100%) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.35) inset,
+    0 10px 28px rgba(249, 115, 22, 0.32),
+    0 0 40px -12px rgba(249, 115, 22, 0.45);
+}
+
+.velvet-personal-builder__actions .velvet-personal-builder__btn-public::after {
+  content: "↗";
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0.92;
+}
+
+@media (hover: hover) {
+  .velvet-personal-builder__actions .velvet-personal-builder__btn-public:hover {
+    color: #fffbeb !important;
+    border-color: #fdba74 !important;
+    background:
+      linear-gradient(165deg, rgba(253, 186, 116, 0.38) 0%, rgba(249, 115, 22, 0.28) 45%, rgba(45, 16, 6, 0.72) 100%) !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.18) inset,
+      0 14px 36px rgba(249, 115, 22, 0.42),
+      0 0 52px -8px rgba(251, 146, 60, 0.55);
+  }
+}
+
+.velvet-personal-builder__actions .velvet-personal-builder__btn-public:focus-visible {
+  outline: 2px solid #fb923c;
+  outline-offset: 3px;
+}
+
+.velvet-personal-builder__actions .velvet-personal-builder__btn-public:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 6px 18px rgba(249, 115, 22, 0.28);
+}
+
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .velvet-personal-builder__actions .velvet-btn:hover {
     transform: translateY(-2px);
@@ -408,7 +466,8 @@
   }
 
   .velvet-personal-builder__actions .velvet-btn:hover,
-  .velvet-personal-builder__actions .velvet-btn:active {
+  .velvet-personal-builder__actions .velvet-btn:active,
+  .velvet-personal-builder__actions .velvet-personal-builder__btn-public:active {
     transform: none;
   }
 }

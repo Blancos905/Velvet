@@ -9,7 +9,6 @@ import it.velvet.appointment.service.AvailabilityService;
 import it.velvet.consumer.domain.ConsumerProfile;
 import it.velvet.consumer.service.ConsumerProfileService;
 import it.velvet.publicapi.dto.AppointmentResponses.AppointmentDto;
-import it.velvet.security.AppointmentTokenService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -39,17 +38,14 @@ public class MeAppointmentsController {
 	private final ConsumerProfileService consumerProfileService;
 	private final AppointmentBookingService appointmentBookingService;
 	private final AvailabilityService availabilityService;
-	private final AppointmentTokenService appointmentTokenService;
 
 	public MeAppointmentsController(
 			ConsumerProfileService consumerProfileService,
 			AppointmentBookingService appointmentBookingService,
-			AvailabilityService availabilityService,
-			AppointmentTokenService appointmentTokenService) {
+			AvailabilityService availabilityService) {
 		this.consumerProfileService = consumerProfileService;
 		this.appointmentBookingService = appointmentBookingService;
 		this.availabilityService = availabilityService;
-		this.appointmentTokenService = appointmentTokenService;
 	}
 
 	@GetMapping
@@ -77,7 +73,7 @@ public class MeAppointmentsController {
 	@PostMapping
 	@Operation(summary = "Crea prenotazione (JWT)")
 	@PreAuthorize("hasAuthority('ROLE_CLIENT')")
-	public CreatedAppointmentResponse create(@AuthenticationPrincipal VelvetUserPrincipal principal, @RequestBody @Valid CreateBody body) {
+	public AppointmentDto create(@AuthenticationPrincipal VelvetUserPrincipal principal, @RequestBody @Valid CreateBody body) {
 		ConsumerProfile p = consumerProfileService.requireActiveProfile(principal);
 		Appointment a = appointmentBookingService.createForConsumer(
 				p,
@@ -85,8 +81,7 @@ public class MeAppointmentsController {
 				body.serviceId(),
 				body.operatorId(),
 				body.start());
-		String manageToken = appointmentTokenService.mintManageToken(a.getId());
-		return new CreatedAppointmentResponse(AppointmentDto.from(a), manageToken);
+		return AppointmentDto.from(a);
 	}
 
 	@PostMapping("/{id}/cancel")
@@ -135,8 +130,5 @@ public class MeAppointmentsController {
 	}
 
 	public record RescheduleMeBody(@NotNull Instant newStart) {
-	}
-
-	public record CreatedAppointmentResponse(AppointmentDto appointment, String manageToken) {
 	}
 }

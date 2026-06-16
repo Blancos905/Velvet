@@ -4,7 +4,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import { apiJson } from "../../../api/client";
 import { useVelvetAuth } from "../../../auth/VelvetAuthProvider";
 import { useMeSalonSummaryQuery } from "../../../hooks/useMeSalonSummary";
-import { minuteOfDayToTimeValue, parseOpeningHoursRange, replaceOpeningHoursTimes, timeValueToMinuteOfDay } from "../../../lib/salonOpeningHours";
+import {
+  formatSalonSplitOpeningHours,
+  minuteOfDayToTimeValue,
+  parseOpeningHoursRange,
+  replaceOpeningHoursTimes,
+  timeValueToMinuteOfDay,
+} from "../../../lib/salonOpeningHours";
 import { readImageFileAsGalleryDataUrl } from "../../../lib/readImageDataUrl";
 import {
   emptySalonShowcase,
@@ -30,6 +36,8 @@ export default function SalonPersonalPageBuilder() {
   const slug = meSalon.data?.primaryLocationSlug?.trim() ?? "";
   const [state, setState] = useState<SalonPersonalPageData>(emptySalonPersonalPageData());
   const [bookingOpenTime, setBookingOpenTime] = useState("08:30");
+  const [bookingMorningEndTime, setBookingMorningEndTime] = useState("");
+  const [bookingAfternoonStartTime, setBookingAfternoonStartTime] = useState("");
   const [bookingCloseTime, setBookingCloseTime] = useState("19:00");
   const [feedback, setFeedback] = useState<{ text: string; kind: "success" | "error" } | null>(null);
   const [showcase, setShowcase] = useState<SalonShowcaseStored>(() => emptySalonShowcase());
@@ -67,10 +75,21 @@ export default function SalonPersonalPageBuilder() {
     if (close != null) {
       setBookingCloseTime(minuteOfDayToTimeValue(close));
     }
+    const morningEnd = meSalon.data.primaryLocationMorningEndMinuteOfDay;
+    const afternoonStart = meSalon.data.primaryLocationAfternoonStartMinuteOfDay;
+    if (morningEnd != null) {
+      setBookingMorningEndTime(minuteOfDayToTimeValue(morningEnd));
+    }
+    if (afternoonStart != null) {
+      setBookingAfternoonStartTime(minuteOfDayToTimeValue(afternoonStart));
+    }
     if (open != null && close != null) {
       setState((prev) => ({
         ...prev,
-        openingHours: replaceOpeningHoursTimes(prev.openingHours, open, close),
+        openingHours:
+          morningEnd != null && afternoonStart != null
+            ? formatSalonSplitOpeningHours(open, morningEnd, afternoonStart, close)
+            : replaceOpeningHoursTimes(prev.openingHours, open, close),
       }));
     }
   }, [meSalon.data]);
@@ -113,12 +132,30 @@ export default function SalonPersonalPageBuilder() {
       return;
     }
     const openMinute = timeValueToMinuteOfDay(bookingOpenTime);
+    const morningEndMinute = timeValueToMinuteOfDay(bookingMorningEndTime);
+    const afternoonStartMinute = timeValueToMinuteOfDay(bookingAfternoonStartTime);
     const closeMinute = timeValueToMinuteOfDay(bookingCloseTime);
     if (openMinute == null || closeMinute == null) {
-      setFeedback({ text: "Inserisci orari di apertura e chiusura validi.", kind: "error" });
+      setFeedback({ text: "Inserisci orari di apertura mattina e chiusura pomeriggio validi.", kind: "error" });
       return;
     }
-    if (openMinute >= closeMinute) {
+    const hasBreak = Boolean(bookingMorningEndTime.trim() || bookingAfternoonStartTime.trim());
+    if (hasBreak) {
+      if (morningEndMinute == null || afternoonStartMinute == null) {
+        setFeedback({
+          text: "Per la pausa pranzo inserisci sia chiusura mattina sia apertura pomeriggio.",
+          kind: "error",
+        });
+        return;
+      }
+      if (openMinute >= morningEndMinute || morningEndMinute >= afternoonStartMinute || afternoonStartMinute >= closeMinute) {
+        setFeedback({
+          text: "Gli orari devono essere: apertura mattina < chiusura mattina < apertura pomeriggio < chiusura.",
+          kind: "error",
+        });
+        return;
+      }
+    } else if (openMinute >= closeMinute) {
       setFeedback({ text: "L'orario di chiusura deve essere successivo all'apertura.", kind: "error" });
       return;
     }
@@ -137,6 +174,8 @@ export default function SalonPersonalPageBuilder() {
             primaryLocationAddressLine: meSalon.data.primaryLocationAddressLine?.trim() ?? "",
             primaryLocationOpeningMinuteOfDay: openMinute,
             primaryLocationClosingMinuteOfDay: closeMinute,
+            primaryLocationMorningEndMinuteOfDay: hasBreak ? morningEndMinute : null,
+            primaryLocationAfternoonStartMinuteOfDay: hasBreak ? afternoonStartMinute : null,
           }),
         });
         await qc.invalidateQueries({ queryKey: ["me", "salon"] });
@@ -310,7 +349,7 @@ export default function SalonPersonalPageBuilder() {
               <div className="velvet-personal-builder__fields">
                 <div className="velvet-personal-builder__row-2">
                   <label className="velvet-form-label">
-                    Apertura (agenda prenotazioni)
+                    Apertura mattina (agenda)
                     <input
                       className="velvet-soft-field"
                       type="time"
@@ -320,7 +359,29 @@ export default function SalonPersonalPageBuilder() {
                     />
                   </label>
                   <label className="velvet-form-label">
-                    Chiusura (agenda prenotazioni)
+                    Chiusura mattina (pausa)
+                    <input
+                      className="velvet-soft-field"
+                      type="time"
+                      value={bookingMorningEndTime}
+                      onChange={(e) => setBookingMorningEndTime(e.target.value)}
+                      placeholder="Es. 13:00"
+                    />
+                  </label>
+                </div>
+                <div className="velvet-personal-builder__row-2">
+                  <label className="velvet-form-label">
+                    Apertura pomeriggio
+                    <input
+                      className="velvet-soft-field"
+                      type="time"
+                      value={bookingAfternoonStartTime}
+                      onChange={(e) => setBookingAfternoonStartTime(e.target.value)}
+                      placeholder="Es. 14:30"
+                    />
+                  </label>
+                  <label className="velvet-form-label">
+                    Chiusura pomeriggio (agenda)
                     <input
                       className="velvet-soft-field"
                       type="time"
@@ -330,6 +391,9 @@ export default function SalonPersonalPageBuilder() {
                     />
                   </label>
                 </div>
+                <p className="velvet-text-muted velvet-personal-builder__hours-hint">
+                  Compila chiusura mattina e apertura pomeriggio se il salone fa pausa: in quella fascia il cliente non può prenotare.
+                </p>
 
                 <label className="velvet-form-label">
                   Testo orari (pagina pubblica)
@@ -436,7 +500,12 @@ export default function SalonPersonalPageBuilder() {
                   Salva home personale
                 </button>
                 {publicHref ? (
-                  <Link className="velvet-btn velvet-btn--secondary" to={publicHref}>
+                  <Link
+                    className="velvet-btn velvet-btn--secondary velvet-personal-builder__btn-public"
+                    to={publicHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Apri pagina pubblica
                   </Link>
                 ) : null}

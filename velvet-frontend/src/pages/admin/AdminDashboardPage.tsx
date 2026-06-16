@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { apiJson } from "../../api/client";
 import type { SuperAdminOverviewResponseDto, SuperAdminRecentSalonRowDto } from "../../api/types";
 import { useAdminAuth } from "../../auth/AdminAuthProvider";
-import { SaloniVelvetLogoMark } from "../../components/SaloniVelvetLogoMark";
+import { SaloniLuxuryLogoMark } from "../../components/SaloniLuxuryLogoMark";
 import { StarRatingDisplay } from "../../components/StarRatingDisplay";
 import { extractSuperAdminProfileFromOverview } from "../../utils/superAdminOverviewProfile";
 import { AdminConsumerClientsSection } from "./AdminConsumerClientsSection";
@@ -163,7 +163,7 @@ export default function AdminDashboardPage() {
         <div className="velvet-admin-welcome-card__shine" aria-hidden />
         <div className="velvet-admin-welcome-card__inner">
           <div className="velvet-admin-welcome-card__mark">
-            <SaloniVelvetLogoMark variant="default" />
+            <SaloniLuxuryLogoMark variant="default" />
           </div>
           <div className="velvet-admin-welcome-card__copy velvet-admin-welcome-card__copy--minimal">
             <h1 id={`${baseId}-welcome-h`} className="velvet-admin-welcome-card__title velvet-admin-welcome-card__title--welcome">

@@ -1,16 +1,17 @@
 package it.velvet.bootstrap;
 
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.annotation.Order;
+import it.velvet.consumer.domain.ConsumerProfile;
+import it.velvet.config.VelvetAsyncConfiguration;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
  * All’avvio garantisce il {@link ConsumerProfile} canonico del super admin se manca ma la credenziale piattaforma c’è.
  */
 @Component
-@Order(10)
-public class SuperAdminConsumerProfileEnsureRunner implements ApplicationRunner {
+public class SuperAdminConsumerProfileEnsureRunner {
 
 	private final SuperAdminConsumerProfileEnsureService superAdminConsumerProfileEnsureService;
 
@@ -18,8 +19,9 @@ public class SuperAdminConsumerProfileEnsureRunner implements ApplicationRunner 
 		this.superAdminConsumerProfileEnsureService = superAdminConsumerProfileEnsureService;
 	}
 
-	@Override
-	public void run(ApplicationArguments args) {
+	@EventListener(ApplicationReadyEvent.class)
+	@Async(VelvetAsyncConfiguration.BOOTSTRAP_EXECUTOR)
+	public void onApplicationReady() {
 		superAdminConsumerProfileEnsureService.ensureSuperAdminConsumerProfileExists();
 	}
 }

@@ -82,4 +82,6 @@ export function LegalPrivacyAudienceNotice({ audience }: { audience: LegalPrivac
   );
 }
 
-export const LEGAL_PRIVACY_PRE_RELEASE_UPDATED_AT = "Fase di Sviluppo (Pre-Release)";
+
+/** Data pubblicata sulle informative privacy B2B/B2C/Staff (allineare a legalSharedCopy). */
+export { LEGAL_UPDATED_AT as LEGAL_PRIVACY_PUBLISHED_AT } from "../../content/legalSharedCopy";

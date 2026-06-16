@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "freeOwnerNative": {
+    "alwaysAllowedPrefixes": [
+      "/login",
+      "/password-reset",
+      "/oidc",
+      "/auth",
+      "/legal",
+      "/piani",
+      "/dev"
+    ],
+    "publicExactPaths": ["/"],
+    "publicPrefixes": ["/s/", "/search"],
+    "accountAllowedExactPaths": ["/account"],
+    "accountAllowedPrefixes": [
+      "/account/home",
+      "/account/prenotazioni",
+      "/account/info-privacy",
+      "/account/assistenza",
+      "/account/profilo",
+      "/account/salone/servizi"
+    ],
+    "blockedPathPrefixes": [
+      "/account/salone/staff",
+      "/account/feedback-velvet",
+      "/account/salone/statistiche",
+      "/account/salone/brand",
+      "/account/salone/posizione",
+      "/account/chat",
+      "/admin"
+    ],
+    "allowedNavLabels": [
+      "aggiungi servizi",
+      "agenda",
+      "assistenza",
+      "info e privacy",
+      "profilo"
+    ],
+    "blockedNavLabels": ["staff", "recensioni"],
+    "premiumPaywallMessage": "Passa a premium per utilizzare {feature}",
+    "paywallBannerMessage": "Piano Free — in app: Aggiungi servizi (senza foto), Agenda, Profilo, Info e privacy, Assistenza. Le altre funzioni richiedono Premium."
+  },
+  "messages": {
+    "freeOwnerWebPanel": "Il tuo salone è attivo con il piano Free (registrazione dall'app Saloni Luxury). Per usufruire del pannello di gestione da browser è necessario passare a Premium."
+  }
+}

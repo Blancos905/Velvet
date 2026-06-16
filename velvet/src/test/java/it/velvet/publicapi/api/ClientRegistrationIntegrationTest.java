@@ -39,9 +39,14 @@ class ClientRegistrationIntegrationTest {
 								"password", "Password1!",
 								"firstName", "Test",
 								"lastName", "User",
+								"country", "FR",
+								"phone", "+33612345678",
 								"acceptedTermsAndPrivacy", true))))
 				.andExpect(status().isCreated());
 
-		assertThat(consumerProfileRepository.findByEmailIgnoreCase(email)).isPresent();
+		var profile = consumerProfileRepository.findByEmailIgnoreCase(email);
+		assertThat(profile).isPresent();
+		assertThat(profile.get().getCountry()).isEqualTo("FR");
+		assertThat(profile.get().getPhone()).isEqualTo("+33612345678");
 	}
 }

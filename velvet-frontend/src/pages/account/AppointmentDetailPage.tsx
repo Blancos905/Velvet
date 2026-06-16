@@ -256,8 +256,11 @@ export default function AppointmentDetailPage() {
 
   return (
     <div className="velvet-appointment-detail-page">
-      <Link to="/account/prenotazioni" className="velvet-link-back">
-        {isSalonTitolare ? "← Agenda" : "← Prenotazioni"}
+      <Link to="/account/prenotazioni" className="velvet-link-back velvet-link-back--overlay-nav">
+        <span className="velvet-link-back__chevron" aria-hidden="true">
+          ←
+        </span>
+        <span className="velvet-link-back__text">{isSalonTitolare ? "Agenda" : "Prenotazioni"}</span>
       </Link>
       <header className="velvet-appointment-detail-page__hero">
         <div className="velvet-appointment-detail-page__hero-glow" aria-hidden />

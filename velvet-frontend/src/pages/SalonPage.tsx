@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { isVelvetNativeAppShell } from "../hooks/useVelvetNativeAppShell";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { apiJson } from "../api/client";
 import { SalonPublicShowcase } from "../components/salon/SalonPublicShowcase";
@@ -8,7 +10,6 @@ import { SalonPublicReviewsBlock } from "../components/salon/SalonPublicReviewsB
 import { LegalSiteFootnote } from "../components/LegalSiteFootnote";
 import type {
   AppointmentDto,
-  CreatedAppointmentResponse,
   DayAvailability,
   OperatorPublic,
   PublicSalonReview,
@@ -23,6 +24,7 @@ import { notifySalonCatalogClientsChanged } from "../lib/salonCatalogClientsSync
 import {
   formatAvailabilitySlotInTimeZone,
   formatSalonOpeningHours,
+  formatSalonSplitOpeningHours,
   isSlotWithinBookingWindow,
   resolveBookingHoursWindow,
 } from "../lib/salonOpeningHours";
@@ -31,6 +33,7 @@ import { salonShowcaseFullQueryKey } from "../lib/prefetchSalonPublicPage";
 import { emptySalonShowcase, readSalonShowcaseAsync } from "../lib/salonShowcaseStorage";
 import "../styles/velvet-salon-showcase.css";
 import "../styles/velvet-salon-page.css";
+import "../styles/velvet-salon-booking-native-app.css";
 
 /** Ruolo come in anagrafica staff (es. Parrucchiere); assente se non impostato in DB. */
 function trimmedPublicOperatorRole(op: OperatorPublic): string | undefined {
@@ -72,6 +75,14 @@ function formatAvailabilityDayLabel(ymd: string): string {
     day: "numeric",
     month: "short",
   });
+}
+
+function formatAvailabilitySlotTimeOnly(iso: string, timeZone: string): string {
+  return new Intl.DateTimeFormat("it-IT", {
+    timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(iso));
 }
 
 function isPublicReviewsEndpointUnavailable(error: unknown): boolean {
@@ -193,6 +204,10 @@ export default function SalonPage() {
   const { isAuthenticated, accessToken, isSalonTitolare, isSalonStaff } = useVelvetAuth();
   /** Solo account cliente B2C: titolare e staff salone gestiscono l'agenda, non prenotano come clienti. */
   const canBookAsClient = !isSalonTitolare && !isSalonStaff;
+  const isNativeApp = isVelvetNativeAppShell();
+  const bookingSlotsModalTitleId = useId();
+  const bookingLoginModalTitleId = useId();
+  const bookingConfirmModalTitleId = useId();
   const qc = useQueryClient();
 
   const [serviceId, setServiceId] = useState<string>("");
@@ -204,13 +219,17 @@ export default function SalonPage() {
   const [from, setFrom] = useState(() => monthStartYmd(new Date()));
   const [to, setTo] = useState(() => monthEndYmd(new Date()));
   const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState("");
+  const [bookingSlotsModalOpen, setBookingSlotsModalOpen] = useState(false);
+  const [bookingLoginModalOpen, setBookingLoginModalOpen] = useState(false);
+  const [bookingConfirmSlot, setBookingConfirmSlot] = useState<string | null>(null);
   const [bookingMsg, setBookingMsg] = useState<string | null>(null);
   const [salonClientFeedback, setSalonClientFeedback] = useState<string | null>(null);
   const [salonClientFeedbackIsError, setSalonClientFeedbackIsError] = useState(false);
-  const [manageToken, setManageToken] = useState<string | null>(null);
+  const userPickedAvailabilityDayRef = useRef(false);
+  const bookingResumeHandledRef = useRef(false);
+  const skipSingleOperatorAutoAdvanceRef = useRef(false);
 
   useEffect(() => {
-    setManageToken(null);
     setBookingMsg(null);
   }, [serviceId, operatorId, from, to]);
 
@@ -227,11 +246,27 @@ export default function SalonPage() {
         detail?.bookingOpeningMinuteOfDay,
         detail?.bookingClosingMinuteOfDay,
         detail?.timeZone,
+        detail?.bookingMorningEndMinuteOfDay,
+        detail?.bookingAfternoonStartMinuteOfDay,
       ),
-    [detail?.bookingOpeningMinuteOfDay, detail?.bookingClosingMinuteOfDay, detail?.timeZone],
+    [
+      detail?.bookingOpeningMinuteOfDay,
+      detail?.bookingClosingMinuteOfDay,
+      detail?.bookingMorningEndMinuteOfDay,
+      detail?.bookingAfternoonStartMinuteOfDay,
+      detail?.timeZone,
+    ],
   );
   const bookingHoursLabel = useMemo(() => {
     if (!bookingWindow) return null;
+    if (bookingWindow.morningEndMinute != null && bookingWindow.afternoonStartMinute != null) {
+      return formatSalonSplitOpeningHours(
+        bookingWindow.openMinute,
+        bookingWindow.morningEndMinute,
+        bookingWindow.afternoonStartMinute,
+        bookingWindow.closeMinute,
+      );
+    }
     return formatSalonOpeningHours(bookingWindow.openMinute, bookingWindow.closeMinute);
   }, [bookingWindow]);
   const salonTimeZone = bookingWindow?.timeZone ?? detail?.timeZone ?? "Europe/Rome";
@@ -310,11 +345,39 @@ export default function SalonPage() {
     [serviceId, servicesQ.data],
   );
 
+  const buildSalonBookingLoginReturnPath = useCallback(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (serviceId.trim()) params.set("service", serviceId.trim());
+    params.set("prenota", "1");
+    const qs = params.toString();
+    return `${window.location.pathname}${qs ? `?${qs}` : ""}`;
+  }, [serviceId]);
+
+  useEffect(() => {
+    bookingResumeHandledRef.current = false;
+    skipSingleOperatorAutoAdvanceRef.current = false;
+  }, [s]);
+
   useEffect(() => {
     const sid = searchParams.get("service")?.trim();
     if (!sid || !servicesQ.data?.length) return;
     if (!servicesQ.data.some((x) => x.id === sid)) return;
     setServiceId(sid);
+    if (searchParams.get("prenota") !== "1" || bookingResumeHandledRef.current) return;
+    bookingResumeHandledRef.current = true;
+    skipSingleOperatorAutoAdvanceRef.current = true;
+    setOperatorId("");
+    setSelectedAvailabilityDate("");
+    setBookingFlowStep("operators");
+    setShowBookingAgenda(true);
+    setBookingMonth(calendarCurrentMonthStart());
+    window.requestAnimationFrame(() => {
+      document.getElementById("velvet-salon-booking")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    const params = new URLSearchParams(window.location.search);
+    params.delete("prenota");
+    const qs = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
   }, [searchParams, servicesQ.data]);
 
   const operatorsQ = useQuery({
@@ -358,6 +421,11 @@ export default function SalonPage() {
     });
   }, [publicReviewStats]);
 
+  const openBookingLoginModal = useCallback(() => {
+    setPostLoginReturnPath(buildSalonBookingLoginReturnPath());
+    setBookingLoginModalOpen(true);
+  }, [buildSalonBookingLoginReturnPath]);
+
   const onBookServiceFromShowcase = useCallback((id: string) => {
     setServiceId(id);
     setOperatorId("");
@@ -399,10 +467,14 @@ export default function SalonPage() {
       return;
     }
     if (ops.length === 1 && !operatorId.trim()) {
+      if (!isAuthenticated || skipSingleOperatorAutoAdvanceRef.current) {
+        setBookingFlowStep("operators");
+        return;
+      }
       setOperatorId(ops[0].id);
       setBookingFlowStep("slots");
     }
-  }, [showBookingAgenda, operatorsQ.isLoading, operatorsQ.data, operatorId]);
+  }, [showBookingAgenda, operatorsQ.isLoading, operatorsQ.data, operatorId, isAuthenticated]);
 
   const operatorsList = operatorsQ.data ?? [];
   const selectedOperator = useMemo(
@@ -502,10 +574,17 @@ export default function SalonPage() {
   }, [bookingMonth]);
 
   useEffect(() => {
+    if (!isNativeApp) return;
+    setBookingSlotsModalOpen(false);
+  }, [isNativeApp, serviceId, operatorId, bookingMonth]);
+
+  useEffect(() => {
     if (availabilityDays.length === 0) {
       setSelectedAvailabilityDate("");
+      if (isNativeApp) setBookingSlotsModalOpen(false);
       return;
     }
+    if (isNativeApp) return;
     const hasCurrent = availabilityDays.some((d) => d.date === selectedAvailabilityDate);
     if (hasCurrent) return;
     const todayYmd = formatLocalYmd(new Date());
@@ -517,14 +596,36 @@ export default function SalonPage() {
       availabilityDays[0]?.date ??
       "";
     setSelectedAvailabilityDate(preferred);
-  }, [availabilityDays, selectedAvailabilityDate]);
+  }, [availabilityDays, isNativeApp, selectedAvailabilityDate]);
+
+  useEffect(() => {
+    if (isNativeApp) return;
+    if (!showBookingAgenda || !selectedAvailabilityDate || selectedDaySlots.length === 0) return;
+    if (!userPickedAvailabilityDayRef.current) return;
+    userPickedAvailabilityDayRef.current = false;
+    requestAnimationFrame(() => {
+      document.getElementById("velvet-booking-slots")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }, [isNativeApp, showBookingAgenda, selectedAvailabilityDate, selectedDaySlots.length]);
+
+  useEffect(() => {
+    if (!bookingSlotsModalOpen && !bookingLoginModalOpen && !bookingConfirmSlot) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [bookingSlotsModalOpen, bookingLoginModalOpen, bookingConfirmSlot]);
+
+  const requestPickSlot = useCallback((startIso: string) => {
+    setBookingConfirmSlot(startIso);
+  }, []);
 
   const onPickSlot = async (startIso: string) => {
     setBookingMsg(null);
-    setManageToken(null);
-    const slotLabel = formatAvailabilitySlotInTimeZone(startIso, salonTimeZone);
-    const confirmed = window.confirm(`Sei sicuro di voler prenotare questo orario?\n${slotLabel}`);
-    if (!confirmed) return;
     if (new Date(startIso).getTime() < Date.now() - 90_000) {
       setBookingMsg(
         "Questo orario risulta già passato. Apri il mese corrente (non mesi passati) e scegli un orario futuro: così la prenotazione comparirà in «In arrivo».",
@@ -538,6 +639,7 @@ export default function SalonPage() {
         operatorId,
         start: startIso,
       });
+      if (isNativeApp) setBookingSlotsModalOpen(false);
       navigate("/account");
       return;
     }
@@ -552,7 +654,7 @@ export default function SalonPage() {
       return;
     }
     try {
-      const res = await apiJson<CreatedAppointmentResponse>("/api/v1/me/appointments", {
+      const res = await apiJson<AppointmentDto>("/api/v1/me/appointments", {
         method: "POST",
         accessToken,
         body: JSON.stringify({
@@ -585,11 +687,11 @@ export default function SalonPage() {
       void qc.invalidateQueries({ queryKey: ["catalog", "clients"] });
       notifySalonCatalogClientsChanged();
       void qc.invalidateQueries({ queryKey: ["me", "notifications"] });
-      setManageToken(res.manageToken);
       setBookingMsg(
         "Prenotazione confermata. Conferma e promemoria compariranno in Notifiche (profilo), come per la email di conferma.",
       );
-      navigate("/account/prenotazioni");
+      if (isNativeApp) setBookingSlotsModalOpen(false);
+      navigate(`/account/prenotazioni/${res.id}`);
     } catch (e) {
       setBookingMsg(e instanceof Error ? e.message : "Errore");
     }
@@ -613,10 +715,6 @@ export default function SalonPage() {
   const waFromWhatsapp = detail?.whatsappE164?.replace(/\D/g, "") ?? "";
   const waFromTel = telForDisplay.replace(/\D/g, "");
   const waDigits = waFromWhatsapp.length > 0 ? waFromWhatsapp : waFromTel;
-  const manageHref =
-    manageToken !== null
-      ? `/prenotazione/gestisci?token=${encodeURIComponent(manageToken)}`
-      : null;
 
   const showcase = showcaseQ.data ?? emptySalonShowcase();
 
@@ -677,7 +775,7 @@ export default function SalonPage() {
             <div className="velvet-salon-public-meta__grid">
               <Link
                 to={`/s/${encodeURIComponent(detail.slug)}/esplora`}
-                className="velvet-salon-public-meta__card velvet-salon-public-meta__card--wide velvet-salon-public-meta__card--clickable velvet-salon-public-meta__card--description velvet-salon-public-meta__card--explore-cta"
+                className="velvet-salon-public-meta__card velvet-salon-public-meta__card--wide velvet-salon-public-meta__card--clickable velvet-salon-public-meta__card--description velvet-salon-public-meta__card--explore-cta velvet-salon-public-meta__card--explore-warm"
               >
                 <div className="velvet-salon-public-meta__explore-inner">
                   <div className="velvet-salon-public-meta__explore-aside">
@@ -686,8 +784,8 @@ export default function SalonPage() {
                         className="velvet-salon-public-meta__explore-logo"
                         src={showcase.logoDataUrl}
                         alt=""
-                        width={88}
-                        height={88}
+                        width={104}
+                        height={104}
                         decoding="async"
                         loading="lazy"
                       />
@@ -698,10 +796,11 @@ export default function SalonPage() {
                     )}
                   </div>
                   <div className="velvet-salon-public-meta__explore-main">
-                    <p className="velvet-salon-public-meta__eyebrow">Scopri di più</p>
-                    <h2 className="velvet-salon-public-meta__title velvet-salon-public-meta__title--explore">
-                      Esplora il nostro salone
-                    </h2>
+                    <div className="velvet-salon-public-meta__explore-head">
+                      <h2 className="velvet-salon-public-meta__title velvet-salon-public-meta__title--explore">
+                        Esplora il nostro salone
+                      </h2>
+                    </div>
                     <span className="velvet-salon-public-meta__explore-pill">
                       Apri la vetrina
                       <span className="velvet-salon-public-meta__explore-pill-arrow" aria-hidden="true">
@@ -713,13 +812,19 @@ export default function SalonPage() {
               </Link>
 
               <div
-                className="velvet-salon-public-meta__card velvet-salon-public-meta__card--wide velvet-salon-public-meta__card--reviews-cta velvet-salon-public-meta__card--reviews-band"
+                className="velvet-salon-public-meta__card velvet-salon-public-meta__card--wide velvet-salon-public-meta__card--reviews-cta velvet-salon-public-meta__card--reviews-band velvet-salon-public-meta__card--reviews-warm"
                 aria-label="Recensioni"
               >
                 <div className="velvet-salon-public-meta__reviews-inner">
                   <div className="velvet-salon-public-meta__reviews-aside">
                     <div className="velvet-salon-public-meta__reviews-aside-stack" aria-hidden="true">
-                      <span className="velvet-salon-public-meta__reviews-aside-stars">★★★★★</span>
+                      <div className="velvet-salon-public-meta__reviews-aside-stars">
+                        {Array.from({ length: 5 }, (_, index) => (
+                          <span key={index} className="velvet-salon-public-meta__reviews-star">
+                            ★
+                          </span>
+                        ))}
+                      </div>
                       {publicReviewAvgLabel != null ? (
                         <span className="velvet-salon-public-meta__reviews-aside-avg">{publicReviewAvgLabel}</span>
                       ) : reviewsQ.isLoading ? (
@@ -734,8 +839,9 @@ export default function SalonPage() {
                     </div>
                   </div>
                   <div className="velvet-salon-public-meta__reviews-main">
-                    <p className="velvet-salon-public-meta__eyebrow">Dicono di noi</p>
-                    <h2 className="velvet-salon-public-meta__title velvet-salon-public-meta__title--reviews">Recensioni</h2>
+                    <div className="velvet-salon-public-meta__reviews-head">
+                      <h2 className="velvet-salon-public-meta__title velvet-salon-public-meta__title--reviews">Recensioni</h2>
+                    </div>
                     <SalonPublicReviewsBlock
                       isLoading={reviewsQ.isLoading}
                       isError={Boolean(reviewsQ.error)}
@@ -761,13 +867,17 @@ export default function SalonPage() {
                   }
                   isPending={false}
                   compact
+                  publicWarmHeader
+                  eyebrow="Posizione"
                   heading="Posizione del salone"
                 />
               </div>
 
               <div className="velvet-salon-public-meta__card velvet-salon-public-meta__card--wide velvet-salon-public-meta__card--contacts velvet-salon-public-meta__card--contacts-warm">
-                <p className="velvet-salon-public-meta__eyebrow">Contatti</p>
-                <h2 className="velvet-salon-public-meta__title">Parla col salone</h2>
+                <div className="velvet-salon-public-meta__contacts-head">
+                  <p className="velvet-salon-public-meta__eyebrow">Contatti</p>
+                  <h2 className="velvet-salon-public-meta__title">Parla con noi</h2>
+                </div>
                 <div className="velvet-salon-public-meta__contact-lines" aria-label="Contatti del salone">
                   {detail.contactEmail?.trim() && contactEmailHref ? (
                     <p className="velvet-salon-public-meta__contact-line velvet-salon-public-meta__contact-line--with-icon">
@@ -815,14 +925,14 @@ export default function SalonPage() {
                 ) : null}
                 <div className="velvet-salon-public-meta__actions" aria-label="Azioni rapide">
                   {telForDisplay && telHref ? (
-                    <a className="velvet-salon-public-meta__btn" href={telHref}>
+                    <a className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--call" href={telHref}>
                       <MetaContactIconPhone className="velvet-salon-public-meta__btn-icon" />
                       <span>Chiama</span>
                     </a>
                   ) : null}
                   {waDigits.length > 0 ? (
                     <a
-                      className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--ghost velvet-salon-public-meta__btn--whatsapp"
+                      className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--whatsapp"
                       href={`https://wa.me/${waDigits}`}
                       target="_blank"
                       rel="noreferrer"
@@ -833,7 +943,7 @@ export default function SalonPage() {
                   ) : null}
                   {salonVelvetChatMembershipId ? (
                     <Link
-                      className="velvet-salon-public-meta__btn"
+                      className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--chat"
                       to={`/account/chat?salonClientId=${encodeURIComponent(salonVelvetChatMembershipId)}`}
                     >
                       <MetaContactIconChat className="velvet-salon-public-meta__btn-icon" />
@@ -841,7 +951,7 @@ export default function SalonPage() {
                     </Link>
                   ) : isAuthenticated ? (
                     <Link
-                      className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--ghost"
+                      className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--chat"
                       to="/account/chat"
                       title="Diventa cliente di questo salone (sezione sotto) per aprire la chat con il titolare."
                     >
@@ -850,7 +960,7 @@ export default function SalonPage() {
                     </Link>
                   ) : (
                     <Link
-                      className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--ghost"
+                      className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--chat"
                       to="/account"
                       onClick={() =>
                         setPostLoginReturnPath(`${window.location.pathname}${window.location.search}`)
@@ -867,10 +977,12 @@ export default function SalonPage() {
 
             <div id="velvet-salon-booking" className="velvet-salon-public-page__booking">
             {showBookingAgenda ? (
-              <div className="velvet-booking-agenda-full">
+              <div className="velvet-booking-agenda-full velvet-booking-agenda-full--warm">
                 {bookingFlowStep === "operators" ? (
-                  <div className="velvet-booking-operator-step">
-                    <h2 className="velvet-section-title">Scegli l&apos;operatore</h2>
+                  <div className="velvet-booking-operator-step velvet-booking-operator-step--warm">
+                    <div className="velvet-booking-operator-step__head">
+                      <h2 className="velvet-booking-operator-step__title">Scegli l&apos;operatore</h2>
+                    </div>
                     {operatorsQ.isLoading ? (
                       <p className="velvet-text-muted">Carico gli operatori…</p>
                     ) : (operatorsQ.data ?? []).length === 0 ? (
@@ -891,6 +1003,11 @@ export default function SalonPage() {
                                   name="op"
                                   checked={operatorId === op.id}
                                   onChange={() => {
+                                    if (!isAuthenticated) {
+                                      openBookingLoginModal();
+                                      return;
+                                    }
+                                    skipSingleOperatorAutoAdvanceRef.current = false;
                                     setOperatorId(op.id);
                                     setSelectedAvailabilityDate("");
                                     setBookingFlowStep("slots");
@@ -972,15 +1089,26 @@ export default function SalonPage() {
                       </p>
                     )}
 
-                    <h2 className="velvet-section-title">Agenda disponibile</h2>
-                {bookingHoursLabel ? (
-                  <p className="velvet-text-muted" style={{ margin: "0 0 0.75rem" }}>
-                    Orari prenotazione: {bookingHoursLabel}
-                    {selectedService?.durationMinutes
-                      ? ` · durata servizio ${selectedService.durationMinutes} min`
-                      : null}
-                  </p>
-                ) : null}
+                    <div className="velvet-booking-agenda-full__schedule-header">
+                      <div className="velvet-booking-agenda-full__schedule-head">
+                        <h2 className="velvet-booking-agenda-full__schedule-title">Agenda disponibile</h2>
+                      </div>
+                      {bookingHoursLabel ? (
+                        <div className="velvet-booking-agenda-full__schedule-meta">
+                          <span className="velvet-booking-agenda-full__schedule-meta-label">
+                            Orari prenotazione
+                          </span>
+                          <span className="velvet-booking-agenda-full__schedule-meta-hours">
+                            {bookingHoursLabel}
+                          </span>
+                          {selectedService?.durationMinutes ? (
+                            <span className="velvet-booking-agenda-full__schedule-meta-duration">
+                              durata {selectedService.durationMinutes} min
+                            </span>
+                          ) : null}
+                        </div>
+                      ) : null}
+                    </div>
                 {availabilityQ.isLoading ? (
                   <p className="velvet-text-muted">Carico agenda…</p>
                 ) : availabilityQ.error ? (
@@ -1064,7 +1192,15 @@ export default function SalonPage() {
                               `${isActive ? " is-active" : ""}`
                             }
                             disabled={!canInteract}
-                            onClick={() => setSelectedAvailabilityDate(cell.ymd)}
+                            onClick={() => {
+                              if (!isAuthenticated) {
+                                openBookingLoginModal();
+                                return;
+                              }
+                              userPickedAvailabilityDayRef.current = true;
+                              setSelectedAvailabilityDate(cell.ymd);
+                              if (isNativeApp) setBookingSlotsModalOpen(true);
+                            }}
                           >
                             <span>{cell.day}</span>
                             <small>{slotLabel}</small>
@@ -1073,15 +1209,15 @@ export default function SalonPage() {
                       })}
                     </div>
 
-                    {selectedDaySlots.length === 0 &&
-                    selectedDayAvailInfo &&
-                    selectedDayAvailInfo.free === 0 &&
-                    selectedDayAvailInfo.total > 0 ? (
+                    {isNativeApp ? null : selectedDaySlots.length === 0 &&
+                      selectedDayAvailInfo &&
+                      selectedDayAvailInfo.free === 0 &&
+                      selectedDayAvailInfo.total > 0 ? (
                       <p className="velvet-text-muted">Non ci sono orari liberi in questo giorno per l&apos;operatore scelto.</p>
                     ) : selectedDaySlots.length === 0 ? (
                       <p className="velvet-text-muted">Clicca un giorno disponibile per vedere gli orari.</p>
                     ) : (
-                      <div className="velvet-booking-agenda-full__slots">
+                      <div id="velvet-booking-slots" className="velvet-booking-agenda-full__slots">
                         <p className="velvet-text-muted" style={{ marginBottom: 8 }}>
                           Orari disponibili per {formatAvailabilityDayLabel(selectedAvailabilityDate)}
                         </p>
@@ -1092,7 +1228,7 @@ export default function SalonPage() {
                                 type="button"
                                 className="velvet-slot-btn"
                                 disabled={isAuthenticated && !canBookAsClient}
-                                onClick={() => void onPickSlot(slot)}
+                                onClick={() => requestPickSlot(slot)}
                               >
                                 {formatAvailabilitySlotInTimeZone(slot, salonTimeZone)}
                               </button>
@@ -1119,45 +1255,9 @@ export default function SalonPage() {
             )}
           </div>
 
-          {!isAuthenticated && (
-            <div className="velvet-surface-card" style={{ marginBottom: "1.25rem" }}>
-              <p
-                style={{
-                  margin: "0 0 0.85rem",
-                  fontSize: "0.95rem",
-                  lineHeight: 1.5,
-                  color: "rgba(255, 251, 235, 0.9)",
-                }}
-              >
-                Per prenotare uno slot serve un account cliente. Accedi con email e password, poi torna su questa pagina per
-                completare la prenotazione.
-              </p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.65rem", alignItems: "center" }}>
-                <Link
-                  to="/account"
-                  className="velvet-btn velvet-btn--secondary"
-                  style={{ textDecoration: "none" }}
-                  onClick={() => {
-                    setPostLoginReturnPath(`${window.location.pathname}${window.location.search}`);
-                  }}
-                >
-                  Accedi con email
-                </Link>
-              </div>
-            </div>
-          )}
-
           {isAuthenticated && !canBookAsClient && (
-            <div className="velvet-surface-card" style={{ marginBottom: "1.25rem" }}>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "0.95rem",
-                  lineHeight: 1.5,
-                  color: "rgba(255, 251, 235, 0.9)",
-                }}
-                role="status"
-              >
+            <div className="velvet-salon-booking-warm-card">
+              <p className="velvet-salon-booking-warm-card__text" role="status">
                 Sei connesso con un account salone: la prenotazione online è riservata ai clienti. Per prenotare qui, registrati
                 come cliente con un&apos;altra email oppure gestisci gli appuntamenti dall&apos;agenda in area account.
               </p>
@@ -1223,21 +1323,191 @@ export default function SalonPage() {
             </div>
           )}
 
-          {manageHref && (
-            <div className="velvet-surface-card velvet-surface-card--success" style={{ marginTop: "1rem" }}>
-              <p className="velvet-text-muted" style={{ marginTop: 0, fontSize: "0.92rem" }}>
-                Puoi modificare o disdire anche <strong>senza accedere</strong> al sito: conserva questo link (es. tra i
-                preferiti del telefono).
-              </p>
-              <Link to={manageHref} className="velvet-link-inline" style={{ fontWeight: 600 }}>
-                Gestisci questa prenotazione →
-              </Link>
-            </div>
-          )}
           </div>
         </>
       )}
-      <LegalSiteFootnote style={{ margin: "1.5rem 1rem 0" }} />
+      {bookingConfirmSlot &&
+        createPortal(
+          <div
+            className="velvet-booking-slots-modal__backdrop velvet-booking-confirm-modal__backdrop"
+            role="presentation"
+            onClick={() => setBookingConfirmSlot(null)}
+          >
+            <div
+              className="velvet-booking-slots-modal__dialog velvet-booking-login-modal__dialog velvet-booking-confirm-modal__dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={bookingConfirmModalTitleId}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="velvet-booking-slots-modal__glow" aria-hidden="true" />
+              <div className="velvet-booking-slots-modal__handle" aria-hidden="true" />
+              <div className="velvet-booking-slots-modal__head">
+                <button
+                  type="button"
+                  className="velvet-booking-slots-modal__close"
+                  onClick={() => setBookingConfirmSlot(null)}
+                  aria-label="Chiudi"
+                >
+                  <span className="velvet-booking-slots-modal__close-icon" aria-hidden="true">
+                    ×
+                  </span>
+                </button>
+                <p className="velvet-booking-slots-modal__eyebrow">Conferma</p>
+                <h2 id={bookingConfirmModalTitleId} className="velvet-booking-confirm-modal__title">
+                  Confermi questo orario?
+                </h2>
+              </div>
+              <div className="velvet-booking-confirm-modal__panel">
+                <p className="velvet-booking-confirm-modal__slot-label">
+                  {formatAvailabilitySlotInTimeZone(bookingConfirmSlot, salonTimeZone)}
+                </p>
+                <p className="velvet-booking-confirm-modal__hint">
+                  Sei sicuro di voler prenotare questo orario?
+                </p>
+                <div className="velvet-booking-confirm-modal__actions">
+                  <button
+                    type="button"
+                    className="velvet-booking-confirm-modal__btn velvet-booking-confirm-modal__btn--cancel"
+                    onClick={() => setBookingConfirmSlot(null)}
+                  >
+                    Annulla
+                  </button>
+                  <button
+                    type="button"
+                    className="velvet-header-cta-pill velvet-header-btn-primary velvet-booking-confirm-modal__btn velvet-booking-confirm-modal__btn--confirm"
+                    onClick={() => {
+                      const startIso = bookingConfirmSlot;
+                      setBookingConfirmSlot(null);
+                      void onPickSlot(startIso);
+                    }}
+                  >
+                    Conferma
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+      {bookingLoginModalOpen &&
+        createPortal(
+          <div
+            className="velvet-booking-slots-modal__backdrop"
+            role="presentation"
+            onClick={() => setBookingLoginModalOpen(false)}
+          >
+            <div
+              className="velvet-booking-slots-modal__dialog velvet-booking-login-modal__dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={bookingLoginModalTitleId}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="velvet-booking-slots-modal__glow" aria-hidden="true" />
+              <div className="velvet-booking-slots-modal__handle" aria-hidden="true" />
+              <div className="velvet-booking-slots-modal__head">
+                <button
+                  type="button"
+                  className="velvet-booking-slots-modal__close"
+                  onClick={() => setBookingLoginModalOpen(false)}
+                  aria-label="Chiudi"
+                >
+                  <span className="velvet-booking-slots-modal__close-icon" aria-hidden="true">
+                    ×
+                  </span>
+                </button>
+                <p className="velvet-booking-slots-modal__eyebrow">Prenotazione</p>
+                <h2 id={bookingLoginModalTitleId} className="velvet-booking-login-modal__title">
+                  accedi per prenotare
+                </h2>
+              </div>
+              <div className="velvet-booking-login-modal__panel">
+                <Link
+                  to="/account"
+                  className="velvet-header-cta-pill velvet-header-btn-primary velvet-booking-login-modal__cta"
+                  onClick={() => {
+                    setPostLoginReturnPath(buildSalonBookingLoginReturnPath());
+                    setBookingLoginModalOpen(false);
+                  }}
+                >
+                  accedi per prenotare
+                </Link>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+      {isNativeApp &&
+        bookingSlotsModalOpen &&
+        selectedAvailabilityDate &&
+        createPortal(
+          <div
+            className="velvet-booking-slots-modal__backdrop"
+            role="presentation"
+            onClick={() => setBookingSlotsModalOpen(false)}
+          >
+            <div
+              className="velvet-booking-slots-modal__dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={bookingSlotsModalTitleId}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="velvet-booking-slots-modal__glow" aria-hidden="true" />
+              <div className="velvet-booking-slots-modal__handle" aria-hidden="true" />
+              <div className="velvet-booking-slots-modal__head">
+                <button
+                  type="button"
+                  className="velvet-booking-slots-modal__close"
+                  onClick={() => setBookingSlotsModalOpen(false)}
+                  aria-label="Chiudi"
+                >
+                  <span className="velvet-booking-slots-modal__close-icon" aria-hidden="true">
+                    ×
+                  </span>
+                </button>
+                <p className="velvet-booking-slots-modal__eyebrow">Scegli l&apos;orario</p>
+                <h2 id={bookingSlotsModalTitleId} className="velvet-booking-slots-modal__title">
+                  Orari per {formatAvailabilityDayLabel(selectedAvailabilityDate)}
+                </h2>
+                {selectedDaySlots.length > 0 ? (
+                  <p className="velvet-booking-slots-modal__meta">
+                    <span className="velvet-booking-slots-modal__meta-count">{selectedDaySlots.length}</span>
+                    {selectedDaySlots.length === 1 ? " slot libero" : " slot liberi"}
+                  </p>
+                ) : null}
+              </div>
+              <div className="velvet-booking-slots-modal__panel">
+                {selectedDaySlots.length === 0 ? (
+                  <p className="velvet-booking-slots-modal__empty">
+                    Non ci sono orari liberi in questo giorno per l&apos;operatore scelto.
+                  </p>
+                ) : (
+                  <ul className="velvet-booking-slots-modal__grid">
+                    {selectedDaySlots.map((slot) => (
+                      <li key={slot}>
+                        <button
+                          type="button"
+                          className="velvet-booking-slots-modal__slot"
+                          disabled={isAuthenticated && !canBookAsClient}
+                          onClick={() => requestPickSlot(slot)}
+                        >
+                          <span className="velvet-booking-slots-modal__slot-face" aria-hidden="true" />
+                          <span className="velvet-booking-slots-modal__slot-time">
+                            {formatAvailabilitySlotTimeOnly(slot, salonTimeZone)}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+      <LegalSiteFootnote className="velvet-legal-site-footnote--salon-page" />
     </main>
   );
 }

@@ -31,6 +31,7 @@ public class PublicClientRegistrationController {
 				body.password(),
 				body.firstName(),
 				body.lastName(),
+				body.country(),
 				body.phone() != null ? body.phone() : "",
 				Boolean.TRUE.equals(body.bootstrapSuperAdmin()),
 				body.legalDocumentVersion());

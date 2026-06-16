@@ -148,6 +148,16 @@ public class SuperAdminOverviewController {
 		return overviewActionsService.listReviews(pageable);
 	}
 
+	@PostMapping("/reviews/{reviewId}/hide")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@Operation(
+			summary = "Nasconde una recensione post-visita dal pubblico",
+			description = "Moderazione su segnalazione (contenuti illeciti o violazione termini). La recensione resta in DB ma non compare in vetrina.")
+	@SecurityRequirement(name = "bearer-jwt")
+	public void hideSalonReview(@PathVariable UUID reviewId) {
+		overviewActionsService.hideSalonReview(reviewId);
+	}
+
 	@GetMapping("/platform-reviews")
 	@Operation(
 			summary = "Recensioni sulla piattaforma Saloni Velvet (paginate)",

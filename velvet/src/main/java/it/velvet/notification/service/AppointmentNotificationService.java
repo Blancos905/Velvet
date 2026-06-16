@@ -22,14 +22,17 @@ public class AppointmentNotificationService {
 	private final ScheduledNotificationRepository scheduledNotificationRepository;
 	private final AppointmentRepository appointmentRepository;
 	private final VelvetNotificationProperties notificationProperties;
+	private final FcmPushDispatchService fcmPushDispatchService;
 
 	public AppointmentNotificationService(
 			ScheduledNotificationRepository scheduledNotificationRepository,
 			AppointmentRepository appointmentRepository,
-			VelvetNotificationProperties notificationProperties) {
+			VelvetNotificationProperties notificationProperties,
+			FcmPushDispatchService fcmPushDispatchService) {
 		this.scheduledNotificationRepository = scheduledNotificationRepository;
 		this.appointmentRepository = appointmentRepository;
 		this.notificationProperties = notificationProperties;
+		this.fcmPushDispatchService = fcmPushDispatchService;
 	}
 
 	@Transactional
@@ -41,8 +44,9 @@ public class AppointmentNotificationService {
 		if (a == null || a.getConsumerProfile() == null) {
 			return;
 		}
-		scheduledNotificationRepository.save(
+		ScheduledNotification salonInbox = scheduledNotificationRepository.save(
 				ScheduledNotification.salonInboxDelivered(a, NotificationType.BOOKING_CREATED_FOR_SALON));
+		dispatchSalonBookingCreatedPush(a, salonInbox);
 		scheduleConfirmationAndReminders(a, NotificationType.BOOKING_CONFIRMATION);
 	}
 
@@ -64,8 +68,9 @@ public class AppointmentNotificationService {
 			return;
 		}
 		if (a.getConsumerProfile() == null) {
-			scheduledNotificationRepository.save(
+			ScheduledNotification salonInbox = scheduledNotificationRepository.save(
 					ScheduledNotification.salonInboxDelivered(a, NotificationType.BOOKING_CREATED_FOR_SALON));
+			dispatchSalonBookingCreatedPush(a, salonInbox);
 			return;
 		}
 		scheduleConfirmationAndReminders(a, NotificationType.BOOKING_CONFIRMATION);
@@ -154,5 +159,16 @@ public class AppointmentNotificationService {
 			sendAt = now;
 		}
 		scheduledNotificationRepository.save(new ScheduledNotification(a, NotificationType.REVIEW_INVITE, sendAt));
+	}
+
+	private void dispatchSalonBookingCreatedPush(Appointment a, ScheduledNotification salonInbox) {
+		if (a.getLocation() == null) {
+			return;
+		}
+		String salon = a.getLocation().getName() != null ? a.getLocation().getName() : "Salone";
+		fcmPushDispatchService.dispatchForScheduledNotification(
+				salonInbox,
+				"Nuova prenotazione cliente — " + salon,
+				"Hai ricevuto una nuova prenotazione.");
 	}
 }

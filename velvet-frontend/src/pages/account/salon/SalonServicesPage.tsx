@@ -221,15 +221,7 @@ export default function SalonServicesPage() {
       return <p className="velvet-text-muted">Carico operatori…</p>;
     }
     if (apiStaff.length === 0) {
-      return (
-        <p className="velvet-text-muted">
-          Nessun operatore in anagrafica.{" "}
-          <Link className="velvet-link-inline" to="/account/salone/staff">
-            Aggiungi staff
-          </Link>{" "}
-          prima di associarlo ai servizi.
-        </p>
-      );
+      return null;
     }
     return (
       <ul className="velvet-salon-services-operator-pick" aria-label="Operatori per questo servizio">
@@ -377,6 +369,12 @@ export default function SalonServicesPage() {
         </header>
       </div>
       <div className="velvet-salon-services-page">
+      {meSalon.isSuccess && meSalon.data?.provisioned && !meSalon.data.primaryLocationSlug ? (
+        <p className="velvet-alert velvet-alert--error" role="alert">
+          Il salone è collegato all&apos;account ma manca la sede in anagrafica. Riprova a salvare: il sistema la
+          ricrea automaticamente. Se l&apos;errore persiste, contatta l&apos;assistenza Velvet.
+        </p>
+      ) : null}
       {meSalon.isSuccess && meSalon.data && !meSalon.data.provisioned ? (
         <p className="velvet-alert velvet-alert--error" role="alert">
           Nessun salone collegato all&apos;account. Se hai già usato questa email su Piani, invia di nuovo il modulo (crea la
@@ -454,10 +452,6 @@ export default function SalonServicesPage() {
           </label>
           <div className="velvet-form-label velvet-salon-services-form__label-tight">
             Operatori per questo servizio
-            <p className="velvet-text-muted" style={{ margin: "0.35rem 0 0.5rem", fontSize: "0.88rem" }}>
-              In prenotazione il cliente vedrà solo gli operatori selezionati. Se non ne scegli nessuno, restano disponibili
-              tutti gli operatori del salone.
-            </p>
             {renderOperatorPicker(createOperatorIds, setCreateOperatorIds, "create")}
           </div>
           <div className="velvet-salon-services-photo-panel" aria-label="Foto opzionale per il nuovo servizio">

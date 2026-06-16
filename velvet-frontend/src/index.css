@@ -130,3 +130,33 @@ a.velvet-search-hit:hover {
   padding-top: clamp(0.65rem, 2vw, 1.1rem);
   border-top: 1px solid rgba(255, 251, 235, 0.12);
 }
+
+/*
+ * App mobile (WebView): pseudo-elementi con inset negativo (hero, header) allargano
+ * scrollWidth oltre lo schermo → fascia vuota a destra (sfondo shell Flutter).
+ */
+html.velvet-native-app {
+  width: 100%;
+  overflow-x: hidden;
+  background-attachment: scroll;
+}
+
+html.velvet-native-app body,
+html.velvet-native-app #root,
+html.velvet-native-app .velvet-layout-main {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.velvet-native-app .velvet-site-header,
+.velvet-native-app .velvet-hero-wrap {
+  overflow-x: clip;
+}
+
+.velvet-native-app .velvet-hero-wrap::before {
+  left: 0;
+  right: 0;
+  width: 100%;
+  inset: -30% 0 auto 0;
+}

@@ -71,4 +71,11 @@ public interface LocationRepository extends JpaRepository<Location, UUID> {
 					  )
 					""")
 	List<Location> findPremiumLocationsDeclaringBusinessTypeCode(@Param("code") String code);
+
+	@Query("""
+			select l from Location l join fetch l.studioGroup g
+			where upper(trim(g.planTier)) in ('PREMIUM', 'STANDARD', 'FULL')
+			order by l.slug asc
+			""")
+	List<Location> findAllPremiumLocationsOrderBySlug();
 }

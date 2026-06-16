@@ -1,5 +1,5 @@
 import { STORE_LEGAL_CITATIONS } from "../../content/legalReferences";
-import { LEGAL_PRIVACY_PRE_RELEASE_UPDATED_AT } from "./LegalPrivacyAccordion";
+import { LEGAL_PRIVACY_PUBLISHED_AT } from "./LegalPrivacyAccordion";
 import { LegalDocumentLayout } from "./LegalDocumentLayout";
 import { PrivacyPolicyLayeredContent } from "./PrivacyPolicyLayeredContent";
 
@@ -8,7 +8,7 @@ export default function PrivacyPolicyPage() {
     <LegalDocumentLayout
       title="Informativa Privacy per i Saloni Partner (B2B)"
       subtitle="Per titolari, staff e gestione Premium del salone. Documento richiesto da App Store e Google Play."
-      updatedAt={LEGAL_PRIVACY_PRE_RELEASE_UPDATED_AT}
+      updatedAt={LEGAL_PRIVACY_PUBLISHED_AT}
       sections={[]}
       storeRequirements={[
         STORE_LEGAL_CITATIONS.googleUserData,

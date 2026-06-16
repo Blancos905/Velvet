@@ -5,18 +5,14 @@ import it.velvet.config.VelvetSecurityProperties;
 import it.velvet.consumer.domain.ConsumerProfile;
 import it.velvet.consumer.domain.ConsumerProfileRepository;
 import it.velvet.security.audit.SecurityAuditService;
-import it.velvet.security.auth.domain.AuthRefreshToken;
-import it.velvet.security.auth.domain.AuthRefreshTokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.time.Instant;
 import java.util.HexFormat;
 import java.util.UUID;
 
@@ -27,19 +23,19 @@ public class VelvetRefreshTokenService {
 
 	private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-	private final AuthRefreshTokenRepository refreshTokenRepository;
+	private final RefreshTokenStore refreshTokenStore;
 	private final ConsumerProfileRepository consumerProfileRepository;
 	private final VelvetTokenService velvetTokenService;
 	private final VelvetSecurityProperties securityProperties;
 	private final SecurityAuditService securityAuditService;
 
 	public VelvetRefreshTokenService(
-			AuthRefreshTokenRepository refreshTokenRepository,
+			RefreshTokenStore refreshTokenStore,
 			ConsumerProfileRepository consumerProfileRepository,
 			VelvetTokenService velvetTokenService,
 			VelvetSecurityProperties securityProperties,
 			SecurityAuditService securityAuditService) {
-		this.refreshTokenRepository = refreshTokenRepository;
+		this.refreshTokenStore = refreshTokenStore;
 		this.consumerProfileRepository = consumerProfileRepository;
 		this.velvetTokenService = velvetTokenService;
 		this.securityProperties = securityProperties;
@@ -49,78 +45,69 @@ public class VelvetRefreshTokenService {
 	public RefreshTokenPair issueForProfile(ConsumerProfile profile, HttpServletRequest request) {
 		String raw = generateRawToken();
 		UUID familyId = UUID.randomUUID();
-		AuthRefreshToken entity = persistToken(profile.getId(), raw, familyId, request);
+		UUID tokenId = UUID.randomUUID();
+		refreshTokenStore.issue(profile.getId(), sha256Hex(raw), familyId, tokenId, refreshTtlSeconds());
 		String accessToken = velvetTokenService.createAccessToken(profile);
-		return new RefreshTokenPair(accessToken, raw, entity.getId(), securityProperties.accessTokenTtlSeconds());
+		return new RefreshTokenPair(accessToken, raw, tokenId, securityProperties.accessTokenTtlSeconds());
 	}
 
-	@Transactional
 	public RefreshTokenPair rotate(String rawRefreshToken, HttpServletRequest request) {
 		if (rawRefreshToken == null || rawRefreshToken.isBlank()) {
 			throw invalidRefresh();
 		}
 		String hash = sha256Hex(rawRefreshToken.trim());
-		AuthRefreshToken existing = refreshTokenRepository.findByTokenHash(hash)
-				.orElseThrow(this::invalidRefresh);
-		Instant now = Instant.now();
-		if (!existing.isActive(now)) {
-			securityAuditService.record("AUTH_REFRESH", "FAIL", null, existing.getProfileId(), request, "expired_or_revoked");
+		String newRaw = generateRawToken();
+		UUID newTokenId = UUID.randomUUID();
+		RefreshTokenStore.RotateOutcome outcome = refreshTokenStore.rotate(
+				hash, sha256Hex(newRaw), newTokenId, refreshTtlSeconds());
+
+		if (outcome.status() == RefreshTokenStore.RotateStatus.REUSED) {
+			if (outcome.familyId() != null) {
+				revokeFamilyOnReuse(outcome.familyId(), request);
+			}
+			securityAuditService.record(
+					"AUTH_REFRESH",
+					"FAIL",
+					null,
+					outcome.profileId(),
+					request,
+					"refresh_token_reuse");
 			throw invalidRefresh();
 		}
-		ConsumerProfile profile = consumerProfileRepository.findById(existing.getProfileId())
+		if (outcome.status() != RefreshTokenStore.RotateStatus.SUCCESS || outcome.profileId() == null) {
+			securityAuditService.record("AUTH_REFRESH", "FAIL", null, null, request, "invalid_or_expired");
+			throw invalidRefresh();
+		}
+
+		ConsumerProfile profile = consumerProfileRepository.findById(outcome.profileId())
 				.filter(p -> p.getDeletedAt() == null)
 				.orElseThrow(this::invalidRefresh);
 
-		String newRaw = generateRawToken();
-		AuthRefreshToken replacement = persistToken(profile.getId(), newRaw, existing.getFamilyId(), request);
-		existing.setRevokedAt(now);
-		existing.setReplacedById(replacement.getId());
-		refreshTokenRepository.save(existing);
-
 		String accessToken = velvetTokenService.createAccessToken(profile);
 		securityAuditService.record("AUTH_REFRESH", "SUCCESS", profile.getKeycloakSub(), profile.getId(), request, null);
-		return new RefreshTokenPair(accessToken, newRaw, replacement.getId(), securityProperties.accessTokenTtlSeconds());
+		return new RefreshTokenPair(accessToken, newRaw, outcome.newTokenId(), securityProperties.accessTokenTtlSeconds());
 	}
 
-	@Transactional
 	public void revoke(String rawRefreshToken, HttpServletRequest request) {
 		if (rawRefreshToken == null || rawRefreshToken.isBlank()) {
 			return;
 		}
 		String hash = sha256Hex(rawRefreshToken.trim());
-		refreshTokenRepository.findByTokenHash(hash).ifPresent(token -> {
-			if (token.getRevokedAt() == null) {
-				token.setRevokedAt(Instant.now());
-				refreshTokenRepository.save(token);
-			}
-			securityAuditService.record("AUTH_LOGOUT", "SUCCESS", null, token.getProfileId(), request, null);
-		});
+		refreshTokenStore.revoke(hash);
+		securityAuditService.record("AUTH_LOGOUT", "SUCCESS", null, null, request, null);
 	}
 
-	@Transactional
 	public void revokeAllForProfile(UUID profileId) {
-		refreshTokenRepository.revokeAllForProfile(profileId, Instant.now());
+		refreshTokenStore.revokeAllForProfile(profileId);
 	}
 
-	@Transactional
 	public void revokeFamilyOnReuse(UUID familyId, HttpServletRequest request) {
-		int revoked = refreshTokenRepository.revokeFamily(familyId, Instant.now());
-		if (revoked > 0) {
-			securityAuditService.record("AUTH_REFRESH_REUSE", "BLOCK", null, null, request, "family=" + familyId);
-		}
+		refreshTokenStore.revokeFamily(familyId);
+		securityAuditService.record("AUTH_REFRESH_REUSE", "BLOCK", null, null, request, "family=" + familyId);
 	}
 
-	private AuthRefreshToken persistToken(UUID profileId, String raw, UUID familyId, HttpServletRequest request) {
-		AuthRefreshToken token = new AuthRefreshToken();
-		token.setProfileId(profileId);
-		token.setTokenHash(sha256Hex(raw));
-		token.setFamilyId(familyId);
-		token.setExpiresAt(Instant.now().plusSeconds(securityProperties.refreshTokenTtlDays() * 86400L));
-		if (request != null) {
-			token.setUserAgent(trim(request.getHeader("User-Agent"), 512));
-			token.setIpAddress(trim(SecurityAuditService.clientIp(request), 64));
-		}
-		return refreshTokenRepository.save(token);
+	private long refreshTtlSeconds() {
+		return securityProperties.refreshTokenTtlDays() * 86400L;
 	}
 
 	private BusinessException invalidRefresh() {
@@ -142,14 +129,6 @@ public class VelvetRefreshTokenService {
 		catch (NoSuchAlgorithmException e) {
 			throw new IllegalStateException("SHA-256 non disponibile.", e);
 		}
-	}
-
-	private static String trim(String value, int max) {
-		if (value == null) {
-			return null;
-		}
-		String t = value.trim();
-		return t.length() <= max ? t : t.substring(0, max);
 	}
 
 	public record RefreshTokenPair(String accessToken, String refreshToken, UUID refreshTokenId, long expiresInSeconds) {

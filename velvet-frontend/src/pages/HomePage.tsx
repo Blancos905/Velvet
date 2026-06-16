@@ -12,13 +12,17 @@ import {
   expectedCapLength,
   italianLocalitiesByCapPrefix,
   normalizeCapInput,
+  resolveItalianCityForCap,
 } from "../data/searchLocations";
-import { TRENDING_GROUPS } from "../data/trendingIdeas";
+import { TRENDING_GROUPS, trendIdeaGroupsForNativeApp } from "../data/trendingIdeas";
+import { useVelvetNativeAppShell } from "../hooks/useVelvetNativeAppShell";
 import { QUICK_SUGGEST_GROUPS } from "../data/quickSuggestGroups";
 import { PartnerSignupLink } from "../components/PartnerSignupLink";
 import { SearchHitLogoAvatar } from "../components/SearchHitLogoAvatar";
 import { formatSalonCityForDisplay } from "../lib/formatSalonCityForDisplay";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
+import { useEditorialCookieAllowed, useMapsCookieAllowed } from "../hooks/useCookieConsent";
+import { editorialBackgroundImage } from "../lib/editorialMedia";
 import { prefetchSalonPublicPage } from "../lib/prefetchSalonPublicPage";
 import type { SalonOrgNavState } from "../lib/publicOrganizationDetail";
 import type { SalonClientGenderId } from "../data/salonClientGenders";
@@ -100,18 +104,88 @@ const STORY_SLIDES: StorySlide[] = [
   },
 ];
 
-function HeroStoryCarousel() {
+/** Carousel home — solo app mobile: 5 foto, autoplay, senza frecce né pallini. */
+const STORY_SLIDES_NATIVE_APP: StorySlide[] = [
+  {
+    kind: "image",
+    id: "saloni",
+    eyebrow: "Saloni",
+    titleBefore: "Trova il ",
+    titleHighlight: "salone",
+    titleAfter: " per te.",
+    body: "Hair, beauty e benessere: scopri le sedi vicino a te e prenota in pochi tap.",
+    image:
+      "https://images.unsplash.com/photo-1633681926022-84c23e8cb04d?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Interno di un salone accogliente",
+  },
+  {
+    kind: "image",
+    id: "hair",
+    eyebrow: "Parrucchieri",
+    titleBefore: "Taglio e colore che ",
+    titleHighlight: "ispirano",
+    titleAfter: ".",
+    body: "Piega, barba e styling: professionisti pronti per la tua prossima visita.",
+    image:
+      "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Parrucchiere al lavoro in salone",
+  },
+  {
+    kind: "image",
+    id: "beauty",
+    eyebrow: "Estetisti",
+    titleBefore: "Bellezza che si ",
+    titleHighlight: "vede",
+    titleAfter: ".",
+    body: "Viso, unghie e trucco: rituali di cura per sentirti al meglio ogni giorno.",
+    image:
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Trattamento viso in istituto estetico",
+  },
+  {
+    kind: "image",
+    id: "massaggi",
+    eyebrow: "Massaggiatori",
+    titleBefore: "Relax e ",
+    titleHighlight: "benessere",
+    titleAfter: ".",
+    body: "Massaggi rilassanti e trattamenti decontratturanti: ritagliati la pausa che meriti.",
+    image:
+      "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Massaggio rilassante in studio benessere",
+  },
+  {
+    kind: "image",
+    id: "unghie",
+    eyebrow: "Estetica & nail",
+    titleBefore: "Dettagli che fanno la ",
+    titleHighlight: "differenza",
+    titleAfter: ".",
+    body: "Manicure, nail art e piccoli gesti di cura per un look curato in ogni occasione.",
+    image:
+      "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Manicure e nail art",
+  },
+];
+
+function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { nativeApp?: boolean; editorialAllowed?: boolean }) {
+  const slides = nativeApp ? STORY_SLIDES_NATIVE_APP : STORY_SLIDES;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const n = STORY_SLIDES.length;
+  const n = slides.length;
+  const autoplayMs = nativeApp ? 5000 : 6500;
 
   useEffect(() => {
-    if (paused) return;
+    setIndex(0);
+  }, [nativeApp]);
+
+  useEffect(() => {
+    if (paused && !nativeApp) return;
     const t = window.setInterval(() => {
       setIndex((i) => (i + 1) % n);
-    }, 6500);
+    }, autoplayMs);
     return () => window.clearInterval(t);
-  }, [paused, n]);
+  }, [paused, n, nativeApp, autoplayMs]);
 
   const go = (delta: number) => {
     setIndex((i) => (i + delta + n) % n);
@@ -208,12 +282,14 @@ function HeroStoryCarousel() {
 
   return (
     <div
-      className="velvet-hero-carousel"
+      className={
+        nativeApp ? "velvet-hero-carousel velvet-hero-carousel--native-app" : "velvet-hero-carousel"
+      }
       role="region"
       aria-roledescription="carousel"
       aria-label="In evidenza SaloniLuxury"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      onMouseEnter={nativeApp ? undefined : () => setPaused(true)}
+      onMouseLeave={nativeApp ? undefined : () => setPaused(false)}
       style={{
         marginTop: "clamp(2.25rem, 5vw, 3.5rem)",
         maxWidth: 1120,
@@ -227,7 +303,7 @@ function HeroStoryCarousel() {
           className="velvet-hero-carousel-track"
           style={{ transform: `translateX(-${index * 100}%)` }}
         >
-          {STORY_SLIDES.map((slide, slideIndex) => (
+          {slides.map((slide, slideIndex) => (
             <div
               key={slide.id}
               className="velvet-hero-carousel-slide"
@@ -273,7 +349,11 @@ function HeroStoryCarousel() {
                   style={{
                     position: "relative",
                     minHeight: "clamp(240px, 42vw, 360px)",
-                    backgroundImage: `linear-gradient(105deg, rgba(124,45,18,0.88) 0%, rgba(194,65,12,0.5) 42%, rgba(251,146,60,0.2) 100%), url(${slide.image})`,
+                    backgroundImage: editorialBackgroundImage(
+                      "linear-gradient(105deg, rgba(124,45,18,0.88) 0%, rgba(194,65,12,0.5) 42%, rgba(251,146,60,0.2) 100%)",
+                      slide.image,
+                      editorialAllowed,
+                    ),
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     padding: "clamp(1.75rem, 4vw, 2.75rem) clamp(1.5rem, 4vw, 2.5rem)",
@@ -291,36 +371,40 @@ function HeroStoryCarousel() {
           ))}
         </div>
 
-        <button
-          type="button"
-          className="velvet-hero-carousel-nav velvet-carousel-prev"
-          onClick={() => go(-1)}
-          aria-label="Slide precedente"
-        >
-          <span aria-hidden>‹</span>
-        </button>
-        <button
-          type="button"
-          className="velvet-hero-carousel-nav velvet-carousel-next"
-          onClick={() => go(1)}
-          aria-label="Slide successiva"
-        >
-          <span aria-hidden>›</span>
-        </button>
-
-        <div className="velvet-carousel-dots-wrap" role="tablist" aria-label="Seleziona slide">
-          {STORY_SLIDES.map((s, i) => (
+        {!nativeApp ? (
+          <>
             <button
-              key={s.id}
               type="button"
-              role="tab"
-              aria-selected={i === index}
-              aria-label={`Slide ${i + 1} di ${n}`}
-              onClick={() => setIndex(i)}
-              className={i === index ? "velvet-carousel-dot is-active" : "velvet-carousel-dot"}
-            />
-          ))}
-        </div>
+              className="velvet-hero-carousel-nav velvet-carousel-prev"
+              onClick={() => go(-1)}
+              aria-label="Slide precedente"
+            >
+              <span aria-hidden>‹</span>
+            </button>
+            <button
+              type="button"
+              className="velvet-hero-carousel-nav velvet-carousel-next"
+              onClick={() => go(1)}
+              aria-label="Slide successiva"
+            >
+              <span aria-hidden>›</span>
+            </button>
+
+            <div className="velvet-carousel-dots-wrap" role="tablist" aria-label="Seleziona slide">
+              {slides.map((s, i) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === index}
+                  aria-label={`Slide ${i + 1} di ${n}`}
+                  onClick={() => setIndex(i)}
+                  className={i === index ? "velvet-carousel-dot is-active" : "velvet-carousel-dot"}
+                />
+              ))}
+            </div>
+          </>
+        ) : null}
       </div>
     </div>
   );
@@ -330,9 +414,35 @@ function trendCardBg(image: string): string {
   return `linear-gradient(165deg, rgba(45, 16, 6, 0.2) 0%, rgba(67, 20, 7, 0.55) 45%, rgba(30, 10, 4, 0.88) 100%), url(${image})`;
 }
 
+function HomeMegaSearchLensIcon() {
+  return (
+    <svg
+      className="velvet-mega-submit__icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="2.25" />
+      <path
+        d="M16 16l5 5"
+        stroke="currentColor"
+        strokeWidth="2.25"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export default function HomePage() {
   const queryClient = useQueryClient();
   const nav = useNavigate();
+  const isNativeApp = useVelvetNativeAppShell();
+  const editorialAllowed = useEditorialCookieAllowed();
+  const mapsAllowed = useMapsCookieAllowed();
+  const trendingGroups = isNativeApp ? trendIdeaGroupsForNativeApp() : TRENDING_GROUPS;
+  const trendingGridClass = isNativeApp
+    ? "velvet-trending-grid velvet-trending-grid--native-four"
+    : "velvet-trending-grid velvet-trending-grid--three";
   const { isAuthenticated, realmRoles } = useVelvetAuth();
   /** Suggerimenti rapidi legati a geolocalizzazione: solo account cliente (JWT con ruolo CLIENT). */
   const canUseQuickGeolocationTags = isAuthenticated && realmRoles.includes("CLIENT");
@@ -408,7 +518,7 @@ export default function HomePage() {
   const dynamicPlaceSuggestionsQ = useQuery({
     queryKey: ["locate", "place-suggestions", country, debouncedCityInput],
     queryFn: () => locateByPlace(debouncedCityInput.trim(), country, 10),
-    enabled: debouncedCityInput.trim().length >= 2,
+    enabled: mapsAllowed && debouncedCityInput.trim().length >= 2,
     staleTime: 30_000,
     retry: false,
   });
@@ -466,7 +576,7 @@ export default function HomePage() {
   const capSuggestionQ = useQuery({
     queryKey: ["locate", "postal-suggestions", country, capDigits],
     queryFn: () => locateByPostalSuggestions(capDigits, country, 100),
-    enabled: country !== "IT" && capLen > 0 && capDigits.length >= 2,
+    enabled: mapsAllowed && country !== "IT" && capLen > 0 && capDigits.length >= 2,
     staleTime: 30_000,
     retry: false,
   });
@@ -544,10 +654,16 @@ export default function HomePage() {
   const resolveCityFromCap = useCallback(async () => {
     if (capLen === 0) return { city: null as string | null, notFound: false as const };
     if (capDigits.length !== capLen) return { city: null as string | null, notFound: false as const };
+    if (country === "IT" && !mapsAllowed) {
+      const localCity = resolveItalianCityForCap(capDigits);
+      if (!localCity) return { city: null, notFound: true as const };
+      return { city: localCity, notFound: false as const };
+    }
+    if (!mapsAllowed) return { city: null, notFound: true as const };
     const r = await locateByPostal(capDigits, country);
     if (!r) return { city: null, notFound: true as const };
     return { city: r.city, notFound: false as const };
-  }, [capDigits, capLen, country]);
+  }, [capDigits, capLen, country, mapsAllowed]);
 
   const resolveSearchCity = useCallback(async (): Promise<{ city: string; error: string | null }> => {
     const raw = cityInput.trim();
@@ -589,11 +705,25 @@ export default function HomePage() {
       setCapPreview({ status: "idle" });
       return;
     }
+    if (!mapsAllowed && country !== "IT") {
+      setCapPreview({ status: "idle" });
+      return;
+    }
     let cancelled = false;
     setCapPreview({ status: "loading" });
     const t = setTimeout(() => {
       void (async () => {
         try {
+          if (country === "IT" && !mapsAllowed) {
+            const localCity = resolveItalianCityForCap(capDigits);
+            if (cancelled) return;
+            if (localCity) {
+              setCapPreview({ status: "ok", city: localCity, displayName: localCity });
+            } else {
+              setCapPreview({ status: "not_found" });
+            }
+            return;
+          }
           const r = await locateByPostal(capDigits, country);
           if (cancelled) return;
           if (r) {
@@ -610,9 +740,15 @@ export default function HomePage() {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [capDigits, capLen, country, cityInput]);
+  }, [capDigits, capLen, country, cityInput, mapsAllowed]);
 
   const runGeoLocateForFilters = useCallback(async (): Promise<{ city: string | null; error: string | null }> => {
+    if (!mapsAllowed) {
+      const msg =
+        "Per usare posizione e geocodifica attiva le preferenze «Mappe e geocodifica» in Scelte privacy.";
+      setFormHint(msg);
+      return { city: null, error: msg };
+    }
     if (!navigator.geolocation) {
       const msg = "Il browser non supporta la geolocalizzazione.";
       setFormHint(msg);
@@ -672,7 +808,7 @@ export default function HomePage() {
         { enableHighAccuracy: true, timeout: 18_000, maximumAge: 120_000 },
       );
     });
-  }, [country]);
+  }, [country, mapsAllowed]);
 
   const handleGeoLocateForFilters = useCallback(() => {
     void runGeoLocateForFilters();
@@ -698,9 +834,17 @@ export default function HomePage() {
     <>
       <section className="velvet-hero-wrap">
         <div className="velvet-home-inner">
-          <h1 className="velvet-home-title">Trova il tuo salone</h1>
+          <h1 className="velvet-home-title">
+            <span className="velvet-home-title__text">Trova il tuo salone</span>
+          </h1>
           <p className="velvet-home-lead velvet-home-lead--epigraph">
-            Prendersi cura non è vanità: è ascolto.
+            <span className="velvet-home-lead__quote" aria-hidden="true">
+              «
+            </span>
+            <span className="velvet-home-lead__text">Prendersi cura non è vanità: è ascolto.</span>
+            <span className="velvet-home-lead__quote velvet-home-lead__quote--end" aria-hidden="true">
+              »
+            </span>
           </p>
 
           <form onSubmit={onSearch} className="velvet-home-form">
@@ -716,7 +860,13 @@ export default function HomePage() {
                 window.setTimeout(() => setMegaFocused(false), 200);
               }}
             >
-              <div className="velvet-mega-search">
+              <div
+                className={
+                  isNativeApp
+                    ? "velvet-mega-search velvet-mega-search--native-app"
+                    : "velvet-mega-search"
+                }
+              >
                 <input
                   id="velvet-mega-q"
                   value={salonName}
@@ -726,8 +876,25 @@ export default function HomePage() {
                   autoComplete="organization"
                   enterKeyHint="search"
                 />
-                <button type="submit" className="velvet-mega-submit" disabled={capLookupSubmitting}>
-                  {capLookupSubmitting ? "…" : "Cerca"}
+                <button
+                  type="submit"
+                  className={
+                    isNativeApp
+                      ? "velvet-mega-submit velvet-mega-submit--icon-only"
+                      : "velvet-mega-submit"
+                  }
+                  disabled={capLookupSubmitting}
+                  aria-label="Cerca salone"
+                >
+                  {capLookupSubmitting ? (
+                    <span className="velvet-mega-submit__loading" aria-hidden>
+                      …
+                    </span>
+                  ) : isNativeApp ? (
+                    <HomeMegaSearchLensIcon />
+                  ) : (
+                    "Cerca"
+                  )}
                 </button>
               </div>
               {megaFocused && debouncedSalonName.trim().length >= 1 ? (
@@ -1043,6 +1210,12 @@ export default function HomePage() {
                             className="velvet-quick-tag"
                             onClick={() => {
                               void (async () => {
+                                if (!mapsAllowed) {
+                                  setFormHint(
+                                    "Per cercare saloni vicino a te attiva le preferenze «Mappe e geocodifica» in Scelte privacy.",
+                                  );
+                                  return;
+                                }
                                 setFormHint(null);
                                 setCapLookupSubmitting(true);
                                 try {
@@ -1080,22 +1253,26 @@ export default function HomePage() {
           </form>
         </div>
 
-        <HeroStoryCarousel />
+        <HeroStoryCarousel nativeApp={isNativeApp} editorialAllowed={editorialAllowed} />
       </section>
 
       <section className="velvet-trending-section">
         <h2 className="velvet-trending-title">Idee per la tua prossima visita</h2>
         <div className="velvet-trending-groups">
-          {TRENDING_GROUPS.map((group) => (
+          {trendingGroups.map((group) => (
             <div key={group.id} className="velvet-trending-group">
               <h3 className="velvet-trending-subtitle">{group.heading}</h3>
-              <div className="velvet-trending-grid velvet-trending-grid--three">
+              <div className={trendingGridClass}>
                 {group.items.map((t) => (
                   <Link
                     key={t.id}
                     to={`/idee/${group.id}/${t.id}`}
-                    className="velvet-trend-card velvet-trend-card--photo"
-                    style={{ backgroundImage: trendCardBg(t.image) }}
+                    className={`velvet-trend-card${editorialAllowed ? " velvet-trend-card--photo" : ""}`}
+                    style={
+                      editorialAllowed
+                        ? { backgroundImage: trendCardBg(t.image) }
+                        : { background: "linear-gradient(165deg, #431407 0%, #7c2d12 55%, #1c0a06 100%)" }
+                    }
                     aria-label={`${t.title}. ${t.imageAlt}`}
                   >
                     <span className="velvet-trend-card-label" aria-hidden="true">

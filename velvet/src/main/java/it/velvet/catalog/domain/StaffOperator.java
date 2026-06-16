@@ -47,6 +47,19 @@ public class StaffOperator {
 	@Column(length = 40)
 	private String calendarColor;
 
+	/** Orario lavoro operatore (minuti da mezzanotte locale); se tutti valorizzati prevalgono sulla sede. */
+	@Column(name = "work_morning_start_minute_of_day")
+	private Integer workMorningStartMinuteOfDay;
+
+	@Column(name = "work_morning_end_minute_of_day")
+	private Integer workMorningEndMinuteOfDay;
+
+	@Column(name = "work_afternoon_start_minute_of_day")
+	private Integer workAfternoonStartMinuteOfDay;
+
+	@Column(name = "work_afternoon_end_minute_of_day")
+	private Integer workAfternoonEndMinuteOfDay;
+
 	/** Account di accesso dedicato (ruolo {@code STAFF} su {@code consumer_profiles}), opzionale. */
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "consumer_profile_id")
@@ -136,6 +149,49 @@ public class StaffOperator {
 
 	public void setCalendarColor(String calendarColor) {
 		this.calendarColor = calendarColor;
+	}
+
+	public Integer getWorkMorningStartMinuteOfDay() {
+		return workMorningStartMinuteOfDay;
+	}
+
+	public void setWorkMorningStartMinuteOfDay(Integer workMorningStartMinuteOfDay) {
+		this.workMorningStartMinuteOfDay = workMorningStartMinuteOfDay;
+	}
+
+	public Integer getWorkMorningEndMinuteOfDay() {
+		return workMorningEndMinuteOfDay;
+	}
+
+	public void setWorkMorningEndMinuteOfDay(Integer workMorningEndMinuteOfDay) {
+		this.workMorningEndMinuteOfDay = workMorningEndMinuteOfDay;
+	}
+
+	public Integer getWorkAfternoonStartMinuteOfDay() {
+		return workAfternoonStartMinuteOfDay;
+	}
+
+	public void setWorkAfternoonStartMinuteOfDay(Integer workAfternoonStartMinuteOfDay) {
+		this.workAfternoonStartMinuteOfDay = workAfternoonStartMinuteOfDay;
+	}
+
+	public Integer getWorkAfternoonEndMinuteOfDay() {
+		return workAfternoonEndMinuteOfDay;
+	}
+
+	public void setWorkAfternoonEndMinuteOfDay(Integer workAfternoonEndMinuteOfDay) {
+		this.workAfternoonEndMinuteOfDay = workAfternoonEndMinuteOfDay;
+	}
+
+	public void updateWorkSchedule(
+			Integer morningStart,
+			Integer morningEnd,
+			Integer afternoonStart,
+			Integer afternoonEnd) {
+		this.workMorningStartMinuteOfDay = morningStart;
+		this.workMorningEndMinuteOfDay = morningEnd;
+		this.workAfternoonStartMinuteOfDay = afternoonStart;
+		this.workAfternoonEndMinuteOfDay = afternoonEnd;
 	}
 
 	public ConsumerProfile getConsumerProfile() {

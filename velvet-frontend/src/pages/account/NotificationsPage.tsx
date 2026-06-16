@@ -22,7 +22,7 @@ const ME_NOTIFICATION_BUCKET_DEFS: Array<{ key: string; label: string }> = [
   { key: "BOOKING_CONFIRMATION", label: "Email — conferme, promemoria e recensioni" },
   { key: "BOOKING_UPDATED", label: "Email — prenotazione aggiornata" },
   { key: "BOOKING_CANCELLED", label: "Email — annullamento prenotazione" },
-  { key: "SYSTEM", label: "Email sistema" },
+  { key: "SYSTEM", label: "Messaggi Luxury" },
 ];
 
 const SUPER_ADMIN_SUPPORT_BUCKET = {
@@ -470,7 +470,7 @@ export default function NotificationsPage() {
                                   disabled={deleteMessageM.isPending && deletingMessageId === m.id}
                                   onClick={() => deleteMessageM.mutate(m.id)}
                                 >
-                                  {deleteMessageM.isPending && deletingMessageId === m.id ? "..." : "Delete"}
+                                  {deleteMessageM.isPending && deletingMessageId === m.id ? "…" : "Cancella"}
                                 </button>
                               </span>
                             </li>

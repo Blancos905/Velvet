@@ -54,6 +54,8 @@ class MeDataExportControllerTest {
 		mockMvc.perform(get("/api/v1/me/data-export").header("Authorization", "Bearer " + token))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.profile.email").value("export@example.com"))
-				.andExpect(jsonPath("$.favorites").isArray());
+				.andExpect(jsonPath("$.favorites").isArray())
+				.andExpect(jsonPath("$.pushDevices").isArray())
+				.andExpect(jsonPath("$.platformNotifications").isArray());
 	}
 }

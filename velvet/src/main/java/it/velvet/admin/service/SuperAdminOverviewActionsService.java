@@ -23,6 +23,7 @@ import it.velvet.publicapi.validation.ConsumerRegistrationValidator;
 import it.velvet.review.domain.PlatformReview;
 import it.velvet.review.domain.PlatformReviewRepository;
 import it.velvet.review.domain.ReviewRepository;
+import it.velvet.review.service.ReviewModerationService;
 import it.velvet.studio.domain.Location;
 import it.velvet.studio.domain.LocationRepository;
 import it.velvet.studio.domain.StudioGroup;
@@ -63,9 +64,11 @@ public class SuperAdminOverviewActionsService {
 	private final VelvetTokenService velvetTokenService;
 	private final VelvetSecurityProperties securityProperties;
 	private final ReviewRepository reviewRepository;
+	private final ReviewModerationService reviewModerationService;
 	private final PlatformReviewRepository platformReviewRepository;
 	private final StaffOperatorRepository staffOperatorRepository;
 	private final AppointmentRepository appointmentRepository;
+	private final SuperAdminProfileAccessNotificationService profileAccessNotificationService;
 
 	public SuperAdminOverviewActionsService(
 			StudioGroupRepository studioGroupRepository,
@@ -79,9 +82,11 @@ public class SuperAdminOverviewActionsService {
 			VelvetTokenService velvetTokenService,
 			VelvetSecurityProperties securityProperties,
 			ReviewRepository reviewRepository,
+			ReviewModerationService reviewModerationService,
 			PlatformReviewRepository platformReviewRepository,
 			StaffOperatorRepository staffOperatorRepository,
-			AppointmentRepository appointmentRepository) {
+			AppointmentRepository appointmentRepository,
+			SuperAdminProfileAccessNotificationService profileAccessNotificationService) {
 		this.studioGroupRepository = studioGroupRepository;
 		this.locationRepository = locationRepository;
 		this.accountRegistrationService = accountRegistrationService;
@@ -93,9 +98,11 @@ public class SuperAdminOverviewActionsService {
 		this.velvetTokenService = velvetTokenService;
 		this.securityProperties = securityProperties;
 		this.reviewRepository = reviewRepository;
+		this.reviewModerationService = reviewModerationService;
 		this.platformReviewRepository = platformReviewRepository;
 		this.staffOperatorRepository = staffOperatorRepository;
 		this.appointmentRepository = appointmentRepository;
+		this.profileAccessNotificationService = profileAccessNotificationService;
 	}
 
 	@Transactional(readOnly = true)
@@ -188,6 +195,11 @@ public class SuperAdminOverviewActionsService {
 		return platformReviewRepository.findPageWithAuthors(sorted).map(this::toPlatformReviewRow);
 	}
 
+	@Transactional
+	public void hideSalonReview(UUID reviewId) {
+		reviewModerationService.hideSalonReview(reviewId);
+	}
+
 	private SuperAdminPlatformReviewRow toPlatformReviewRow(PlatformReview p) {
 		String authorKind = p.getAuthorKind().name();
 		String who;
@@ -206,11 +218,13 @@ public class SuperAdminOverviewActionsService {
 
 	@Transactional
 	public void createClient(SuperAdminCreateClientRequest body) {
+		String country = body.country() != null && !body.country().isBlank() ? body.country().trim().toUpperCase(Locale.ROOT) : "IT";
 		accountRegistrationService.registerBookingClient(
 				body.email(),
 				body.password(),
 				body.firstName(),
 				body.lastName(),
+				country,
 				body.phone(),
 				false,
 				null);
@@ -358,6 +372,7 @@ public class SuperAdminOverviewActionsService {
 		salonOwnerRoleAlignmentService.alignAfterSuccessfulPasswordLogin(profile);
 		ConsumerProfile forToken = consumerProfileRepository.findById(profile.getId()).orElse(profile);
 		String accessToken = velvetTokenService.createAccessToken(forToken);
+		profileAccessNotificationService.notifySalonProfileAccess(group);
 		return new SalonOwnerVelvetSession(accessToken, securityProperties.authJwtTtlHours() * 3600L);
 	}
 
@@ -473,6 +488,8 @@ public class SuperAdminOverviewActionsService {
 			@NotBlank @Size(min = 8, max = 200) String password,
 			@NotBlank @Size(max = 100) String firstName,
 			@NotBlank @Size(max = 100) String lastName,
+			@jakarta.validation.constraints.Pattern(regexp = "^[A-Z]{2}$", message = "Paese: usa codice ISO a 2 lettere (es. IT)")
+			String country,
 			@Size(max = 40) String phone) {
 	}
 

@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import {
-  LEGAL_ENTITY_ADDRESS_TODO,
-  LEGAL_ENTITY_LEGAL_NAME_TODO,
-  LEGAL_ENTITY_VAT_TODO,
-  legalEntityName,
+  companyAddress,
+  companyLegalName,
+  companyName,
+  companyVat,
 } from "../../content/legalEntity";
+import { logRetentionDays } from "../../content/legalConfig";
 import { GDPR_CITATIONS } from "../../content/legalReferences";
+import { LEGAL_ART28_SUBPROCESSORS_PARAGRAPH, LEGAL_PUSH_NOTIFICATIONS_PARAGRAPH } from "../../content/legalSharedCopy";
 import { LegalCitationList } from "./LegalDocumentLayout";
 import {
   LegalPrivacyAccordion,
@@ -26,14 +28,19 @@ export function PrivacyPolicyStaffLayeredContent() {
           assegnarti turni e permessi, caricare la tua eventuale foto profilo e gestire il rapporto lavorativo o di collaborazione.
         </p>
         <p className="velvet-legal-public__text">
-          <strong>{legalEntityName}</strong> (<em>{LEGAL_ENTITY_LEGAL_NAME_TODO}</em>, sede <em>{LEGAL_ENTITY_ADDRESS_TODO}</em>,
-          P.IVA <em>{LEGAL_ENTITY_VAT_TODO}</em>) agisce esclusivamente come{" "}
+          <strong>{companyName}</strong> (<em>{companyLegalName}</em>, sede <em>{companyAddress}</em>
+          {companyVat ? (
+            <>
+              , P.IVA <em>{companyVat}</em>
+            </>
+          ) : null}
+          ) agisce esclusivamente come{" "}
           <strong>Responsabile del Trattamento (Art. 28 GDPR)</strong>: fornisce l&apos;infrastruttura tecnologica (backend Spring
           Boot, database PostGIS per la geolocalizzazione dei servizi del salone, cache Redis per le sessioni dello staff) e tratta
           i tuoi dati <strong>solo secondo le istruzioni del contratto</strong> stipulato con il salone titolare.
         </p>
         <p className="velvet-legal-public__text">
-          {legalEntityName} <strong>non utilizza</strong> i dati degli operatori per finalità proprie di marketing o profilazione
+          {companyName} <strong>non utilizza</strong> i dati degli operatori per finalità proprie di marketing o profilazione
           commerciale indipendente dal servizio SaaS erogato al salone.
         </p>
         <LegalCitationList citations={[GDPR_CITATIONS.art13, GDPR_CITATIONS.art14, GDPR_CITATIONS.edpbTransparency]} />
@@ -109,6 +116,8 @@ export function PrivacyPolicyStaffLayeredContent() {
           </li>
         </ol>
         <p className="velvet-legal-public__text">I dati non vengono venduti a terzi.</p>
+        <p className="velvet-legal-public__text">{LEGAL_ART28_SUBPROCESSORS_PARAGRAPH}</p>
+        <p className="velvet-legal-public__text">{LEGAL_PUSH_NOTIFICATIONS_PARAGRAPH}</p>
         <LegalCitationList citations={[GDPR_CITATIONS.art13, GDPR_CITATIONS.art14]} />
       </LegalPrivacyAccordion>
 
@@ -127,8 +136,8 @@ export function PrivacyPolicyStaffLayeredContent() {
           titolare.
         </p>
         <p className="velvet-legal-public__text">
-          {legalEntityName} conserva log di sicurezza per il tempo strettamente necessario all&apos;audit e alla prevenzione abusi,
-          poi li sovrascrive o anonimizza.
+          {companyName} conserva log di sicurezza per un massimo di <em>{logRetentionDays} giorni</em> per finalità di audit e
+          prevenzione abusi, poi li sovrascrive o anonimizza.
         </p>
         <LegalCitationList citations={[GDPR_CITATIONS.art13]} />
       </LegalPrivacyAccordion>
@@ -140,7 +149,7 @@ export function PrivacyPolicyStaffLayeredContent() {
           può disattivare il profilo, aggiornare turni e foto o confermare la cessazione del trattamento nei limiti del gestionale.
         </p>
         <p className="velvet-legal-public__text">
-          <strong>{legalEntityName} non può cancellare autonomamente</strong> un operatore senza istruzioni del titolare
+          <strong>{companyName} non può cancellare autonomamente</strong> un operatore senza istruzioni del titolare
           dell&apos;account Premium del salone, salvo obblighi di legge o segnalazioni di abuso grave.
         </p>
         <p className="velvet-legal-public__text">

@@ -3,6 +3,7 @@ package it.velvet.publicapi.dto;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -13,6 +14,9 @@ public record ClientRegistrationRequest(
 		@NotBlank @Size(min = 8, max = 200) String password,
 		@NotBlank @Size(max = 100) String firstName,
 		@NotBlank @Size(max = 100) String lastName,
+		@NotBlank
+		@Pattern(regexp = "^[A-Z]{2}$", message = "Paese: usa codice ISO a 2 lettere (es. IT)")
+		String country,
 		@Size(max = 40) String phone,
 		/** Se {@code true}: solo se non esiste ancora super admin (DB/env), crea credenziali piattaforma e ruolo {@code ADMIN}. */
 		Boolean bootstrapSuperAdmin,

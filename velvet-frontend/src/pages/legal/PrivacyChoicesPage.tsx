@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { CookiePreferencesEditor } from "../../components/CookiePreferencesEditor";
 import { LEGAL_RIGHTS_RESPONSE_PARAGRAPH, LEGAL_UPDATED_AT } from "../../content/legalSharedCopy";
 import { GDPR_CITATIONS, LEGAL_CONTACT_EMAIL, STORE_LEGAL_CITATIONS } from "../../content/legalReferences";
 import { LegalDocumentLayout } from "./LegalDocumentLayout";
@@ -23,7 +24,7 @@ export default function PrivacyChoicesPage() {
         {
           heading: "2. Cancellazione account",
           paragraphs: [
-            "Puoi avviare la chiusura definitiva dell’account dalla sezione «Chiudi account» in Profilo oppure seguire la pagina pubblica Elimina account.",
+            "Puoi avviare la chiusura dell’account dalla sezione «Chiudi account» in Profilo oppure seguire la pagina pubblica Elimina account. Dopo la conferma, l’accesso viene disattivato e i dati identificativi del profilo sono anonimizzati secondo l’informativa privacy.",
           ],
           citations: [GDPR_CITATIONS.art17, STORE_LEGAL_CITATIONS.googleUserData],
         },
@@ -59,6 +60,14 @@ export default function PrivacyChoicesPage() {
         },
       ]}
     >
+      <section className="velvet-legal-public__section">
+        <h2 className="velvet-legal-public__section-title">Cookie e tecnologie simili</h2>
+        <p className="velvet-legal-public__text">
+          Gestisci le preferenze su mappe (Google Maps) e contenuti editoriali da terze parti. I cookie necessari al servizio
+          non possono essere disattivati.
+        </p>
+        <CookiePreferencesEditor />
+      </section>
       <section className="velvet-legal-public__section">
         <h2 className="velvet-legal-public__section-title">Collegamenti rapidi (con account)</h2>
         <ul className="velvet-legal-public__actions">

@@ -8,6 +8,7 @@ import it.velvet.catalog.domain.StaffOperatorRepository;
 import it.velvet.consumer.domain.ConsumerProfileRepository;
 import it.velvet.consumer.domain.FavoriteLocationRepository;
 import it.velvet.notification.domain.ScheduledNotificationRepository;
+import it.velvet.notification.domain.UserDeviceRepository;
 import it.velvet.review.domain.PlatformReviewRepository;
 import it.velvet.review.domain.ReviewRepository;
 import it.velvet.security.auth.domain.AuthRefreshTokenRepository;
@@ -28,6 +29,7 @@ public class VelvetConsumerTestCleanup {
 	private final SalonClientRepository salonClientRepository;
 	private final FavoriteLocationRepository favoriteLocationRepository;
 	private final StaffOperatorRepository staffOperatorRepository;
+	private final UserDeviceRepository userDeviceRepository;
 
 	public VelvetConsumerTestCleanup(
 			ConsumerProfileRepository consumerProfileRepository,
@@ -40,7 +42,8 @@ public class VelvetConsumerTestCleanup {
 			SalonVelvetChatReadStateRepository salonVelvetChatReadStateRepository,
 			SalonClientRepository salonClientRepository,
 			FavoriteLocationRepository favoriteLocationRepository,
-			StaffOperatorRepository staffOperatorRepository) {
+			StaffOperatorRepository staffOperatorRepository,
+			UserDeviceRepository userDeviceRepository) {
 		this.consumerProfileRepository = consumerProfileRepository;
 		this.appointmentRepository = appointmentRepository;
 		this.authRefreshTokenRepository = authRefreshTokenRepository;
@@ -52,6 +55,7 @@ public class VelvetConsumerTestCleanup {
 		this.salonClientRepository = salonClientRepository;
 		this.favoriteLocationRepository = favoriteLocationRepository;
 		this.staffOperatorRepository = staffOperatorRepository;
+		this.userDeviceRepository = userDeviceRepository;
 	}
 
 	@Transactional
@@ -64,6 +68,7 @@ public class VelvetConsumerTestCleanup {
 		scheduledNotificationRepository.deleteAll();
 		appointmentRepository.deleteAll();
 		favoriteLocationRepository.deleteAll();
+		userDeviceRepository.deleteAll();
 		salonClientRepository.deleteAll();
 		staffOperatorRepository.findAll().stream()
 				.filter(op -> op.getConsumerProfile() != null)

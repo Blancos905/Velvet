@@ -1,24 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 /** WebView Flutter: user agent impostato in velvet-app/lib/shell/velvet_web_shell.dart */
-const NATIVE_APP_UA_MARKER = /SaloniVelvetApp\//i;
+const NATIVE_APP_UA_MARKERS = [/SaloniLuxuryApp\//i, /VelvetMobileApp/i];
 
 export function isVelvetNativeAppShell(): boolean {
   if (typeof navigator === "undefined") {
     return false;
   }
-  return NATIVE_APP_UA_MARKER.test(navigator.userAgent);
+  const ua = navigator.userAgent;
+  return NATIVE_APP_UA_MARKERS.some((marker) => marker.test(ua));
 }
 
 /** True quando la pagina gira nell'app mobile (non nel browser del sito). */
 export function useVelvetNativeAppShell(): boolean {
-  const [isNativeApp, setIsNativeApp] = useState(false);
-
-  useEffect(() => {
-    setIsNativeApp(isVelvetNativeAppShell());
-  }, []);
-
-  return isNativeApp;
+  return isVelvetNativeAppShell();
 }
 
 /** Classe su `<html>` per stili dedicati alla WebView Flutter. */

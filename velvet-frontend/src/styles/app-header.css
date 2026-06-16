@@ -53,14 +53,14 @@
 .velvet-brand {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   text-decoration: none;
   color: inherit;
 }
 
 .velvet-brand-logo {
-  width: clamp(76px, 15vw, 112px);
-  height: clamp(76px, 15vw, 112px);
+  width: clamp(68px, 13vw, 100px);
+  height: clamp(68px, 13vw, 100px);
   object-fit: cover;
   object-position: center;
   border-radius: 50%;
@@ -71,27 +71,27 @@
 .velvet-brand-text {
   display: flex;
   flex-direction: column;
-  line-height: 1.05;
-  gap: 4px;
-  padding: 8px 16px 10px;
-  border-radius: 14px;
+  line-height: 1.02;
+  gap: 2px;
+  padding: 4px 9px 5px;
+  border-radius: 10px;
   background: linear-gradient(180deg, #fff7ed 0%, #ffedd5 100%);
   border: 1px solid rgba(234, 88, 12, 0.22);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.14);
 }
 
 .velvet-brand-saloni {
-  font-size: clamp(0.72rem, 1.9vw, 0.88rem);
+  font-size: clamp(0.58rem, 1.5vw, 0.74rem);
   font-weight: 700;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.18em;
   color: #ea580c;
   text-transform: uppercase;
 }
 
 .velvet-brand-velvet {
-  font-size: clamp(1.5rem, 4.2vw, 2.35rem);
+  font-size: clamp(1.1rem, 3.1vw, 1.72rem);
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #0a0a0a;
 }
@@ -825,5 +825,41 @@
     letter-spacing: 0.02em;
     filter: none;
   }
+}
+
+/* App mobile: menu profilo cliente identico al frontend web */
+.velvet-native-app .velvet-header-main,
+.velvet-native-app .velvet-header-nav {
+  overflow: visible;
+}
+
+.velvet-native-app .velvet-header-profile-trigger {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.velvet-native-app .velvet-header-profile-menu:has(.velvet-header-profile-dropdown.is-open) {
+  z-index: 120;
+}
+
+/* App mobile: badge «Saloni Luxury» più compatto in header */
+.velvet-native-app .velvet-brand {
+  gap: 10px;
+}
+
+.velvet-native-app .velvet-brand-text {
+  padding: 3px 7px 4px;
+  border-radius: 9px;
+  gap: 1px;
+}
+
+.velvet-native-app .velvet-brand-saloni {
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+}
+
+.velvet-native-app .velvet-brand-velvet {
+  font-size: 1rem;
+  letter-spacing: 0.03em;
 }
 

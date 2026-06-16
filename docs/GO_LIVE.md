@@ -26,9 +26,19 @@ Combinare con l’audit tecnico:
 | `src/content/legalSharedCopy.ts` | `LEGAL_UPDATED_AT`, `LEGAL_DOCUMENT_VERSION` allineati alla data di rilascio |
 | `src/pages/legal/LegalPrivacyAccordion.tsx` | Sostituire «Fase di Sviluppo (Pre-Release)» |
 | Privacy B2B `/privacy`, B2C `/privacy/clienti`, Staff `/privacy/staff` | Testo rivisto; retention log definita (non `[es. 30/90 giorni]`) |
-| Email | `privacy@salonivelvet.it`, `assistenza@salonivelvet.it` attive (SPF/DKIM) |
+| Email | `privacy@saloniluxury.it`, `assistenza@saloniluxury.it` attive (SPF/DKIM) |
 
 **URL per store:** vedi `src/content/velvetLegalPanelPaths.ts` e hub `/legale`.
+
+### Aruba — tre credenziali diverse (non confondere la Gmail)
+
+| Contesto | Username | Password |
+|----------|----------|----------|
+| **Login area clienti Aruba** ([aruba.it](https://www.aruba.it) / Hosting e domini) | `19867967@aruba.it` | Password scelta in fase di ordine/registrazione Aruba |
+| **Webmail caselle** ([webmail.aruba.it](https://webmail.aruba.it)) | `privacy@`, `assistenza@` o `noreply@saloniluxury.it` | Password della singola casella |
+| **SMTP backend** (`SPRING_MAIL_USERNAME` in `.env`) | `noreply@saloniluxury.it` | Password della casella `noreply@` |
+
+La **Gmail personale** è solo l’email di **contatto** dell’account Aruba (fatture, comunicazioni, eventuale reset password): **non** va usata come username per il login al pannello né per SMTP.
 
 ---
 
@@ -48,10 +58,10 @@ cp -r dist ../infrastructure/frontend-web-dist/
 | Variabile / file | Produzione |
 |------------------|------------|
 | `VELVET_TOKEN_SECRET` | Chiave casuale lunga (mai `velvet-dev-token-secret…`) |
-| `VELVET_PUBLIC_FRONTEND_URL` | `https://www.salonivelvet.it` |
+| `VELVET_PUBLIC_FRONTEND_URL` | `https://www.saloniluxury.it` |
 | `VELVET_CORS_ALLOWED_ORIGINS` | Solo domini HTTPS reali |
 | Super admin | BCrypt hash; revocare `VELVET_SUPER_ADMIN_SETUP_TOKEN` dopo setup |
-| Email SMTP | **Non configurato oggi** — notifiche in-app + log; integrare SMTP se serve invio esterno |
+| Email SMTP | `VELVET_MAIL_ENABLED=true` + `SPRING_MAIL_*` (Aruba `smtps.aruba.it:465` SSL, user `noreply@saloniluxury.it`) — conferme prenotazione e promemoria |
 | Refresh token | Documentato come Redis; implementazione attuale su **Postgres** — allineare testi o codice |
 
 Template server VM: `velvet/deploy/velvet.env.example`  
@@ -74,7 +84,7 @@ Certificati TLS in `nginx/certs/`. Non committare `.env` né certificati.
 
 ## 5. App mobile (`velvet-app`)
 
-- `VELVET_WEB_BASE_URL=https://salonivelvet.it`
+- `VELVET_WEB_BASE_URL=https://saloniluxury.it`
 - WebView legali: stessi path del sito (`?embed=1`)
 
 ---

@@ -1,6 +1,8 @@
 package it.velvet.catalog.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -10,17 +12,39 @@ import java.util.UUID;
 
 public interface SalonClientRepository extends JpaRepository<SalonClient, UUID> {
 
-	Optional<SalonClient> findByLocation_IdAndConsumerProfile_Id(UUID locationId, UUID consumerProfileId);
+	@Query("""
+			select sc from SalonClient sc
+			join fetch sc.location
+			where sc.location.id = :locationId and sc.consumerProfile.id = :consumerProfileId
+			""")
+	Optional<SalonClient> findByLocation_IdAndConsumerProfile_Id(
+			@Param("locationId") UUID locationId,
+			@Param("consumerProfileId") UUID consumerProfileId);
 
-	List<SalonClient> findByConsumerProfile_IdOrderByCreatedAtDesc(UUID consumerProfileId);
+	@Query("""
+			select distinct sc from SalonClient sc
+			join fetch sc.location
+			where sc.consumerProfile.id = :consumerProfileId
+			order by sc.createdAt desc
+			""")
+	List<SalonClient> findByConsumerProfile_IdOrderByCreatedAtDesc(
+			@Param("consumerProfileId") UUID consumerProfileId);
 
 	List<SalonClient> findByLocation_IdOrderByDisplayName(UUID locationId);
 
 	List<SalonClient> findByLocation_IdAndIdInOrderByDisplayName(UUID locationId, Collection<UUID> ids);
 
+	@Query("""
+			select sc from SalonClient sc
+			join fetch sc.location
+			where sc.location.id = :locationId
+			  and sc.consumerProfile is null
+			  and lower(sc.email) = lower(:email)
+			order by sc.createdAt desc
+			""")
 	Optional<SalonClient> findFirstByLocation_IdAndConsumerProfileIsNullAndEmailIgnoreCaseOrderByCreatedAtDesc(
-			UUID locationId,
-			String email);
+			@Param("locationId") UUID locationId,
+			@Param("email") String email);
 
 	List<SalonClient> findByConsumerProfileIsNotNull();
 

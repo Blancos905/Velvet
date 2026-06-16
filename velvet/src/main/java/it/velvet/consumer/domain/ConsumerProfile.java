@@ -30,6 +30,10 @@ public class ConsumerProfile {
 	@Column(length = 40)
 	private String phone;
 
+	/** Paese di residenza / contatto — ISO 3166-1 alpha-2 (es. {@code IT}). */
+	@Column(length = 2)
+	private String country;
+
 	@Column(length = 16)
 	private String preferredLocale;
 
@@ -147,6 +151,14 @@ public class ConsumerProfile {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
 	}
 
 	public String getPreferredLocale() {

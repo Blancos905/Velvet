@@ -10,10 +10,12 @@ import {
 } from "react";
 import type { PreviewAmbientUiTone } from "../../data/previewAnimatedBackgrounds";
 import { vetPaletteHueFromTemplateId, vetPaletteSkinIndexFromTemplateId } from "../../data/standardLayoutCatalog";
+import { isVelvetNativeAppShell } from "../../hooks/useVelvetNativeAppShell";
 import { formatPriceEUR } from "../../lib/format";
 import { formatSalonCityForDisplay } from "../../lib/formatSalonCityForDisplay";
 import { normalizeShowcaseHexColor, type SalonShowcaseStored } from "../../lib/salonShowcaseStorage";
 import { salonShowcaseHasContent } from "../../lib/salonShowcaseStorage";
+import "../../styles/app-header.css";
 import "../../styles/velvet-salon-showcase.css";
 
 export type SalonShowcaseServiceChip = {
@@ -273,6 +275,21 @@ export function SalonPublicShowcase({
 
   const closeServiceDetail = () => setDetailServiceId(null);
 
+  /** In app WebView: prenotazione inline sotto la vetrina, senza modale dettaglio servizio. */
+  const bookServiceDirectInNativeApp = (serviceId: string) => {
+    if (serviceId.startsWith("_demo")) return false;
+    if (!isVelvetNativeAppShell()) return false;
+    if (!onBookService && !onSelectService) return false;
+    setInternalSelectedId(serviceId);
+    closeServiceDetail();
+    if (onBookService) {
+      onBookService(serviceId);
+    } else {
+      onSelectService?.(serviceId);
+    }
+    return true;
+  };
+
   const renderServiceChipsAndDetail = () => {
     if (stripServices.length === 0) return null;
     return (
@@ -288,10 +305,13 @@ export function SalonPublicShowcase({
                 <button
                   key={svc.id}
                   type="button"
-                  className={`velvet-salon-showcase__pill${active ? " velvet-salon-showcase__pill--active" : ""}`}
+                  className={`velvet-header-cta-pill velvet-header-btn-primary velvet-salon-showcase__pill${
+                    active ? " active velvet-salon-showcase__pill--active" : ""
+                  }`}
                   aria-pressed={active}
                   onClick={() => {
                     const next = active ? null : svc.id;
+                    if (next && bookServiceDirectInNativeApp(next)) return;
                     if (onSelectService) {
                       onSelectService(next ?? "");
                     } else {
@@ -419,11 +439,12 @@ export function SalonPublicShowcase({
             <button
               key={svc.id}
               type="button"
-              className={`velvet-btn velvet-btn--secondary velvet-salon-showcase__service-pick-btn${
-                effectiveSelectedId === svc.id ? " velvet-salon-showcase__service-pick-btn--active" : ""
+              className={`velvet-header-cta-pill velvet-header-btn-primary velvet-salon-showcase__service-pick-btn${
+                effectiveSelectedId === svc.id ? " active velvet-salon-showcase__service-pick-btn--active" : ""
               }`}
               tabIndex={useServicesToggle && !publicServicesStripOpen ? -1 : undefined}
               onClick={() => {
+                if (bookServiceDirectInNativeApp(svc.id)) return;
                 setDetailServiceId(svc.id);
                 setInternalSelectedId(svc.id);
                 if (onSelectService && !svc.id.startsWith("_demo")) {
@@ -449,7 +470,7 @@ export function SalonPublicShowcase({
               aria-controls={servicesStripRegionId}
               onClick={() => setPublicServicesStripOpen((v) => !v)}
             >
-              {publicServicesStripOpen ? "Nascondi servizi" : "I nostri servizi"}
+              {publicServicesStripOpen ? "Nascondi servizi" : "prenota i nostri servizi"}
             </button>
           </div>
         ) : null}

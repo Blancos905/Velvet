@@ -5,12 +5,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import it.velvet.appointment.domain.AppointmentRepository;
 import it.velvet.catalog.domain.SalonClient;
 import it.velvet.catalog.domain.SalonClientRepository;
-import it.velvet.catalog.domain.StaffOperatorRepository;
 import it.velvet.common.api.BusinessException;
 import it.velvet.security.auth.VelvetUserPrincipal;
+import it.velvet.staff.service.SalonLocationAccessService;
+import it.velvet.staff.service.SalonLocationAccessService.CatalogAccess;
 import it.velvet.studio.domain.Location;
-import it.velvet.studio.domain.LocationRepository;
-import it.velvet.studio.service.StudioGroupOwnerResolver;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -35,22 +34,16 @@ import java.util.UUID;
 @Tag(name = "Staff — clienti salone")
 public class SalonClientStaffController {
 
-	private final LocationRepository locationRepository;
 	private final SalonClientRepository salonClientRepository;
-	private final StudioGroupOwnerResolver studioGroupOwnerResolver;
-	private final StaffOperatorRepository staffOperatorRepository;
+	private final SalonLocationAccessService salonLocationAccessService;
 	private final AppointmentRepository appointmentRepository;
 
 	public SalonClientStaffController(
-			LocationRepository locationRepository,
 			SalonClientRepository salonClientRepository,
-			StudioGroupOwnerResolver studioGroupOwnerResolver,
-			StaffOperatorRepository staffOperatorRepository,
+			SalonLocationAccessService salonLocationAccessService,
 			AppointmentRepository appointmentRepository) {
-		this.locationRepository = locationRepository;
 		this.salonClientRepository = salonClientRepository;
-		this.studioGroupOwnerResolver = studioGroupOwnerResolver;
-		this.staffOperatorRepository = staffOperatorRepository;
+		this.salonLocationAccessService = salonLocationAccessService;
 		this.appointmentRepository = appointmentRepository;
 	}
 
@@ -61,8 +54,8 @@ public class SalonClientStaffController {
 	public List<ClientDto> list(
 			@RequestHeader("X-Location-Id") UUID locationId,
 			@AuthenticationPrincipal VelvetUserPrincipal principal) {
-		Location loc = resolveLocation(locationId);
-		CatalogAccess access = resolveCatalogAccess(principal, loc);
+		Location loc = salonLocationAccessService.requireAccessibleLocation(principal, locationId);
+		CatalogAccess access = salonLocationAccessService.resolveCatalogAccess(principal, loc);
 		if (access.fullCatalog()) {
 			return salonClientRepository.findByLocation_IdOrderByDisplayName(locationId).stream()
 					.map(ClientDto::from)
@@ -86,13 +79,13 @@ public class SalonClientStaffController {
 			@RequestHeader("X-Location-Id") UUID locationId,
 			@PathVariable UUID id,
 			@AuthenticationPrincipal VelvetUserPrincipal principal) {
-		Location loc = resolveLocation(locationId);
+		Location loc = salonLocationAccessService.requireAccessibleLocation(principal, locationId);
 		SalonClient c = salonClientRepository.findById(id)
 				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Cliente non trovato."));
 		if (!c.getLocation().getId().equals(locationId)) {
 			throw new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Cliente non trovato.");
 		}
-		CatalogAccess access = resolveCatalogAccess(principal, loc);
+		CatalogAccess access = salonLocationAccessService.resolveCatalogAccess(principal, loc);
 		if (!access.fullCatalog()
 				&& !appointmentRepository.existsByLocation_IdAndOperator_IdAndSalonClient_Id(
 						locationId, access.staffOperatorId(), c.getId())) {
@@ -110,8 +103,8 @@ public class SalonClientStaffController {
 			@RequestHeader("X-Location-Id") UUID locationId,
 			@RequestBody @Valid CreateClientBody body,
 			@AuthenticationPrincipal VelvetUserPrincipal principal) {
-		Location loc = resolveLocation(locationId);
-		resolveCatalogAccess(principal, loc);
+		Location loc = salonLocationAccessService.requireAccessibleLocation(principal, locationId);
+		salonLocationAccessService.resolveCatalogAccess(principal, loc);
 		SalonClient c = new SalonClient(loc, body.displayName());
 		c.setEmail(blankToNull(body.email()));
 		c.setPhone(blankToNull(body.phone()));
@@ -124,42 +117,6 @@ public class SalonClientStaffController {
 		}
 		String t = value.trim();
 		return t.isEmpty() ? null : t;
-	}
-
-	private Location resolveLocation(UUID locationId) {
-		return locationRepository.findById(locationId)
-				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Sede non trovata."));
-	}
-
-	/**
-	 * Titolare dello studio della sede: catalogo completo. Operatore collegato alla stessa sede: solo clienti con
-	 * almeno un appuntamento assegnato a lui.
-	 */
-	private CatalogAccess resolveCatalogAccess(VelvetUserPrincipal principal, Location loc) {
-		if (principal == null || principal.getSubject() == null || principal.getSubject().isBlank()) {
-			throw new BusinessException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "Autenticazione richiesta.");
-		}
-		UUID locationStudioGroupId = loc.getStudioGroup().getId();
-		var ownerGroup = studioGroupOwnerResolver.resolveStudioGroupForOwner(principal);
-		if (ownerGroup.isPresent() && ownerGroup.get().getId().equals(locationStudioGroupId)) {
-			return CatalogAccess.ownerFull();
-		}
-		String sub = principal.getSubject() != null ? principal.getSubject() : "";
-		var op = staffOperatorRepository.resolveLinkedOperatorId(principal.getProfileId(), sub);
-		if (op.isPresent() && op.get().getLocation().getId().equals(loc.getId())) {
-			return CatalogAccess.staffFiltered(op.get().getId());
-		}
-		throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Permessi insufficienti per consultare i clienti di questa sede.");
-	}
-
-	private record CatalogAccess(boolean fullCatalog, UUID staffOperatorId) {
-		static CatalogAccess ownerFull() {
-			return new CatalogAccess(true, null);
-		}
-
-		static CatalogAccess staffFiltered(UUID operatorId) {
-			return new CatalogAccess(false, operatorId);
-		}
 	}
 
 	public record ClientDto(UUID id, String displayName, String email, String phone, boolean velvetConsumerLinked) {

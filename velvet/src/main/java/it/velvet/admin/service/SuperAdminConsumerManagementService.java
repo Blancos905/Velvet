@@ -26,16 +26,19 @@ public class SuperAdminConsumerManagementService {
 	private final StudioGroupRepository studioGroupRepository;
 	private final VelvetTokenService velvetTokenService;
 	private final VelvetSecurityProperties securityProperties;
+	private final SuperAdminProfileAccessNotificationService profileAccessNotificationService;
 
 	public SuperAdminConsumerManagementService(
 			ConsumerProfileRepository consumerProfileRepository,
 			StudioGroupRepository studioGroupRepository,
 			VelvetTokenService velvetTokenService,
-			VelvetSecurityProperties securityProperties) {
+			VelvetSecurityProperties securityProperties,
+			SuperAdminProfileAccessNotificationService profileAccessNotificationService) {
 		this.consumerProfileRepository = consumerProfileRepository;
 		this.studioGroupRepository = studioGroupRepository;
 		this.velvetTokenService = velvetTokenService;
 		this.securityProperties = securityProperties;
+		this.profileAccessNotificationService = profileAccessNotificationService;
 	}
 
 	public Page<SuperAdminConsumerRow> list(Pageable pageable) {
@@ -88,6 +91,7 @@ public class SuperAdminConsumerManagementService {
 		}
 		ConsumerProfile forToken = consumerProfileRepository.findById(p.getId()).orElse(p);
 		String accessToken = velvetTokenService.createAccessToken(forToken);
+		profileAccessNotificationService.notifyConsumerProfileAccess(forToken);
 		return new ConsumerVelvetSession(accessToken, securityProperties.authJwtTtlHours() * 3600L);
 	}
 

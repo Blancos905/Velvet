@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.velvet.publicapi.dto.PlaceLocateSuggestionResponse;
 import it.velvet.publicapi.dto.PostalLocateResponse;
+import it.velvet.publicapi.dto.ReverseLocateResponse;
 import it.velvet.publicapi.service.PostalLocateService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,5 +51,15 @@ public class PublicLocateController {
 			@RequestParam String countryCode,
 			@RequestParam(defaultValue = "8") int limit) {
 		return postalLocateService.suggestPlacesByPostal(postalCode, countryCode, limit);
+	}
+
+	@GetMapping("/locate-by-coordinates")
+	@Operation(summary = "Geocoding inverso: coordinate GPS → comune/CAP (per ricerca saloni)")
+	public ResponseEntity<ReverseLocateResponse> locateByCoordinates(
+			@RequestParam double lat,
+			@RequestParam double lon) {
+		return postalLocateService.reverseLocate(lat, lon)
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
 	}
 }

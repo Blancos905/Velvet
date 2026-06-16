@@ -2,12 +2,8 @@ package it.velvet.studio.service;
 
 import it.velvet.publicapi.service.PostalLocateService;
 import it.velvet.studio.domain.Location;
-import it.velvet.studio.domain.LocationRepository;
 import it.velvet.studio.domain.StudioGroup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -19,17 +15,10 @@ import java.util.Optional;
 @Service
 public class SalonLocationGeocodingService {
 
-	private static final Logger log = LoggerFactory.getLogger(SalonLocationGeocodingService.class);
-	private static final long NOMINATIM_PAUSE_MS = 1_100L;
-
 	private final PostalLocateService postalLocateService;
-	private final LocationRepository locationRepository;
 
-	public SalonLocationGeocodingService(
-			PostalLocateService postalLocateService,
-			LocationRepository locationRepository) {
+	public SalonLocationGeocodingService(PostalLocateService postalLocateService) {
 		this.postalLocateService = postalLocateService;
-		this.locationRepository = locationRepository;
 	}
 
 	/**
@@ -52,42 +41,6 @@ public class SalonLocationGeocodingService {
 			return true;
 		}
 		return false;
-	}
-
-	public void tryApplyCoordinates(Location loc) {
-		try {
-			if (!applyCoordinates(loc)) {
-				log.debug("Geocoding sede non riuscito per slug={}", loc != null ? loc.getSlug() : null);
-			}
-		}
-		catch (Exception e) {
-			log.warn(
-					"Geocoding sede fallito per slug={}: {}",
-					loc != null ? loc.getSlug() : null,
-					e.getMessage());
-		}
-	}
-
-	@Transactional
-	public int backfillMissingPremiumCoordinates(int maxLocations) throws InterruptedException {
-		int cap = Math.max(1, maxLocations);
-		List<Location> candidates = locationRepository.findAll().stream()
-				.filter(SalonLocationGeocodingService::isPremiumLocation)
-				.filter(loc -> loc.getLatitude() == null || loc.getLongitude() == null)
-				.limit(cap)
-				.toList();
-		if (candidates.isEmpty()) {
-			return 0;
-		}
-		int updated = 0;
-		for (Location loc : candidates) {
-			if (applyCoordinates(loc)) {
-				locationRepository.save(loc);
-				updated++;
-			}
-			Thread.sleep(NOMINATIM_PAUSE_MS);
-		}
-		return updated;
 	}
 
 	static String buildGeocodeQuery(Location loc) {

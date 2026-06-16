@@ -83,7 +83,7 @@ my-salon-platform/
 
 - **Stack**: React 18, TypeScript, Vite 5, Tailwind 3, React Router 6,
   TanStack React Query, Framer Motion, lucide-react, jsPDF, react-rnd.
-  Integrazione `@base44/sdk`. Test con Vitest.
+  Test con Vitest.
 - **Ruolo**: è l'unica UI sia per il web pubblico sia per l'area privata; viene anche
   incapsulata nella WebView dell'app mobile.
 - **Build di prod** copiata in `infrastructure/frontend-web-dist/` e servita da Nginx;
@@ -91,7 +91,7 @@ my-salon-platform/
 
 ### Pagine principali (`src/pages/`)
 `HomePage`, `SearchPage`, `SalonExplorePage`, `SalonPage`, `SalonPersonalPage`,
-`SalonPlansPage`, `PartnerPage`, `ManageBookingPage`, `ReviewPage`, `ClientSignupPage`,
+`SalonPlansPage`, `PartnerPage`, `ReviewPage`, `ClientSignupPage`,
 `PasswordResetPage`, `OidcCallbackPage`, `MonthlyIdeaPage`, più sezioni `account/`,
 `admin/`, `legal/`, `dev/`.
 
@@ -148,10 +148,22 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 ---
 
-## 8. Cosa serve sapere quando ci aiuti
+## 8. Piani salone (Free vs Premium) — regola importante
+
+| Piano | Registrazione | Pannello web (`/account`) | App mobile |
+|-------|---------------|---------------------------|------------|
+| **Free (BASE)** | Solo dall'**app** (su `/piani` il web mostra: scarica l'app) | **Nessun pannello**: su `/account` da browser compare la card `SalonFreeWebPanelGate` (invito Premium, senza hub gestionale) | Stessa SPA in WebView con vincoli Free (`velvet_free_web_bridge.dart`) |
+| **Premium** | Web (`/piani`) o app | Pannello completo (vetrina, brand, clienti, chat, statistiche, …) | Stessa SPA in WebView + funzioni Premium |
+
+Anche dopo registrazione Free dall'app, il titolare sul web vede solo `SalonFreeWebPanelGate` in `AccountLayout` (può accedere con le credenziali ma non l'hub account). In app: tema e filtri nav in `velvet_free_web_bridge.dart`.
+
+---
+
+## 9. Cosa serve sapere quando ci aiuti
 
 - È un **monorepo a 4 progetti** (backend Java, frontend React, app Flutter, infra Docker)
   fortemente integrati: la SPA è il cuore, riusata su web e mobile, con SSR dell'head per la SEO.
 - La **SEO local** (JSON-LD, sitemap, slug per salone) è un requisito di prodotto, non un dettaglio.
 - La **sicurezza** è centrale: JWT+refresh su Redis, DB/Redis isolati, Nginx unico ingresso.
 - Convenzioni: codice e commenti del progetto sono in **italiano**; i package backend sotto `it.velvet`.
+- **Email Aruba (`saloniluxury.it`):** login pannello hosting = `19867967@aruba.it` (non la Gmail di contatto); caselle `privacy@`, `assistenza@`, `noreply@`; SMTP backend usa `noreply@saloniluxury.it` su `smtps.aruba.it:465` (SSL).

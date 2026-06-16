@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { apiFetch, apiJson } from "../../api/client";
 import type {
@@ -15,6 +15,7 @@ import { useEffectiveSalonPlanTier } from "../../hooks/useEffectiveSalonPlanTier
 import { ME_SALON_CHAT_UNREAD_QUERY_KEY } from "../../hooks/useMeSalonChatUnread";
 import { useMeSalonSummaryQuery } from "../../hooks/useMeSalonSummary";
 import { useMeStaffSalonQuery } from "../../hooks/useMeStaffSalon";
+import { isVelvetNativeAppShell } from "../../hooks/useVelvetNativeAppShell";
 import {
   clearSalonChatInboxSummaries404,
   isSalonChatInboxSummaries404,
@@ -25,6 +26,7 @@ import "../../styles/velvet-account-salon-services.css";
 import "../../styles/velvet-consumer-bookings-page.css";
 import "../../styles/salon-clients-page.css";
 import "../../styles/salon-velvet-chat-page.css";
+import "../../styles/salon-velvet-chat-native-app.css";
 
 function messageReadByRecipient(msg: SalonVelvetChatMessageDto): boolean {
   if (typeof msg.readByRecipient === "boolean") return msg.readByRecipient;
@@ -42,6 +44,23 @@ function fmtWhen(iso: string): string {
     });
   } catch {
     return iso;
+  }
+}
+
+/** Ora/data compatta per la lista chat in app (stile WhatsApp). */
+function fmtChatListTime(iso: string): string {
+  try {
+    const d = new Date(iso);
+    const now = new Date();
+    if (d.toDateString() === now.toDateString()) {
+      return d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+    }
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    if (d.toDateString() === yesterday.toDateString()) return "Ieri";
+    return d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "2-digit" });
+  } catch {
+    return fmtWhen(iso);
   }
 }
 
@@ -221,7 +240,7 @@ const SalonVelvetChatComposer = memo(function SalonVelvetChatComposer({
         <textarea
           className="velvet-salon-chat__textarea"
           rows={1}
-          placeholder={chatEndpointMissing ? "Aggiorna il backend per inviare messaggi…" : "Aa"}
+          placeholder={chatEndpointMissing ? "Aggiorna il backend per inviare messaggi…" : "Messaggio"}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           maxLength={4000}
@@ -254,6 +273,7 @@ const SalonVelvetChatComposer = memo(function SalonVelvetChatComposer({
 });
 
 export default function SalonVelvetChatPage() {
+  const isNativeApp = isVelvetNativeAppShell();
   const { accessToken, isSalonTitolare, isSalonStaff, isVelvetSuperAdmin } = useVelvetAuth();
   const tier = useEffectiveSalonPlanTier();
   const meSalon = useMeSalonSummaryQuery();
@@ -265,6 +285,9 @@ export default function SalonVelvetChatPage() {
 
   const [selectedSalonClientId, setSelectedSalonClientId] = useState<string | null>(null);
   const [selectedStaffOperatorId, setSelectedStaffOperatorId] = useState<string | null>(null);
+  /** In app: lista conversazioni oppure thread aperto (navigazione tipo WhatsApp). */
+  const [nativeShowsThread, setNativeShowsThread] = useState(false);
+  const streamRef = useRef<HTMLDivElement>(null);
 
   const ownerPremium = isSalonTitolare && tier === "PREMIUM";
   const slug = meSalon.data?.primaryLocationSlug?.trim() ?? "";
@@ -347,6 +370,7 @@ export default function SalonVelvetChatPage() {
     if (paramThread) {
       setSelectedSalonClientId(paramThread);
       setSelectedStaffOperatorId(paramStaffOperatorId || null);
+      if (isNativeApp) setNativeShowsThread(true);
       return;
     }
     if (!isSalonTitolare && !isSalonStaff && membershipsQ.data?.length && !selectedSalonClientId) {
@@ -360,6 +384,7 @@ export default function SalonVelvetChatPage() {
   }, [
     paramThread,
     paramStaffOperatorId,
+    isNativeApp,
     isSalonTitolare,
     isSalonStaff,
     listClientsAsSalonSide,
@@ -401,6 +426,13 @@ export default function SalonVelvetChatPage() {
       void queryClient.invalidateQueries({ queryKey: ["me", "salon-chat", "inbox-summaries"] });
     }
   }, [selectedSalonClientId, messagesQ.isSuccess, queryClient]);
+
+  useEffect(() => {
+    if (!isNativeApp || !nativeShowsThread || !messagesQ.data?.length) return;
+    const el = streamRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [isNativeApp, nativeShowsThread, messagesQ.data, messagesQ.dataUpdatedAt]);
 
   const summaryByThreadKey = useMemo(() => {
     const list = inboxSummariesQ.data;
@@ -634,13 +666,26 @@ export default function SalonVelvetChatPage() {
     "velvet-page-main velvet-clients-dash velvet-clients-dash--base44 velvet-salon-chat-account velvet-salon-chat-account--salon-side";
   const mainConsumerClasses =
     "velvet-page-main velvet-consumer-bookings-dash velvet-consumer-bookings-dash--base44 velvet-salon-chat-account";
+  const nativeMainClass = isNativeApp ? " velvet-salon-chat--native-app" : "";
+  const nativeLayoutClass =
+    "velvet-salon-chat__layout" +
+    (isNativeApp ? " velvet-salon-chat__layout--native" : "") +
+    (isNativeApp && nativeShowsThread && selectedSalonClientId
+      ? " velvet-salon-chat__layout--native-thread"
+      : "");
+
+  const openNativeThread = (salonClientId: string, staffOperatorId: string | null) => {
+    setSelectedSalonClientId(salonClientId);
+    setSelectedStaffOperatorId(staffOperatorId);
+    if (isNativeApp) setNativeShowsThread(true);
+  };
 
   return (
-    <main className={listClientsAsSalonSide ? mainSalonClasses : mainConsumerClasses}>
+    <main className={(listClientsAsSalonSide ? mainSalonClasses : mainConsumerClasses) + nativeMainClass}>
       <div className={listClientsAsSalonSide ? "velvet-clients-dash__shell" : "velvet-consumer-bookings-dash__shell"}>
-        {listClientsAsSalonSide ? heroSalon : heroConsumer}
+        {!isNativeApp ? (listClientsAsSalonSide ? heroSalon : heroConsumer) : null}
         <div className="velvet-salon-chat__shell">
-          <div className="velvet-salon-chat__layout">
+          <div className={nativeLayoutClass}>
             <aside className="velvet-salon-chat__sidebar" aria-label="Conversazioni">
               <div className="velvet-salon-chat__sidebar-title">{listClientsAsSalonSide ? "Clienti" : "I tuoi saloni"}</div>
               {listClientsAsSalonSide
@@ -661,31 +706,35 @@ export default function SalonVelvetChatPage() {
                         className={
                           "velvet-salon-chat__thread-btn" + (isActive ? " velvet-salon-chat__thread-btn--active" : "")
                         }
-                        onClick={() => {
-                          setSelectedSalonClientId(c.id);
-                          setSelectedStaffOperatorId(activeChatStaffOperatorId);
-                        }}
+                        onClick={() => openNativeThread(c.id, activeChatStaffOperatorId)}
                       >
-                        <div className="velvet-salon-chat__thread-head">
-                          <div className="velvet-salon-chat__thread-name">{c.displayName}</div>
-                          <div className="velvet-salon-chat__thread-head-end">
-                            {unread > 0 ? (
-                              <span className="velvet-salon-chat__thread-unread" title={`${unread} messaggi da leggere`}>
-                                {unread > 99 ? "99+" : unread}
-                              </span>
-                            ) : null}
-                            {lastAtIso ? (
-                              <span className="velvet-salon-chat__thread-time" title={lastAtIso}>
-                                {fmtWhen(lastAtIso)}
-                              </span>
-                            ) : null}
-                          </div>
-                        </div>
-                        {preview ? (
-                          <div className="velvet-salon-chat__thread-preview" title={preview}>
-                            {preview}
+                        {isNativeApp ? (
+                          <div className="velvet-salon-chat__thread-avatar" aria-hidden="true">
+                            {chatAvatarInitials(c.displayName ?? "")}
                           </div>
                         ) : null}
+                        <div className={isNativeApp ? "velvet-salon-chat__thread-content" : undefined}>
+                          <div className="velvet-salon-chat__thread-head">
+                            <div className="velvet-salon-chat__thread-name">{c.displayName}</div>
+                            <div className="velvet-salon-chat__thread-head-end">
+                              {unread > 0 ? (
+                                <span className="velvet-salon-chat__thread-unread" title={`${unread} messaggi da leggere`}>
+                                  {unread > 99 ? "99+" : unread}
+                                </span>
+                              ) : null}
+                              {lastAtIso ? (
+                                <span className="velvet-salon-chat__thread-time" title={lastAtIso}>
+                                  {isNativeApp ? fmtChatListTime(lastAtIso) : fmtWhen(lastAtIso)}
+                                </span>
+                              ) : null}
+                            </div>
+                          </div>
+                          {preview ? (
+                            <div className="velvet-salon-chat__thread-preview" title={preview}>
+                              {preview}
+                            </div>
+                          ) : null}
+                        </div>
                       </button>
                     );
                   })
@@ -707,31 +756,35 @@ export default function SalonVelvetChatPage() {
                         className={
                           "velvet-salon-chat__thread-btn" + (isActive ? " velvet-salon-chat__thread-btn--active" : "")
                         }
-                        onClick={() => {
-                          setSelectedSalonClientId(thread.salonClientId);
-                          setSelectedStaffOperatorId(thread.staffOperatorId ?? null);
-                        }}
+                        onClick={() => openNativeThread(thread.salonClientId, thread.staffOperatorId ?? null)}
                       >
-                        <div className="velvet-salon-chat__thread-head">
-                          <div className="velvet-salon-chat__thread-name">{label}</div>
-                          <div className="velvet-salon-chat__thread-head-end">
-                            {unread > 0 ? (
-                              <span className="velvet-salon-chat__thread-unread" title={`${unread} messaggi da leggere`}>
-                                {unread > 99 ? "99+" : unread}
-                              </span>
-                            ) : null}
-                            {lastAtIso ? (
-                              <span className="velvet-salon-chat__thread-time" title={lastAtIso}>
-                                {fmtWhen(lastAtIso)}
-                              </span>
-                            ) : null}
-                          </div>
-                        </div>
-                        {preview ? (
-                          <div className="velvet-salon-chat__thread-preview" title={preview}>
-                            {preview}
+                        {isNativeApp ? (
+                          <div className="velvet-salon-chat__thread-avatar" aria-hidden="true">
+                            {chatAvatarInitials(label)}
                           </div>
                         ) : null}
+                        <div className={isNativeApp ? "velvet-salon-chat__thread-content" : undefined}>
+                          <div className="velvet-salon-chat__thread-head">
+                            <div className="velvet-salon-chat__thread-name">{label}</div>
+                            <div className="velvet-salon-chat__thread-head-end">
+                              {unread > 0 ? (
+                                <span className="velvet-salon-chat__thread-unread" title={`${unread} messaggi da leggere`}>
+                                  {unread > 99 ? "99+" : unread}
+                                </span>
+                              ) : null}
+                              {lastAtIso ? (
+                                <span className="velvet-salon-chat__thread-time" title={lastAtIso}>
+                                  {isNativeApp ? fmtChatListTime(lastAtIso) : fmtWhen(lastAtIso)}
+                                </span>
+                              ) : null}
+                            </div>
+                          </div>
+                          {preview ? (
+                            <div className="velvet-salon-chat__thread-preview" title={preview}>
+                              {preview}
+                            </div>
+                          ) : null}
+                        </div>
                       </button>
                     );
                   })}
@@ -745,6 +798,16 @@ export default function SalonVelvetChatPage() {
               ) : (
                 <>
                   <div className="velvet-salon-chat__panel-head">
+                    {isNativeApp ? (
+                      <button
+                        type="button"
+                        className="velvet-salon-chat__panel-back"
+                        aria-label="Torna alle conversazioni"
+                        onClick={() => setNativeShowsThread(false)}
+                      >
+                        ←
+                      </button>
+                    ) : null}
                     <div className="velvet-salon-chat__panel-avatar" aria-hidden="true">
                       {chatAvatarInitials(selectedLabel)}
                     </div>
@@ -752,7 +815,7 @@ export default function SalonVelvetChatPage() {
                       <div className="velvet-salon-chat__panel-title">{selectedLabel}</div>
                     </div>
                   </div>
-                  <div className="velvet-salon-chat__stream" aria-live="polite">
+                  <div className="velvet-salon-chat__stream" ref={streamRef} aria-live="polite">
                     {messagesQ.isLoading ? (
                       <div className="velvet-salon-chat__empty">Caricamento messaggi…</div>
                     ) : chatEndpointMissing ? (
@@ -799,7 +862,7 @@ export default function SalonVelvetChatPage() {
                                       : "L’altro non ha ancora letto (o non ha aperto la chat dopo questo messaggio)."
                                   }
                                 >
-                                  {seen ? "Letto" : "Non letto"}
+                                  {isNativeApp ? (seen ? "✓✓" : "✓") : seen ? "Letto" : "Non letto"}
                                 </div>
                               ) : null}
                             </div>

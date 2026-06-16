@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiJson } from "../api/client";
-import type { CreatedAppointmentResponse } from "../api/types";
+import type { AppointmentDto } from "../api/types";
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
 import { notifySalonCatalogClientsChanged } from "../lib/salonCatalogClientsSync";
 
@@ -52,7 +52,7 @@ export function PendingBookingResume() {
     }
     (async () => {
       try {
-        const res = await apiJson<CreatedAppointmentResponse>("/api/v1/me/appointments", {
+        const res = await apiJson<AppointmentDto>("/api/v1/me/appointments", {
           method: "POST",
           accessToken,
           body: JSON.stringify({
@@ -68,7 +68,7 @@ export function PendingBookingResume() {
         await qc.invalidateQueries({ queryKey: ["me", "salon-clients"] });
         void qc.invalidateQueries({ queryKey: ["catalog", "clients"] });
         notifySalonCatalogClientsChanged();
-        navigate(`/prenotazione/gestisci?token=${encodeURIComponent(res.manageToken)}`, { replace: true });
+        navigate(`/account/prenotazioni/${res.id}`, { replace: true });
       } catch (e) {
         sessionStorage.removeItem(STORAGE_KEY);
         ran.current = false;

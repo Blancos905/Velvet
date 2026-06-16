@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { isVelvetNativeAppShell } from "../../hooks/useVelvetNativeAppShell";
 import { accountHubNavBtn } from "./accountHubNavBtn";
 
 const navBtn = accountHubNavBtn;
@@ -45,12 +46,16 @@ export function AccountHubNavOwnerConsumerLinks({
   trustedSalonsNavBadge,
   showTrustedSalonsNavPill,
 }: AccountHubNavOwnerConsumerLinksProps) {
+  const isNativeApp = isVelvetNativeAppShell();
+  const showFreeSalonShortcuts = isSalonTitolare && !showPremiumSalonNav && !isNativeApp;
+  const showFreeSalonNativeHome = isSalonTitolare && !showPremiumSalonNav && isNativeApp;
+
   return (
     <div
       className="velvet-account-hub__nav-scroll velvet-account-hub__nav-scroll--consumer-grid"
       aria-label="Menu principale account"
     >
-      {isSalonTitolare && !showPremiumSalonNav ? (
+      {showFreeSalonShortcuts ? (
         <>
           <NavLink to="/account/salone" className={navBtn()}>
             Il mio salone
@@ -59,6 +64,11 @@ export function AccountHubNavOwnerConsumerLinks({
             Posizione del salone
           </NavLink>
         </>
+      ) : null}
+      {showFreeSalonNativeHome ? (
+        <NavLink to="/account/salone" className={navBtn()}>
+          Il mio salone
+        </NavLink>
       ) : null}
       {!isSalonTitolare ? (
         <NavLink to="/" className={navBtn()}>
@@ -87,11 +97,6 @@ export function AccountHubNavOwnerConsumerLinks({
               </span>
             ) : null}
           </span>
-        </NavLink>
-      ) : null}
-      {isSalonTitolare && !showPremiumSalonNav ? (
-        <NavLink to="/account/salone/posizione" className={navBtn()}>
-          Posizione del salone
         </NavLink>
       ) : null}
       <NavLink to="/account/prenotazioni" className={navBtn()}>

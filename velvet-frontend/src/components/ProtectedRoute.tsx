@@ -1,10 +1,11 @@
-import { useId, useState, type ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useId, useEffect, useState, type ReactNode } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
 import {
   clearPostLoginReturnPath,
   consumePostLoginReturnPath,
   normalizePostLoginReturnPath,
+  setPostLoginReturnPath,
 } from "../lib/postLoginReturnPath";
 import { humanizePostRegistrationAuthError } from "../utils/oidcErrors";
 import { hasPendingBooking } from "./PendingBookingResume";
@@ -15,12 +16,18 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const emailFieldId = `${formId}-email`;
   const passFieldId = `${formId}-pass`;
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, isLoading, signInWithPassword } = useVelvetAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isLoading || isAuthenticated) return;
+    setPostLoginReturnPath(`${location.pathname}${location.search}`);
+  }, [isAuthenticated, isLoading, location.pathname, location.search]);
 
   if (isLoading) {
     return (

@@ -102,6 +102,7 @@ public class ConsumerProfileService {
 			String email,
 			String displayName,
 			String phone,
+			String country,
 			String preferredLocale) {
 		ConsumerProfile p = requireActiveProfile(principal);
 		if (email != null) {
@@ -121,6 +122,13 @@ public class ConsumerProfileService {
 		}
 		if (phone != null) {
 			p.setPhone(phone);
+		}
+		if (country != null) {
+			String normalized = country.trim().toUpperCase(Locale.ROOT);
+			if (!normalized.matches("^[A-Z]{2}$")) {
+				throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Paese non valido.");
+			}
+			p.setCountry(normalized);
 		}
 		if (preferredLocale != null) {
 			p.setPreferredLocale(preferredLocale);

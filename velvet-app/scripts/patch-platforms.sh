@@ -28,4 +28,16 @@ if [[ -f "$IOS_PLIST" ]]; then
       /usr/libexec/PlistBuddy -c "Set :NSAppTransportSecurity:NSAllowsLocalNetworking true" "$IOS_PLIST"
     echo "iOS: NSAllowsLocalNetworking abilitato per dev HTTP (127.0.0.1:5173)."
   fi
+  if ! grep -q 'NSLocationWhenInUseUsageDescription' "$IOS_PLIST"; then
+    /usr/libexec/PlistBuddy -c "Add :NSLocationWhenInUseUsageDescription string Saloni Luxury usa la tua posizione per trovare saloni vicini a te e compilare comune e CAP nella ricerca." "$IOS_PLIST"
+    /usr/libexec/PlistBuddy -c "Add :NSLocationAlwaysAndWhenInUseUsageDescription string Saloni Luxury usa la tua posizione per trovare saloni vicini a te e compilare comune e CAP nella ricerca." "$IOS_PLIST"
+    echo "iOS: descrizioni permesso posizione aggiunte."
+  fi
+fi
+
+if [[ -f "$ANDROID_MANIFEST" ]]; then
+  if ! grep -q 'ACCESS_FINE_LOCATION' "$ANDROID_MANIFEST"; then
+    perl -0pi -e 's|<manifest xmlns:android="http://schemas.android.com/apk/res/android">|<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />|' "$ANDROID_MANIFEST"
+    echo "Android: permessi geolocalizzazione aggiunti."
+  fi
 fi

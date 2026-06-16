@@ -149,11 +149,10 @@ print_checklist() {
   print_header "Checklist Go-Live (da completare manualmente)"
   cat <<'EOF'
   LEGALI (velvet-frontend)
-    [ ] Build con VITE_LEGAL_ENTITY_LEGAL_NAME, ADDRESS, VAT (nessun [TODO_LEGAL] pubblico)
-    [ ] Data informative: sostituire "Fase di Sviluppo (Pre-Release)" con data go-live
+    [ ] Build con VITE_COMPANY_LEGAL_NAME, ADDRESS, VAT, EMAIL (nessun placeholder legale pubblico)
     [ ] Allineare LEGAL_DOCUMENT_VERSION / LEGAL_UPDATED_AT (legalSharedCopy.ts + registrazione)
-    [ ] Definire retention log (es. 90 giorni) al posto di "[es. 30/90 giorni]" in privacy B2B
-    [ ] Caselle attive: privacy@salonivelvet.it, assistenza@salonivelvet.it (SPF/DKIM/DMARC)
+    [ ] Allineare VITE_LOG_RETENTION_DAYS con velvet.logging.retention-days (default 180; job purge audit attivo)
+    [ ] Caselle attive: privacy@saloniluxury.it, assistenza@saloniluxury.it (SPF/DKIM/DMARC)
     [ ] URL store: B2C /privacy/clienti · Staff /privacy/staff · B2B /privacy · Elimina /privacy/elimina-account
 
   FRONTEND BUILD
@@ -166,11 +165,10 @@ print_checklist() {
   BACKEND (velvet)
     [ ] VELVET_TOKEN_SECRET / JWT: chiave casuale ≥ 32 byte (mai velvet-dev-token-secret…)
     [ ] Super admin: BCrypt hash in prod; revocare SETUP_TOKEN dopo prima installazione
-    [ ] VELVET_PUBLIC_FRONTEND_URL = https://www.salonivelvet.it (o dominio canonico)
+    [ ] VELVET_PUBLIC_FRONTEND_URL = https://www.saloniluxury.it (o dominio canonico)
     [ ] CORS solo domini produzione (VELVET_CORS_ALLOWED_ORIGINS)
     [ ] Valutare ddl-auto=validate + migrazioni DB (non solo update in prod)
     [ ] Email: oggi notifiche in-app+log — se serve SMTP reale, integrare prima del go-live
-    [ ] Allineare copy Redis vs implementazione (refresh token oggi su Postgres)
 
   INFRASTRUCTURE (Docker)
     [ ] infrastructure/.env da .env.example — password DB/Redis forti, JWT_SECRET nuovo
@@ -179,7 +177,7 @@ print_checklist() {
     [ ] docker compose -f docker-compose.prod.yml up -d --build
 
   APP MOBILE (velvet-app)
-    [ ] Release con VELVET_WEB_BASE_URL=https://salonivelvet.it
+    [ ] Release con VELVET_WEB_BASE_URL=https://saloniluxury.it
     [ ] WebView legali: URL B2C/B2B/Staff coerenti con ?embed=1
 
   STORE & SICUREZZA
@@ -206,6 +204,9 @@ print_header "[1/4] Frontend — informative e placeholder legali"
 check_fail legal "Placeholder [TODO_LEGAL] nel sorgente" 'TODO_LEGAL' \
   "$ROOT_DIR/velvet-frontend/src"
 
+check_fail legal "Google Fonts CDN in index.html (usare /fonts/fonts.css self-hosted)" 'fonts\.googleapis\.com|fonts\.gstatic\.com' \
+  "$ROOT_DIR/velvet-frontend/index.html"
+
 check_fail legal 'Data "Fase di Sviluppo (Pre-Release)" ancora pubblicata' 'Pre-Release|Fase di Sviluppo' \
   "$ROOT_DIR/velvet-frontend/src/pages/legal" \
   "$ROOT_DIR/velvet-frontend/src/content"
@@ -217,11 +218,11 @@ check_warn legal "App Store URL placeholder (ricerca generica)" 'apps\.apple\.co
   "$ROOT_DIR/velvet-frontend/src/config/env.ts"
 
 if [[ -f "$ROOT_DIR/velvet-frontend/.env.production" ]]; then
-  if ! grep -q 'VITE_LEGAL_ENTITY_LEGAL_NAME=' "$ROOT_DIR/velvet-frontend/.env.production" 2>/dev/null; then
-    echo "${C_YELLOW}⚠ WARN${C_RESET}  [legal] .env.production senza VITE_LEGAL_ENTITY_LEGAL_NAME"
+  if ! grep -qE 'VITE_COMPANY_LEGAL_NAME=|VITE_LEGAL_ENTITY_LEGAL_NAME=' "$ROOT_DIR/velvet-frontend/.env.production" 2>/dev/null; then
+    echo "${C_YELLOW}⚠ WARN${C_RESET}  [legal] .env.production senza VITE_COMPANY_LEGAL_NAME"
     WARN_COUNT=$((WARN_COUNT + 1))
   else
-    echo "${C_GREEN}✔ PASS${C_RESET}  [legal] .env.production contiene VITE_LEGAL_ENTITY_*"
+    echo "${C_GREEN}✔ PASS${C_RESET}  [legal] .env.production contiene dati societari (VITE_COMPANY_*)"
   fi
 else
   echo "${C_YELLOW}⚠ WARN${C_RESET}  [legal] Creare velvet-frontend/.env.production (vedi .env.example)"

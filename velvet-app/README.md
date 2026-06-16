@@ -1,4 +1,4 @@
-# Velvet App (SaloniVelvet)
+# Velvet App (SaloniLuxury)
 
 Shell **Flutter** per iOS e Android: **nessuna logica di business** nell’app. Tutta l’esperienza (UI, auth JWT, prenotazioni, account) è quella di **`velvet-frontend`**, caricata in **WebView**.
 
@@ -24,7 +24,7 @@ Dalla cartella `velvet-app` (genera `android/` e `ios/` se mancanti):
 Oppure manualmente:
 
 ```bash
-flutter create . --org it.salonivelvet --project-name velvet_app --platforms=android,ios
+flutter create . --org it.saloniluxury --project-name velvet_app --platforms=android,ios
 flutter pub get
 ```
 
@@ -32,7 +32,16 @@ flutter pub get
 
 1. Backend Spring su `:8080` e frontend Vite su `:5173` (proxy `/api` → backend).
 2. Setup piattaforme (una volta): `./scripts/setup-flutter.sh`
-3. Simulatore + Vite insieme:
+3. **Consigliato** — tutto in ordine (Spring + Vite + simulatore):
+
+```bash
+# dalla root del monorepo
+./scripts/dev-app-ios.sh
+# oppure
+./scripts/dev-app-android.sh
+```
+
+Oppure dalla cartella `velvet-app`:
 
 ```bash
 ./scripts/dev-with-frontend.sh ios
@@ -40,9 +49,13 @@ flutter pub get
 ./scripts/dev-with-frontend.sh android
 ```
 
+`wait-for-backend.sh` attende Spring Boot e, se la porta 8080 è libera, lo **avvia in automatico** (log in `/tmp/velvet-spring-dev.log`). Per disabilitare: `VELVET_AUTO_START_BACKEND=0`.
+
+Probe dev backend: `GET /api/v1/public/health` (Tomcat + DB, senza query pesante su organizations).
+
 ## Avvio
 
-**Produzione** (default: `https://salonivelvet.it`):
+**Produzione** (default: `https://saloniluxury.it`):
 
 ```bash
 flutter run
@@ -76,7 +89,7 @@ cd ../velvet-frontend && npm run dev -- --host
 
 | Nome | Default | Uso |
 |------|---------|-----|
-| `VELVET_WEB_BASE_URL` | `https://salonivelvet.it` | Origine del sito (velvet-frontend deployato o dev server) |
+| `VELVET_WEB_BASE_URL` | `https://saloniluxury.it` | Origine del sito (velvet-frontend deployato o dev server) |
 | `VELVET_WEB_INITIAL_PATH` | `/` | Path iniziale (es. `/ricerca`) |
 
 Le chiamate API restano gestite dal **frontend** (proxy Vite in dev, `VITE_API_BASE_URL` in prod). L’app non espone `EXPO_PUBLIC_*` né duplica client HTTP.

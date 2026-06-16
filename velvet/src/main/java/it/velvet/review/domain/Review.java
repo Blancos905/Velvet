@@ -39,6 +39,14 @@ public class Review {
 	@Column(nullable = false)
 	private Instant createdAt = Instant.now();
 
+	/** Dopo cancellazione account: il testo resta ma non mostra più l'identità dell'autore. */
+	@Column(name = "reviewer_identity_detached", nullable = false)
+	private boolean reviewerIdentityDetached = false;
+
+	/** Moderazione: recensione nascosta dal pubblico (segnalazioni / illeciti). */
+	@Column(name = "hidden_at")
+	private Instant hiddenAt;
+
 	protected Review() {
 	}
 
@@ -71,5 +79,25 @@ public class Review {
 
 	public Instant getCreatedAt() {
 		return createdAt;
+	}
+
+	public boolean isReviewerIdentityDetached() {
+		return reviewerIdentityDetached;
+	}
+
+	public void setReviewerIdentityDetached(boolean reviewerIdentityDetached) {
+		this.reviewerIdentityDetached = reviewerIdentityDetached;
+	}
+
+	public Instant getHiddenAt() {
+		return hiddenAt;
+	}
+
+	public void setHiddenAt(Instant hiddenAt) {
+		this.hiddenAt = hiddenAt;
+	}
+
+	public boolean isPubliclyVisible() {
+		return hiddenAt == null;
 	}
 }

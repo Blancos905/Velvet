@@ -22,6 +22,12 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 	@Query("select avg(r.rating) from Review r")
 	Optional<Double> averageRating();
 
+	@Query("select avg(r.rating) from Review r where r.hiddenAt is null")
+	Optional<Double> averagePublicRating();
+
+	@Query("select count(r) from Review r where r.hiddenAt is null")
+	long countPublic();
+
 	@Query("select count(r) from Review r where r.createdAt >= :fromInclusive")
 	long countCreatedSince(@Param("fromInclusive") Instant fromInclusive);
 
@@ -31,13 +37,15 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 	/** Media e conteggio recensioni per sede (location), per elenco ricerca pubblica. */
 	@Query(
 			"select r.appointment.location.id, avg(r.rating), count(r) from Review r "
-					+ "where r.appointment.location.id in :locationIds group by r.appointment.location.id")
+					+ "where r.appointment.location.id in :locationIds and r.hiddenAt is null "
+					+ "group by r.appointment.location.id")
 	List<Object[]> summarizeRatingsByLocationIds(@Param("locationIds") Collection<UUID> locationIds);
 
 	/** Media e conteggio recensioni per sede in un intervallo di date (es. mese solare corrente). */
 	@Query(
 			"select r.appointment.location.id, avg(r.rating), count(r) from Review r "
 					+ "where r.appointment.location.id in :locationIds "
+					+ "and r.hiddenAt is null "
 					+ "and r.createdAt >= :fromInclusive and r.createdAt < :toExclusive "
 					+ "group by r.appointment.location.id")
 	List<Object[]> summarizeRatingsByLocationIdsAndCreatedAtRange(
@@ -48,7 +56,7 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 	/** Media e conteggio voti verso l'operatore ({@code staff_rating}) per operatore della sede (wizard pubblico). */
 	@Query(
 			"select a.operator.id, avg(r.staffRating), count(r) from Review r join r.appointment a "
-					+ "where a.location.id = :locationId and r.staffRating is not null "
+					+ "where a.location.id = :locationId and r.staffRating is not null and r.hiddenAt is null "
 					+ "group by a.operator.id")
 	List<Object[]> summarizeStaffRatingsByOperatorForLocation(@Param("locationId") UUID locationId);
 
@@ -64,6 +72,18 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 			})
 	@Query("select r from Review r")
 	Page<Review> findPageWithAssociations(Pageable pageable);
+
+	@EntityGraph(
+			attributePaths = {
+					"appointment",
+					"appointment.location",
+					"appointment.location.studioGroup",
+					"appointment.salonClient",
+					"appointment.consumerProfile",
+					"appointment.service"
+			})
+	@Query("select r from Review r where r.hiddenAt is null order by r.createdAt desc")
+	Page<Review> findPublicPageWithAssociations(Pageable pageable);
 
 	/** Media e conteggio recensioni post-visita per salone (studio), tutte le sedi e i servizi. */
 	@Query(

@@ -25,6 +25,11 @@ class VelvetPublicEndpointsSmokeTest {
 	}
 
 	@Test
+	void publicHealth_returnsOk() throws Exception {
+		mockMvc.perform(get("/api/v1/public/health")).andExpect(status().isOk());
+	}
+
+	@Test
 	void publicOrganizationsSearch_returnsOk() throws Exception {
 		mockMvc.perform(get("/api/v1/public/organizations")).andExpect(status().isOk());
 	}
@@ -59,6 +64,31 @@ class VelvetPublicEndpointsSmokeTest {
 	@Test
 	void publicReviewsShowcase_returnsOk() throws Exception {
 		mockMvc.perform(get("/api/v1/public/reviews/showcase")).andExpect(status().isOk());
+	}
+
+	@Test
+	void publicLocateByCoordinates_invalidCoords_returnsNotFound() throws Exception {
+		mockMvc.perform(get("/api/v1/public/locate-by-coordinates")
+						.param("lat", "999")
+						.param("lon", "9.19"))
+				.andExpect(status().isNotFound());
+	}
+
+	@Test
+	void publicLocateByCoordinates_validCoords_returnsOkOrNotFound() throws Exception {
+		mockMvc.perform(get("/api/v1/public/locate-by-coordinates")
+						.param("lat", "45.4642")
+						.param("lon", "9.19"))
+				.andExpect(status().is2xxSuccessful());
+	}
+
+	@Test
+	void publicLocateByPostalSuggestions_returnsOk() throws Exception {
+		mockMvc.perform(get("/api/v1/public/locate-by-postal-suggestions")
+						.param("postalCode", "20121")
+						.param("countryCode", "IT")
+						.param("limit", "5"))
+				.andExpect(status().isOk());
 	}
 
 	@Test

@@ -15,5 +15,9 @@ public record MeSalonUpdateRequest(
 		@Size(max = 500) String primaryLocationAddressLine,
 		List<String> primaryLocationSalonClientGenders,
 		Integer primaryLocationOpeningMinuteOfDay,
-		Integer primaryLocationClosingMinuteOfDay) {
+		Integer primaryLocationClosingMinuteOfDay,
+		/** Fine fascia mattutina (pausa pranzo); opzionale. */
+		Integer primaryLocationMorningEndMinuteOfDay,
+		/** Inizio fascia pomeridiana (pausa pranzo); opzionale. */
+		Integer primaryLocationAfternoonStartMinuteOfDay) {
 }

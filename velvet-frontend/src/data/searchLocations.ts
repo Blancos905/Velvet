@@ -143,6 +143,15 @@ export function italianLocalitiesByCapPrefix(capPrefixRaw: string): { cap: strin
   return out;
 }
 
+/** Risolve un CAP italiano completo (5 cifre) senza chiamate di geocodifica esterne. */
+export function resolveItalianCityForCap(capDigits: string): string | null {
+  const normalized = normalizeCapInput(capDigits);
+  if (normalized.length !== 5) return null;
+  const rows = italianLocalitiesByCapPrefix(normalized);
+  if (rows.length === 0) return null;
+  return rows[0]?.city ?? null;
+}
+
 /** Etichetta menu «Città». */
 export function formatCitySelectLabel(c: CityEntry): string {
   const prov = c.province ? ` (${c.province})` : "";

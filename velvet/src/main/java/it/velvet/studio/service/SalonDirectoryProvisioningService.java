@@ -28,15 +28,15 @@ public class SalonDirectoryProvisioningService {
 
 	private final StudioGroupRepository studioGroupRepository;
 	private final LocationRepository locationRepository;
-	private final SalonLocationGeocodingService salonLocationGeocodingService;
+	private final SalonLocationGeocodingAsyncService salonLocationGeocodingAsyncService;
 
 	public SalonDirectoryProvisioningService(
 			StudioGroupRepository studioGroupRepository,
 			LocationRepository locationRepository,
-			SalonLocationGeocodingService salonLocationGeocodingService) {
+			SalonLocationGeocodingAsyncService salonLocationGeocodingAsyncService) {
 		this.studioGroupRepository = studioGroupRepository;
 		this.locationRepository = locationRepository;
-		this.salonLocationGeocodingService = salonLocationGeocodingService;
+		this.salonLocationGeocodingAsyncService = salonLocationGeocodingAsyncService;
 	}
 
 	@Transactional
@@ -94,6 +94,27 @@ public class SalonDirectoryProvisioningService {
 		appendLocation(created, name, city, salon, salonBusinessTypes, salonClientGenders);
 	}
 
+	/**
+	 * Idempotente: se lo {@link StudioGroup} esiste ma non ha sedi (provisioning parziale), crea la prima sede.
+	 */
+	@Transactional
+	public void ensurePrimaryLocationIfMissing(
+			StudioGroup group,
+			String salonPublicName,
+			RegistrationSalonLocation salon,
+			List<SalonBusinessType> salonBusinessTypes,
+			List<SalonClientGender> salonClientGenders) {
+		if (group == null) {
+			return;
+		}
+		if (!locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId()).isEmpty()) {
+			return;
+		}
+		String name = firstNonBlank(salonPublicName, salon.displayName(), group.getName(), "Salone");
+		String city = trimToEmpty(salon.city());
+		appendLocation(group, name, city, salon, salonBusinessTypes, salonClientGenders);
+	}
+
 	/** Trova gruppo già esistente per subject titolare o per email titolare (un titolare = un gruppo). */
 	private StudioGroup resolveExistingGroup(String ownerSub, String ownerEmail) {
 		if (ownerSub != null) {
@@ -149,8 +170,8 @@ public class SalonDirectoryProvisioningService {
 		if (salonClientGenders != null && !salonClientGenders.isEmpty()) {
 			loc.setSalonClientGenders(SalonClientGender.toCsv(salonClientGenders));
 		}
-		salonLocationGeocodingService.tryApplyCoordinates(loc);
-		locationRepository.save(loc);
+		Location saved = locationRepository.save(loc);
+		salonLocationGeocodingAsyncService.scheduleGeocode(saved.getId());
 	}
 
 	private String uniqueSlug(String base) {

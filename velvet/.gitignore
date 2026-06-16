@@ -39,3 +39,5 @@ data/
 spring-dev.local.env
 # Config Spring locale (password DB, anagrafica lab, tunnel): copia da application-local.properties.example.
 src/main/resources/application-local.properties
+# Credenziali Firebase Admin SDK (service account): non committare.
+src/main/resources/firebase-service-account.json

@@ -4,14 +4,23 @@ import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
 import { registerConsumerApi } from "../api/registerConsumer";
-import { SaloniVelvetLogoMark } from "../components/SaloniVelvetLogoMark";
+import { SaloniLuxuryLogoMark } from "../components/SaloniLuxuryLogoMark";
 import { SalonPremiumPlanCardPreview } from "../components/salon/SalonPremiumPlanCardPreview";
 import { SalonPremiumOwnerInfoPrivacyModal } from "../components/salon/SalonPremiumOwnerInfoPrivacyModal";
+import { VelvetEuropeanContactFields } from "../components/VelvetEuropeanContactFields";
 import { partnerContactEmail } from "../config/env";
 import { SALON_BUSINESS_TYPE_OPTIONS } from "../data/salonBusinessTypes";
 import { SALON_CLIENT_GENDER_OPTIONS } from "../data/salonClientGenders";
 import { SALON_PLANS, planDisplayName, type SalonPlanTier } from "../data/salonPlans";
-import { DEFAULT_IT_PHONE_PREFIX, optionalPhoneForRegisterApi } from "../lib/itPhoneDefaults";
+import {
+  DEFAULT_EUROPEAN_COUNTRY_CODE,
+  EUROPEAN_PHONE_COUNTRIES,
+  europeanCountryByCode,
+} from "../data/europeanPhonePrefixes";
+import { optionalEuropeanPhoneForRegisterApi } from "../lib/europeanPhone";
+import { isFeatureEnabled, resolveSubscriptionSurface } from "../lib/subscription-guards";
+import { useVelvetNativeAppShell } from "../hooks/useVelvetNativeAppShell";
+import { isNativePremiumBillingBlocked, NATIVE_PREMIUM_BILLING_BLOCKED_MESSAGE } from "../lib/nativePremiumUpgradePolicy";
 import { humanizeOidcNetworkError, humanizePostRegistrationAuthError } from "../utils/oidcErrors";
 import "../styles/velvet-search-page.css";
 
@@ -32,6 +41,7 @@ export default function SalonPlansPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { signUpForSalon, signInWithPassword } = useVelvetAuth();
+  const isNativeApp = useVelvetNativeAppShell();
   const [modalPlan, setModalPlan] = useState<SalonPlanTier | null>(null);
   const [freePlanNoticeOpen, setFreePlanNoticeOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -41,20 +51,24 @@ export default function SalonPlansPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState(DEFAULT_IT_PHONE_PREFIX);
+  const [phoneDialCode, setPhoneDialCode] = useState(
+    () => europeanCountryByCode(DEFAULT_EUROPEAN_COUNTRY_CODE)?.dialCode ?? "+39",
+  );
+  const [phoneLocal, setPhoneLocal] = useState("");
   const [salonName, setSalonName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [confirmAdult16, setConfirmAdult16] = useState(false);
   const [privacyNoticeOpen, setPrivacyNoticeOpen] = useState(false);
 
   const [salonAddressLine1, setSalonAddressLine1] = useState("");
   const [salonPostalCode, setSalonPostalCode] = useState("");
   const [salonCity, setSalonCity] = useState("");
   const [salonProvince, setSalonProvince] = useState("");
-  const [salonCountry, setSalonCountry] = useState("IT");
+  const [salonCountry, setSalonCountry] = useState(DEFAULT_EUROPEAN_COUNTRY_CODE);
   const [salonBusinessTypes, setSalonBusinessTypes] = useState<Set<string>>(() => new Set());
   const [salonClientGenders, setSalonClientGenders] = useState<Set<string>>(() => new Set());
 
@@ -66,7 +80,7 @@ export default function SalonPlansPage() {
   const openRegistration = (tier: SalonPlanTier) => {
     setErrorHint(null);
     setInfoHint(null);
-    if (tier === "BASE") {
+    if (!isFeatureEnabled("owner.web.freeRegistration", tier, { surface: resolveSubscriptionSurface(isNativeApp) })) {
       setFreePlanNoticeOpen(true);
       return;
     }
@@ -75,7 +89,8 @@ export default function SalonPlansPage() {
     setFirstName("");
     setLastName("");
     setEmail("");
-    setPhone(DEFAULT_IT_PHONE_PREFIX);
+    setPhoneDialCode(europeanCountryByCode(DEFAULT_EUROPEAN_COUNTRY_CODE)?.dialCode ?? "+39");
+    setPhoneLocal("");
     setSalonName("");
     setPassword("");
     setConfirmPassword("");
@@ -86,7 +101,7 @@ export default function SalonPlansPage() {
     setSalonPostalCode("");
     setSalonCity("");
     setSalonProvince("");
-    setSalonCountry("IT");
+    setSalonCountry(DEFAULT_EUROPEAN_COUNTRY_CODE);
     setSalonBusinessTypes(new Set());
     setSalonClientGenders(new Set());
   };
@@ -126,6 +141,10 @@ export default function SalonPlansPage() {
       setErrorHint("Per proseguire accetta i termini del servizio.");
       return;
     }
+    if (!confirmAdult16) {
+      setErrorHint("Per registrarti devi confermare di avere almeno 16 anni.");
+      return;
+    }
     if (!salonName.trim()) {
       setErrorHint("Indica il nome del salone (come lo vedono i clienti in ricerca e in vetrina).");
       return;
@@ -163,7 +182,7 @@ export default function SalonPlansPage() {
           password,
           firstName,
           lastName,
-          phone: optionalPhoneForRegisterApi(phone),
+          phone: optionalEuropeanPhoneForRegisterApi(phoneDialCode, phoneLocal),
           salonName: salonName.trim(),
           planTier: modalPlan,
           ...(modalPlan === "BASE" || modalPlan === "PREMIUM"
@@ -172,7 +191,7 @@ export default function SalonPlansPage() {
                 salonPostalCode: salonPostalCode.trim(),
                 salonCity: salonCity.trim(),
                 salonProvince: salonProvince.trim(),
-                salonCountry: salonCountry.trim() || "IT",
+                salonCountry: salonCountry.trim() || DEFAULT_EUROPEAN_COUNTRY_CODE,
                 salonBusinessTypes: [...salonBusinessTypes].sort(),
                 salonClientGenders: [...salonClientGenders].sort(),
               }
@@ -182,7 +201,17 @@ export default function SalonPlansPage() {
         await queryClient.invalidateQueries({ queryKey: ["me"] });
         try {
           await signInWithPassword(emailNorm, password);
+          const requestedPremium = modalPlan === "PREMIUM";
           setModalPlan(null);
+          if (requestedPremium) {
+            if (isNativePremiumBillingBlocked()) {
+              setInfoHint(NATIVE_PREMIUM_BILLING_BLOCKED_MESSAGE);
+              navigate("/account/salone", { replace: true });
+              return;
+            }
+            navigate("/account/billing/checkout", { replace: true });
+            return;
+          }
           navigate("/account", { replace: true });
         } catch (authErr) {
           setErrorHint(humanizePostRegistrationAuthError(authErr));
@@ -310,18 +339,18 @@ export default function SalonPlansPage() {
                         disabled={submitting}
                       />
                     </label>
-                    <label className="velvet-plans-field velvet-plans-field--full">
-                      <span>Telefono</span>
-                      <input
-                        name="phone"
-                        type="tel"
-                        autoComplete="tel"
-                        maxLength={40}
-                        value={phone}
-                        onChange={(ev) => setPhone(ev.target.value)}
-                        disabled={submitting}
-                      />
-                    </label>
+                    <VelvetEuropeanContactFields
+                      countryCode={salonCountry}
+                      onCountryCodeChange={setSalonCountry}
+                      dialCode={phoneDialCode}
+                      onDialCodeChange={setPhoneDialCode}
+                      phoneLocal={phoneLocal}
+                      onPhoneLocalChange={setPhoneLocal}
+                      disabled={submitting}
+                      showCountryField={false}
+                      prefixSelectId={`${formId}-phone-prefix`}
+                      phoneInputId={`${formId}-phone-local`}
+                    />
                     <label className="velvet-plans-field velvet-plans-field--full">
                       <span>Nome del salone</span>
                       <input
@@ -452,16 +481,26 @@ export default function SalonPlansPage() {
                           />
                         </label>
                         <label className="velvet-plans-field">
-                          <span>Paese (ISO)</span>
-                          <input
+                          <span>Paese</span>
+                          <select
                             name="salonCountry"
-                            autoComplete="country"
-                            maxLength={2}
-                            value={salonCountry}
-                            onChange={(ev) => setSalonCountry(ev.target.value.toUpperCase())}
+                            className="velvet-eu-contact-select"
+                            value={salonCountry || DEFAULT_EUROPEAN_COUNTRY_CODE}
+                            onChange={(ev) => {
+                              const nextCode = ev.target.value;
+                              setSalonCountry(nextCode);
+                              const country = europeanCountryByCode(nextCode);
+                              if (country) setPhoneDialCode(country.dialCode);
+                            }}
                             disabled={submitting}
-                            placeholder="IT"
-                          />
+                            autoComplete="country"
+                          >
+                            {EUROPEAN_PHONE_COUNTRIES.map((c) => (
+                              <option key={c.code} value={c.code}>
+                                {c.name} ({c.code})
+                              </option>
+                            ))}
+                          </select>
                         </label>
                       </>
                     ) : null}
@@ -618,6 +657,15 @@ export default function SalonPlansPage() {
                           .
                         </span>
                       </label>
+                      <label className="velvet-plans-field velvet-plans-field--check">
+                        <input
+                          type="checkbox"
+                          checked={confirmAdult16}
+                          onChange={(ev) => setConfirmAdult16(ev.target.checked)}
+                          disabled={submitting}
+                        />
+                        <span>Confermo di avere almeno 16 anni.</span>
+                      </label>
                       <button
                         type="button"
                         className="velvet-plans-privacy-open"
@@ -647,25 +695,45 @@ export default function SalonPlansPage() {
   return (
     <>
     <main className="velvet-page-main velvet-search-page velvet-plans-page">
-      <div className="velvet-search-back-row">
-        <Link to="/partner" className="velvet-search-back" aria-label="Indietro a Perché Saloni Luxury">
-          <svg className="velvet-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path
-              d="M15 18l-6-6 6-6"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          Indietro
-        </Link>
-      </div>
+      {isNativeApp ? (
+        <div className="velvet-app-plans-top-row" aria-label="Navigazione e brand">
+          <div className="velvet-search-back-row">
+            <Link to="/partner" className="velvet-search-back" aria-label="Indietro a Perché Saloni Luxury">
+              <svg className="velvet-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path
+                  d="M15 18l-6-6 6-6"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Indietro
+            </Link>
+          </div>
+          <SaloniLuxuryLogoMark variant="hero" />
+        </div>
+      ) : (
+        <div className="velvet-search-back-row">
+          <Link to="/partner" className="velvet-search-back" aria-label="Indietro a Perché Saloni Luxury">
+            <svg className="velvet-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M15 18l-6-6 6-6"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Indietro
+          </Link>
+        </div>
+      )}
 
       <header className="velvet-search-hero">
         <div className="velvet-search-hero__glow" aria-hidden />
-        <SaloniVelvetLogoMark variant="hero" />
-        <p className="velvet-plans-page__kicker">Per titolari e saloni</p>
+        {!isNativeApp ? <SaloniLuxuryLogoMark variant="hero" /> : null}
+        {!isNativeApp ? <p className="velvet-plans-page__kicker">Per titolari e saloni</p> : null}
         <h1 className="velvet-page-title">
           <span className="velvet-search-hero__title-text">Scegli il piano e registrati</span>
         </h1>

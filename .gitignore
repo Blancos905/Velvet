@@ -20,4 +20,5 @@ velvet/src/main/resources/application-local.properties
 .idea/
 *.iml
 .cursor/
+scripts/.seed-tmp/
 

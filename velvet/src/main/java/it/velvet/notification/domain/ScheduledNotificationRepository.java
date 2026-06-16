@@ -407,6 +407,57 @@ public interface ScheduledNotificationRepository extends JpaRepository<Scheduled
 			@Param("type") NotificationType type,
 			@Param("deletedAt") Instant deletedAt);
 
+	@Query(
+			"""
+					select count(n) from ScheduledNotification n
+					where n.recipientConsumer.id = :consumerProfileId
+					and n.appointment is null
+					and n.type = :type
+					and n.status = :status
+					and (cast(:cutoff as timestamp) is null or n.sentAt > :cutoff)
+					and n.consumerDeletedAt is null
+					""")
+	long countSentPlatformByConsumerAfter(
+			@Param("consumerProfileId") UUID consumerProfileId,
+			@Param("type") NotificationType type,
+			@Param("status") QueuedNotificationStatus status,
+			@Param("cutoff") Instant cutoff);
+
+	@Query(
+			"""
+					select n from ScheduledNotification n
+					where n.recipientConsumer.id = :consumerProfileId
+					and n.appointment is null
+					and n.type = :type
+					and n.consumerDeletedAt is null
+					and n.status = :sent
+					and (cast(:ack as timestamp) is null or n.sentAt > :ack)
+					order by n.sentAt desc
+					""")
+	List<ScheduledNotification> findRecentPlatformByConsumerAck(
+			@Param("consumerProfileId") UUID consumerProfileId,
+			@Param("type") NotificationType type,
+			@Param("sent") QueuedNotificationStatus sent,
+			@Param("ack") Instant ack,
+			Pageable pageable);
+
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
+	@Query(
+			"""
+					update ScheduledNotification n
+					set n.consumerDeletedAt = :deletedAt
+					where n.id = :id
+					and n.consumerDeletedAt is null
+					and n.appointment is null
+					and n.recipientConsumer.id = :consumerProfileId
+					and n.type = :type
+					""")
+	int markDeletedPlatformForConsumer(
+			@Param("id") UUID id,
+			@Param("consumerProfileId") UUID consumerProfileId,
+			@Param("type") NotificationType type,
+			@Param("deletedAt") Instant deletedAt);
+
 	@Query("""
 			select count(n) from ScheduledNotification n
 			where n.type = :type and n.status = :status and n.supportRequestFromSalon = true
@@ -416,4 +467,17 @@ public interface ScheduledNotificationRepository extends JpaRepository<Scheduled
 
 	@Query("select count(n) from ScheduledNotification n where n.type = :type and n.status = :status")
 	long countByTypeAndStatus(@Param("type") NotificationType type, @Param("status") QueuedNotificationStatus status);
+
+	@Query(
+			"""
+					select n from ScheduledNotification n
+					left join fetch n.appointment a
+					where (
+						(a is not null and a.consumerProfile.id = :consumerProfileId and n.consumerDeletedAt is null)
+						or (n.recipientConsumer.id = :consumerProfileId and n.recipientConsumerDeletedAt is null)
+					)
+					order by coalesce(n.sentAt, n.scheduledAt) desc
+					""")
+	List<ScheduledNotification> findAllForConsumerDataExport(
+			@Param("consumerProfileId") UUID consumerProfileId, Pageable pageable);
 }

@@ -12,7 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * CORS opzionale per SPA su dominio diverso dall’API (es. produzione). In dev, il proxy Vite evita il bisogno.
+ * CORS per SPA / WebView dev e produzione cross-host.
+ * In dev con proxy Vite le fetch sono same-origin; serve se il browser chiama :8080 direttamente.
  */
 @Configuration
 public class VelvetCorsConfiguration {
@@ -32,8 +33,16 @@ public class VelvetCorsConfiguration {
 					"velvet.cors.allowed-origins è valorizzato ma non contiene origini valide dopo il trim.");
 		}
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
-		config.setAllowedHeaders(List.of("*"));
-		config.setAllowCredentials(false);
+		config.setAllowedHeaders(List.of(
+				"Authorization",
+				"Content-Type",
+				"Accept",
+				"Accept-Language",
+				"Origin",
+				"X-Requested-With",
+				"X-Location-Id"));
+		config.setExposedHeaders(List.of("Authorization"));
+		config.setAllowCredentials(true);
 		config.setMaxAge(3600L);
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/api/**", config);

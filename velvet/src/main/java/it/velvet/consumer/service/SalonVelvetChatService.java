@@ -15,6 +15,7 @@ import it.velvet.consumer.domain.ConsumerProfile;
 import it.velvet.security.auth.VelvetUserPrincipal;
 import it.velvet.studio.domain.Location;
 import it.velvet.studio.domain.LocationRepository;
+import it.velvet.notification.service.SalonVelvetChatEmailDispatchService;
 import it.velvet.studio.domain.StudioGroup;
 import it.velvet.studio.service.StudioGroupOwnerResolver;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,7 @@ public class SalonVelvetChatService {
 	private final LocationRepository locationRepository;
 	private final StaffOperatorRepository staffOperatorRepository;
 	private final AppointmentRepository appointmentRepository;
+	private final SalonVelvetChatEmailDispatchService chatEmailDispatchService;
 
 	public SalonVelvetChatService(
 			SalonClientRepository salonClientRepository,
@@ -52,7 +54,8 @@ public class SalonVelvetChatService {
 			StudioGroupOwnerResolver studioGroupOwnerResolver,
 			LocationRepository locationRepository,
 			StaffOperatorRepository staffOperatorRepository,
-			AppointmentRepository appointmentRepository) {
+			AppointmentRepository appointmentRepository,
+			SalonVelvetChatEmailDispatchService chatEmailDispatchService) {
 		this.salonClientRepository = salonClientRepository;
 		this.chatMessageRepository = chatMessageRepository;
 		this.readStateRepository = readStateRepository;
@@ -61,6 +64,7 @@ public class SalonVelvetChatService {
 		this.locationRepository = locationRepository;
 		this.staffOperatorRepository = staffOperatorRepository;
 		this.appointmentRepository = appointmentRepository;
+		this.chatEmailDispatchService = chatEmailDispatchService;
 	}
 
 	@Transactional
@@ -95,6 +99,7 @@ public class SalonVelvetChatService {
 		StaffOperator threadOperator = resolveThreadStaffOperatorEntity(threadStaffOperatorId);
 		SalonVelvetChatMessage row = new SalonVelvetChatMessage(sc, threadOperator, sender, body);
 		SalonVelvetChatMessage saved = chatMessageRepository.save(row);
+		chatEmailDispatchService.dispatchNewChatMessage(sender, body, sc, threadOperator);
 		ReadWatermark wm = readWatermarksForThread(salonClientId, threadStaffOperatorId);
 		SalonVelvetChatMessageDto dto = SalonVelvetChatMessageDto.from(saved, wm);
 		markThreadReadForCurrentViewer(principal, sc, threadStaffOperatorId);

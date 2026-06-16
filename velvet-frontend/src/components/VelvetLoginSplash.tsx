@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import "../styles/velvet-login-splash.css";
 
-const LOGO = "/logo-saloni-velvet.png";
+const LOGO = "/logo-saloni-luxury.png";
 const SPLASH_VISIBLE_MS = 1800;
 const SPLASH_EXIT_S = 0.2;
 const LOGO_ROTATION_MS = SPLASH_VISIBLE_MS;

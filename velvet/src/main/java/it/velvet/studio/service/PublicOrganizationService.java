@@ -10,6 +10,7 @@ import it.velvet.publicapi.dto.PublicDtos.OperatorPublicDto;
 import it.velvet.publicapi.dto.PublicDtos.OrganizationSummaryDto;
 import it.velvet.publicapi.dto.PublicDtos.PublicSalonReviewDto;
 import it.velvet.publicapi.dto.PublicDtos.OrganizationDetailDto;
+import it.velvet.review.ReviewPrivacySupport;
 import it.velvet.review.domain.ReviewRepository;
 import it.velvet.studio.domain.Location;
 import it.velvet.studio.domain.LocationRepository;
@@ -197,14 +198,14 @@ public class PublicOrganizationService {
 		double radiusKm = (nearKm != null && nearKm > 0) ? Math.min(nearKm, 200.0) : 25.0;
 		List<Location> locs;
 		if (nearSearch && q.isEmpty() && c.isEmpty()) {
-			locs = filterPremiumWithinRadius(locationRepository.findAll(), nearLat, nearLng, radiusKm, true);
+			locs = filterPremiumWithinRadius(locationRepository.findAll(), nearLat, nearLng, radiusKm, false);
 		}
 		else {
 			List<Location> candidates = nearSearch && !q.isEmpty()
 					? locationsMatchingFreeTextOrServiceCatalogForNearSearch(q)
 					: search(query, city);
 			if (nearSearch) {
-				locs = filterPremiumWithinRadius(candidates, nearLat, nearLng, radiusKm, true);
+				locs = filterPremiumWithinRadius(candidates, nearLat, nearLng, radiusKm, false);
 			}
 			else {
 				locs = candidates;
@@ -910,18 +911,26 @@ public class PublicOrganizationService {
 	public List<PublicSalonReviewDto> listPublicReviews(String slug) {
 		Location loc = requireBySlug(slug);
 		return reviewRepository.findByAppointment_Location_IdOrderByCreatedAtDesc(loc.getId()).stream()
+				.filter(r -> r.isPubliclyVisible())
 				.limit(30)
 				.map(r -> {
 					var a = r.getAppointment();
 					var salonClient = a != null ? a.getSalonClient() : null;
 					var consumer = a != null ? a.getConsumerProfile() : null;
-					String reviewerName = salonClient != null
+					String reviewerName;
+					if (r.isReviewerIdentityDetached()) {
+						reviewerName = ReviewPrivacySupport.ANONYMOUS_REVIEWER_LABEL;
+					} else if (salonClient != null
 							&& salonClient.getDisplayName() != null
-							&& !salonClient.getDisplayName().isBlank()
-									? salonClient.getDisplayName().trim()
-									: consumer != null && consumer.getDisplayName() != null && !consumer.getDisplayName().isBlank()
-											? consumer.getDisplayName().trim()
-											: "Cliente";
+							&& !salonClient.getDisplayName().isBlank()) {
+						reviewerName = salonClient.getDisplayName().trim();
+					} else if (consumer != null
+							&& consumer.getDisplayName() != null
+							&& !consumer.getDisplayName().isBlank()) {
+						reviewerName = consumer.getDisplayName().trim();
+					} else {
+						reviewerName = "Cliente";
+					}
 					String serviceName = a != null && a.getService() != null ? a.getService().getName() : null;
 					var operator = a != null ? a.getOperator() : null;
 					String staffDisplayName = operator != null

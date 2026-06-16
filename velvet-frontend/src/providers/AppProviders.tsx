@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
 import { AdminAuthProvider } from "../auth/AdminAuthProvider";
 import { VelvetAuthProvider } from "../auth/VelvetAuthProvider";
+import { VelvetFcmTokenSync } from "../components/VelvetFcmTokenSync";
 import { isLikelyNetworkFetchError } from "../api/fetchWithTimeout";
 
 function createAppQueryClient(): QueryClient {
@@ -25,6 +26,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <VelvetAuthProvider>
+        <VelvetFcmTokenSync />
         <AdminAuthProvider>{children}</AdminAuthProvider>
       </VelvetAuthProvider>
     </QueryClientProvider>

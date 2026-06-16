@@ -5,8 +5,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
-import 'config/velvet_app_config.dart';
-import 'shell/velvet_web_shell.dart';
+import 'config/velvet_subscription_guards.dart';
+import 'shell/free_account_wrapper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,26 +24,16 @@ Future<void> main() async {
   }
 
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  await VelvetSubscriptionGuards.load();
   runApp(const VelvetApp());
 }
 
+/// Entry point: [FreeAccountWrapper] applica tema e vincoli piano Free (solo app mobile).
 class VelvetApp extends StatelessWidget {
   const VelvetApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SaloniVelvet',
-      debugShowCheckedModeBanner: VelvetAppConfig.isLocalDev,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFF97316),
-          brightness: Brightness.dark,
-          surface: const Color(0xFF1C0A06),
-        ),
-        useMaterial3: true,
-      ),
-      home: const VelvetWebShell(),
-    );
+    return const FreeAccountWrapper();
   }
 }

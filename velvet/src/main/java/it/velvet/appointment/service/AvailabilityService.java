@@ -94,24 +94,27 @@ public class AvailabilityService {
 			blockingByOperator.put(op.getId(), blocking);
 		}
 
+		List<WorkSchedule.MinuteWindow> locationWindows = WorkSchedule.windowsForLocation(location);
 		Instant earliestBookable = Instant.now();
 		for (LocalDate d = from; !d.isAfter(to); d = d.plusDays(1)) {
-			ZonedDateTime open = d.atStartOfDay(zone).plusMinutes(location.getWorkStartMinuteOfDay());
-			ZonedDateTime close = d.atStartOfDay(zone).plusMinutes(location.getWorkEndMinuteOfDay());
-			if (!open.isBefore(close)) {
-				continue;
-			}
 			List<Instant> slots = new ArrayList<>();
 			int totalSlots = 0;
-			for (ZonedDateTime cursor = open; !cursor.plusMinutes(duration).isAfter(close); cursor = cursor.plusMinutes(step)) {
-				Instant start = cursor.toInstant();
-				if (!start.isAfter(earliestBookable)) {
+			for (WorkSchedule.MinuteWindow window : locationWindows) {
+				ZonedDateTime open = d.atStartOfDay(zone).plusMinutes(window.startMinute());
+				ZonedDateTime close = d.atStartOfDay(zone).plusMinutes(window.endMinute());
+				if (!open.isBefore(close)) {
 					continue;
 				}
-				totalSlots++;
-				Instant end = start.plus(Duration.ofMinutes(duration));
-				if (operators.isEmpty() || anyOperatorFits(operators, blockingByOperator, start, end)) {
-					slots.add(start);
+				for (ZonedDateTime cursor = open; !cursor.plusMinutes(duration).isAfter(close); cursor = cursor.plusMinutes(step)) {
+					Instant start = cursor.toInstant();
+					if (!start.isAfter(earliestBookable)) {
+						continue;
+					}
+					totalSlots++;
+					Instant end = start.plus(Duration.ofMinutes(duration));
+					if (operators.isEmpty() || anyOperatorFits(location, operators, blockingByOperator, start, end, zone)) {
+						slots.add(start);
+					}
 				}
 			}
 			if (totalSlots > 0) {
@@ -122,13 +125,20 @@ public class AvailabilityService {
 	}
 
 	private static boolean anyOperatorFits(
+			Location location,
 			List<StaffOperator> operators,
 			Map<UUID, List<Appointment>> blockingByOperator,
 			Instant start,
-			Instant end) {
+			Instant end,
+			ZoneId zone) {
+		int startMinute = start.atZone(zone).getHour() * 60 + start.atZone(zone).getMinute();
+		int endMinute = end.atZone(zone).getHour() * 60 + end.atZone(zone).getMinute();
 		for (StaffOperator op : operators) {
 			List<Appointment> blocking = blockingByOperator.getOrDefault(op.getId(), List.of());
-			if (fits(blocking, start, end)) {
+			if (!fits(blocking, start, end)) {
+				continue;
+			}
+			if (WorkSchedule.fitsAnyWindow(WorkSchedule.windowsForOperator(op, location), startMinute, endMinute)) {
 				return true;
 			}
 		}

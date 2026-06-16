@@ -1,3 +1,4 @@
+import path from "node:path";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv } from "vite";
 
@@ -30,10 +31,28 @@ export default defineConfig(({ mode }) => {
 
   /** Desktop/iCloud: cache e pre-bundle fuori dal Desktop evitano hang di Vite su Safari/simulatore. */
   const viteCacheDir = process.env.VELVET_VITE_CACHE_DIR ?? "/tmp/velvet-vite-cache";
+  /** `dev-local.sh` avvia Vite da /tmp con src/public symlinkati al repo reale. */
+  const repoRoot = process.env.VELVET_FRONTEND_REPO_ROOT?.trim();
+  const serverFs = repoRoot
+    ? { allow: [process.cwd(), path.resolve(repoRoot)] as string[] }
+    : undefined;
 
   return {
     cacheDir: viteCacheDir,
     plugins: [react()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes("node_modules")) return;
+            if (id.includes("jspdf") || id.includes("html2canvas")) return "vendor-pdf";
+            if (id.includes("framer-motion")) return "vendor-motion";
+            if (id.includes("@tanstack/react-query")) return "vendor-query";
+            if (id.includes("react-dom") || id.includes("/react/")) return "vendor-react";
+          },
+        },
+      },
+    },
     server: {
       port: 5173,
       strictPort: true,
@@ -41,6 +60,7 @@ export default defineConfig(({ mode }) => {
       host: true,
       /** Riduce errori CORS se la pagina è servita da origini «vicine» (es. tool di preview / mismatch host). */
       cors: true,
+      ...(serverFs ? { fs: serverFs } : {}),
       proxy,
     },
     preview: {

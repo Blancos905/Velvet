@@ -1,11 +1,17 @@
 import { Link } from "react-router-dom";
 import {
-  LEGAL_ENTITY_ADDRESS_TODO,
-  LEGAL_ENTITY_LEGAL_NAME_TODO,
-  LEGAL_ENTITY_VAT_TODO,
-  legalEntityName,
+  companyAddress,
+  companyLegalName,
+  companyName,
+  companyVat,
 } from "../../content/legalEntity";
+import { logRetentionDays } from "../../content/legalConfig";
 import { GDPR_CITATIONS } from "../../content/legalReferences";
+import {
+  LEGAL_ART28_SUBPROCESSORS_PARAGRAPH,
+  LEGAL_PUSH_NOTIFICATIONS_PARAGRAPH,
+  LEGAL_REVIEW_MODERATION_PARAGRAPH,
+} from "../../content/legalSharedCopy";
 import { LegalCitationList } from "./LegalDocumentLayout";
 import {
   LegalPrivacyAccordion,
@@ -21,8 +27,13 @@ export function PrivacyPolicyLayeredContent() {
       <LegalPrivacyAccordion title="Chi tratta i dati" defaultOpen>
         <p className="velvet-legal-public__text">
           <strong>Titolare del Trattamento:</strong> Il trattamento dei dati personali è effettuato da{" "}
-          <em>{LEGAL_ENTITY_LEGAL_NAME_TODO}</em>, con sede legale in <em>{LEGAL_ENTITY_ADDRESS_TODO}</em>, P.IVA{" "}
-          <em>{LEGAL_ENTITY_VAT_TODO}</em> (di seguito denominata <strong>«{legalEntityName}»</strong>).
+          <em>{companyLegalName}</em>, con sede legale in <em>{companyAddress}</em>
+          {companyVat ? (
+            <>
+              , P.IVA <em>{companyVat}</em>
+            </>
+          ) : null}{" "}
+          (di seguito denominata <strong>«{companyName}»</strong>).
         </p>
         <p className="velvet-legal-public__text">
           <strong>Contatto Privacy Ufficiale:</strong> <LegalPrivacyMailLink /> (dedicato all&apos;esercizio dei diritti GDPR).
@@ -33,14 +44,14 @@ export function PrivacyPolicyLayeredContent() {
         </p>
         <ul className="velvet-legal-public__list">
           <li>
-            <strong>B2B (Staff/Titolari):</strong> {legalEntityName} tratta i dati necessari a registrare e gestire il tuo
+            <strong>B2B (Staff/Titolari):</strong> {companyName} tratta i dati necessari a registrare e gestire il tuo
             account titolare, l&apos;abbonamento Premium, e la piattaforma tecnica (autenticazione tramite token, sicurezza,
             assistenza, notifiche di servizio e funzioni come vetrina personalizzata, statistiche e report).
           </li>
           <li>
             <strong>B2C (Clienti finali dei saloni):</strong> Per i dati dei clienti trattati in agenda, anagrafica,
             prenotazioni e comunicazioni operative, il salone partner agisce come <strong>Titolare del Trattamento</strong>{" "}
-            verso la propria clientela. {legalEntityName} tratta tali dati esclusivamente come{" "}
+            verso la propria clientela. {companyName} tratta tali dati esclusivamente come{" "}
             <strong>Responsabile del Trattamento (Data Processor)</strong>, secondo contratto e istruzioni necessarie
             all&apos;erogazione del servizio.
           </li>
@@ -73,8 +84,8 @@ export function PrivacyPolicyLayeredContent() {
             salone.
           </li>
           <li>
-            <strong>Dati tecnici e di sicurezza:</strong> Log di accesso, identificativi di sessione (gestiti tramite JWT con
-            refresh token rotation su cache Redis blindata) necessari a garantire la prevenzione degli abusi.
+            <strong>Dati tecnici e di sicurezza:</strong> Log di accesso, identificativi di sessione (JWT con refresh token
+            rotation su Redis in produzione) necessari a garantire la prevenzione degli abusi.
           </li>
         </ul>
         <LegalCitationList citations={[GDPR_CITATIONS.regulation, GDPR_CITATIONS.art13]} />
@@ -83,9 +94,8 @@ export function PrivacyPolicyLayeredContent() {
       <LegalPrivacyAccordion title="Geolocalizzazione e posizione del salone">
         <p className="velvet-legal-public__text">
           Per l&apos;erogazione del servizio trattiamo i dati di posizione geografica del salone inseriti nel Profilo
-          (indirizzo, città, CAP). Tramite processi di geocodifica (Google Maps API), ricaviamo le coordinate geografiche
-          necessarie per mostrare la struttura sulle mappe e consentire l&apos;indicizzazione dei dati strutturati (JSON-LD) da
-          parte dei motori di ricerca.
+          (indirizzo, città, CAP). Tramite geocodifica server-side (OpenStreetMap Nominatim e, ove configurato, Google Maps)
+          ricaviamo le coordinate necessarie per la ricerca «vicino a me» e l&apos;indicizzazione Local SEO (JSON-LD).
         </p>
         <p className="velvet-legal-public__text">
           Per la gestione ordinaria del salone <strong>non è richiesta la posizione GPS in tempo reale del tuo dispositivo</strong>
@@ -126,18 +136,19 @@ export function PrivacyPolicyLayeredContent() {
             Luxury, il database PostGIS e la cache Redis.
           </li>
           <li>
-            <strong>Fornitori di servizi di geocodifica e mappe (Google Maps API):</strong> A cui viene inviato l&apos;indirizzo
-            del salone esclusivamente per calcolare le coordinate geografiche e mostrare le mappe interattive.
+            <strong>Fornitori di servizi di geocodifica e mappe:</strong> OpenStreetMap Nominatim (server-side) e Google Maps
+            (embed/link con consenso cookie) per coordinate e indicazioni.
           </li>
           <li>
             <strong>Fornitori di servizi IT di invio email transazionali:</strong> Per l&apos;invio automatizzato di notifiche
             di prenotazione, scadenze o reset password.
           </li>
+          <li>
+            <strong>Google Firebase Cloud Messaging:</strong> Consegna notifiche push all&apos;app mobile (token dispositivo), se
+            l&apos;utente le abilita.
+          </li>
         </ol>
-        <p className="velvet-legal-public__text">
-          Tutti i fornitori tecnici esterni agiscono in veste di Responsabili del Trattamento vincolati da accordi di
-          riservatezza (Art. 28 GDPR).
-        </p>
+        <p className="velvet-legal-public__text">{LEGAL_ART28_SUBPROCESSORS_PARAGRAPH}</p>
         <LegalCitationList citations={[GDPR_CITATIONS.art13, GDPR_CITATIONS.art14]} />
       </LegalPrivacyAccordion>
 
@@ -156,11 +167,19 @@ export function PrivacyPolicyLayeredContent() {
           </li>
           <li>
             <strong>Log di sicurezza e sessione (Redis/Postgres):</strong> Conservati per un periodo massimo di{" "}
-            <em>[es. 30/90 giorni]</em> per finalità di audit di sicurezza e tracciamento abusi, dopodiché sovrascritti o resi
+            <em>{logRetentionDays} giorni</em> per finalità di audit di sicurezza e tracciamento abusi, dopodiché sovrascritti o resi
             anonimi.
           </li>
         </ul>
         <LegalCitationList citations={[GDPR_CITATIONS.art13]} />
+      </LegalPrivacyAccordion>
+
+      <LegalPrivacyAccordion title="Recensioni e moderazione contenuti">
+        <p className="velvet-legal-public__text">{LEGAL_REVIEW_MODERATION_PARAGRAPH}</p>
+      </LegalPrivacyAccordion>
+
+      <LegalPrivacyAccordion title="Notifiche push (app mobile)">
+        <p className="velvet-legal-public__text">{LEGAL_PUSH_NOTIFICATIONS_PARAGRAPH}</p>
       </LegalPrivacyAccordion>
 
       <LegalPrivacyAccordion title="Diritti degli interessati (Artt. 15–22 GDPR)">
@@ -169,11 +188,13 @@ export function PrivacyPolicyLayeredContent() {
           Cancellazione/Oblio, Limitazione, Portabilità e Opposizione) inviando una comunicazione a: <LegalPrivacyMailLink />.
         </p>
         <p className="velvet-legal-public__text">
-          <strong>Cancellazione Account via Mobile App (Luxury App / Flutter Shell):</strong> In conformità con le policy di
-          trasparenza degli store Apple e Google, se utilizzi l&apos;applicazione mobile puoi richiedere la rimozione immediata,
-          self-service e definitiva del tuo account e dei relativi dati personali accedendo alla sezione{" "}
-          <code>Account &gt; Elimina Account</code> (che richiama l&apos;endpoint sicuro di backend{" "}
-          <code>DELETE /api/v1/me/account</code>).
+          <strong>Cancellazione account (web e app):</strong> Da Profilo o dalla pagina{" "}
+          <Link to="/privacy/elimina-account" className="velvet-legal-public__inline-link">
+            Elimina account
+          </Link>{" "}
+          puoi richiedere la chiusura self-service: l&apos;endpoint <code>DELETE /api/v1/me/account</code> disattiva l&apos;accesso,
+          revoca i refresh token, rimuove i token dispositivo registrati e anonimizza i dati identificativi del profilo. Le
+          recensioni già pubblicate possono restare visibili come «Utente anonimo» per non alterare le medie del salone.
         </p>
         <p className="velvet-legal-public__text">
           Sul web puoi usare anche la pagina{" "}

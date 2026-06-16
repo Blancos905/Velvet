@@ -106,6 +106,16 @@ public class MeNotificationInboxService {
 					PageRequest.of(0, MESSAGE_PAGE_SIZE));
 			return rows.stream().map(this::toMessageDto).toList();
 		}
+		if (bucket == NotificationBucket.SYSTEM) {
+			Instant ack = effectiveAck(profile, bucket);
+			List<ScheduledNotification> rows = scheduledNotificationRepository.findRecentPlatformByConsumerAck(
+					profile.getId(),
+					NotificationType.ADMIN_PLATFORM_MESSAGE,
+					QueuedNotificationStatus.SENT,
+					ack,
+					PageRequest.of(0, MESSAGE_PAGE_SIZE));
+			return rows.stream().map(this::toMessageDto).toList();
+		}
 		List<NotificationType> types = typesForBucket(bucket);
 		if (types.isEmpty()) {
 			return List.of();
@@ -132,6 +142,14 @@ public class MeNotificationInboxService {
 			if (support > 0) {
 				return;
 			}
+		}
+		int platform = scheduledNotificationRepository.markDeletedPlatformForConsumer(
+				messageId,
+				profile.getId(),
+				NotificationType.ADMIN_PLATFORM_MESSAGE,
+				Instant.now());
+		if (platform > 0) {
+			return;
 		}
 		int updated = scheduledNotificationRepository.markDeletedForConsumer(messageId, profile.getId(), Instant.now());
 		if (updated == 0) {
@@ -179,6 +197,16 @@ public class MeNotificationInboxService {
 				long sent = scheduledNotificationRepository.countSentSupportToVelvetAfter(
 						profile.getId(),
 						NotificationType.SUPPORT_REQUEST_TO_VELVET,
+						QueuedNotificationStatus.SENT,
+						cutoff);
+				rows.add(new MeSalonNotificationTypeStatDto(bucket.name(), italianLabel(bucket), sent, 0));
+				continue;
+			}
+			if (bucket == NotificationBucket.SYSTEM) {
+				Instant cutoff = effectiveAck(profile, bucket);
+				long sent = scheduledNotificationRepository.countSentPlatformByConsumerAfter(
+						profile.getId(),
+						NotificationType.ADMIN_PLATFORM_MESSAGE,
 						QueuedNotificationStatus.SENT,
 						cutoff);
 				rows.add(new MeSalonNotificationTypeStatDto(bucket.name(), italianLabel(bucket), sent, 0));
@@ -240,6 +268,22 @@ public class MeNotificationInboxService {
 					null,
 					title,
 					preview.isEmpty() ? "Richiesta assistenza dall'area account." : preview);
+		}
+		if (n.getType() == NotificationType.ADMIN_PLATFORM_MESSAGE && n.getAppointment() == null) {
+			String title = n.getPlatformMessageSubject() != null && !n.getPlatformMessageSubject().isBlank()
+					? n.getPlatformMessageSubject().trim()
+					: "Saloni Luxury";
+			String body = n.getPlatformMessageBody() != null ? n.getPlatformMessageBody().trim() : "";
+			String preview = body.length() > 280 ? body.substring(0, 277) + "…" : body;
+			return new MeSalonNotificationMessageDto(
+					n.getId(),
+					n.getType().name(),
+					n.getStatus().name(),
+					n.getScheduledAt(),
+					n.getSentAt(),
+					null,
+					title,
+					preview.isEmpty() ? "Messaggio da Saloni Luxury." : preview);
 		}
 		var a = n.getAppointment();
 		if (a == null) {
@@ -309,7 +353,7 @@ public class MeNotificationInboxService {
 					NotificationType.REVIEW_INVITE);
 			case BOOKING_UPDATED -> List.of(NotificationType.BOOKING_UPDATED);
 			case BOOKING_CANCELLED -> List.of(NotificationType.BOOKING_CANCELLED_BY_CONSUMER, NotificationType.BOOKING_CANCELLED_BY_SALON);
-			case SYSTEM -> List.of();
+			case SYSTEM -> List.of(NotificationType.ADMIN_PLATFORM_MESSAGE);
 			case SUPPORT_REQUEST -> List.of();
 		};
 	}
@@ -331,7 +375,7 @@ public class MeNotificationInboxService {
 			case BOOKING_CONFIRMATION -> "Email — conferme, promemoria e recensioni";
 			case BOOKING_UPDATED -> "Email — prenotazione aggiornata";
 			case BOOKING_CANCELLED -> "Email — annullamento prenotazione";
-			case SYSTEM -> "Email sistema";
+			case SYSTEM -> "Messaggi Luxury";
 			case SUPPORT_REQUEST -> "Richieste assistenza (area account)";
 		};
 	}

@@ -59,6 +59,10 @@ export type MeSalonSummary = {
   primaryLocationOpeningMinuteOfDay?: number | null;
   /** Chiusura sede (minuti da mezzanotte locale). */
   primaryLocationClosingMinuteOfDay?: number | null;
+  /** Fine fascia mattutina (pausa pranzo). */
+  primaryLocationMorningEndMinuteOfDay?: number | null;
+  /** Inizio fascia pomeridiana (pausa pranzo). */
+  primaryLocationAfternoonStartMinuteOfDay?: number | null;
   /** Premium con PIN statistiche configurato in registrazione. */
   statisticsPinRequired?: boolean;
 };
@@ -112,6 +116,8 @@ export type OrganizationDetail = {
   /** Fascia oraria prenotabile (minuti da mezzanotte locale sede). */
   bookingOpeningMinuteOfDay?: number;
   bookingClosingMinuteOfDay?: number;
+  bookingMorningEndMinuteOfDay?: number | null;
+  bookingAfternoonStartMinuteOfDay?: number | null;
 };
 
 /** `GET /api/v1/clients` con header `X-Location-Id` — anagrafica clienti della sede (stessa base di «Diventa cliente»). */
@@ -197,6 +203,8 @@ export type ProfileDto = {
   email: string | null;
   displayName: string | null;
   phone: string | null;
+  /** ISO 3166-1 alpha-2 (es. IT). */
+  country: string | null;
   preferredLocale: string | null;
 };
 
@@ -426,9 +434,4 @@ export type MePendingReviewInviteItem = {
   operatorName?: string | null;
   /** Istante di fine appuntamento (`endsAt`). */
   completedAt: string | null;
-};
-
-export type CreatedAppointmentResponse = {
-  appointment: AppointmentDto;
-  manageToken: string;
 };

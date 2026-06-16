@@ -111,6 +111,22 @@ class MeSalonServicesControllerTest {
 	}
 
 	@Test
+	void create_owner_repairsMissingLocationThenPersists() throws Exception {
+		String suffix = UUID.randomUUID().toString().substring(0, 8);
+		String email = "svc-noloc-" + suffix + "@test.com";
+		studioGroupRepository.save(new StudioGroup("Salone Senza Sede", email, "BASE"));
+		ConsumerProfile p = saveOwner("sub-noloc-" + suffix, email);
+
+		mockMvc.perform(post("/api/v1/me/salon/services")
+						.header("Authorization", bearer(p))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(
+								"{\"name\":\"Piega\",\"durationMinutes\":20,\"priceCents\":1800,\"description\":\"Piega con phon\"}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.name").value("Piega"));
+	}
+
+	@Test
 	void create_owner_persistsAndReturns() throws Exception {
 		String suffix = UUID.randomUUID().toString().substring(0, 8);
 		String email = "svc-create-" + suffix + "@test.com";

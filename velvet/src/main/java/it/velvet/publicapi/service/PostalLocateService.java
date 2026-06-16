@@ -4,14 +4,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.velvet.publicapi.dto.PlaceLocateSuggestionResponse;
 import it.velvet.publicapi.dto.PostalLocateResponse;
+import it.velvet.publicapi.dto.ReverseLocateResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,14 +32,23 @@ public class PostalLocateService {
 
 	private static final Logger log = LoggerFactory.getLogger(PostalLocateService.class);
 
-	private static final String USER_AGENT = "Velvet/1.0 (https://github.com/velvet; cap-lookup)";
+	private static final String USER_AGENT = "SaloniLuxury/1.0 (https://www.saloniluxury.it; geocoding)";
+	/** Evita thread Tomcat bloccati indefinitamente se Nominatim non risponde. */
+	private static final Duration NOMINATIM_CONNECT_TIMEOUT = Duration.ofSeconds(3);
+	private static final Duration NOMINATIM_READ_TIMEOUT = Duration.ofSeconds(5);
 
 	private final RestClient restClient;
 	private final ObjectMapper objectMapper;
 
 	public PostalLocateService(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
+		var httpClient = HttpClient.newBuilder()
+				.connectTimeout(NOMINATIM_CONNECT_TIMEOUT)
+				.build();
+		var requestFactory = new JdkClientHttpRequestFactory(httpClient);
+		requestFactory.setReadTimeout(NOMINATIM_READ_TIMEOUT);
 		this.restClient = RestClient.builder()
+				.requestFactory(requestFactory)
 				.defaultHeader(HttpHeaders.USER_AGENT, USER_AGENT)
 				.defaultHeader(HttpHeaders.ACCEPT_LANGUAGE, "it")
 				.build();
@@ -136,6 +149,36 @@ public class PostalLocateService {
 	}
 
 	public record GeoPoint(double lat, double lng) {
+	}
+
+	/** Geocoding inverso (coordinate WGS84 → comune/CAP) tramite Nominatim. */
+	public Optional<ReverseLocateResponse> reverseLocate(double lat, double lng) {
+		if (lat < -90.0 || lat > 90.0 || lng < -180.0 || lng > 180.0) {
+			return Optional.empty();
+		}
+		URI uri = UriComponentsBuilder.newInstance()
+				.scheme("https")
+				.host("nominatim.openstreetmap.org")
+				.path("/reverse")
+				.queryParam("lat", Double.toString(lat))
+				.queryParam("lon", Double.toString(lng))
+				.queryParam("format", "json")
+				.queryParam("addressdetails", "1")
+				.queryParam("zoom", "18")
+				.build()
+				.toUri();
+		try {
+			String body = restClient.get().uri(uri).retrieve().body(String.class);
+			if (body == null || body.isBlank()) {
+				return Optional.empty();
+			}
+			JsonNode hit = objectMapper.readTree(body);
+			return parseReverseHit(hit);
+		}
+		catch (Exception e) {
+			log.warn("Nominatim reverse failed for lat={} lng={}: {}", lat, lng, e.getMessage());
+			return Optional.empty();
+		}
 	}
 
 	/**
@@ -256,6 +299,40 @@ public class PostalLocateService {
 			log.warn("Nominatim suggest failed for query='{}' country={}: {}", query, country, e.getMessage());
 			return List.of();
 		}
+	}
+
+	private Optional<ReverseLocateResponse> parseReverseHit(JsonNode hit) {
+		if (hit == null || hit.isNull()) {
+			return Optional.empty();
+		}
+		JsonNode addr = hit.get("address");
+		if (addr == null || !addr.isObject()) {
+			return Optional.empty();
+		}
+		String city = firstNonBlank(
+				text(addr, "city"),
+				text(addr, "town"),
+				text(addr, "village"),
+				text(addr, "municipality"),
+				text(addr, "hamlet"),
+				text(addr, "suburb"),
+				text(addr, "county"),
+				text(addr, "state"));
+		if (city == null && hit.hasNonNull("display_name")) {
+			String dn = hit.get("display_name").asText();
+			if (dn != null && !dn.isBlank()) {
+				int comma = dn.indexOf(',');
+				city = (comma > 0 ? dn.substring(0, comma) : dn).trim();
+			}
+		}
+		if (city == null || city.isBlank()) {
+			return Optional.empty();
+		}
+		String postalCode = text(addr, "postcode");
+		String ccRaw = text(addr, "country_code");
+		String cc = ccRaw != null ? ccRaw.toUpperCase(Locale.ROOT) : "";
+		String display = hit.hasNonNull("display_name") ? hit.get("display_name").asText() : city;
+		return Optional.of(new ReverseLocateResponse(city.trim(), postalCode, cc, display));
 	}
 
 	private Optional<PostalLocateResponse> parseHit(JsonNode hit) {

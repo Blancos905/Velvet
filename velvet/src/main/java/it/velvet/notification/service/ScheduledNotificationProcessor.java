@@ -16,17 +16,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.UUID;
 
 /**
- * Le notifiche transazionali non vengono inviate via email all'esterno della piattaforma:
- * il messaggio resta consultabile in-app (inbox titolare/cliente) e viene comunque registrato nei log
- * del backend. WhatsApp è l'unico canale esterno supportato (se configurato).
+ * Elabora la coda notifiche transazionali: inbox in-app, push FCM, email SMTP (se configurata) e log backend.
  */
 @Service
 public class ScheduledNotificationProcessor {
@@ -36,20 +35,23 @@ public class ScheduledNotificationProcessor {
 	private final ScheduledNotificationRepository scheduledNotificationRepository;
 	private final VelvetNotificationProperties notificationProperties;
 	private final AppointmentTokenService appointmentTokenService;
-	private final NotificationWhatsappDispatcher notificationWhatsappDispatcher;
 	private final ReviewRepository reviewRepository;
+	private final FcmPushDispatchService fcmPushDispatchService;
+	private final TransactionalEmailDispatchService transactionalEmailDispatchService;
 
 	public ScheduledNotificationProcessor(
 			ScheduledNotificationRepository scheduledNotificationRepository,
 			VelvetNotificationProperties notificationProperties,
 			AppointmentTokenService appointmentTokenService,
-			NotificationWhatsappDispatcher notificationWhatsappDispatcher,
-			ReviewRepository reviewRepository) {
+			ReviewRepository reviewRepository,
+			FcmPushDispatchService fcmPushDispatchService,
+			TransactionalEmailDispatchService transactionalEmailDispatchService) {
 		this.scheduledNotificationRepository = scheduledNotificationRepository;
 		this.notificationProperties = notificationProperties;
 		this.appointmentTokenService = appointmentTokenService;
-		this.notificationWhatsappDispatcher = notificationWhatsappDispatcher;
 		this.reviewRepository = reviewRepository;
+		this.fcmPushDispatchService = fcmPushDispatchService;
+		this.transactionalEmailDispatchService = transactionalEmailDispatchService;
 	}
 
 	@Transactional
@@ -110,58 +112,37 @@ public class ScheduledNotificationProcessor {
 		String toPhone = resolveRecipientPhone(type, a);
 		String subject = buildSubject(type, a);
 		String body = buildBody(type, a);
+		String htmlBody = buildHtmlEmailBody(type, a);
 
-		logDelivery(type, a.getId(), toPhone, subject, body);
+		String toEmail = TransactionalEmailDispatchService.resolveRecipientEmail(type, a);
+		logDelivery(type, a.getId(), toPhone, toEmail, subject, body);
+		fcmPushDispatchService.dispatchForScheduledNotification(n, subject, body);
+		transactionalEmailDispatchService.dispatchForBookingNotification(type, a, subject, body, htmlBody);
 
-		Instant sendClock = Instant.now();
-
-		if (isConsumerFacingNotification(type)) {
-			boolean phonePresent = toPhone != null && !toPhone.isBlank();
-			if (phonePresent) {
-				if (!notificationWhatsappDispatcher.canSend()) {
-					log.warn(
-							"[Velvet notifica] Numero presente ma WhatsApp webhook disabilitato — proseguo senza WA appointmentId={} type={}",
-							a.getId(),
-							type);
-				}
-				else if (n.getWhatsappSentAt() == null) {
-					try {
-						notificationWhatsappDispatcher.send(toPhone, body, a.getId(), type.name());
-						n.setWhatsappSentAt(sendClock);
-					}
-					catch (RuntimeException e) {
-						log.warn(
-								"Invio WhatsApp fallito id={} phone={}",
-								n.getId(),
-								toPhone,
-								e);
-					}
-				}
-			}
-		}
-
-		n.markSent(sendClock);
+		n.markSent(Instant.now());
 	}
 
 	private void logDelivery(
 			NotificationType type,
 			java.util.UUID appointmentId,
 			String toPhone,
+			String toEmail,
 			String subject,
 			String body) {
 		log.info(
-				"[Velvet notifica] type={} appointmentId={} toPhone={}\nSubject: {}\n---\n{}",
+				"[Velvet notifica] type={} appointmentId={} toPhone={} toEmail={} subject={}",
 				type,
 				appointmentId,
 				toPhone == null || toPhone.isBlank() ? "(nessun telefono)" : toPhone,
-				subject,
-				body);
+				toEmail == null || toEmail.isBlank() ? "(nessuna email)" : toEmail,
+				subject);
+		log.debug("[Velvet notifica body]\n{}", body);
 	}
 
 	/**
-	 * Destinatario WhatsApp. Per i promemoria solo il telefono del {@link it.velvet.consumer.domain.ConsumerProfile}
-	 * collegato all’appuntamento: non si usa il numero sulla scheda {@code SalonClient}, che in salone può essere
-	 * diverso o gestito dallo staff (evita che il messaggio finisca a salone/operatore per errore di anagrafica).
+	 * Recapito telefonico del cliente (solo metadato di log). Per i promemoria solo il telefono del
+	 * {@link it.velvet.consumer.domain.ConsumerProfile} collegato all’appuntamento: non si usa il numero sulla
+	 * scheda {@code SalonClient}, che in salone può essere diverso o gestito dallo staff.
 	 */
 	private static String resolveRecipientPhone(NotificationType type, Appointment a) {
 		if (type == NotificationType.REMINDER_24H || type == NotificationType.REMINDER_1H) {
@@ -173,7 +154,11 @@ public class ScheduledNotificationProcessor {
 			}
 			return null;
 		}
-		if (!isConsumerFacingNotification(type)) {
+		if (type != NotificationType.BOOKING_CONFIRMATION
+				&& type != NotificationType.BOOKING_UPDATED
+				&& type != NotificationType.BOOKING_CANCELLED_BY_CONSUMER
+				&& type != NotificationType.BOOKING_CANCELLED_BY_SALON
+				&& type != NotificationType.REVIEW_INVITE) {
 			return null;
 		}
 		if (a.getConsumerProfile() != null
@@ -187,24 +172,12 @@ public class ScheduledNotificationProcessor {
 		return null;
 	}
 
-	/** Tipi per cui può partire un messaggio WhatsApp verso il recapito del cliente (con regole specifiche sui promemoria in {@link #resolveRecipientPhone}). */
-	private static boolean isConsumerFacingNotification(NotificationType type) {
-		return type == NotificationType.BOOKING_CONFIRMATION
-				|| type == NotificationType.BOOKING_UPDATED
-				|| type == NotificationType.REMINDER_24H
-				|| type == NotificationType.REMINDER_1H
-				|| type == NotificationType.BOOKING_CANCELLED_BY_CONSUMER
-				|| type == NotificationType.BOOKING_CANCELLED_BY_SALON
-				|| type == NotificationType.REVIEW_INVITE;
-	}
-
-	private String buildManageUrl(String token) {
+	private String buildConsumerAppointmentUrl(UUID appointmentId) {
 		String base = notificationProperties.getFrontendBaseUrl().replaceAll("/+$", "");
-		String path = notificationProperties.getManagePath().startsWith("/")
-				? notificationProperties.getManagePath()
-				: "/" + notificationProperties.getManagePath();
-		String enc = URLEncoder.encode(token, StandardCharsets.UTF_8);
-		return base + path + "?token=" + enc;
+		String path = notificationProperties.getConsumerAppointmentsPath().startsWith("/")
+				? notificationProperties.getConsumerAppointmentsPath()
+				: "/" + notificationProperties.getConsumerAppointmentsPath();
+		return base + path + "/" + appointmentId;
 	}
 
 	private String buildReviewUrl(String token) {
@@ -271,8 +244,6 @@ public class ScheduledNotificationProcessor {
 						+ "\n";
 			}
 			case BOOKING_CONFIRMATION, BOOKING_UPDATED, REMINDER_24H, REMINDER_1H -> {
-				String manageToken = appointmentTokenService.mintManageToken(a.getId());
-				String manageUrl = buildManageUrl(manageToken);
 				String intro = switch (type) {
 					case BOOKING_CONFIRMATION -> "La tua prenotazione è confermata.";
 					case BOOKING_UPDATED -> "La tua prenotazione è stata spostata. Ecco il nuovo orario.";
@@ -280,7 +251,8 @@ public class ScheduledNotificationProcessor {
 					case REMINDER_1H -> "Ti ricordiamo l'appuntamento tra circa 2 ore.";
 					default -> "";
 				};
-				yield "Grazie per aver prenotato con SaloniVelvet.\n\n"
+				String appointmentUrl = buildConsumerAppointmentUrl(a.getId());
+				yield "Grazie per aver prenotato con SaloniLuxury.\n\n"
 						+ "Un ringraziamento anche da parte di "
 						+ salon
 						+ ".\n\n"
@@ -298,8 +270,8 @@ public class ScheduledNotificationProcessor {
 						+ "\n\n"
 						+ intro
 						+ "\n\n"
-						+ "Modifica o disdici la prenotazione:\n"
-						+ manageUrl
+						+ "Vedi la prenotazione nel tuo account:\n"
+						+ appointmentUrl
 						+ "\n";
 			}
 			case BOOKING_CANCELLED_BY_CONSUMER -> "Hai annullato la prenotazione.\n\n"
@@ -328,7 +300,7 @@ public class ScheduledNotificationProcessor {
 					+ "Sede: "
 					+ salon
 					+ "\n"
-					+ "\nPer un nuovo appuntamento visita il sito del salone o l'app SaloniVelvet.\n";
+					+ "\nPer un nuovo appuntamento visita il sito del salone o l'app SaloniLuxury.\n";
 			case REVIEW_INVITE -> {
 				String reviewToken = appointmentTokenService.mintReviewToken(a.getId());
 				String reviewUrl = buildReviewUrl(reviewToken);
@@ -346,5 +318,38 @@ public class ScheduledNotificationProcessor {
 			}
 			case SUPPORT_REQUEST_TO_VELVET -> "";
 		};
+	}
+
+	private String buildHtmlEmailBody(NotificationType type, Appointment a) {
+		return switch (type) {
+			case BOOKING_CONFIRMATION, BOOKING_UPDATED, REMINDER_24H, REMINDER_1H -> buildConsumerAppointmentHtml(type, a);
+			default -> null;
+		};
+	}
+
+	private String buildConsumerAppointmentHtml(NotificationType type, Appointment a) {
+		ZoneId zone;
+		try {
+			zone = ZoneId.of(a.getLocation().getTimeZone());
+		}
+		catch (RuntimeException e) {
+			zone = ZoneId.of("Europe/Rome");
+		}
+		DateTimeFormatter fmtIt = DateTimeFormatter.ofPattern("EEEE d MMMM yyyy, HH:mm", Locale.ITALIAN).withZone(zone);
+		DateTimeFormatter dayFmt = DateTimeFormatter.ofPattern("EEEE", Locale.ITALIAN).withZone(zone);
+		String when = fmtIt.format(a.getStart());
+		String weekday = dayFmt.format(a.getStart());
+		String service = a.getService().getName();
+		String salon = a.getLocation().getName();
+		String appointmentUrl = buildConsumerAppointmentUrl(a.getId());
+		String intro = switch (type) {
+			case BOOKING_CONFIRMATION -> "La tua prenotazione è confermata.";
+			case BOOKING_UPDATED -> "La tua prenotazione è stata spostata.";
+			case REMINDER_24H -> "Promemoria: appuntamento tra circa 24 ore.";
+			case REMINDER_1H -> "Promemoria: appuntamento tra circa 2 ore.";
+			default -> "La tua prenotazione.";
+		};
+		return TransactionalBookingEmailHtml.buildManageBookingEmail(
+				intro, salon, service, weekday, when, appointmentUrl, "Vedi prenotazione");
 	}
 }

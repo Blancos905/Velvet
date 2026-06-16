@@ -12,7 +12,8 @@ public class VelvetNotificationProperties {
 
 	private String frontendBaseUrl = "http://localhost:5173";
 
-	private String managePath = "/prenotazione/gestisci";
+	/** Base path frontend area prenotazioni consumatore (link email: path + /{appointmentId}). */
+	private String consumerAppointmentsPath = "/account/prenotazioni";
 
 	/** Path sul frontend per aprire il flusso recensione con query `token`. */
 	private String reviewPath = "/recensione";
@@ -23,30 +24,10 @@ public class VelvetNotificationProperties {
 	/** Validità del link di reimpostazione (minuti). */
 	private int passwordResetTokenTtlMinutes = 60;
 
-	/** Ore dopo la fine appuntamento ({@code endsAt}) per l'invito recensione (in-app + WhatsApp). */
+	/** Ore dopo la fine appuntamento ({@code endsAt}) per l'invito recensione in-app. */
 	private int reviewInviteOffsetHours = 2;
 
 	private long pollIntervalMs = 15_000L;
-
-	/**
-	 * Se true abilita l'invio WhatsApp via webhook HTTP.
-	 */
-	private boolean whatsappEnabled = false;
-
-	/**
-	 * Endpoint webhook provider WhatsApp (es. Twilio Function / Make / Zapier / backend bridge).
-	 */
-	private String whatsappWebhookUrl = "";
-
-	/**
-	 * Token bearer opzionale per autenticare la chiamata al webhook.
-	 */
-	private String whatsappBearerToken = "";
-
-	/**
-	 * Prefisso paese senza "+" per normalizzare numeri nazionali (es. Italia {@code 39}) quando il numero non è in formato E.164.
-	 */
-	private String whatsappDefaultCountryCallingCode = "39";
 
 	public boolean isEnabled() {
 		return enabled;
@@ -64,12 +45,12 @@ public class VelvetNotificationProperties {
 		this.frontendBaseUrl = frontendBaseUrl;
 	}
 
-	public String getManagePath() {
-		return managePath;
+	public String getConsumerAppointmentsPath() {
+		return consumerAppointmentsPath;
 	}
 
-	public void setManagePath(String managePath) {
-		this.managePath = managePath;
+	public void setConsumerAppointmentsPath(String consumerAppointmentsPath) {
+		this.consumerAppointmentsPath = consumerAppointmentsPath;
 	}
 
 	public String getReviewPath() {
@@ -110,39 +91,5 @@ public class VelvetNotificationProperties {
 
 	public void setPollIntervalMs(long pollIntervalMs) {
 		this.pollIntervalMs = pollIntervalMs;
-	}
-
-	public boolean isWhatsappEnabled() {
-		return whatsappEnabled;
-	}
-
-	public void setWhatsappEnabled(boolean whatsappEnabled) {
-		this.whatsappEnabled = whatsappEnabled;
-	}
-
-	public String getWhatsappWebhookUrl() {
-		return whatsappWebhookUrl;
-	}
-
-	public void setWhatsappWebhookUrl(String whatsappWebhookUrl) {
-		this.whatsappWebhookUrl = whatsappWebhookUrl;
-	}
-
-	public String getWhatsappBearerToken() {
-		return whatsappBearerToken;
-	}
-
-	public void setWhatsappBearerToken(String whatsappBearerToken) {
-		this.whatsappBearerToken = whatsappBearerToken;
-	}
-
-	public String getWhatsappDefaultCountryCallingCode() {
-		return whatsappDefaultCountryCallingCode == null || whatsappDefaultCountryCallingCode.isBlank()
-				? "39"
-				: whatsappDefaultCountryCallingCode.trim();
-	}
-
-	public void setWhatsappDefaultCountryCallingCode(String whatsappDefaultCountryCallingCode) {
-		this.whatsappDefaultCountryCallingCode = whatsappDefaultCountryCallingCode;
 	}
 }

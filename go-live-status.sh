@@ -126,9 +126,9 @@ fi
 NGINX_CONF="$ROOT_DIR/infrastructure/nginx/conf.d/app.conf"
 if file_exists "$NGINX_CONF"; then
   mark_done "Config Nginx produzione presente (nginx/conf.d/app.conf)"
-  if grep -q 'api\.salonivelvet\.it' "$NGINX_CONF" 2>/dev/null \
+  if grep -q 'api\.saloniluxury\.it' "$NGINX_CONF" 2>/dev/null \
     && ! grep -qE "connect-src[^;]*'self'" "$NGINX_CONF" 2>/dev/null; then
-    mark_todo "Verificare CSP nginx: connect-src punta a api.salonivelvet.it — allineare a same-origin /api se non usi sottodominio API"
+    mark_todo "Verificare CSP nginx: connect-src punta a api.saloniluxury.it — allineare a same-origin /api se non usi sottodominio API"
   fi
   if ! grep -q '/var/www/certbot' "$ROOT_DIR/infrastructure/docker-compose.prod.yml" 2>/dev/null; then
     mark_todo "Opzionale: montare volume /var/www/certbot in docker-compose per rinnovo Certbot automatico"
@@ -189,10 +189,11 @@ else
 fi
 
 # --- Domini email ---
-if grep -q 'saloniluxury\.it' "$ROOT_DIR/velvet-frontend/src/content/legalReferences.ts" 2>/dev/null; then
-  mark_todo "Allineare email legali (oggi @saloniluxury.it) al dominio produzione (@salonivelvet.it) + SPF/DKIM"
+if grep -q 'saloniluxury\.it' "$ROOT_DIR/velvet-frontend/src/content/legalReferences.ts" 2>/dev/null \
+  && grep -q 'saloniluxury\.it' "$ROOT_DIR/infrastructure/.env.example" 2>/dev/null; then
+  mark_done "Email e dominio produzione allineati su saloniluxury.it (verificare SPF/DKIM su Aruba)"
 else
-  mark_done "Email legali allineate al dominio pubblico (no saloniluxury.it in legalReferences)"
+  mark_todo "Allineare email legali e dominio produzione su saloniluxury.it + SPF/DKIM"
 fi
 
 # --- Backend ---
@@ -224,7 +225,7 @@ if grep -qE '^\s+redis:' "$ROOT_DIR/infrastructure/docker-compose.prod.yml" 2>/d
 fi
 
 # --- App mobile ---
-mark_done "App Flutter shell WebView (velvet-app) con default VELVET_WEB_BASE_URL=https://salonivelvet.it"
+mark_done "App Flutter shell WebView (velvet-app) con default VELVET_WEB_BASE_URL=https://saloniluxury.it"
 
 ANDROID_GRADLE="$ROOT_DIR/velvet-app/android/app/build.gradle.kts"
 if grep -q 'signingConfigs.getByName("debug")' "$ANDROID_GRADLE" 2>/dev/null; then

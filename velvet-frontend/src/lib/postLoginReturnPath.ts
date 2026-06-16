@@ -10,7 +10,6 @@ const ALLOWED_PREFIXES = [
   "/piani",
   "/partner",
   "/registrati",
-  "/prenotazione/",
   "/recensione",
 ] as const;
 

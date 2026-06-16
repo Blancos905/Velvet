@@ -7,7 +7,13 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties({
 	VelvetSecurityProperties.class,
 	VelvetNotificationProperties.class,
-	VelvetSuperAdminProperties.class
+	VelvetMailProperties.class,
+	VelvetSuperAdminProperties.class,
+	VelvetFirebaseProperties.class,
+	VelvetRedisProperties.class,
+	VelvetSeoProperties.class,
+	VelvetStripeProperties.class,
+	VelvetLoggingProperties.class
 })
 public class VelvetPropertiesConfiguration {
 }

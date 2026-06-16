@@ -383,8 +383,8 @@
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.velvet-salon-showcase__pill,
-.velvet-salon-showcase__pill--static {
+.velvet-salon-showcase__pill--static,
+.velvet-salon-showcase__pill:not(.velvet-header-cta-pill) {
   appearance: none;
   font: inherit;
   cursor: default;
@@ -403,24 +403,18 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
 }
 
-.velvet-salon-showcase__pill {
+.velvet-salon-showcase__pill:not(.velvet-header-cta-pill) {
   cursor: pointer;
 }
 
-.velvet-salon-showcase__pill:hover {
+.velvet-salon-showcase__pill:not(.velvet-header-cta-pill):hover {
   filter: brightness(1.08);
 }
 
-.velvet-salon-showcase__pill--active {
+.velvet-salon-showcase__pill--active:not(.active) {
   background: var(--vs-pill-active-bg);
   border-color: var(--vs-pill-active-border);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
-}
-
-.velvet-salon-showcase__pill-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .velvet-salon-showcase__service-detail {
@@ -966,8 +960,8 @@
   background: #000000;
   color: #fb923c;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-transform: none;
   font-size: 0.78rem;
   min-width: min(100%, 15rem);
   box-shadow: 0 1px 0 rgba(251, 146, 60, 0.12) inset;
@@ -1145,25 +1139,25 @@
   justify-content: center;
 }
 
-.velvet-salon-showcase__service-pick-btn {
-  text-align: center;
-  font-weight: 600;
+/* Servizi selezionabili: stessa pill «Accedi» (app-header.css) */
+.velvet-salon-showcase .velvet-salon-showcase__service-pick-btn.velvet-header-cta-pill,
+.velvet-salon-showcase .velvet-salon-showcase__pill.velvet-header-cta-pill {
+  cursor: pointer;
+  font-family: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
   max-width: min(100%, 18rem);
+  white-space: normal;
+  text-align: center;
+  line-height: 1.25;
 }
 
-.velvet-salon-showcase .velvet-salon-showcase__service-pick-btn.velvet-btn--secondary {
-  border: 1px solid #000000;
-  color: var(--vs-showcase-custom-service-text, #fffbeb);
-}
-
-.velvet-salon-showcase .velvet-salon-showcase__service-pick-btn.velvet-btn--secondary:hover:not(:disabled) {
-  border-color: #000000;
-  color: var(--vs-showcase-custom-service-text, #fffbeb);
-}
-
-.velvet-salon-showcase .velvet-salon-showcase__service-pick-btn.velvet-salon-showcase__service-pick-btn--active.velvet-btn--secondary {
-  border-color: #000000;
-  box-shadow: 0 0 0 2px #000000;
+.velvet-salon-showcase .velvet-salon-showcase__pill-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .velvet-salon-showcase__service-detail-backdrop {

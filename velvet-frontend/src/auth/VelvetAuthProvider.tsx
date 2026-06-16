@@ -25,6 +25,7 @@ import {
   writeStoredRefreshToken,
   type AuthLoginResponse,
 } from "./velvetRefreshSession";
+import { unregisterVelvetFcmDevice } from "../api/fcmDevice";
 import { useVelvetSessionExpiryWatchdog } from "./useVelvetSessionExpiryWatchdog";
 
 const ACCESS_TOKEN_STORAGE_KEY = "velvet_access_token";
@@ -196,6 +197,7 @@ export function VelvetAuthProvider({ children }: { children: ReactNode }) {
             credentials: "include",
             body: JSON.stringify({ email: normalizedUsername, password }),
           });
+          queryClient.removeQueries({ queryKey: ["me"] });
           persistToken(body.accessToken);
           if (body.refreshToken) {
             writeStoredRefreshToken(body.refreshToken);
@@ -204,6 +206,9 @@ export function VelvetAuthProvider({ children }: { children: ReactNode }) {
           await yieldToBrowser();
           const token = body.accessToken;
           const rolesAfterLogin = velvetJwtHintsFromAccessToken(token).realmRoles;
+          if (!rolesAfterLogin.includes("OWNER")) {
+            sessionStorage.removeItem(SALON_PLAN_STORAGE_KEY);
+          }
           if (token && rolesAfterLogin.includes("ADMIN")) {
             writeAdminAccessToken(token);
           }
@@ -269,6 +274,7 @@ export function VelvetAuthProvider({ children }: { children: ReactNode }) {
         }
       },
       signOut: async () => {
+        await unregisterVelvetFcmDevice(accessToken);
         await logoutVelvetSession();
         clearToken();
         clearAdminAccessToken();

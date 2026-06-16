@@ -13,6 +13,10 @@ export type SalonStaffApiItem = {
   role?: string | null;
   photoDataUrl?: string | null;
   loginEnabled?: boolean | null;
+  workMorningStartMinuteOfDay?: number | null;
+  workMorningEndMinuteOfDay?: number | null;
+  workAfternoonStartMinuteOfDay?: number | null;
+  workAfternoonEndMinuteOfDay?: number | null;
   /** Presenti solo se elenco da endpoint pubblico operatori. */
   averageStaffRating?: number | null;
   staffReviewCount?: number | null;
@@ -27,6 +31,10 @@ export type StaffViewItem = {
   role: string;
   photoDataUrl: string | null;
   loginEnabled?: boolean;
+  workMorningStartMinuteOfDay?: number | null;
+  workMorningEndMinuteOfDay?: number | null;
+  workAfternoonStartMinuteOfDay?: number | null;
+  workAfternoonEndMinuteOfDay?: number | null;
 };
 
 export function useSalonStaffList() {
@@ -81,6 +89,10 @@ export function useSalonStaffList() {
           role: member.role?.trim() || "Staff",
           photoDataUrl: member.photoDataUrl ?? null,
           loginEnabled: Boolean(member.loginEnabled),
+          workMorningStartMinuteOfDay: member.workMorningStartMinuteOfDay ?? null,
+          workMorningEndMinuteOfDay: member.workMorningEndMinuteOfDay ?? null,
+          workAfternoonStartMinuteOfDay: member.workAfternoonStartMinuteOfDay ?? null,
+          workAfternoonEndMinuteOfDay: member.workAfternoonEndMinuteOfDay ?? null,
         };
       }
       const parts = display.split(/\s+/).filter(Boolean);
@@ -93,6 +105,10 @@ export function useSalonStaffList() {
         role: member.role?.trim() || "Staff",
         photoDataUrl: member.photoDataUrl ?? null,
         loginEnabled: Boolean(member.loginEnabled),
+        workMorningStartMinuteOfDay: member.workMorningStartMinuteOfDay ?? null,
+        workMorningEndMinuteOfDay: member.workMorningEndMinuteOfDay ?? null,
+        workAfternoonStartMinuteOfDay: member.workAfternoonStartMinuteOfDay ?? null,
+        workAfternoonEndMinuteOfDay: member.workAfternoonEndMinuteOfDay ?? null,
       };
     });
     return [

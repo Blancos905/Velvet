@@ -1,9 +1,18 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { apiJson } from "../../../api/client";
 import { useVelvetAuth } from "../../../auth/VelvetAuthProvider";
+import { useMeSalonSummaryQuery } from "../../../hooks/useMeSalonSummary";
 import { useSalonStaffList, type StaffViewItem, type SalonStaffApiItem } from "../../../hooks/useSalonStaffList";
+import {
+  defaultStaffWorkHoursFromSalon,
+  formatStaffWorkHoursLabel,
+  parseStaffWorkHoursForm,
+  staffWorkHoursFromMinutes,
+  type StaffWorkHoursForm,
+  type StaffWorkHoursPayload,
+} from "../../../lib/staffWorkHours";
 import { readImageFileAsStaffPhotoDataUrl } from "../../../lib/readImageDataUrl";
 import { localStaffId, writeLocalStaff, type LocalStaffItem } from "../../../lib/salonStaffLocal";
 import { staffFallbackAvatar } from "../../../lib/salonStaffAvatar";
@@ -83,6 +92,65 @@ function StaffPasswordRevealButton(props: {
   );
 }
 
+function StaffWorkHoursFields(props: {
+  value: StaffWorkHoursForm;
+  onChange: (next: StaffWorkHoursForm) => void;
+}) {
+  const { value, onChange } = props;
+  return (
+    <fieldset className="velvet-salon-staff-work-hours">
+      <legend className="velvet-form-label">Orario di lavoro (agenda prenotazioni)</legend>
+      <p className="velvet-text-muted velvet-salon-staff-work-hours__hint">
+        Mattina e pomeriggio separati: nella pausa il cliente non può prenotare con questo operatore.
+      </p>
+      <div className="velvet-personal-builder__row-2">
+        <label className="velvet-form-label">
+          Apertura mattina
+          <input
+            className="velvet-soft-field"
+            type="time"
+            value={value.morningStart}
+            onChange={(e) => onChange({ ...value, morningStart: e.target.value })}
+            required
+          />
+        </label>
+        <label className="velvet-form-label">
+          Chiusura mattina
+          <input
+            className="velvet-soft-field"
+            type="time"
+            value={value.morningEnd}
+            onChange={(e) => onChange({ ...value, morningEnd: e.target.value })}
+            required
+          />
+        </label>
+      </div>
+      <div className="velvet-personal-builder__row-2">
+        <label className="velvet-form-label">
+          Apertura pomeriggio
+          <input
+            className="velvet-soft-field"
+            type="time"
+            value={value.afternoonStart}
+            onChange={(e) => onChange({ ...value, afternoonStart: e.target.value })}
+            required
+          />
+        </label>
+        <label className="velvet-form-label">
+          Chiusura pomeriggio
+          <input
+            className="velvet-soft-field"
+            type="time"
+            value={value.afternoonEnd}
+            onChange={(e) => onChange({ ...value, afternoonEnd: e.target.value })}
+            required
+          />
+        </label>
+      </div>
+    </fieldset>
+  );
+}
+
 async function renderAvatarDataUrl(sourceDataUrl: string, adjustments: AvatarAdjustments, size = 320): Promise<string> {
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
@@ -122,6 +190,7 @@ async function renderAvatarDataUrl(sourceDataUrl: string, adjustments: AvatarAdj
 export default function SalonStaffPage() {
   const qc = useQueryClient();
   const { isSalonTitolare, accessToken } = useVelvetAuth();
+  const meSalon = useMeSalonSummaryQuery();
   const {
     mergedStaffMembers,
     staffQuery,
@@ -130,6 +199,16 @@ export default function SalonStaffPage() {
     setLocalMembers,
     salonSlug,
   } = useSalonStaffList();
+  const defaultWorkHours = useMemo(
+    () =>
+      defaultStaffWorkHoursFromSalon(
+        meSalon.data?.primaryLocationOpeningMinuteOfDay,
+        meSalon.data?.primaryLocationMorningEndMinuteOfDay,
+        meSalon.data?.primaryLocationAfternoonStartMinuteOfDay,
+        meSalon.data?.primaryLocationClosingMinuteOfDay,
+      ),
+    [meSalon.data],
+  );
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [staffEmail, setStaffEmail] = useState("");
@@ -138,6 +217,7 @@ export default function SalonStaffPage() {
   const [showStaffPassword, setShowStaffPassword] = useState(false);
   const [showStaffPasswordConfirm, setShowStaffPasswordConfirm] = useState(false);
   const [role, setRole] = useState("");
+  const [workHours, setWorkHours] = useState<StaffWorkHoursForm>(() => defaultStaffWorkHoursFromSalon());
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
   const [photoSourceDataUrl, setPhotoSourceDataUrl] = useState<string | null>(null);
   const [photoAdjustments, setPhotoAdjustments] = useState<AvatarAdjustments>(DEFAULT_AVATAR_ADJUSTMENTS);
@@ -150,6 +230,7 @@ export default function SalonStaffPage() {
   const [editPhotoDataUrl, setEditPhotoDataUrl] = useState<string | null>(null);
   const [editPhotoSourceDataUrl, setEditPhotoSourceDataUrl] = useState<string | null>(null);
   const [editPhotoAdjustments, setEditPhotoAdjustments] = useState<AvatarAdjustments>(DEFAULT_AVATAR_ADJUSTMENTS);
+  const [editWorkHours, setEditWorkHours] = useState<StaffWorkHoursForm>(() => defaultStaffWorkHoursFromSalon());
   const addPhotoRenderSeq = useRef(0);
   const editPhotoRenderSeq = useRef(0);
   const saveMsgTimeoutRef = useRef<number | null>(null);
@@ -161,6 +242,10 @@ export default function SalonStaffPage() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    setWorkHours(defaultWorkHours);
+  }, [defaultWorkHours]);
 
   const showSaveMessage = (msg: string, autoHideMs?: number) => {
     if (saveMsgTimeoutRef.current !== null) {
@@ -205,7 +290,7 @@ export default function SalonStaffPage() {
   }, [editPhotoAdjustments, editPhotoSourceDataUrl]);
 
   const createMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (hoursPayload: StaffWorkHoursPayload) =>
       apiJson<SalonStaffApiItem>("/api/v1/me/salon/staff", {
         method: "POST",
         accessToken,
@@ -216,6 +301,7 @@ export default function SalonStaffPage() {
           photoDataUrl,
           email: staffEmail.trim().toLowerCase(),
           password: staffPassword,
+          ...hoursPayload,
         }),
       }),
     onSuccess: async () => {
@@ -228,6 +314,7 @@ export default function SalonStaffPage() {
       setShowStaffPassword(false);
       setShowStaffPasswordConfirm(false);
       setRole("");
+      setWorkHours(defaultWorkHours);
       setPhotoDataUrl(null);
       setPhotoSourceDataUrl(null);
       setPhotoAdjustments(DEFAULT_AVATAR_ADJUSTMENTS);
@@ -240,7 +327,14 @@ export default function SalonStaffPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (payload: { id: string; firstName: string; lastName: string; role: string; photoDataUrl: string | null }) =>
+    mutationFn: (payload: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      role: string;
+      photoDataUrl: string | null;
+      hoursPayload: StaffWorkHoursPayload;
+    }) =>
       apiJson<SalonStaffApiItem>(`/api/v1/me/salon/staff/${encodeURIComponent(payload.id)}`, {
         method: "PUT",
         accessToken,
@@ -251,6 +345,7 @@ export default function SalonStaffPage() {
           photoDataUrl: payload.photoDataUrl,
           email: null,
           password: null,
+          ...payload.hoursPayload,
         }),
       }),
     onSuccess: async () => {
@@ -321,6 +416,14 @@ export default function SalonStaffPage() {
     setEditPhotoDataUrl(member.photoDataUrl);
     setEditPhotoSourceDataUrl(member.photoDataUrl);
     setEditPhotoAdjustments(DEFAULT_AVATAR_ADJUSTMENTS);
+    setEditWorkHours(
+      staffWorkHoursFromMinutes(
+        member.workMorningStartMinuteOfDay,
+        member.workMorningEndMinuteOfDay,
+        member.workAfternoonStartMinuteOfDay,
+        member.workAfternoonEndMinuteOfDay,
+      ) ?? defaultWorkHours,
+    );
   };
 
   const onDeleteMember = async (member: StaffViewItem) => {
@@ -345,6 +448,11 @@ export default function SalonStaffPage() {
       setSaveMsg("Inserisci nome e cognome.");
       return;
     }
+    const parsedHours = parseStaffWorkHoursForm(editWorkHours);
+    if (typeof parsedHours === "string") {
+      setSaveMsg(parsedHours);
+      return;
+    }
     if (member.source === "local") {
       const next = localMembers.map((m) =>
         m.id === member.rawId ? { ...m, firstName: first, lastName: last, role: roleValue, photoDataUrl: editPhotoDataUrl } : m,
@@ -361,6 +469,7 @@ export default function SalonStaffPage() {
       lastName: last,
       role: roleValue,
       photoDataUrl: editPhotoDataUrl,
+      hoursPayload: parsedHours,
     });
   };
 
@@ -383,6 +492,13 @@ export default function SalonStaffPage() {
         setSaveMsg("La password deve avere almeno 8 caratteri.");
         return;
       }
+      const parsedHours = parseStaffWorkHoursForm(workHours);
+      if (typeof parsedHours === "string") {
+        setSaveMsg(parsedHours);
+        return;
+      }
+      await createMutation.mutateAsync(parsedHours);
+      return;
     }
     if (!backendStaffAvailable) {
       const next: LocalStaffItem[] = [
@@ -405,7 +521,6 @@ export default function SalonStaffPage() {
       setPhotoMsg(null);
       return;
     }
-    await createMutation.mutateAsync();
   };
 
   return (
@@ -422,7 +537,7 @@ export default function SalonStaffPage() {
               <span className="velvet-salon-staff-hero__headline-accent">staff</span>
             </h1>
             <p className="velvet-account-page-shell__hero-sub">
-              Nome, cognome, ruolo e foto; con backend attivo anche email e password per l&apos;accesso all&apos;agenda.
+              Nome, cognome, ruolo, orario di lavoro e foto; con backend attivo anche email e password per l&apos;accesso all&apos;agenda.
             </p>
           </div>
         </header>
@@ -512,6 +627,9 @@ export default function SalonStaffPage() {
                 </div>
               </label>
             </>
+          ) : null}
+          {backendStaffAvailable ? (
+            <StaffWorkHoursFields value={workHours} onChange={setWorkHours} />
           ) : null}
           <label className="velvet-form-label velvet-salon-staff-form__tight">
             Foto (opzionale)
@@ -623,6 +741,22 @@ export default function SalonStaffPage() {
                   {member.firstName} {member.lastName}
                 </strong>
                 <span className="velvet-text-muted velvet-salon-staff-item__role">Ruolo: {member.role}</span>
+                {formatStaffWorkHoursLabel(
+                  member.workMorningStartMinuteOfDay,
+                  member.workMorningEndMinuteOfDay,
+                  member.workAfternoonStartMinuteOfDay,
+                  member.workAfternoonEndMinuteOfDay,
+                ) ? (
+                  <span className="velvet-text-muted velvet-salon-staff-item__role">
+                    Orario:{" "}
+                    {formatStaffWorkHoursLabel(
+                      member.workMorningStartMinuteOfDay,
+                      member.workMorningEndMinuteOfDay,
+                      member.workAfternoonStartMinuteOfDay,
+                      member.workAfternoonEndMinuteOfDay,
+                    )}
+                  </span>
+                ) : null}
                 {member.loginEnabled ? (
                   <span className="velvet-salon-staff-item__chip velvet-salon-staff-item__chip--login">Accesso agenda attivo</span>
                 ) : (
@@ -633,6 +767,9 @@ export default function SalonStaffPage() {
                     <input className="velvet-soft-field" value={editFirstName} onChange={(e) => setEditFirstName(e.target.value)} />
                     <input className="velvet-soft-field" value={editLastName} onChange={(e) => setEditLastName(e.target.value)} />
                     <input className="velvet-soft-field" value={editRole} onChange={(e) => setEditRole(e.target.value)} />
+                    {member.source === "api" ? (
+                      <StaffWorkHoursFields value={editWorkHours} onChange={setEditWorkHours} />
+                    ) : null}
                     <input
                       className="velvet-soft-field"
                       type="file"

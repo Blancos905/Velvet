@@ -36,6 +36,8 @@ ln -snf "$ROOT/node_modules" "$RUN_ROOT/node_modules"
 
 # Cache/pre-bundle di Vite su disco locale, fuori dal Desktop/iCloud.
 export VELVET_VITE_CACHE_DIR="${VELVET_VITE_CACHE_DIR:-/tmp/velvet-vite-cache}"
+# src/public sono symlink al repo: Vite deve poter servire file fuori da $RUN_ROOT.
+export VELVET_FRONTEND_REPO_ROOT="$ROOT"
 
 # Libera la porta se un'istanza precedente è rimasta appesa.
 lsof -ti ":$PORT" | xargs kill -9 2>/dev/null || true

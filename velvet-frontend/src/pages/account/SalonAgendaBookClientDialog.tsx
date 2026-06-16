@@ -110,6 +110,8 @@ export function SalonAgendaBookClientDialog({
         meSalon.data?.primaryLocationOpeningMinuteOfDay,
         meSalon.data?.primaryLocationClosingMinuteOfDay,
         "Europe/Rome",
+        meSalon.data?.primaryLocationMorningEndMinuteOfDay,
+        meSalon.data?.primaryLocationAfternoonStartMinuteOfDay,
       ),
     [meSalon.data],
   );

@@ -69,8 +69,9 @@ public class AppointmentBookingService {
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Servizio non appartiene alla sede.");
 		}
 		Instant end = start.plus(Duration.ofMinutes(service.getDurationMinutes()));
-		assertWithinWorkHours(location, start, end);
+		assertWithinLocationWorkHours(location, start, end);
 		StaffOperator operator = resolveOperatorForConsumerBooking(location, service, operatorId, start, end);
+		assertWithinOperatorWorkHours(location, operator, start, end);
 
 		SalonClient client = salonClientRepository
 				.findByLocation_IdAndConsumerProfile_Id(location.getId(), consumer.getId())
@@ -126,7 +127,13 @@ public class AppointmentBookingService {
 			assertNoOverlap(created.getId(), start, end, null);
 			return created;
 		}
+		ZoneId zone = ZoneId.of(location.getTimeZone());
+		int startMinute = start.atZone(zone).getHour() * 60 + start.atZone(zone).getMinute();
+		int endMinute = end.atZone(zone).getHour() * 60 + end.atZone(zone).getMinute();
 		for (StaffOperator candidate : operators) {
+			if (!WorkSchedule.fitsAnyWindow(WorkSchedule.windowsForOperator(candidate, location), startMinute, endMinute)) {
+				continue;
+			}
 			boolean overlap = appointmentRepository.existsOverlapping(
 					candidate.getId(),
 					start,
@@ -163,7 +170,9 @@ public class AppointmentBookingService {
 
 		SalonService service = appointment.getService();
 		Instant newEnd = newStart.plus(Duration.ofMinutes(service.getDurationMinutes()));
-		assertWithinWorkHours(appointment.getLocation(), newStart, newEnd);
+		Location location = appointment.getLocation();
+		assertWithinLocationWorkHours(location, newStart, newEnd);
+		assertWithinOperatorWorkHours(location, appointment.getOperator(), newStart, newEnd);
 		assertNoOverlap(appointment.getOperator().getId(), newStart, newEnd, appointment.getId());
 
 		appointment.setStart(newStart);
@@ -188,8 +197,31 @@ public class AppointmentBookingService {
 		}
 	}
 
-	private static void assertWithinWorkHours(Location location, Instant start, Instant end) {
-		ZoneId zone = ZoneId.of(location.getTimeZone());
+	private static void assertWithinLocationWorkHours(Location location, Instant start, Instant end) {
+		assertWithinWorkWindows(
+				WorkSchedule.windowsForLocation(location),
+				location.getTimeZone(),
+				start,
+				end,
+				"L'orario scelto è fuori dall'orario di apertura del salone.");
+	}
+
+	private static void assertWithinOperatorWorkHours(Location location, StaffOperator operator, Instant start, Instant end) {
+		assertWithinWorkWindows(
+				WorkSchedule.windowsForOperator(operator, location),
+				location.getTimeZone(),
+				start,
+				end,
+				"L'orario scelto è fuori dall'orario di lavoro dell'operatore.");
+	}
+
+	private static void assertWithinWorkWindows(
+			List<WorkSchedule.MinuteWindow> windows,
+			String timeZone,
+			Instant start,
+			Instant end,
+			String outsideMessage) {
+		ZoneId zone = ZoneId.of(timeZone);
 		ZonedDateTime zStart = start.atZone(zone);
 		ZonedDateTime zEnd = end.atZone(zone);
 		if (!zStart.toLocalDate().equals(zEnd.toLocalDate())) {
@@ -198,9 +230,7 @@ public class AppointmentBookingService {
 					"VALIDATION_ERROR",
 					"Il servizio deve iniziare e finire nello stesso giorno di apertura.");
 		}
-		int open = location.getWorkStartMinuteOfDay();
-		int close = location.getWorkEndMinuteOfDay();
-		if (open >= close) {
+		if (windows.isEmpty()) {
 			throw new BusinessException(
 					HttpStatus.CONFLICT,
 					"BOOKING_CLOSED",
@@ -208,11 +238,8 @@ public class AppointmentBookingService {
 		}
 		int startMinute = zStart.getHour() * 60 + zStart.getMinute();
 		int endMinute = zEnd.getHour() * 60 + zEnd.getMinute();
-		if (startMinute < open || endMinute > close) {
-			throw new BusinessException(
-					HttpStatus.CONFLICT,
-					"OUTSIDE_OPENING_HOURS",
-					"L'orario scelto è fuori dall'orario di apertura del salone.");
+		if (!WorkSchedule.fitsAnyWindow(windows, startMinute, endMinute)) {
+			throw new BusinessException(HttpStatus.CONFLICT, "OUTSIDE_OPENING_HOURS", outsideMessage);
 		}
 	}
 
@@ -291,7 +318,8 @@ public class AppointmentBookingService {
 		}
 
 		Instant end = start.plus(Duration.ofMinutes(service.getDurationMinutes()));
-		assertWithinWorkHours(location, start, end);
+		assertWithinLocationWorkHours(location, start, end);
+		assertWithinOperatorWorkHours(location, operator, start, end);
 		assertNoOverlap(operator.getId(), start, end, null);
 
 		Appointment a = new Appointment(location, service, operator, client, start, end);
@@ -391,32 +419,10 @@ public class AppointmentBookingService {
 		}
 	}
 
-	/** Per token: stessa logica senza possesso JWT (identità dal token su appointment). */
+	/** Per token recensione: verifica che l'id nel payload corrisponda all'appuntamento. */
 	public void assertTokenMatchesAppointment(Appointment appointment, UUID appointmentIdFromToken) {
 		if (!appointment.getId().equals(appointmentIdFromToken)) {
 			throw new BusinessException(HttpStatus.NOT_FOUND, "INVALID_TOKEN", "Token non valido.");
 		}
-	}
-
-	public void cancelByToken(Appointment appointment) {
-		if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
-			return;
-		}
-		assertConsumerCanMutateState(appointment);
-		appointment.cancel(CancelledBy.CONSUMER);
-		appointmentRepository.save(appointment);
-		appointmentNotificationService.onConsumerBookingCancelled(appointment.getId());
-	}
-
-	public void rescheduleByToken(Appointment appointment, Instant newStart) {
-		assertConsumerCanMutateState(appointment);
-		SalonService service = appointment.getService();
-		Instant newEnd = newStart.plus(Duration.ofMinutes(service.getDurationMinutes()));
-		assertWithinWorkHours(appointment.getLocation(), newStart, newEnd);
-		assertNoOverlap(appointment.getOperator().getId(), newStart, newEnd, appointment.getId());
-		appointment.setStart(newStart);
-		appointment.setEnd(newEnd);
-		appointmentRepository.save(appointment);
-		appointmentNotificationService.onConsumerBookingRescheduled(appointment.getId());
 	}
 }

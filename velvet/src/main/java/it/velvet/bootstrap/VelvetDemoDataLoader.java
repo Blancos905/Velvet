@@ -14,15 +14,22 @@ import it.velvet.studio.domain.StudioGroup;
 import it.velvet.studio.domain.StudioGroupRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.annotation.Order;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static it.velvet.config.VelvetAsyncConfiguration.BOOTSTRAP_EXECUTOR;
+
 @Component
-@Order(1)
-public class VelvetDemoDataLoader implements ApplicationRunner {
+@Profile("local")
+public class VelvetDemoDataLoader {
 
 	private static final Logger log = LoggerFactory.getLogger(VelvetDemoDataLoader.class);
 
@@ -58,8 +65,9 @@ public class VelvetDemoDataLoader implements ApplicationRunner {
 		this.passwordEncoder = passwordEncoder;
 	}
 
-	@Override
-	public void run(ApplicationArguments args) {
+	@EventListener(ApplicationReadyEvent.class)
+	@Async(BOOTSTRAP_EXECUTOR)
+	public void onApplicationReady() {
 		if (consumerProfileRepository.findByKeycloakSub(DEMO_OWNER_KEYCLOAK_SUB).isEmpty()) {
 			ConsumerProfile p = new ConsumerProfile(DEMO_OWNER_KEYCLOAK_SUB, DEMO_OWNER_EMAIL, "Dev Titolare");
 			p.setPasswordHash(passwordEncoder.encode("demo"));
@@ -73,10 +81,12 @@ public class VelvetDemoDataLoader implements ApplicationRunner {
 				.orElseGet(() -> studioGroupRepository.save(
 						new StudioGroup("Velvet Demo Salon", DEMO_OWNER_EMAIL, "PREMIUM", DEMO_OWNER_KEYCLOAK_SUB)));
 
-		Location loc = locationRepository.findBySlug("demo-salone").orElse(null);
+		List<Location> groupLocations = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId());
+		Location loc = groupLocations.isEmpty() ? null : groupLocations.get(0);
 		boolean createdDemoSalon = false;
 		if (loc == null) {
-			loc = new Location(group, "demo-salone", "Velvet Demo Salon", "Milano");
+			String slug = resolveAvailableDemoSlug(group);
+			loc = new Location(group, slug, "Velvet Demo Salon", "Milano");
 			loc.setAddressLine("Via Esempio 1");
 			loc.setPostalCode("20100");
 			loc.setPhoneE164("+393331234567");
@@ -94,7 +104,7 @@ public class VelvetDemoDataLoader implements ApplicationRunner {
 		}
 
 		if (!createdDemoSalon) {
-			log.info("Demo salon già presente (slug=demo-salone, id={})", loc.getId());
+			log.info("Demo salon già presente (slug={}, id={})", loc.getSlug(), loc.getId());
 			log.info("Demo titolare: email={} password=demo", DEMO_OWNER_EMAIL);
 			return;
 		}
@@ -109,9 +119,38 @@ public class VelvetDemoDataLoader implements ApplicationRunner {
 		SalonClient walkIn = new SalonClient(loc, "Cliente walk-in");
 		salonClientRepository.save(walkIn);
 
-		log.info("Velvet demo: sede slug=demo-salone id={} — usa header X-Location-Id per API staff.", loc.getId());
+		log.info("Velvet demo: sede slug={} id={} — usa header X-Location-Id per API staff.", loc.getSlug(), loc.getId());
 		log.info("Servizio esempio id={} (durata {} min)", baffo.getId(), baffo.getDurationMinutes());
 		log.info("Operatore esempio id={}", op1.getId());
 		log.info("Demo titolare: email={} password=demo", DEMO_OWNER_EMAIL);
+	}
+
+	/**
+	 * Slug demo idempotente: riusa {@code demo-salone} se libero o già del gruppo demo; altrimenti suffisso numerico.
+	 */
+	private String resolveAvailableDemoSlug(StudioGroup demoGroup) {
+		final String base = "demo-salone";
+		Optional<Location> existing = locationRepository.findBySlug(base);
+		if (existing.isEmpty()) {
+			return base;
+		}
+		if (existing.get().getStudioGroup().getId().equals(demoGroup.getId())) {
+			return base;
+		}
+		log.warn(
+				"Slug {} già usato da studio_group_id={}: creo sede demo con slug alternativo per groupId={}",
+				base,
+				existing.get().getStudioGroup().getId(),
+				demoGroup.getId());
+		String candidate = base;
+		int n = 0;
+		while (locationRepository.existsBySlug(candidate)) {
+			n++;
+			candidate = base + "-" + n;
+			if (n > 5000) {
+				return base + "-" + UUID.randomUUID().toString().substring(0, 8);
+			}
+		}
+		return candidate;
 	}
 }

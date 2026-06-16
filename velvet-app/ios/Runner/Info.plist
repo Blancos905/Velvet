@@ -31,6 +31,21 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Saloni Luxury si connette al computer di sviluppo sulla rete Wi‑Fi locale per caricare l’interfaccia in modalità debug.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartVmService._tcp</string>
+	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Saloni Luxury usa la tua posizione per trovare saloni vicini a te e compilare comune e CAP nella ricerca.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Saloni Luxury usa la tua posizione per trovare saloni vicini a te e compilare comune e CAP nella ricerca.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

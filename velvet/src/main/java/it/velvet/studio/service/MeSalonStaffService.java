@@ -75,6 +75,7 @@ public class MeSalonStaffService {
 		String normalizedRole = role.isBlank() ? "Staff" : role;
 		StaffOperator saved = saveWithPhotoFallback(loc, firstName, lastName, normalizedRole, photoDataUrl.isBlank() ? null : photoDataUrl);
 		saved.setConsumerProfile(account);
+		applyWorkSchedule(saved, body);
 		saved = staffOperatorRepository.save(saved);
 		return MeSalonStaffDto.from(saved);
 	}
@@ -93,6 +94,7 @@ public class MeSalonStaffService {
 		String normalizedRole = role.isBlank() ? "Staff" : role;
 		String normalizedPhoto = photoDataUrl.isBlank() ? null : photoDataUrl;
 		operator.updateProfile(firstName, lastName, normalizedRole, normalizedPhoto);
+		applyWorkSchedule(operator, body);
 		try {
 			return MeSalonStaffDto.from(staffOperatorRepository.save(operator));
 		} catch (DataIntegrityViolationException ex) {
@@ -140,6 +142,44 @@ public class MeSalonStaffService {
 		if (v == null) return "";
 		String t = v.trim();
 		return t.length() > maxLen ? t.substring(0, maxLen) : t;
+	}
+
+	private static void applyWorkSchedule(StaffOperator operator, MeSalonStaffCreateRequest body) {
+		Integer morningStart = body.workMorningStartMinuteOfDay();
+		Integer morningEnd = body.workMorningEndMinuteOfDay();
+		Integer afternoonStart = body.workAfternoonStartMinuteOfDay();
+		Integer afternoonEnd = body.workAfternoonEndMinuteOfDay();
+		boolean any = morningStart != null || morningEnd != null || afternoonStart != null || afternoonEnd != null;
+		if (!any) {
+			return;
+		}
+		if (morningStart == null || morningEnd == null || afternoonStart == null || afternoonEnd == null) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"VALIDATION_ERROR",
+					"Per l'orario operatore servono apertura/chiusura mattina e apertura/chiusura pomeriggio.");
+		}
+		validateMinuteOfDay(morningStart, "apertura mattina");
+		validateMinuteOfDay(morningEnd, "chiusura mattina");
+		validateMinuteOfDay(afternoonStart, "apertura pomeriggio");
+		validateMinuteOfDay(afternoonEnd, "chiusura pomeriggio");
+		if (morningStart >= morningEnd || afternoonStart >= afternoonEnd || morningEnd >= afternoonStart) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"VALIDATION_ERROR",
+					"Gli orari operatore devono essere: mattina apertura < chiusura < pomeriggio apertura < chiusura.");
+		}
+		operator.updateWorkSchedule(morningStart, morningEnd, afternoonStart, afternoonEnd);
+	}
+
+	private static int validateMinuteOfDay(int minute, String label) {
+		if (minute < 0 || minute > 1439) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"VALIDATION_ERROR",
+					"Orario " + label + " non valido.");
+		}
+		return minute;
 	}
 
 	private StaffOperator saveWithPhotoFallback(

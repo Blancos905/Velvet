@@ -16,6 +16,25 @@ my-salon-platform/
 └── infrastructure/     # Docker Compose prod + Nginx indurito
 ```
 
+## Sviluppo locale (dev quotidiano)
+
+Tre terminali (ordine consigliato):
+
+```bash
+./scripts/dev-backend.sh          # Spring Boot → http://127.0.0.1:8080 (~15–30s, salta test-compile)
+./scripts/dev-frontend.sh         # Vite → http://127.0.0.1:5173 (cache /tmp, no loop iCloud)
+./scripts/dev-app-ios.sh          # oppure ./scripts/dev-app-android.sh
+```
+
+Verifica rapida:
+
+```bash
+curl -sf http://127.0.0.1:8080/api/v1/public/health
+curl -sf http://127.0.0.1:5173/
+```
+
+**Note:** non avviare due `./mvnw spring-boot:run` insieme; se la porta 8080 è libera ma Maven è già in compilazione, `wait-for-backend.sh` attende invece di duplicare il processo. Per test completi: `cd velvet && ./mvnw test`.
+
 ## Sviluppo frontend-web
 
 ```bash

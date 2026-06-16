@@ -15,7 +15,7 @@
   <!-- Certificate pinning produzione: sostituire SHA-256 del certificato pubblico -->
   <!--
   <domain-config>
-    <domain includeSubdomains="true">salonivelvet.it</domain>
+    <domain includeSubdomains="true">saloniluxury.it</domain>
     <pin-set expiration="2027-01-01">
       <pin digest="SHA-256">BASE64_PIN_HERE=</pin>
     </pin-set>

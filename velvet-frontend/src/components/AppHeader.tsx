@@ -1,58 +1,41 @@
-import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
+import { useEffectiveSalonPlanTier } from "../hooks/useEffectiveSalonPlanTier";
+import { isVelvetNativeAppShell } from "../hooks/useVelvetNativeAppShell";
+import {
+  CONSUMER_PROFILE_MENU_ITEMS,
+  ownerProfileMenuItems,
+  STAFF_PROFILE_MENU_ITEMS,
+  SUPER_ADMIN_PROFILE_MENU_ITEMS,
+} from "../lib/appHeaderProfileMenuItems";
+import { useMeSalonSummaryQuery } from "../hooks/useMeSalonSummary";
+import { isSalonFreeOwnerBlockedOnWeb } from "../lib/subscription-guards";
 import { setPostLoginReturnPath } from "../lib/postLoginReturnPath";
+import { AppHeaderProfileMenu } from "./AppHeaderProfileMenu";
 import { PartnerSignupLink } from "./PartnerSignupLink";
 import "../styles/app-header.css";
 
 export function AppHeader() {
   const location = useLocation();
-  const { isAuthenticated, isSalonTitolare, isVelvetSuperAdmin, signOut } = useVelvetAuth();
+  const { isAuthenticated, isSalonTitolare, isSalonStaff, isVelvetSuperAdmin, signOut } = useVelvetAuth();
+  const isNativeApp = isVelvetNativeAppShell();
+  const salonPlanTier = useEffectiveSalonPlanTier();
+  const meSalon = useMeSalonSummaryQuery();
+  const hideOwnerSalonHeaderLink =
+    isSalonTitolare && !isNativeApp && isSalonFreeOwnerBlockedOnWeb(meSalon.data);
   const adminAreaActive = location.pathname.startsWith("/admin");
-  const isConsumerAuthenticated = isAuthenticated && !isSalonTitolare && !isVelvetSuperAdmin;
-  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const profileMenuRef = useRef<HTMLDivElement | null>(null);
-  const profileDropdownRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const el = profileDropdownRef.current;
-    if (!el) return;
-    if (!profileMenuOpen) el.setAttribute("inert", "");
-    else el.removeAttribute("inert");
-  }, [profileMenuOpen]);
-
-  useEffect(() => {
-    if (!profileMenuOpen) return;
-    const onDocumentPointerDown = (event: PointerEvent) => {
-      if (!profileMenuRef.current) return;
-      if (profileMenuRef.current.contains(event.target as Node)) return;
-      setProfileMenuOpen(false);
-    };
-    const onDocumentKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setProfileMenuOpen(false);
-    };
-    document.addEventListener("pointerdown", onDocumentPointerDown);
-    document.addEventListener("keydown", onDocumentKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", onDocumentPointerDown);
-      document.removeEventListener("keydown", onDocumentKeyDown);
-    };
-  }, [profileMenuOpen]);
-
-  useEffect(() => {
-    setProfileMenuOpen(false);
-  }, [location.pathname, location.search, location.hash]);
+  const isConsumerAuthenticated = isAuthenticated && !isSalonTitolare && !isVelvetSuperAdmin && !isSalonStaff;
 
   return (
     <header className="velvet-site-header">
       <div className="velvet-header-main">
         <Link to="/" className="velvet-brand">
           <img
-            src="/logo-saloni-velvet.png"
+            src="/logo-saloni-luxury.png"
             alt="Saloni Luxury"
             className="velvet-brand-logo"
-            width={112}
-            height={112}
+            width={100}
+            height={100}
           />
           <div className="velvet-brand-text">
             <span className="velvet-brand-saloni">Saloni</span>
@@ -82,77 +65,50 @@ export function AppHeader() {
           {isAuthenticated && (
             <>
               {isVelvetSuperAdmin ? (
-                <NavLink
-                  to="/admin/dashboard"
-                  className={() => (adminAreaActive ? "active" : "")}
-                >
-                  Gestione piattaforma
-                </NavLink>
+                isNativeApp ? (
+                  <AppHeaderProfileMenu
+                    items={SUPER_ADMIN_PROFILE_MENU_ITEMS}
+                    ariaLabel="Menu super admin"
+                    headerLabel="Amministrazione"
+                  />
+                ) : (
+                  <NavLink
+                    to="/admin/dashboard"
+                    className={() => (adminAreaActive ? "active" : "")}
+                  >
+                    Gestione piattaforma
+                  </NavLink>
+                )
               ) : isSalonTitolare ? (
-                <NavLink
-                  to="/account/salone"
-                  className={({ isActive }) =>
-                    `velvet-header-cta-pill velvet-header-btn-primary${isActive ? " active" : ""}`
-                  }
-                >
-                  Il mio salone
-                </NavLink>
+                isNativeApp || hideOwnerSalonHeaderLink ? (
+                  <AppHeaderProfileMenu
+                    items={ownerProfileMenuItems(salonPlanTier)}
+                    ariaLabel="Menu profilo titolare"
+                    headerLabel="Il tuo salone"
+                  />
+                ) : (
+                  <NavLink
+                    to="/account/salone"
+                    className={({ isActive }) =>
+                      `velvet-header-cta-pill velvet-header-btn-primary${isActive ? " active" : ""}`
+                    }
+                  >
+                    Il mio salone
+                  </NavLink>
+                )
+              ) : isSalonStaff ? (
+                <AppHeaderProfileMenu
+                  items={STAFF_PROFILE_MENU_ITEMS}
+                  ariaLabel="Menu profilo staff"
+                  headerLabel="Accesso operatore"
+                />
               ) : (
-                <div className="velvet-header-profile-menu" ref={profileMenuRef}>
-                  <button
-                    type="button"
-                    className={`velvet-header-cta-pill velvet-header-profile-trigger${profileMenuOpen ? " is-open" : ""}`}
-                    aria-haspopup="menu"
-                    aria-expanded={profileMenuOpen}
-                    aria-controls="velvet-header-profile-dropdown"
-                    onClick={() => setProfileMenuOpen((open) => !open)}
-                  >
-                    Profilo
-                    <span aria-hidden className="velvet-header-profile-caret">
-                      ▾
-                    </span>
-                  </button>
-                  <div
-                    ref={profileDropdownRef}
-                    id="velvet-header-profile-dropdown"
-                    className={`velvet-header-profile-dropdown${profileMenuOpen ? " is-open" : ""}`}
-                    role="menu"
-                    aria-label="Menu profilo cliente"
-                    aria-hidden={!profileMenuOpen}
-                  >
-                    <p className="velvet-header-profile-dropdown__header" role="presentation">
-                      Il tuo account
-                    </p>
-                    <Link to="/account/profilo" role="menuitem" className="velvet-header-profile-item">
-                      Informazioni
-                    </Link>
-                    <Link to="/account/prenotazioni" role="menuitem" className="velvet-header-profile-item">
-                      Prenotazioni
-                    </Link>
-                    <Link to="/account/chat" role="menuitem" className="velvet-header-profile-item">
-                      Chat
-                    </Link>
-                    <Link to="/account/notifiche" role="menuitem" className="velvet-header-profile-item">
-                      Notifiche
-                    </Link>
-                    <Link to="/account/saloni-di-fiducia" role="menuitem" className="velvet-header-profile-item">
-                      Saloni di fiducia
-                    </Link>
-                    <Link to="/recensione" role="menuitem" className="velvet-header-profile-item">
-                      Recensioni
-                    </Link>
-                    <button
-                      type="button"
-                      role="menuitem"
-                      className="velvet-header-profile-item velvet-header-profile-item--button velvet-header-profile-item--logout"
-                      onClick={() => void signOut()}
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </div>
+                <AppHeaderProfileMenu
+                  items={CONSUMER_PROFILE_MENU_ITEMS}
+                  ariaLabel="Menu profilo cliente"
+                />
               )}
-              {!isConsumerAuthenticated ? (
+              {isAuthenticated && (isNativeApp || !isConsumerAuthenticated || hideOwnerSalonHeaderLink) ? (
                 <button
                   type="button"
                   className="velvet-header-cta-pill velvet-header-btn-primary"
@@ -170,7 +126,6 @@ export function AppHeader() {
                 `velvet-header-cta-pill velvet-header-btn-primary${isActive ? " active" : ""}`
               }
               onClick={() => {
-                /* «Accedi» porta a /account: dopo login si resta in area account, non sulla pagina pubblica precedente (es. /search). */
                 setPostLoginReturnPath("/account");
               }}
             >

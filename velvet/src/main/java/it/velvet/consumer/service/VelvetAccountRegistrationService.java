@@ -40,6 +40,7 @@ public class VelvetAccountRegistrationService {
 			String password,
 			String firstName,
 			String lastName,
+			String country,
 			String phone,
 			boolean bootstrapSuperAdmin,
 			String legalDocumentVersion) {
@@ -55,6 +56,7 @@ public class VelvetAccountRegistrationService {
 		if (phone != null && !phone.isBlank()) {
 			p.setPhone(phone.trim());
 		}
+		p.setCountry(normalizeCountryCode(country));
 		applyLegalAcceptance(p, legalDocumentVersion);
 		consumerProfileRepository.save(p);
 		if (grantAdmin) {
@@ -167,5 +169,12 @@ public class VelvetAccountRegistrationService {
 		String l = lastName != null ? lastName.trim() : "";
 		String joined = (f + " " + l).trim();
 		return joined.isEmpty() ? null : joined;
+	}
+
+	private static String normalizeCountryCode(String country) {
+		if (country == null || country.isBlank()) {
+			return "IT";
+		}
+		return country.trim().toUpperCase(Locale.ROOT);
 	}
 }

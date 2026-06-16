@@ -53,10 +53,10 @@ public class ReviewShowcaseService {
 	}
 
 	private SalonReviewsBlock buildSalonBlock() {
-		double avg = reviewRepository.averageRating().orElse(0.0);
-		long count = reviewRepository.count();
+		double avg = reviewRepository.averagePublicRating().orElse(0.0);
+		long count = reviewRepository.countPublic();
 		List<Review> slice = reviewRepository
-				.findPageWithAssociations(PageRequest.of(0, SHOWCASE_LIMIT))
+				.findPublicPageWithAssociations(PageRequest.of(0, SHOWCASE_LIMIT))
 				.getContent();
 		List<PublicSalonReviewItem> items = slice.stream()
 				.map(r -> {

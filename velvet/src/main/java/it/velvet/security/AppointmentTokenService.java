@@ -30,11 +30,6 @@ public class AppointmentTokenService {
 		this.objectMapper = objectMapper;
 	}
 
-	public String mintManageToken(UUID appointmentId) {
-		long expSeconds = Instant.now().getEpochSecond() + securityProperties.manageTokenTtlHours() * 3600L;
-		return sign(new Payload(appointmentId.toString(), TokenPurpose.MANAGE.name(), expSeconds));
-	}
-
 	public String mintReviewToken(UUID appointmentId) {
 		long expSeconds = Instant.now().getEpochSecond() + securityProperties.reviewTokenTtlDays() * 86400L;
 		return sign(new Payload(appointmentId.toString(), TokenPurpose.REVIEW.name(), expSeconds));

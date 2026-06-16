@@ -143,6 +143,10 @@ public class MeSalonAppointmentsService {
 						"Nessun salone collegato a questo account. Completa la registrazione titolare."));
 		List<Location> locs = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId());
 		if (locs.isEmpty()) {
+			meSalonOwnerOrphanRepairService.tryRepairIfOwnerWithNoLocation(principal);
+			locs = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId());
+		}
+		if (locs.isEmpty()) {
 			throw new BusinessException(
 					HttpStatus.CONFLICT,
 					"SALON_NO_LOCATION",

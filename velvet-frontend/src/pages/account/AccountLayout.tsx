@@ -1,11 +1,12 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { apiJson } from "../../api/client";
 import type { OrganizationDetail, SalonCatalogClientRow, SalonClientMembershipDto } from "../../api/types";
 import { useOptionalAdminAuth } from "../../auth/AdminAuthProvider";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
-import { SaloniVelvetLogoMark } from "../../components/SaloniVelvetLogoMark";
+import { SaloniLuxuryLogoMark } from "../../components/SaloniLuxuryLogoMark";
+import { VelvetNativeAccountOverlay } from "../../components/VelvetNativeAccountOverlay";
 import { planDisplayName, parseSalonPlanTier } from "../../data/salonPlans";
 import { useEffectiveSalonPlanTier } from "../../hooks/useEffectiveSalonPlanTier";
 import { useMeNotificationInboxQuery } from "../../hooks/useMeNotificationInbox";
@@ -18,6 +19,13 @@ import { useMeSalonSummaryQuery } from "../../hooks/useMeSalonSummary";
 import { useSalonShowcaseOwnerMigration } from "../../hooks/useSalonShowcaseOwnerMigration";
 import { useMeStaffSalonQuery } from "../../hooks/useMeStaffSalon";
 import { useVelvetEmbeddedPanel } from "../../hooks/useVelvetEmbeddedPanel";
+import { isVelvetNativeAppShell } from "../../hooks/useVelvetNativeAppShell";
+import { nativeAccountOverlayTitle } from "../../lib/nativeAccountOverlayTitle";
+import {
+  isNativeAccountHubPath,
+  nativeAccountHubFallbackPath,
+  normalizeAccountPath,
+} from "../../lib/nativeAccountHubPaths";
 import { readSalonClientsNavDebugEnabled } from "../../lib/salonClientsNavDebug";
 import { subscribeSalonCatalogClientsInvalidate } from "../../lib/salonCatalogClientsSync";
 import {
@@ -41,16 +49,21 @@ import {
   readSalonReviewLastSeenAt,
   writeSalonReviewLastSeenAt,
 } from "../../lib/salonReviewNotifications";
+import { isSalonFreeOwnerBlockedOnWeb } from "../../lib/subscription-guards";
 import { readSalonBrandingNameFromAccessToken } from "../../lib/velvetJwtHintsFromAccessToken";
 import "../../styles/account-hub.css";
+import "../../styles/account-hub-native-app.css";
 import "../../styles/salon-notifications.css";
 import { AccountHubNavOwnerConsumerLinks } from "./AccountHubNavOwnerConsumerLinks";
 import { AccountHubNavPremiumSalonLinks } from "./AccountHubNavPremiumSalonLinks";
+import { SalonFreeWebPanelGate } from "./SalonFreeWebPanelGate";
 import { accountHubNavBtn as navBtn } from "./accountHubNavBtn";
 
 export function AccountLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const embedded = useVelvetEmbeddedPanel();
+  const isNativeApp = isVelvetNativeAppShell();
   const queryClient = useQueryClient();
   const { isSalonTitolare, isSalonStaff, isVelvetSuperAdmin, accessToken, userDisplayLabel, userEmail } = useVelvetAuth();
   const isAdminSession = useOptionalAdminAuth()?.isAdminSession ?? false;
@@ -390,15 +403,70 @@ export function AccountLayout() {
   const meSalonForbidden = /403|forbidden/i.test(meSalonErrorText);
   const accountHubUsesVelvetPlansTheme =
     isSalonTitolare || isSalonStaff || (!isSalonTitolare && !isSalonStaff && !isVelvetSuperAdmin);
-  const accountHubClassName = accountHubUsesVelvetPlansTheme
-    ? "velvet-account-hub velvet-account-hub--velvet-plans"
-    : "velvet-account-hub";
+  const isNativeHubScreen =
+    isNativeApp && isNativeAccountHubPath(location.pathname);
+  const accountHubClassName = [
+    accountHubUsesVelvetPlansTheme ? "velvet-account-hub velvet-account-hub--velvet-plans" : "velvet-account-hub",
+    isNativeHubScreen ? "velvet-account-hub--native-hub" : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const isAccountSubRoute =
+    location.pathname !== "/account" && location.pathname.startsWith("/account/");
+
+  const hideNativeHubOutlet =
+    isNativeHubScreen && normalizeAccountPath(location.pathname) === "/account/home";
+
+  const closeNativeAccountOverlay = useCallback(() => {
+    if (location.key !== "default") {
+      navigate(-1);
+      return;
+    }
+    navigate(
+      nativeAccountHubFallbackPath({ isSalonTitolare, isSalonStaff, salonPlanTier: salonTier }),
+      { replace: true },
+    );
+  }, [isSalonStaff, isSalonTitolare, location.key, navigate, salonTier]);
 
   if (embedded) {
     return (
       <div className="velvet-account-hub velvet-account-hub--embedded" aria-label="Pannello account incorporato">
         <Outlet />
       </div>
+    );
+  }
+
+  const billingCheckoutPaths = ["/account/billing/checkout", "/account/billing/success"];
+  const isBillingCheckoutRoute = billingCheckoutPaths.some(
+    (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
+  );
+
+  const blockFreeOwnerWebPanel =
+    isSalonTitolare && !isNativeApp && !isSuperAdminViewingAsSalonOwner && !isBillingCheckoutRoute;
+  if (blockFreeOwnerWebPanel) {
+    if (meSalon.isPending) {
+      return (
+        <main className="velvet-auth-page">
+          <div className="velvet-auth-card">
+            <p className="velvet-auth-loading">Caricamento account salone…</p>
+          </div>
+        </main>
+      );
+    }
+    if (isSalonFreeOwnerBlockedOnWeb(meSalon.data)) {
+      return <SalonFreeWebPanelGate />;
+    }
+  }
+
+  if (isNativeApp && isAccountSubRoute && !isNativeHubScreen) {
+    return (
+      <VelvetNativeAccountOverlay
+        title={nativeAccountOverlayTitle(location.pathname)}
+        onClose={closeNativeAccountOverlay}
+      >
+        <Outlet />
+      </VelvetNativeAccountOverlay>
     );
   }
 
@@ -420,7 +488,7 @@ export function AccountLayout() {
 
           <header className="velvet-account-hub__welcome">
             <div className="velvet-account-hub__mark-wrap">
-              <SaloniVelvetLogoMark variant="default" />
+              <SaloniLuxuryLogoMark variant="default" />
             </div>
             <div className="velvet-account-hub__welcome-copy">
               <p className="velvet-account-hub__welcome-line">Benvenuto in Saloni Luxury</p>
@@ -466,7 +534,7 @@ export function AccountLayout() {
                     )}
                   </p>
                   {titolareSalonGreeting.hasNamedSalon ? (
-                    <p className="velvet-account-hub__welcome-line" style={{ fontSize: "0.92rem", opacity: 0.88, marginTop: "0.2rem" }}>
+                    <p className="velvet-account-hub__salon-name">
                       Salone <strong>{titolareSalonGreeting.salonName}</strong>
                     </p>
                   ) : "salonHint" in titolareSalonGreeting && titolareSalonGreeting.salonHint === "pending" ? (
@@ -694,7 +762,7 @@ export function AccountLayout() {
       </nav>
 
       <div className="velvet-account-hub__body">
-        <Outlet />
+        {!hideNativeHubOutlet ? <Outlet /> : null}
       </div>
 
       {readSalonClientsNavDebugEnabled() && isSalonTitolare && !isSalonStaff ? (
