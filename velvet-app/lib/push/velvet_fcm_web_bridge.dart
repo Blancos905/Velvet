@@ -5,6 +5,7 @@ class VelvetFcmWebBridge {
   VelvetFcmWebBridge._();
 
   static const fcmTokenStorageKey = 'velvet_fcm_device_token';
+  static const pendingPushOpenStorageKey = 'velvet_pending_push_open';
 
   static String deliverTokenScript(String? token) {
     if (token == null || token.isEmpty) {
@@ -23,6 +24,40 @@ class VelvetFcmWebBridge {
 })();
 ''';
   }
+
+  /// Tap su push FCM (app in background o cold start) → popup notifica nel frontend.
+  static String deliverPushOpenScript(Map<String, String> data, {String? title, String? body}) {
+    final payload = <String, String>{
+      ...data,
+      if (title != null && title.isNotEmpty) 'title': title,
+      if (body != null && body.isNotEmpty) 'body': body,
+    };
+    final encoded = jsonEncode(payload);
+    return '''
+(function() {
+  var payload = $encoded;
+  try { sessionStorage.setItem('$pendingPushOpenStorageKey', JSON.stringify(payload)); } catch (e) {}
+  if (typeof window.onVelvetPushNotificationOpen === 'function') {
+    try { window.onVelvetPushNotificationOpen(payload); } catch (e2) {}
+    try { sessionStorage.removeItem('$pendingPushOpenStorageKey'); } catch (e3) {}
+  }
+})();
+''';
+  }
+
+  /// Dopo ogni `onPageFinished`: riprova l'apertura popup se il tap push è arrivato prima del frontend.
+  static String get flushPendingPushOpenScript => '''
+(function() {
+  var raw = '';
+  try { raw = sessionStorage.getItem('$pendingPushOpenStorageKey') || ''; } catch (e) {}
+  if (!raw) return;
+  var payload = null;
+  try { payload = JSON.parse(raw); } catch (e2) { return; }
+  if (typeof window.onVelvetPushNotificationOpen !== 'function') return;
+  try { window.onVelvetPushNotificationOpen(payload); } catch (e3) {}
+  try { sessionStorage.removeItem('$pendingPushOpenStorageKey'); } catch (e4) {}
+})();
+''';
 
   /// DELETE token FCM prima di rimuovere la sessione JWT (logout menu nativo).
   static String nativeLogoutScript({required String apiBaseUrl}) {
@@ -46,6 +81,7 @@ class VelvetFcmWebBridge {
   try { delete window.velvetFcmToken; } catch (e5) {}
   try { sessionStorage.removeItem('velvet_access_token'); } catch (e6) {}
   try { sessionStorage.removeItem('velvet_refresh_token'); } catch (e7) {}
+  try { sessionStorage.setItem('velvet_clear_login_on_next_login_form', '1'); } catch (e8) {}
   window.location.href = '/';
 })();
 ''';

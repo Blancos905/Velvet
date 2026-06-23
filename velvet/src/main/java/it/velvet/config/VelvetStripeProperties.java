@@ -33,7 +33,7 @@ public record VelvetStripeProperties(
 			checkoutSuccessPath = "/account/billing/success";
 		}
 		if (checkoutCancelPath == null || checkoutCancelPath.isBlank()) {
-			checkoutCancelPath = "/piani";
+			checkoutCancelPath = "/piani/premium-prova";
 		}
 		if (portalReturnPath == null || portalReturnPath.isBlank()) {
 			portalReturnPath = "/account/profilo";

@@ -56,6 +56,13 @@ maybe_start_backend() {
   echo "  Per disabilitare: VELVET_AUTO_START_BACKEND=0"
   (
     cd "$VELVET_DIR"
+    ENV_FILE="$VELVET_DIR/spring-dev.local.env"
+    if [[ -f "$ENV_FILE" ]]; then
+      set -a
+      # shellcheck disable=SC1090
+      source "$ENV_FILE"
+      set +a
+    fi
     # -Dmaven.test.skip=true: evita test-compile (43 file) ad ogni avvio dev (~1–3 min risparmiati).
     nohup ./mvnw spring-boot:run -Dmaven.test.skip=true >>"$BACKEND_LOG" 2>&1 &
     echo $! > /tmp/velvet-spring-dev.pid

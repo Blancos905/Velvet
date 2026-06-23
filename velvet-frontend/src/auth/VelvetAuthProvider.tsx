@@ -12,15 +12,19 @@ import { apiJson } from "../api/client";
 import { setVelvetAccountClosedHandler } from "../api/accountClosedSession";
 import { setVelvetSessionExpiredHandler } from "../api/velvetSessionExpired";
 import type { MeSalonSummary, MeStaffSalon } from "../api/types";
-import { SALON_PLAN_STORAGE_KEY, type SalonPlanTier } from "../data/salonPlans";
+import type { SalonPlanTier } from "../data/salonPlans";
+import { clearIntendedSalonPlan, persistIntendedSalonPlan } from "../lib/salonRegistrationPostLogin";
 import { isVelvetAccessTokenExpired } from "../lib/velvetAccessTokenExpiry";
 import { normalizePostLoginReturnPath, setPostLoginReturnPath } from "../lib/postLoginReturnPath";
+import { notifyVelvetSessionEnded } from "../lib/velvetLoginFormReset";
+import { redirectAfterVelvetLogout } from "../lib/postLogoutRedirect";
 import { velvetJwtHintsFromAccessToken } from "../lib/velvetJwtHintsFromAccessToken";
 import { humanizePostRegistrationAuthError } from "../utils/oidcErrors";
 import { clearAdminAccessToken, writeAdminAccessToken } from "./adminSession";
 import {
   clearStoredRefreshToken,
   logoutVelvetSession,
+  readStoredRefreshToken,
   refreshVelvetAccessToken,
   writeStoredRefreshToken,
   type AuthLoginResponse,
@@ -28,7 +32,9 @@ import {
 import { unregisterVelvetFcmDevice } from "../api/fcmDevice";
 import { useVelvetSessionExpiryWatchdog } from "./useVelvetSessionExpiryWatchdog";
 
-const ACCESS_TOKEN_STORAGE_KEY = "velvet_access_token";
+import { VELVET_ACCESS_TOKEN_KEY } from "./adminSession";
+
+const ACCESS_TOKEN_STORAGE_KEY = VELVET_ACCESS_TOKEN_KEY;
 
 function readStoredAccessToken(): string | undefined {
   if (typeof sessionStorage === "undefined") return undefined;
@@ -63,6 +69,8 @@ export type VelvetAuthContextValue = {
    */
   signInWithIssuedToken: (accessToken: string) => Promise<void>;
   signOut: () => Promise<void>;
+  /** Chiude la sessione app senza redirect post-logout (es. passaggio da super admin a titolare salone). */
+  signOutForAccountSwitch: () => Promise<void>;
   accessToken: string | undefined;
   userEmail: string | undefined;
   userDisplayLabel: string | undefined;
@@ -90,14 +98,23 @@ export function VelvetAuthProvider({ children }: { children: ReactNode }) {
 
   const persistToken = useCallback((token: string) => {
     sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, token);
+    if (velvetJwtHintsFromAccessToken(token).realmRoles.includes("ADMIN")) {
+      writeAdminAccessToken(token);
+    }
     setAccessToken(token);
   }, []);
 
   const clearToken = useCallback(() => {
+    const hadSession =
+      Boolean(accessToken) ||
+      (typeof sessionStorage !== "undefined" && sessionStorage.getItem(ACCESS_TOKEN_STORAGE_KEY));
     sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
     clearStoredRefreshToken();
     setAccessToken(undefined);
-  }, []);
+    if (hadSession) {
+      notifyVelvetSessionEnded();
+    }
+  }, [accessToken]);
 
   const expireSession = useCallback(() => {
     clearToken();
@@ -111,9 +128,17 @@ export function VelvetAuthProvider({ children }: { children: ReactNode }) {
       if (accessToken && !isVelvetAccessTokenExpired(accessToken)) {
         return;
       }
+      // Evita POST /refresh (401 in console) quando non c'è alcuna sessione da rinnovare.
+      if (!accessToken && !readStoredRefreshToken()) {
+        return;
+      }
       const refreshed = await refreshVelvetAccessToken();
       if (!cancelled && refreshed && !isVelvetAccessTokenExpired(refreshed)) {
         persistToken(refreshed);
+        return;
+      }
+      if (!cancelled && accessToken && velvetJwtHintsFromAccessToken(accessToken).realmRoles.includes("ADMIN")) {
+        writeAdminAccessToken(accessToken);
       }
     })();
     return () => {
@@ -122,6 +147,13 @@ export function VelvetAuthProvider({ children }: { children: ReactNode }) {
   }, [accessToken, persistToken]);
 
   useVelvetSessionExpiryWatchdog(accessToken, expireSession);
+
+  useEffect(() => {
+    if (!accessToken || isVelvetAccessTokenExpired(accessToken)) return;
+    if (velvetJwtHintsFromAccessToken(accessToken).realmRoles.includes("ADMIN")) {
+      writeAdminAccessToken(accessToken);
+    }
+  }, [accessToken]);
 
   useEffect(() => {
     setVelvetSessionExpiredHandler(expireSession);
@@ -186,7 +218,7 @@ export function VelvetAuthProvider({ children }: { children: ReactNode }) {
         window.location.assign("/account");
       },
       signUpForSalon: (plan: SalonPlanTier) => {
-        sessionStorage.setItem(SALON_PLAN_STORAGE_KEY, plan);
+        persistIntendedSalonPlan(plan);
       },
       signInWithPassword: async (email: string, password: string) => {
         const normalizedUsername = email.trim().toLowerCase();
@@ -207,7 +239,7 @@ export function VelvetAuthProvider({ children }: { children: ReactNode }) {
           const token = body.accessToken;
           const rolesAfterLogin = velvetJwtHintsFromAccessToken(token).realmRoles;
           if (!rolesAfterLogin.includes("OWNER")) {
-            sessionStorage.removeItem(SALON_PLAN_STORAGE_KEY);
+            clearIntendedSalonPlan();
           }
           if (token && rolesAfterLogin.includes("ADMIN")) {
             writeAdminAccessToken(token);
@@ -274,6 +306,14 @@ export function VelvetAuthProvider({ children }: { children: ReactNode }) {
         }
       },
       signOut: async () => {
+        await unregisterVelvetFcmDevice(accessToken);
+        await logoutVelvetSession();
+        clearToken();
+        clearAdminAccessToken();
+        queryClient.removeQueries({ queryKey: ["me"] });
+        redirectAfterVelvetLogout();
+      },
+      signOutForAccountSwitch: async () => {
         await unregisterVelvetFcmDevice(accessToken);
         await logoutVelvetSession();
         clearToken();

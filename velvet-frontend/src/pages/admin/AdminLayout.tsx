@@ -3,11 +3,13 @@ import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { apiJson } from "../../api/client";
 import type { SuperAdminOverviewResponseDto } from "../../api/types";
 import { useAdminAuth } from "../../auth/AdminAuthProvider";
+import { useAdminSupportAlerts } from "../../hooks/useAdminSupportAlerts";
 
 export function AdminLayout() {
   const { pathname } = useLocation();
   const isProfilePage = pathname === "/admin/profilo" || pathname.endsWith("/admin/profilo");
   const { accessToken, isAdminSession, signOut } = useAdminAuth();
+  useAdminSupportAlerts();
 
   const overviewBadgeQ = useQuery({
     queryKey: ["admin", "overview", accessToken],

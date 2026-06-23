@@ -8,6 +8,7 @@ import { useMeNotificationInboxQuery } from "../../hooks/useMeNotificationInbox"
 import { useMeNotificationMessagesQuery } from "../../hooks/useMeNotificationMessages";
 import { useMeSalonNotificationInboxQuery } from "../../hooks/useMeSalonNotificationInbox";
 import { useMeSalonNotificationMessagesQuery } from "../../hooks/useMeSalonNotificationMessages";
+import { SalonNotificationMessageLine } from "../../components/SalonNotificationMessageLine";
 import "../../styles/velvet-consumer-bookings-page.css";
 import "../../styles/salon-notifications.css";
 
@@ -243,30 +244,13 @@ function StaffSalonNotificationsView() {
                         ) : (
                           <ul className="velvet-salon-notif-detail__list" aria-label={`Messaggi: ${row.label}`}>
                             {messages.data?.map((m) => (
-                              <li key={m.id} className="velvet-salon-notif-detail__line">
-                                <span className="velvet-salon-notif-detail__text">{m.previewLine}</span>
-                                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.55rem" }}>
-                                  <span className="velvet-salon-notif-detail__meta" title={m.status}>
-                                    {m.status === "SENT" && m.sentAt
-                                      ? `Inviata ${new Date(m.sentAt).toLocaleString("it-IT")}`
-                                      : m.status === "PENDING"
-                                        ? "In coda"
-                                        : m.status}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    className="velvet-btn velvet-btn--secondary"
-                                    style={{ padding: "0.2rem 0.45rem", minWidth: "2rem" }}
-                                    disabled={deleteSalonMessageM.isPending && deletingMessageId === m.id}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      deleteSalonMessageM.mutate(m.id);
-                                    }}
-                                  >
-                                    {deleteSalonMessageM.isPending && deletingMessageId === m.id ? "…" : "Elimina"}
-                                  </button>
-                                </span>
-                              </li>
+                              <SalonNotificationMessageLine
+                                key={m.id}
+                                message={m}
+                                categoryLabel={row.label}
+                                deleting={deleteSalonMessageM.isPending && deletingMessageId === m.id}
+                                onDelete={(messageId) => deleteSalonMessageM.mutate(messageId)}
+                              />
                             ))}
                           </ul>
                         )}
@@ -457,23 +441,14 @@ export default function NotificationsPage() {
                       ) : (
                         <ul className="velvet-salon-notif-detail__list">
                           {messages.data?.map((m) => (
-                            <li key={m.id} className="velvet-salon-notif-detail__line">
-                              <span className="velvet-salon-notif-detail__text">{m.previewLine}</span>
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: "0.55rem" }}>
-                                <span className="velvet-salon-notif-detail__meta">
-                                  {m.status === "SENT" && m.sentAt ? `Inviata ${new Date(m.sentAt).toLocaleString("it-IT")}` : m.status}
-                                </span>
-                                <button
-                                  type="button"
-                                  className="velvet-btn velvet-btn--secondary"
-                                  style={{ padding: "0.2rem 0.45rem", minWidth: "2rem" }}
-                                  disabled={deleteMessageM.isPending && deletingMessageId === m.id}
-                                  onClick={() => deleteMessageM.mutate(m.id)}
-                                >
-                                  {deleteMessageM.isPending && deletingMessageId === m.id ? "…" : "Cancella"}
-                                </button>
-                              </span>
-                            </li>
+                            <SalonNotificationMessageLine
+                              key={m.id}
+                              message={m}
+                              categoryLabel={row.label}
+                              deleteLabel="Cancella"
+                              deleting={deleteMessageM.isPending && deletingMessageId === m.id}
+                              onDelete={(messageId) => deleteMessageM.mutate(messageId)}
+                            />
                           ))}
                         </ul>
                       )}

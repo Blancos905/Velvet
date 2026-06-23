@@ -1,6 +1,7 @@
 package it.velvet.consumer.service;
 
 import it.velvet.appointment.domain.AppointmentRepository;
+import it.velvet.billing.service.SalonPremiumEntitlementService;
 import it.velvet.catalog.domain.StaffOperator;
 import it.velvet.catalog.domain.StaffOperatorRepository;
 import it.velvet.catalog.domain.SalonClient;
@@ -45,6 +46,7 @@ public class SalonVelvetChatService {
 	private final StaffOperatorRepository staffOperatorRepository;
 	private final AppointmentRepository appointmentRepository;
 	private final SalonVelvetChatEmailDispatchService chatEmailDispatchService;
+	private final SalonPremiumEntitlementService salonPremiumEntitlementService;
 
 	public SalonVelvetChatService(
 			SalonClientRepository salonClientRepository,
@@ -55,7 +57,8 @@ public class SalonVelvetChatService {
 			LocationRepository locationRepository,
 			StaffOperatorRepository staffOperatorRepository,
 			AppointmentRepository appointmentRepository,
-			SalonVelvetChatEmailDispatchService chatEmailDispatchService) {
+			SalonVelvetChatEmailDispatchService chatEmailDispatchService,
+			SalonPremiumEntitlementService salonPremiumEntitlementService) {
 		this.salonClientRepository = salonClientRepository;
 		this.chatMessageRepository = chatMessageRepository;
 		this.readStateRepository = readStateRepository;
@@ -65,6 +68,7 @@ public class SalonVelvetChatService {
 		this.staffOperatorRepository = staffOperatorRepository;
 		this.appointmentRepository = appointmentRepository;
 		this.chatEmailDispatchService = chatEmailDispatchService;
+		this.salonPremiumEntitlementService = salonPremiumEntitlementService;
 	}
 
 	@Transactional
@@ -172,7 +176,7 @@ public class SalonVelvetChatService {
 			if (groupOpt.isEmpty()) {
 				return List.of();
 			}
-			if (!"PREMIUM".equals(StudioGroup.canonicalPlanTier(groupOpt.get().getPlanTier()))) {
+			if (!salonPremiumEntitlementService.hasActivePremium(groupOpt.get())) {
 				return List.of();
 			}
 			List<Location> locs = locationRepository.findByStudioGroup_IdOrderByNameAsc(groupOpt.get().getId());
@@ -280,7 +284,7 @@ public class SalonVelvetChatService {
 			return 0;
 		}
 		StudioGroup group = groupOpt.get();
-		if (!"PREMIUM".equals(StudioGroup.canonicalPlanTier(group.getPlanTier()))) {
+		if (!salonPremiumEntitlementService.hasActivePremium(group)) {
 			return 0;
 		}
 		List<Location> locs = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId());
@@ -305,7 +309,7 @@ public class SalonVelvetChatService {
 				.map(op -> {
 					Location loc = op.getLocation();
 					StudioGroup group = loc.getStudioGroup();
-					if (!"PREMIUM".equals(StudioGroup.canonicalPlanTier(group.getPlanTier()))) {
+					if (!salonPremiumEntitlementService.hasActivePremium(group)) {
 						return 0;
 					}
 					List<SalonClient> clients = listBookedSalonClientsForStaffOperator(op, null);
@@ -432,7 +436,7 @@ public class SalonVelvetChatService {
 		if (group == null) {
 			return false;
 		}
-		if (!"PREMIUM".equals(StudioGroup.canonicalPlanTier(group.getPlanTier()))) {
+		if (!salonPremiumEntitlementService.hasActivePremium(group)) {
 			return false;
 		}
 		Location loc = locationRepository.findById(locationId).orElse(null);
@@ -441,7 +445,7 @@ public class SalonVelvetChatService {
 
 	private List<SalonClient> listBookedSalonClientsForStaffOperator(StaffOperator op, UUID xLocationId) {
 		Location loc = op.getLocation();
-		if (!"PREMIUM".equals(StudioGroup.canonicalPlanTier(loc.getStudioGroup().getPlanTier()))) {
+		if (!salonPremiumEntitlementService.hasActivePremium(loc.getStudioGroup())) {
 			return List.of();
 		}
 		if (xLocationId != null && !xLocationId.equals(loc.getId())) {
@@ -468,7 +472,7 @@ public class SalonVelvetChatService {
 					if (!opLoc.getId().equals(sc.getLocation().getId())) {
 						return false;
 					}
-					if (!"PREMIUM".equals(StudioGroup.canonicalPlanTier(opLoc.getStudioGroup().getPlanTier()))) {
+					if (!salonPremiumEntitlementService.hasActivePremium(opLoc.getStudioGroup())) {
 						return false;
 					}
 					return appointmentRepository.existsByLocation_IdAndOperator_IdAndSalonClient_Id(

@@ -1,12 +1,14 @@
 package it.velvet.notification.service;
 
 import it.velvet.appointment.domain.Appointment;
+import it.velvet.catalog.domain.StaffOperator;
 import it.velvet.consumer.domain.ConsumerProfile;
 import it.velvet.notification.domain.NotificationType;
 import it.velvet.notification.domain.ScheduledNotification;
 import it.velvet.notification.domain.UserDevice;
 import it.velvet.notification.domain.UserDeviceRepository;
 import it.velvet.consumer.domain.ConsumerProfileRepository;
+import it.velvet.catalog.domain.StaffOperatorRepository;
 import it.velvet.studio.domain.Location;
 import it.velvet.studio.domain.StudioGroup;
 import org.junit.jupiter.api.Test;
@@ -40,10 +42,13 @@ class FcmPushDispatchServiceTest {
 	@Mock
 	private ConsumerProfileRepository consumerProfileRepository;
 
+	@Mock
+	private StaffOperatorRepository staffOperatorRepository;
+
 	@Test
 	void dispatchForScheduledNotification_consumerBookingConfirmation_sendsToConsumerDevices() {
 		FcmPushDispatchService service = new FcmPushDispatchService(
-				notificationService, userDeviceRepository, consumerProfileRepository);
+				notificationService, userDeviceRepository, consumerProfileRepository, staffOperatorRepository);
 		Appointment appointment = org.mockito.Mockito.mock(Appointment.class);
 		ConsumerProfile consumer = org.mockito.Mockito.mock(ConsumerProfile.class);
 		ScheduledNotification notification = org.mockito.Mockito.mock(ScheduledNotification.class);
@@ -67,7 +72,7 @@ class FcmPushDispatchServiceTest {
 	@Test
 	void dispatchForScheduledNotification_salonBookingCreated_sendsToOwnerDevices() {
 		FcmPushDispatchService service = new FcmPushDispatchService(
-				notificationService, userDeviceRepository, consumerProfileRepository);
+				notificationService, userDeviceRepository, consumerProfileRepository, staffOperatorRepository);
 		Appointment appointment = org.mockito.Mockito.mock(Appointment.class);
 		Location location = org.mockito.Mockito.mock(Location.class);
 		StudioGroup studioGroup = org.mockito.Mockito.mock(StudioGroup.class);
@@ -91,5 +96,121 @@ class FcmPushDispatchServiceTest {
 		service.dispatchForScheduledNotification(notification, "Nuova prenotazione", "Corpo");
 
 		verify(notificationService).sendPushNotification(eq(FCM_TOKEN), eq("Nuova prenotazione"), eq("Corpo"), any());
+	}
+
+	@Test
+	void dispatchForScheduledNotification_salonBookingCreated_sendsToLinkedStaffOperator() {
+		FcmPushDispatchService service = new FcmPushDispatchService(
+				notificationService, userDeviceRepository, consumerProfileRepository, staffOperatorRepository);
+		Appointment appointment = org.mockito.Mockito.mock(Appointment.class);
+		Location location = org.mockito.Mockito.mock(Location.class);
+		StudioGroup studioGroup = org.mockito.Mockito.mock(StudioGroup.class);
+		StaffOperator operator = org.mockito.Mockito.mock(StaffOperator.class);
+		ConsumerProfile owner = org.mockito.Mockito.mock(ConsumerProfile.class);
+		ConsumerProfile staff = org.mockito.Mockito.mock(ConsumerProfile.class);
+		ScheduledNotification notification = org.mockito.Mockito.mock(ScheduledNotification.class);
+		UUID ownerId = UUID.fromString("33333333-3333-3333-3333-333333333333");
+		UUID staffId = UUID.fromString("44444444-4444-4444-4444-444444444444");
+		String staffToken = "staff-device-token";
+
+		when(notification.getAppointment()).thenReturn(appointment);
+		when(notification.getType()).thenReturn(NotificationType.BOOKING_CREATED_FOR_SALON);
+		when(notification.getId()).thenReturn(UUID.randomUUID());
+		when(appointment.getId()).thenReturn(APPOINTMENT_ID);
+		when(appointment.getLocation()).thenReturn(location);
+		when(appointment.getOperator()).thenReturn(operator);
+		when(operator.getConsumerProfile()).thenReturn(staff);
+		when(staff.getDeletedAt()).thenReturn(null);
+		when(staff.getId()).thenReturn(staffId);
+		when(location.getStudioGroup()).thenReturn(studioGroup);
+		when(studioGroup.getOwnerKeycloakSub()).thenReturn("owner-sub");
+		when(consumerProfileRepository.findByKeycloakSub("owner-sub")).thenReturn(Optional.of(owner));
+		when(owner.getDeletedAt()).thenReturn(null);
+		when(owner.getId()).thenReturn(ownerId);
+		when(userDeviceRepository.findByUserId(ownerId))
+				.thenReturn(List.of(new UserDevice(ownerId, FCM_TOKEN, it.velvet.notification.domain.DeviceOsType.IOS)));
+		when(userDeviceRepository.findByUserId(staffId))
+				.thenReturn(List.of(new UserDevice(staffId, staffToken, it.velvet.notification.domain.DeviceOsType.ANDROID)));
+
+		service.dispatchForScheduledNotification(notification, "Nuova prenotazione", "Corpo");
+
+		verify(notificationService).sendPushNotification(eq(FCM_TOKEN), eq("Nuova prenotazione"), eq("Corpo"), any());
+		verify(notificationService).sendPushNotification(eq(staffToken), eq("Nuova prenotazione"), eq("Corpo"), any());
+	}
+
+	@Test
+	void dispatchForScheduledNotification_salonBookingCreated_resolvesStaffViaRepositoryWhenProfileNotLoaded() {
+		FcmPushDispatchService service = new FcmPushDispatchService(
+				notificationService, userDeviceRepository, consumerProfileRepository, staffOperatorRepository);
+		Appointment appointment = org.mockito.Mockito.mock(Appointment.class);
+		StaffOperator operator = org.mockito.Mockito.mock(StaffOperator.class);
+		ScheduledNotification notification = org.mockito.Mockito.mock(ScheduledNotification.class);
+		UUID operatorId = UUID.fromString("55555555-5555-5555-5555-555555555555");
+		UUID staffId = UUID.fromString("44444444-4444-4444-4444-444444444444");
+		String staffToken = "staff-device-token";
+
+		when(notification.getAppointment()).thenReturn(appointment);
+		when(notification.getType()).thenReturn(NotificationType.BOOKING_CREATED_FOR_SALON);
+		when(notification.getId()).thenReturn(UUID.randomUUID());
+		when(appointment.getId()).thenReturn(APPOINTMENT_ID);
+		when(appointment.getLocation()).thenReturn(null);
+		when(appointment.getOperator()).thenReturn(operator);
+		when(operator.getId()).thenReturn(operatorId);
+		when(operator.getConsumerProfile()).thenReturn(null);
+		when(staffOperatorRepository.findConsumerProfileIdByOperatorId(operatorId)).thenReturn(Optional.of(staffId));
+		when(userDeviceRepository.findByUserId(staffId))
+				.thenReturn(List.of(new UserDevice(staffId, staffToken, it.velvet.notification.domain.DeviceOsType.ANDROID)));
+
+		service.dispatchForScheduledNotification(notification, "Nuova prenotazione", "Corpo");
+
+		verify(notificationService).sendPushNotification(eq(staffToken), eq("Nuova prenotazione"), eq("Corpo"), any());
+	}
+
+	@Test
+	void dispatchForScheduledNotification_bookingUpdated_sendsToOwnerStaffAndConsumer() {
+		FcmPushDispatchService service = new FcmPushDispatchService(
+				notificationService, userDeviceRepository, consumerProfileRepository, staffOperatorRepository);
+		Appointment appointment = org.mockito.Mockito.mock(Appointment.class);
+		Location location = org.mockito.Mockito.mock(Location.class);
+		StudioGroup studioGroup = org.mockito.Mockito.mock(StudioGroup.class);
+		StaffOperator operator = org.mockito.Mockito.mock(StaffOperator.class);
+		ConsumerProfile owner = org.mockito.Mockito.mock(ConsumerProfile.class);
+		ConsumerProfile staff = org.mockito.Mockito.mock(ConsumerProfile.class);
+		ConsumerProfile consumer = org.mockito.Mockito.mock(ConsumerProfile.class);
+		ScheduledNotification notification = org.mockito.Mockito.mock(ScheduledNotification.class);
+		UUID ownerId = UUID.fromString("33333333-3333-3333-3333-333333333333");
+		UUID staffId = UUID.fromString("44444444-4444-4444-4444-444444444444");
+		UUID consumerId = CONSUMER_ID;
+		String staffToken = "staff-device-token";
+		String consumerToken = "consumer-device-token";
+
+		when(notification.getAppointment()).thenReturn(appointment);
+		when(notification.getType()).thenReturn(NotificationType.BOOKING_UPDATED);
+		when(notification.getId()).thenReturn(UUID.randomUUID());
+		when(appointment.getId()).thenReturn(APPOINTMENT_ID);
+		when(appointment.getLocation()).thenReturn(location);
+		when(appointment.getOperator()).thenReturn(operator);
+		when(appointment.getConsumerProfile()).thenReturn(consumer);
+		when(operator.getConsumerProfile()).thenReturn(staff);
+		when(staff.getDeletedAt()).thenReturn(null);
+		when(staff.getId()).thenReturn(staffId);
+		when(consumer.getId()).thenReturn(consumerId);
+		when(location.getStudioGroup()).thenReturn(studioGroup);
+		when(studioGroup.getOwnerKeycloakSub()).thenReturn("owner-sub");
+		when(consumerProfileRepository.findByKeycloakSub("owner-sub")).thenReturn(Optional.of(owner));
+		when(owner.getDeletedAt()).thenReturn(null);
+		when(owner.getId()).thenReturn(ownerId);
+		when(userDeviceRepository.findByUserId(ownerId))
+				.thenReturn(List.of(new UserDevice(ownerId, FCM_TOKEN, it.velvet.notification.domain.DeviceOsType.IOS)));
+		when(userDeviceRepository.findByUserId(staffId))
+				.thenReturn(List.of(new UserDevice(staffId, staffToken, it.velvet.notification.domain.DeviceOsType.ANDROID)));
+		when(userDeviceRepository.findByUserId(consumerId))
+				.thenReturn(List.of(new UserDevice(consumerId, consumerToken, it.velvet.notification.domain.DeviceOsType.IOS)));
+
+		service.dispatchForScheduledNotification(notification, "Prenotazione spostata", "Corpo");
+
+		verify(notificationService).sendPushNotification(eq(FCM_TOKEN), eq("Prenotazione spostata"), eq("Corpo"), any());
+		verify(notificationService).sendPushNotification(eq(staffToken), eq("Prenotazione spostata"), eq("Corpo"), any());
+		verify(notificationService).sendPushNotification(eq(consumerToken), eq("Prenotazione spostata"), eq("Corpo"), any());
 	}
 }

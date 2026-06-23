@@ -3,10 +3,11 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { downloadMeDataExport } from "../../api/meDataExport";
 import { apiFetch, apiJson } from "../../api/client";
-import { fetchBillingStatus, openBillingPortal } from "../../api/billing";
+import { fetchBillingStatus, openBillingPortal, openCancelSubscriptionPortal } from "../../api/billing";
 import { isNativePremiumBillingBlocked } from "../../lib/nativePremiumUpgradePolicy";
 import type { MeStaffOperatorSelf, ProfileDto } from "../../api/types";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
+import { SalonBillingProfileEditor } from "../../components/SalonBillingProfileEditor";
 import { LEGAL_CONTACT_EMAIL } from "../../content/legalReferences";
 import { SALON_CLIENT_GENDER_OPTIONS } from "../../data/salonClientGenders";
 import { parseSalonPlanTier, planDisplayName } from "../../data/salonPlans";
@@ -63,6 +64,7 @@ export default function ProfilePage() {
     staleTime: 60_000,
   });
   const [portalBusy, setPortalBusy] = useState(false);
+  const [cancelSubscriptionBusy, setCancelSubscriptionBusy] = useState(false);
 
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -287,6 +289,11 @@ export default function ProfilePage() {
   const salonPlanTier = parseSalonPlanTier(meSalon.data?.planTier);
   const salonPlan = salonPlanTier ? planDisplayName(salonPlanTier) : "—";
   const salonRequiresClientGenders = salonPlanTier === "BASE" || salonPlanTier === "PREMIUM";
+  const showBillingProfileSection = isSalonTitolare && salonPlanTier === "PREMIUM";
+  const showCancelSubscription =
+    isSalonTitolare &&
+    !isNativePremiumBillingBlocked() &&
+    Boolean(billingStatus.data?.configured && billingStatus.data.premiumAccess && !billingStatus.data.cancelAtPeriodEnd);
   const publicSalonUrl = salonSlug.trim() ? `/s/${encodeURIComponent(salonSlug.trim())}` : "";
 
   return (
@@ -316,11 +323,9 @@ export default function ProfilePage() {
               {isVelvetSuperAdmin ? "profilo" : isSalonTitolare ? "account titolare" : "profilo"}
             </span>
           </h1>
-          {isVelvetSuperAdmin || isSalonTitolare ? (
+          {isVelvetSuperAdmin ? (
             <p className="velvet-page-subtitle" style={{ margin: 0 }}>
-              {isVelvetSuperAdmin
-                ? "Credenziali, telefono e password dell’account amministratore."
-                : "Dati personali, sicurezza dell’account e anagrafica del salone pubblicata in ricerca (non è la pagina «Il mio salone»)."}
+              Credenziali, telefono e password dell’account amministratore.
             </p>
           ) : null}
         </div>
@@ -820,6 +825,15 @@ export default function ProfilePage() {
             ) : null}
           </article>
         ) : null}
+
+        {showBillingProfileSection ? (
+          <article className="velvet-profile-card velvet-profile-card--account">
+            <div className="velvet-profile-insert-panel">
+              <h2 className="velvet-section-title velvet-profile-card__title">Dati fatturazione</h2>
+              <SalonBillingProfileEditor accessToken={accessToken} context="profile" />
+            </div>
+          </article>
+        ) : null}
       </section>
 
       <section className="velvet-profile-close" aria-labelledby="velvet-profile-data-export-title">
@@ -856,9 +870,39 @@ export default function ProfilePage() {
 
       <section className="velvet-profile-close">
         <h2 className="velvet-section-title velvet-profile-card__title">Chiudi account</h2>
-        {canSelfDeleteAccount ? (
+        {showCancelSubscription ? (
           <>
             <p className="velvet-text-muted">
+              Puoi disdire l&apos;abbonamento Premium in qualsiasi momento. Verrai reindirizzato su Stripe per confermare
+              la disdetta; riceverai anche un&apos;email di conferma.
+            </p>
+            <button
+              type="button"
+              className="velvet-btn velvet-btn--secondary velvet-profile-close__cancel-subscription-btn"
+              disabled={cancelSubscriptionBusy || !accessToken}
+              onClick={() => {
+                setMsg(null);
+                setCancelSubscriptionBusy(true);
+                void openCancelSubscriptionPortal(accessToken)
+                  .catch(() => {
+                    setMsg("Impossibile aprire la pagina di disdetta abbonamento su Stripe.");
+                  })
+                  .finally(() => setCancelSubscriptionBusy(false));
+              }}
+            >
+              {cancelSubscriptionBusy ? "Apertura Stripe…" : "Disdici abbonamento"}
+            </button>
+          </>
+        ) : null}
+        {canSelfDeleteAccount ? (
+          <>
+            <p
+              className={
+                showCancelSubscription
+                  ? "velvet-text-muted velvet-profile-close__delete-intro"
+                  : "velvet-text-muted"
+              }
+            >
               L&apos;account verrà disattivato; i dati identificativi del profilo saranno anonimizzati secondo l&apos;informativa
               privacy.
             </p>

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.velvet.consumer.service.VelvetAccountRegistrationService;
 import it.velvet.publicapi.dto.ClientRegistrationRequest;
+import it.velvet.publicapi.dto.RegistrationCreatedResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class PublicClientRegistrationController {
 
 	@PostMapping
 	@Operation(summary = "Crea account cliente (form /registrati: ruolo CLIENT)")
-	public ResponseEntity<Void> register(@Valid @RequestBody ClientRegistrationRequest body) {
+	public ResponseEntity<RegistrationCreatedResponse> register(@Valid @RequestBody ClientRegistrationRequest body) {
 		velvetAccountRegistrationService.registerBookingClient(
 				body.email(),
 				body.password(),
@@ -35,6 +36,9 @@ public class PublicClientRegistrationController {
 				body.phone() != null ? body.phone() : "",
 				Boolean.TRUE.equals(body.bootstrapSuperAdmin()),
 				body.legalDocumentVersion());
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(
+						new RegistrationCreatedResponse(
+								"Abbiamo inviato un'email di conferma. Clicca il link per attivare l'account, poi accedi."));
 	}
 }

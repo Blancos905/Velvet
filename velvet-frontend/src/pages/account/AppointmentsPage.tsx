@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { apiJson } from "../../api/client";
 import type { AppointmentDto } from "../../api/types";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
@@ -22,7 +22,7 @@ function formatAgendaDate(iso: string): { day: string; month: string; weekday: s
 function statusLabel(status: string): string {
   switch (status) {
     case "BOOKED":
-      return "Prenotata";
+      return "In attesa di conferma";
     case "CONFIRMED":
       return "Confermata";
     case "COMPLETED":
@@ -41,7 +41,7 @@ function consumerSalonFollowUp(a: AppointmentDto): boolean {
 }
 
 export default function AppointmentsPage() {
-  const { accessToken, isSalonTitolare } = useVelvetAuth();
+  const { accessToken, isSalonTitolare, isSalonStaff } = useVelvetAuth();
   const [upcoming, setUpcoming] = useState(true);
 
   const q = useQuery({
@@ -50,8 +50,12 @@ export default function AppointmentsPage() {
       apiJson<AppointmentDto[]>(`/api/v1/me/appointments?upcoming=${upcoming}`, {
         accessToken,
       }),
-    enabled: Boolean(accessToken) && !isSalonTitolare,
+    enabled: Boolean(accessToken) && !isSalonTitolare && !isSalonStaff,
   });
+
+  if (isSalonStaff) {
+    return <Navigate to="/account/staff" replace />;
+  }
 
   if (isSalonTitolare) {
     return <PrenotazioniStaffPickPage />;

@@ -13,14 +13,20 @@ public class BillingStatusService {
 
 	private final VelvetStripeProperties stripeProperties;
 	private final StudioGroupOwnerResolver studioGroupOwnerResolver;
+	private final SalonBillingProfileService salonBillingProfileService;
+	private final SalonPremiumEntitlementService salonPremiumEntitlementService;
 	private final StripeSubscriptionSyncService subscriptionSyncService;
 
 	public BillingStatusService(
 			VelvetStripeProperties stripeProperties,
 			StudioGroupOwnerResolver studioGroupOwnerResolver,
+			SalonBillingProfileService salonBillingProfileService,
+			SalonPremiumEntitlementService salonPremiumEntitlementService,
 			org.springframework.beans.factory.ObjectProvider<StripeSubscriptionSyncService> subscriptionSyncService) {
 		this.stripeProperties = stripeProperties;
 		this.studioGroupOwnerResolver = studioGroupOwnerResolver;
+		this.salonBillingProfileService = salonBillingProfileService;
+		this.salonPremiumEntitlementService = salonPremiumEntitlementService;
 		this.subscriptionSyncService = subscriptionSyncService.getIfAvailable();
 	}
 
@@ -28,15 +34,16 @@ public class BillingStatusService {
 		boolean enabled = stripeProperties.enabled();
 		boolean configured = stripeProperties.configured();
 		if (principal == null) {
-			return new BillingStatusDto(enabled, configured, null, null, false, false);
+			return new BillingStatusDto(enabled, configured, null, null, false, false, false);
 		}
 		return studioGroupOwnerResolver.resolveStudioGroupForOwner(principal)
-				.map(this::toDto)
-				.orElseGet(() -> new BillingStatusDto(enabled, configured, null, null, false, false));
+				.map(group -> toDto(group, principal))
+				.orElseGet(() -> new BillingStatusDto(enabled, configured, null, null, false, false, false));
 	}
 
-	private BillingStatusDto toDto(StudioGroup group) {
-		boolean premiumFromPlan = "PREMIUM".equals(StudioGroup.canonicalPlanTier(group.getPlanTier()));
+	private BillingStatusDto toDto(StudioGroup group, VelvetUserPrincipal principal) {
+		boolean premiumAccess = salonPremiumEntitlementService.hasActivePremium(group);
+		boolean profileComplete = salonBillingProfileService.isProfileComplete(principal);
 		if (subscriptionSyncService == null) {
 			return new BillingStatusDto(
 					stripeProperties.enabled(),
@@ -44,7 +51,8 @@ public class BillingStatusService {
 					null,
 					null,
 					false,
-					premiumFromPlan);
+					premiumAccess,
+					profileComplete);
 		}
 		return subscriptionSyncService.findByStudioGroupId(group.getId())
 				.map(account -> new BillingStatusDto(
@@ -53,13 +61,15 @@ public class BillingStatusService {
 						account.getSubscriptionStatus(),
 						account.getCurrentPeriodEnd(),
 						account.isCancelAtPeriodEnd(),
-						premiumFromPlan))
+						premiumAccess,
+						profileComplete))
 				.orElseGet(() -> new BillingStatusDto(
 						stripeProperties.enabled(),
 						stripeProperties.configured(),
 						null,
 						null,
 						false,
-						premiumFromPlan));
+						premiumAccess,
+						profileComplete));
 	}
 }

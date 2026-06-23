@@ -102,7 +102,7 @@ export default function AdminRegisterSuperAdminPage() {
                   }
                   throw new Error(msg);
                 }
-                window.location.assign("/admin/login");
+                window.location.assign("/account");
               } catch (err) {
                 setError(err instanceof Error ? err.message : "Registrazione non riuscita.");
               } finally {
@@ -180,7 +180,7 @@ export default function AdminRegisterSuperAdminPage() {
           </button>
         </form>
         <p className="velvet-admin-muted" style={{ marginTop: "1rem", textAlign: "center" }}>
-          <Link to="/admin/login">Ho già un account — vai al login</Link>
+          <Link to="/account">Ho già un account — accedi</Link>
         </p>
       </div>
     </main>

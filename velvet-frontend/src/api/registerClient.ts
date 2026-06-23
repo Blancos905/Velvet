@@ -14,10 +14,14 @@ export type ClientRegistrationPayload = {
   bootstrapSuperAdmin?: boolean;
 };
 
+export type RegistrationCreatedResponse = {
+  message: string;
+};
+
 /**
  * Registrazione **cliente** (consumatore) via `POST /api/v1/public/client-registration` (backend Velvet).
  */
-export async function registerClientApi(payload: ClientRegistrationPayload): Promise<void> {
+export async function registerClientApi(payload: ClientRegistrationPayload): Promise<string> {
   const body: Record<string, unknown> = {
     email: payload.email.trim().toLowerCase(),
     password: payload.password,
@@ -57,7 +61,17 @@ export async function registerClientApi(payload: ClientRegistrationPayload): Pro
     window.clearTimeout(timeoutId);
   }
 
-  if (res.ok) return;
+  if (res.ok) {
+    try {
+      const j = (await res.json()) as RegistrationCreatedResponse;
+      if (typeof j.message === "string" && j.message.trim()) {
+        return j.message.trim();
+      }
+    } catch {
+      /* body opzionale */
+    }
+    return "Abbiamo inviato un'email di conferma. Clicca il link per attivare l'account, poi accedi.";
+  }
 
   const msg = await httpApiErrorMessage(res, "Registrazione non riuscita");
   throw new Error(msg);

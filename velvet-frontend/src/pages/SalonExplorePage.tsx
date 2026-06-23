@@ -4,6 +4,7 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import { apiJson } from "../api/client";
 import type { OrganizationDetail, PublicSalonReview, SalonClientMembershipDto, ServicePublic } from "../api/types";
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
+import { canBookOnlineAsConsumer } from "../lib/velvetConsumerBooking";
 import { formatPriceEUR } from "../lib/format";
 import { formatSalonCityForDisplay } from "../lib/formatSalonCityForDisplay";
 import { useMapsCookieAllowed } from "../hooks/useCookieConsent";
@@ -136,7 +137,8 @@ export default function SalonExplorePage() {
   const location = useLocation();
   const queryClient = useQueryClient();
   const mapsAllowed = useMapsCookieAllowed();
-  const { accessToken, isAuthenticated, signIn } = useVelvetAuth();
+  const { accessToken, isAuthenticated, isSalonTitolare, isSalonStaff, signIn } = useVelvetAuth();
+  const canBookAsClient = canBookOnlineAsConsumer(isSalonTitolare, isSalonStaff);
   const s = slug ?? "";
   const [showcase, setShowcase] = useState<SalonShowcaseStored>(() => emptySalonShowcase());
   const [showcaseLoading, setShowcaseLoading] = useState(false);
@@ -449,6 +451,7 @@ export default function SalonExplorePage() {
                   type="button"
                   className="velvet-salon-explore__nav-client-cta"
                   onClick={() => {
+                    if (!canBookAsClient && !alreadyClient) return;
                     setMembershipFeedback(null);
                     setMembershipFeedbackIsError(false);
                     if (!isAuthenticated) {
@@ -467,11 +470,19 @@ export default function SalonExplorePage() {
                     becomeClientM.mutate(detail.id);
                   }}
                   disabled={
+                    (!canBookAsClient && !alreadyClient) ||
                     !detail?.id ||
                     (alreadyClient ? leaveSalonClientM.isPending : becomeClientM.isPending)
                   }
+                  title={
+                    !canBookAsClient && !alreadyClient
+                      ? "Con un account salone non puoi collegarti come cliente: usa l'agenda in area account."
+                      : undefined
+                  }
                 >
-                  {alreadyClient
+                  {!canBookAsClient && !alreadyClient
+                    ? "Prenotazione solo clienti"
+                    : alreadyClient
                     ? leaveSalonClientM.isPending
                       ? "Scollegamento…"
                       : "Non essere più cliente di questo salone"
@@ -669,9 +680,21 @@ export default function SalonExplorePage() {
                   {personal.bookingNote?.trim() || "Prenota come e quando vuoi con un semplice click."}
                 </p>
                 <div className="velvet-salon-explore__prenota-cta-row">
-                  <Link className="velvet-salon-explore__prenota-main-cta" to={`/s/${encodeURIComponent(s)}`}>
-                    {personal.bookingCtaLabel?.trim() || "Prenota ora"}
-                  </Link>
+                  {isAuthenticated && !canBookAsClient ? (
+                    <>
+                      <p className="velvet-salon-explore__block-prenota-text">
+                        Con il profilo salone non puoi prenotare online: gestisci gli appuntamenti dall&apos;agenda in area
+                        account.
+                      </p>
+                      <Link className="velvet-salon-explore__prenota-main-cta" to="/account/prenotazioni">
+                        Vai all&apos;agenda salone
+                      </Link>
+                    </>
+                  ) : (
+                    <Link className="velvet-salon-explore__prenota-main-cta" to={`/s/${encodeURIComponent(s)}`}>
+                      {personal.bookingCtaLabel?.trim() || "Prenota ora"}
+                    </Link>
+                  )}
                 </div>
               </div>
             </section>

@@ -1,5 +1,8 @@
 package it.velvet.publicapi.validation;
 
+import it.velvet.billing.domain.SalonBillingProfile;
+import it.velvet.billing.dto.RegistrationSalonBillingDetails;
+import it.velvet.billing.validation.SalonBillingProfileValidator;
 import it.velvet.common.api.BusinessException;
 import it.velvet.publicapi.dto.RegistrationSalonLocation;
 import it.velvet.studio.domain.SalonBusinessType;
@@ -63,6 +66,38 @@ public final class ConsumerRegistrationValidator {
 		if (blank(loc.addressLine1()) || blank(loc.postalCode()) || blank(loc.city()) || blank(loc.province())) {
 			throw bad("Per il piano Free indica l’indirizzo della sede (via, CAP, città e provincia) così i clienti possono trovarti in ricerca e in vetrina.");
 		}
+	}
+
+	/** Piano Premium: dati fatturazione obbligatori in registrazione. */
+	public static void requireBillingForPremiumPlan(String planTier, RegistrationSalonBillingDetails billing, String accountEmail) {
+		if (!"PREMIUM".equalsIgnoreCase(planTier != null ? planTier.trim() : "")) {
+			return;
+		}
+		if (billing == null || !billing.hasAnyField()) {
+			throw bad("Per il piano Premium indica i dati di fatturazione (intestazione, indirizzo, P.IVA o codice fiscale, SDI o PEC).");
+		}
+		SalonBillingProfile scratch = scratchProfile(billing, accountEmail);
+		SalonBillingProfileValidator.validateForSave(scratch);
+	}
+
+	private static SalonBillingProfile scratchProfile(RegistrationSalonBillingDetails billing, String accountEmail) {
+		var group = new it.velvet.studio.domain.StudioGroup("Salone", accountEmail, "BASE");
+		SalonBillingProfile profile = new SalonBillingProfile(group);
+		profile.setLegalName(billing.legalName());
+		profile.setBillingEmail(
+				SalonBillingProfileValidator.normalizeEmail(
+						billing.billingEmail() != null && !billing.billingEmail().isBlank() ? billing.billingEmail() : accountEmail));
+		profile.setVatNumber(billing.vatNumber());
+		profile.setFiscalCode(billing.fiscalCode());
+		profile.setSubjectType(billing.subjectType());
+		profile.setAddressLine1(billing.addressLine1());
+		profile.setPostalCode(billing.postalCode());
+		profile.setCity(billing.city());
+		profile.setProvince(billing.province());
+		profile.setCountry(billing.country() != null && !billing.country().isBlank() ? billing.country() : "IT");
+		profile.setSdiCode(billing.sdiCode());
+		profile.setPecEmail(billing.pecEmail());
+		return profile;
 	}
 
 	private static boolean blank(String s) {

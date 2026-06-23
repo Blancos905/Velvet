@@ -60,7 +60,7 @@ public class MeSalonClientsController {
 
 	@PutMapping("/{organizationId}")
 	@Operation(summary = "Diventa cliente di un salone (idempotente)")
-	@PreAuthorize("hasAnyAuthority('ROLE_CLIENT','ROLE_OWNER')")
+	@PreAuthorize("hasAuthority('ROLE_CLIENT')")
 	public SalonClientMembershipDto becomeClient(
 			@AuthenticationPrincipal VelvetUserPrincipal principal,
 			@PathVariable UUID organizationId) {

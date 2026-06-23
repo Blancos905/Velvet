@@ -5,20 +5,32 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
+typedef VelvetFcmNotificationOpenedHandler = void Function(
+  Map<String, String> data, {
+  String? title,
+  String? body,
+});
+
 /// Inizializza Firebase Messaging e espone il token FCM per la WebView.
 class VelvetFcmService {
   VelvetFcmService._();
 
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   static StreamSubscription<String>? _tokenRefreshSub;
+  static StreamSubscription<RemoteMessage>? _messageOpenedSub;
   static String? _currentToken;
   static void Function(String? token)? _onTokenChanged;
+  static VelvetFcmNotificationOpenedHandler? _onNotificationOpened;
   static var _initialized = false;
 
   static String? get currentToken => _currentToken;
 
-  static Future<void> initialize(void Function(String? token) onTokenChanged) async {
+  static Future<void> initialize(
+    void Function(String? token) onTokenChanged, {
+    VelvetFcmNotificationOpenedHandler? onNotificationOpened,
+  }) async {
     _onTokenChanged = onTokenChanged;
+    _onNotificationOpened = onNotificationOpened;
     if (_initialized) {
       _onTokenChanged?.call(_currentToken);
       return;
@@ -40,13 +52,32 @@ class VelvetFcmService {
       _onTokenChanged?.call(token);
     });
 
+    await _messageOpenedSub?.cancel();
+    _messageOpenedSub = FirebaseMessaging.onMessageOpenedApp.listen(_dispatchOpenedMessage);
+    final initialMessage = await _messaging.getInitialMessage();
+    if (initialMessage != null) {
+      _dispatchOpenedMessage(initialMessage);
+    }
+
     await _refreshToken(notify: true);
   }
 
   static Future<void> dispose() async {
     await _tokenRefreshSub?.cancel();
     _tokenRefreshSub = null;
+    await _messageOpenedSub?.cancel();
+    _messageOpenedSub = null;
     _onTokenChanged = null;
+    _onNotificationOpened = null;
+  }
+
+  static void _dispatchOpenedMessage(RemoteMessage message) {
+    final data = Map<String, String>.from(message.data);
+    _onNotificationOpened?.call(
+      data,
+      title: message.notification?.title,
+      body: message.notification?.body,
+    );
   }
 
   static Future<void> _requestPermissions() async {

@@ -23,8 +23,9 @@ class VelvetProfileMenuWebBridge {
 
     if (session.isSalonStaff) {
       return const [
-        VelvetProfileMenuItem(label: 'La mia agenda', href: '/account/prenotazioni'),
+        VelvetProfileMenuItem(label: 'La mia agenda', href: '/account/staff'),
         VelvetProfileMenuItem(label: 'Profilo', href: '/account/profilo'),
+        VelvetProfileMenuItem(label: 'Recensioni', href: '/account/feedback-velvet'),
         VelvetProfileMenuItem(label: 'Notifiche', href: '/account/notifiche'),
         VelvetProfileMenuItem(label: 'Assistenza', href: '/account/assistenza'),
         VelvetProfileMenuItem(label: 'Logout', logout: true),

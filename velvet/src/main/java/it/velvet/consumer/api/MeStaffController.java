@@ -16,6 +16,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/me/staff")
@@ -69,5 +72,32 @@ public class MeStaffController {
 			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
 			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
 		return meStaffAgendaService.listAgenda(principal, from, to);
+	}
+
+	@GetMapping("/appointments/{id}")
+	@Operation(summary = "Dettaglio prenotazione assegnata all’operatore collegato")
+	@PreAuthorize("hasAuthority('ROLE_STAFF')")
+	public AppointmentDto appointmentForStaff(
+			@AuthenticationPrincipal VelvetUserPrincipal principal,
+			@PathVariable UUID id) {
+		return meStaffAgendaService.getForStaff(principal, id);
+	}
+
+	@PostMapping("/appointments/{id}/confirm")
+	@Operation(summary = "Accetta una richiesta prenotazione cliente (stato BOOKED → CONFIRMED)")
+	@PreAuthorize("hasAuthority('ROLE_STAFF')")
+	public AppointmentDto confirmAppointmentForStaff(
+			@AuthenticationPrincipal VelvetUserPrincipal principal,
+			@PathVariable UUID id) {
+		return meStaffAgendaService.confirmForStaff(principal, id);
+	}
+
+	@PostMapping("/appointments/{id}/reject")
+	@Operation(summary = "Rifiuta una richiesta prenotazione cliente (stato BOOKED → CANCELLED)")
+	@PreAuthorize("hasAuthority('ROLE_STAFF')")
+	public void rejectAppointmentForStaff(
+			@AuthenticationPrincipal VelvetUserPrincipal principal,
+			@PathVariable UUID id) {
+		meStaffAgendaService.rejectForStaff(principal, id);
 	}
 }

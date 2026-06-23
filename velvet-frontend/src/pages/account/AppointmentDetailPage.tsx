@@ -1,8 +1,9 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { apiJson } from "../../api/client";
 import type { AppointmentDto, ReviewSubmitResponse } from "../../api/types";
+import { BookingConfirmedModal } from "../../components/BookingConfirmedModal";
 import { StarRatingInput } from "../../components/StarRatingInput";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
 import { formatPriceEUR } from "../../lib/format";
@@ -28,25 +29,42 @@ function canSalonCancel(status: string): boolean {
 function appointmentStatusLabel(status: string): string {
   switch (status) {
     case "BOOKED":
-      return "Prenotata";
+      return "In attesa di conferma";
     case "CONFIRMED":
       return "Confermata";
     case "COMPLETED":
       return "Completata";
     case "CANCELLED":
-      return "Cancellata";
+      return "Annullata";
     default:
       return status;
   }
 }
 
+function salonAppointmentApiBase(isSalonTitolare: boolean, isSalonStaff: boolean): string | null {
+  if (isSalonTitolare) return "/api/v1/me/salon/appointments";
+  if (isSalonStaff) return "/api/v1/me/staff/appointments";
+  return null;
+}
+
+type BookingConfirmedLocationState = {
+  bookingConfirmed?: {
+    startIso: string;
+    serviceName?: string;
+  };
+};
+
 export default function AppointmentDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { accessToken, isSalonTitolare } = useVelvetAuth();
+  const { accessToken, isSalonTitolare, isSalonStaff } = useVelvetAuth();
   const qc = useQueryClient();
   const reviewSectionRef = useRef<HTMLElement | null>(null);
+  const salonSide = isSalonTitolare || isSalonStaff;
+  const salonApiBase = salonAppointmentApiBase(isSalonTitolare, isSalonStaff);
+  const agendaListPath = isSalonStaff ? "/account/staff" : "/account/prenotazioni";
 
   const [slots, setSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
@@ -61,18 +79,27 @@ export default function AppointmentDetailPage() {
   const [reviewErr, setReviewErr] = useState<string | null>(null);
   const [reviewDone, setReviewDone] = useState(false);
   const [reviewReturning, setReviewReturning] = useState(false);
+  const [bookingConfirmedPopup, setBookingConfirmedPopup] = useState<{
+    startIso: string;
+    serviceName?: string;
+  } | null>(() => {
+    const state = location.state as BookingConfirmedLocationState | null;
+    const payload = state?.bookingConfirmed;
+    return payload?.startIso ? payload : null;
+  });
   const openReview = searchParams.get("openReview") === "1";
   const rawReturnTo = searchParams.get("returnTo")?.trim() ?? "";
   const returnTo = rawReturnTo.startsWith("/account/") ? rawReturnTo : null;
 
   const q = useQuery({
-    queryKey: ["me", "appointments", "one", id, isSalonTitolare ? "salon" : "consumer"],
-    queryFn: () =>
-      apiJson<AppointmentDto>(
-        isSalonTitolare ? `/api/v1/me/salon/appointments/${id}` : `/api/v1/me/appointments/${id}`,
-        { accessToken },
-      ),
-    enabled: Boolean(id && accessToken),
+    queryKey: ["me", "appointments", "one", id, isSalonTitolare ? "salon" : isSalonStaff ? "staff" : "consumer"],
+    queryFn: () => {
+      const url = salonApiBase
+        ? `${salonApiBase}/${id}`
+        : `/api/v1/me/appointments/${id}`;
+      return apiJson<AppointmentDto>(url, { accessToken });
+    },
+    enabled: Boolean(id && accessToken && (salonSide ? salonApiBase : true)),
   });
 
   const reload = useCallback(async () => {
@@ -95,12 +122,18 @@ export default function AppointmentDetailPage() {
 
   useEffect(() => {
     if (!openReview) return;
-    if (!a || a.status !== "COMPLETED" || isSalonTitolare) return;
+    if (!a || a.status !== "COMPLETED" || salonSide) return;
     const t = window.setTimeout(() => {
       reviewSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 120);
     return () => window.clearTimeout(t);
-  }, [openReview, a, isSalonTitolare]);
+  }, [openReview, a, salonSide]);
+
+  useEffect(() => {
+    const state = location.state as BookingConfirmedLocationState | null;
+    if (!state?.bookingConfirmed) return;
+    navigate({ pathname: location.pathname, search: location.search }, { replace: true, state: null });
+  }, [location.pathname, location.search, location.state, navigate]);
 
   const loadSlots = async () => {
     if (!id || !accessToken) return;
@@ -144,13 +177,13 @@ export default function AppointmentDetailPage() {
   };
 
   const onCancelSalon = async () => {
-    if (!id || !accessToken || !a || !canSalonCancel(a.status)) return;
+    if (!id || !accessToken || !a || !canSalonCancel(a.status) || !salonApiBase) return;
     if (!window.confirm("Annullare questa prenotazione come salone?")) return;
     setBusy(true);
     setErr(null);
     setOkMsg(null);
     try {
-      await apiJson(`/api/v1/me/salon/appointments/${id}/cancel`, {
+      await apiJson(`${salonApiBase}/${id}/cancel`, {
         method: "POST",
         accessToken,
       });
@@ -159,6 +192,49 @@ export default function AppointmentDetailPage() {
       setOkMsg("Prenotazione annullata con successo.");
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Annullamento fallito");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onConfirmSalon = async () => {
+    if (!id || !accessToken || !a || a.status !== "BOOKED" || !salonApiBase) return;
+    setBusy(true);
+    setErr(null);
+    setOkMsg(null);
+    try {
+      await apiJson(`${salonApiBase}/${id}/confirm`, {
+        method: "POST",
+        accessToken,
+      });
+      await qc.invalidateQueries({ queryKey: ["me", "salon", "agenda"] });
+      await qc.invalidateQueries({ queryKey: ["me", "salon", "notifications"] });
+      await q.refetch();
+      setOkMsg("Prenotazione confermata. Il cliente riceverà una notifica.");
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Conferma non riuscita");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onRejectSalon = async () => {
+    if (!id || !accessToken || !a || a.status !== "BOOKED" || !salonApiBase) return;
+    if (!window.confirm("Rifiutare questa richiesta di prenotazione?")) return;
+    setBusy(true);
+    setErr(null);
+    setOkMsg(null);
+    try {
+      await apiJson(`${salonApiBase}/${id}/reject`, {
+        method: "POST",
+        accessToken,
+      });
+      await qc.invalidateQueries({ queryKey: ["me", "salon", "agenda"] });
+      await qc.invalidateQueries({ queryKey: ["me", "salon", "notifications"] });
+      await q.refetch();
+      setOkMsg("Richiesta rifiutata. Il cliente riceverà una notifica.");
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Rifiuto non riuscito");
     } finally {
       setBusy(false);
     }
@@ -188,12 +264,12 @@ export default function AppointmentDetailPage() {
   };
 
   const onRescheduleSalon = async () => {
-    if (!id || !accessToken || !selectedSlot || !a || !canSalonCancel(a.status)) return;
+    if (!id || !accessToken || !selectedSlot || !a || !canSalonCancel(a.status) || !salonApiBase) return;
     setBusy(true);
     setErr(null);
     setOkMsg(null);
     try {
-      await apiJson(`/api/v1/me/salon/appointments/${id}/reschedule`, {
+      await apiJson(`${salonApiBase}/${id}/reschedule`, {
         method: "POST",
         accessToken,
         body: JSON.stringify({ newStart: selectedSlot }),
@@ -211,7 +287,7 @@ export default function AppointmentDetailPage() {
   };
 
   const loadSlotsSalon = async () => {
-    if (!id || !accessToken || !a || !canSalonCancel(a.status)) return;
+    if (!id || !accessToken || !a || !canSalonCancel(a.status) || !isSalonTitolare) return;
     const { from, to } = localDayBounds();
     setSlotsLoading(true);
     setSlots([]);
@@ -243,38 +319,43 @@ export default function AppointmentDetailPage() {
         <p className="velvet-alert velvet-alert--error" role="alert">
           {q.error instanceof Error ? q.error.message : "Appuntamento non trovato"}
         </p>
-        <Link to="/account/prenotazioni" className="velvet-link-back">
+        <Link to={agendaListPath} className="velvet-link-back">
           ← Torna all&apos;elenco
         </Link>
       </div>
     );
   }
 
-  const showConsumerBookingActions = isBookedOrConfirmed(a.status) && !isSalonTitolare;
+  const showConsumerBookingActions = isBookedOrConfirmed(a.status) && !salonSide;
+  const pendingSalonDecision = a.status === "BOOKED";
   const hasSelfService = a.canConsumerCancel || a.canConsumerReschedule;
   const deadlineFmt = new Intl.DateTimeFormat("it-IT", { dateStyle: "short", timeStyle: "short" });
 
   return (
     <div className="velvet-appointment-detail-page">
-      <Link to="/account/prenotazioni" className="velvet-link-back velvet-link-back--overlay-nav">
+      <Link to={agendaListPath} className="velvet-link-back velvet-link-back--overlay-nav">
         <span className="velvet-link-back__chevron" aria-hidden="true">
           ←
         </span>
-        <span className="velvet-link-back__text">{isSalonTitolare ? "Agenda" : "Prenotazioni"}</span>
+        <span className="velvet-link-back__text">{salonSide ? "Agenda" : "Prenotazioni"}</span>
       </Link>
       <header className="velvet-appointment-detail-page__hero">
         <div className="velvet-appointment-detail-page__hero-glow" aria-hidden />
         <div className="velvet-appointment-detail-page__hero-inner">
           <h1 className="velvet-appointment-detail-page__headline">
             <span className="velvet-appointment-detail-page__headline-pre">
-              {isSalonTitolare ? "Appuntamento · " : "Prenotazione · "}
+              {salonSide ? "Appuntamento · " : "Prenotazione · "}
             </span>
             <span className="velvet-appointment-detail-page__headline-accent">{a.serviceName}</span>
           </h1>
           <p className="velvet-appointment-detail-page__hero-sub">
-            {isSalonTitolare
-              ? "Dettaglio prenotazione: modifica orario o annulla come salone."
-              : "Dettaglio della tua visita: orario, sede e stato."}
+            {salonSide
+              ? pendingSalonDecision
+                ? "Richiesta cliente in attesa: accetta o rifiuta la prenotazione."
+                : "Dettaglio prenotazione: modifica orario o annulla come salone."
+              : a.status === "BOOKED"
+                ? "In attesa di conferma dal salone. Riceverai una notifica quando la richiesta sarà accettata o rifiutata."
+                : "Dettaglio della tua visita: orario, sede e stato."}
           </p>
         </div>
       </header>
@@ -373,15 +454,26 @@ export default function AppointmentDetailPage() {
         </p>
       )}
 
-      {!showConsumerBookingActions && a.status !== "CANCELLED" && a.status !== "COMPLETED" && !isSalonTitolare && (
+      {!showConsumerBookingActions && a.status !== "CANCELLED" && a.status !== "COMPLETED" && !salonSide && a.status !== "BOOKED" && (
         <p className="velvet-text-muted" style={{ marginTop: "1.25rem" }}>
           Per modifiche in questo stato contatta il salone.
         </p>
       )}
 
-      {isSalonTitolare && (
+      {salonSide && pendingSalonDecision ? (
         <div className="velvet-btn-row velvet-appointment-detail-page__actions">
-          {!slots.length && canSalonCancel(a.status) ? (
+          <button type="button" className="velvet-btn velvet-btn--primary" onClick={() => void onConfirmSalon()} disabled={busy}>
+            Accetta prenotazione
+          </button>
+          <button type="button" className="velvet-btn velvet-btn--secondary" onClick={() => void onRejectSalon()} disabled={busy}>
+            Rifiuta
+          </button>
+        </div>
+      ) : null}
+
+      {salonSide && !pendingSalonDecision ? (
+        <div className="velvet-btn-row velvet-appointment-detail-page__actions">
+          {!slots.length && canSalonCancel(a.status) && isSalonTitolare ? (
             <button
               type="button"
               className="velvet-btn velvet-btn--primary"
@@ -431,9 +523,9 @@ export default function AppointmentDetailPage() {
             </div>
           ) : null}
         </div>
-      )}
+      ) : null}
 
-      {a.status === "COMPLETED" && !isSalonTitolare && accessToken && (
+      {a.status === "COMPLETED" && !salonSide && accessToken && (
         <section ref={reviewSectionRef} className="velvet-surface-card velvet-appointment-detail-page__review">
           <h2 className="velvet-section-title" style={{ marginTop: 0 }}>
             La tua recensione
@@ -516,6 +608,14 @@ export default function AppointmentDetailPage() {
           )}
         </section>
       )}
+      {bookingConfirmedPopup ? (
+        <BookingConfirmedModal
+          startIso={bookingConfirmedPopup.startIso}
+          serviceName={bookingConfirmedPopup.serviceName}
+          pendingApproval
+          onClose={() => setBookingConfirmedPopup(null)}
+        />
+      ) : null}
     </div>
   );
 }

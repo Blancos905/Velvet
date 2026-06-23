@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { apiFetch, apiJson } from "../../api/client";
 import type {
@@ -226,15 +226,28 @@ const SalonVelvetChatComposer = memo(function SalonVelvetChatComposer({
     },
   });
 
+  const trySend = useCallback(() => {
+    const text = draft.trim();
+    if (chatEndpointMissing || !text || sendM.isPending) return;
+    sendM.mutate(text);
+  }, [chatEndpointMissing, draft, sendM]);
+
+  const onComposerKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLTextAreaElement>) => {
+      if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing) return;
+      event.preventDefault();
+      trySend();
+    },
+    [trySend],
+  );
+
   return (
     <>
       <form
         className="velvet-salon-chat__composer"
         onSubmit={(e) => {
           e.preventDefault();
-          const text = draft.trim();
-          if (chatEndpointMissing || !text || sendM.isPending) return;
-          sendM.mutate(text);
+          trySend();
         }}
       >
         <textarea
@@ -243,6 +256,8 @@ const SalonVelvetChatComposer = memo(function SalonVelvetChatComposer({
           placeholder={chatEndpointMissing ? "Aggiorna il backend per inviare messaggi…" : "Messaggio"}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={onComposerKeyDown}
+          enterKeyHint="send"
           maxLength={4000}
           disabled={chatEndpointMissing}
           aria-label="Testo messaggio"

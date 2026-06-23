@@ -41,15 +41,21 @@ public class StripeWebhookProcessor {
 
 	private final StripeWebhookEventRepository webhookEventRepository;
 	private final StripeSubscriptionSyncService subscriptionSyncService;
+	private final SalonBillingNotificationService billingNotificationService;
 	private final SecurityAuditService securityAuditService;
+	private final com.stripe.StripeClient stripeClient;
 
 	public StripeWebhookProcessor(
 			StripeWebhookEventRepository webhookEventRepository,
 			StripeSubscriptionSyncService subscriptionSyncService,
-			SecurityAuditService securityAuditService) {
+			SalonBillingNotificationService billingNotificationService,
+			SecurityAuditService securityAuditService,
+			com.stripe.StripeClient stripeClient) {
 		this.webhookEventRepository = webhookEventRepository;
 		this.subscriptionSyncService = subscriptionSyncService;
+		this.billingNotificationService = billingNotificationService;
 		this.securityAuditService = securityAuditService;
+		this.stripeClient = stripeClient;
 	}
 
 	@Transactional
@@ -68,7 +74,7 @@ public class StripeWebhookProcessor {
 		}
 
 		try {
-			UUID studioGroupId = dispatch(event);
+			UUID studioGroupId = dispatch(event, rawPayload);
 			row.setStudioGroupId(studioGroupId);
 			markProcessed(row, request, event, studioGroupId);
 		}
@@ -87,12 +93,12 @@ public class StripeWebhookProcessor {
 		}
 	}
 
-	private UUID dispatch(Event event) throws StripeException {
+	private UUID dispatch(Event event, String rawPayload) throws StripeException {
 		return switch (event.getType()) {
 			case "checkout.session.completed" -> handleCheckoutCompleted(event);
 			case "customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted" ->
 					handleSubscriptionEvent(event);
-			case "invoice.payment_failed", "invoice.paid" -> handleInvoiceEvent(event);
+			case "invoice.payment_failed", "invoice.paid" -> handleInvoiceEvent(event, rawPayload);
 			default -> null;
 		};
 	}
@@ -108,6 +114,7 @@ public class StripeWebhookProcessor {
 		String subscriptionId = session.getSubscription();
 		if (subscriptionId != null && !subscriptionId.isBlank()) {
 			subscriptionSyncService.syncFromSubscriptionId(subscriptionId, studioGroupId);
+			billingNotificationService.onCheckoutSessionCompleted(session, studioGroupId);
 		}
 		return studioGroupId;
 	}
@@ -118,18 +125,26 @@ public class StripeWebhookProcessor {
 			return null;
 		}
 		UUID studioGroupId = parseUuid(metadata(subscription, "velvet_studio_group_id"));
+		billingNotificationService.onSubscriptionEvent(subscription, studioGroupId);
 		subscriptionSyncService.syncFromSubscriptionObject(subscription, studioGroupId);
 		return studioGroupId != null ? studioGroupId
 				: subscriptionSyncService.findByStudioGroupIdFromSubscription(subscription);
 	}
 
-	private UUID handleInvoiceEvent(Event event) throws StripeException {
+	private UUID handleInvoiceEvent(Event event, String rawPayload) throws StripeException {
 		com.stripe.model.Invoice invoice = deserialize(event, com.stripe.model.Invoice.class);
-		if (invoice == null || invoice.getSubscription() == null || invoice.getSubscription().isBlank()) {
+		if (invoice == null) {
 			return null;
 		}
-		subscriptionSyncService.syncFromSubscriptionId(invoice.getSubscription(), null);
-		return null;
+		String subscriptionId = StripeInvoiceSupport.resolveSubscriptionId(invoice, rawPayload, stripeClient);
+		if (subscriptionId == null || subscriptionId.isBlank()) {
+			return null;
+		}
+		subscriptionSyncService.syncFromSubscriptionId(subscriptionId, null);
+		if ("invoice.paid".equals(event.getType())) {
+			billingNotificationService.onInvoicePaid(invoice, subscriptionId);
+		}
+		return billingNotificationService.findStudioGroupIdForSubscription(subscriptionId).orElse(null);
 	}
 
 	private void markProcessed(StripeWebhookEvent row, HttpServletRequest request, Event event, UUID studioGroupId) {

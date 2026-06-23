@@ -192,7 +192,7 @@ public class ScheduledNotificationProcessor {
 	private String buildSubject(NotificationType type, Appointment a) {
 		String salon = a.getLocation().getName();
 		return switch (type) {
-			case BOOKING_CREATED_FOR_SALON -> "Nuova prenotazione cliente — " + salon;
+			case BOOKING_CREATED_FOR_SALON -> "Richiesta prenotazione da confermare — " + salon;
 			case BOOKING_CONFIRMATION -> "Conferma prenotazione — " + salon;
 			case BOOKING_UPDATED -> "Prenotazione aggiornata — " + salon;
 			case BOOKING_CANCELLED_BY_CONSUMER -> "Prenotazione annullata — " + salon;
@@ -247,7 +247,7 @@ public class ScheduledNotificationProcessor {
 				String intro = switch (type) {
 					case BOOKING_CONFIRMATION -> "La tua prenotazione è confermata.";
 					case BOOKING_UPDATED -> "La tua prenotazione è stata spostata. Ecco il nuovo orario.";
-					case REMINDER_24H -> "Ti ricordiamo l'appuntamento tra circa 24 ore.";
+					case REMINDER_24H -> "Ti ricordiamo l'appuntamento tra 24 ore.";
 					case REMINDER_1H -> "Ti ricordiamo l'appuntamento tra circa 2 ore.";
 					default -> "";
 				};
@@ -345,7 +345,7 @@ public class ScheduledNotificationProcessor {
 		String intro = switch (type) {
 			case BOOKING_CONFIRMATION -> "La tua prenotazione è confermata.";
 			case BOOKING_UPDATED -> "La tua prenotazione è stata spostata.";
-			case REMINDER_24H -> "Promemoria: appuntamento tra circa 24 ore.";
+			case REMINDER_24H -> "Promemoria: appuntamento tra 24 ore.";
 			case REMINDER_1H -> "Promemoria: appuntamento tra circa 2 ore.";
 			default -> "La tua prenotazione.";
 		};

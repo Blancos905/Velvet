@@ -4,6 +4,7 @@ import it.velvet.appointment.domain.Appointment;
 import it.velvet.appointment.domain.AppointmentRepository;
 import it.velvet.appointment.domain.AppointmentStatus;
 import it.velvet.appointment.domain.CancelledBy;
+import it.velvet.consumer.service.ConsumerB2CEligibility;
 import it.velvet.catalog.domain.SalonClient;
 import it.velvet.catalog.domain.SalonClientRepository;
 import it.velvet.catalog.domain.SalonService;
@@ -14,7 +15,6 @@ import it.velvet.catalog.domain.StaffOperatorRepository;
 import it.velvet.common.api.BusinessException;
 import it.velvet.consumer.domain.ConsumerProfile;
 import it.velvet.notification.service.AppointmentNotificationService;
-import it.velvet.security.auth.VelvetUserPrincipal;
 import it.velvet.studio.domain.Location;
 import it.velvet.studio.domain.LocationRepository;
 import org.springframework.http.HttpStatus;
@@ -60,7 +60,7 @@ public class AppointmentBookingService {
 			UUID serviceId,
 			UUID operatorId,
 			Instant start) {
-		assertConsumerAccountMayBookOnline(consumer);
+		ConsumerB2CEligibility.assertMayActAsConsumer(consumer);
 		Location location = locationRepository.findBySlug(locationSlug)
 				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Sede non trovata."));
 		SalonService service = salonServiceRepository.findByIdWithOperators(serviceId)
@@ -94,7 +94,7 @@ public class AppointmentBookingService {
 
 		Appointment a = new Appointment(location, service, operator, client, start, end);
 		a.setConsumerProfile(consumer);
-		a.setStatus(AppointmentStatus.CONFIRMED);
+		a.setStatus(AppointmentStatus.BOOKED);
 		appointmentRepository.save(a);
 		appointmentRepository.flush();
 		Appointment created = requireAppointment(a.getId());
@@ -335,6 +335,37 @@ public class AppointmentBookingService {
 	}
 
 	@Transactional
+	public Appointment confirmBookingAsSalon(Appointment appointment) {
+		if (appointment.getStatus() != AppointmentStatus.BOOKED) {
+			throw new BusinessException(
+					HttpStatus.CONFLICT,
+					"APPOINTMENT_NOT_PENDING",
+					"Solo le richieste in attesa possono essere confermate.");
+		}
+		appointment.setStatus(AppointmentStatus.CONFIRMED);
+		appointmentRepository.save(appointment);
+		appointmentNotificationService.onBookingConfirmedBySalon(appointment.getId());
+		return appointment;
+	}
+
+	@Transactional
+	public void rejectBookingAsSalon(Appointment appointment) {
+		if (appointment.getStatus() != AppointmentStatus.BOOKED) {
+			throw new BusinessException(
+					HttpStatus.CONFLICT,
+					"APPOINTMENT_NOT_PENDING",
+					"Solo le richieste in attesa possono essere rifiutate.");
+		}
+		AppointmentStatus previous = appointment.getStatus();
+		appointment.cancel(CancelledBy.STAFF);
+		appointmentRepository.save(appointment);
+		appointmentNotificationService.onAppointmentStatusChanged(
+				appointment.getId(),
+				previous,
+				AppointmentStatus.CANCELLED);
+	}
+
+	@Transactional
 	public Appointment updateStatusStaff(UUID appointmentId, UUID locationId, AppointmentStatus newStatus) {
 		Appointment a = requireAppointment(appointmentId);
 		if (!a.getLocation().getId().equals(locationId)) {
@@ -382,16 +413,6 @@ public class AppointmentBookingService {
 		appointment.setEnd(newEnd);
 		appointmentRepository.save(appointment);
 		appointmentNotificationService.onConsumerBookingRescheduled(appointment.getId());
-	}
-
-	private static void assertConsumerAccountMayBookOnline(ConsumerProfile consumer) {
-		var roles = VelvetUserPrincipal.parseRoleStrings(consumer.getSecurityRoles());
-		if (!roles.contains("CLIENT") || roles.contains("OWNER") || roles.contains("STAFF")) {
-			throw new BusinessException(
-					HttpStatus.FORBIDDEN,
-					"FORBIDDEN",
-					"Solo gli account cliente possono prenotare online.");
-		}
 	}
 
 	private static void assertConsumerOwns(Appointment appointment, ConsumerProfile consumer) {

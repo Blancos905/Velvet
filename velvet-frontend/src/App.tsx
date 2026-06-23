@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { VelvetNotificationPopupHost } from "./components/VelvetNotificationPopupHost";
 import { useVelvetAuth } from "./auth/VelvetAuthProvider";
 import { AdminProtectedRoute } from "./components/AdminProtectedRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -9,17 +10,16 @@ import { RootLayout } from "./layout/RootLayout";
 import HomePage from "./pages/HomePage";
 import OidcCallbackPage from "./pages/OidcCallbackPage";
 import PasswordResetPage from "./pages/PasswordResetPage";
+import EmailVerificationPage from "./pages/EmailVerificationPage";
 import {
   AccountBillingCheckoutPage,
   AccountBillingSuccessPage,
   AccountHomePage,
   AccountInfoPrivacyPage,
-  AccountLayout,
   AccountSalonHomePage,
   AdminAssistenzaPage,
   AdminDashboardPage,
   AdminLayout,
-  AdminLoginPage,
   AdminRegisterSuperAdminPage,
   AdminSuperAdminProfilePage,
   AppointmentDetailPage,
@@ -49,6 +49,7 @@ import {
   SalonPersonalPage,
   SalonPersonalPageBuilder,
   SalonPlansPage,
+  SalonFreePremiumUpgradePage,
   SalonServicesPage,
   SalonStaffAgendaPage,
   SalonStaffPage,
@@ -63,39 +64,40 @@ import {
   VelvetFeedbackPage,
 } from "./routes/lazyPages";
 
-import { useEffectiveSalonPlanTier } from "./hooks/useEffectiveSalonPlanTier";
-import { isVelvetNativeAppShell } from "./hooks/useVelvetNativeAppShell";
-import { nativeSalonOwnerHubPath } from "./lib/nativeAccountHubPaths";
+import { AccountLayout } from "./pages/account/AccountLayout";
 import "./styles/velvet-route-loading.css";
 
-function AccountIndexRedirect() {
-  const { isSalonTitolare, isSalonStaff, isVelvetSuperAdmin } = useVelvetAuth();
-  const salonPlanTier = useEffectiveSalonPlanTier();
+/** Super admin: niente hub `/account` — solo pannello `/admin`. */
+function AccountAreaLayout() {
+  const { isVelvetSuperAdmin } = useVelvetAuth();
   if (isVelvetSuperAdmin) {
     return <Navigate to="/admin/dashboard" replace />;
   }
-  if (isVelvetNativeAppShell()) {
-    if (isSalonStaff) {
-      return <Navigate to="/account/staff" replace />;
-    }
-    if (isSalonTitolare) {
-      return <Navigate to={nativeSalonOwnerHubPath(salonPlanTier)} replace />;
-    }
-    return <Navigate to="/account/home" replace />;
+  return <AccountLayout />;
+}
+
+function AccountIndexRedirect() {
+  const { isSalonTitolare, isSalonStaff, isVelvetSuperAdmin } = useVelvetAuth();
+  if (isVelvetSuperAdmin) {
+    return <Navigate to="/admin/dashboard" replace />;
   }
   if (isSalonStaff) {
     return <Navigate to="/account/staff" replace />;
   }
-  return <Navigate to={isSalonTitolare ? "/account/home" : "/"} replace />;
+  if (isSalonTitolare) {
+    return <Navigate to="/account/salone" replace />;
+  }
+  return <Navigate to="/account/prenotazioni" replace />;
 }
 
 export default function App() {
   return (
     <BrowserRouter>
+      <VelvetNotificationPopupHost />
       <Suspense fallback={<RouteLoadingFallback />}>
         <Routes>
           <Route element={<RootLayout />}>
-            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin/login" element={<Navigate to="/account" replace />} />
             <Route path="/admin/register" element={<AdminRegisterSuperAdminPage />} />
             <Route
               path="/admin"
@@ -113,9 +115,11 @@ export default function App() {
             </Route>
             <Route path="/auth/callback" element={<OidcCallbackPage />} />
             <Route path="/reimposta-password" element={<PasswordResetPage />} />
+            <Route path="/conferma-email" element={<EmailVerificationPage />} />
             <Route path="/" element={<HomePage />} />
             <Route path="/partner" element={<VelvetEntrySplashGate><PartnerPage /></VelvetEntrySplashGate>} />
             <Route path="/registrati" element={<VelvetEntrySplashGate><ClientSignupPage /></VelvetEntrySplashGate>} />
+            <Route path="/piani/premium-prova" element={<SalonFreePremiumUpgradePage />} />
             <Route path="/piani" element={<SalonPlansPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/idee/:groupId/:itemId" element={<MonthlyIdeaPage />} />
@@ -137,7 +141,7 @@ export default function App() {
               path="/account"
               element={
                 <ProtectedRoute>
-                  <AccountLayout />
+                  <AccountAreaLayout />
                 </ProtectedRoute>
               }
             >

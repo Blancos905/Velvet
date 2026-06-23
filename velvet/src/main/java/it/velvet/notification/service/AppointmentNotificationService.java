@@ -23,16 +23,19 @@ public class AppointmentNotificationService {
 	private final AppointmentRepository appointmentRepository;
 	private final VelvetNotificationProperties notificationProperties;
 	private final FcmPushDispatchService fcmPushDispatchService;
+	private final TransactionalEmailDispatchService transactionalEmailDispatchService;
 
 	public AppointmentNotificationService(
 			ScheduledNotificationRepository scheduledNotificationRepository,
 			AppointmentRepository appointmentRepository,
 			VelvetNotificationProperties notificationProperties,
-			FcmPushDispatchService fcmPushDispatchService) {
+			FcmPushDispatchService fcmPushDispatchService,
+			TransactionalEmailDispatchService transactionalEmailDispatchService) {
 		this.scheduledNotificationRepository = scheduledNotificationRepository;
 		this.appointmentRepository = appointmentRepository;
 		this.notificationProperties = notificationProperties;
 		this.fcmPushDispatchService = fcmPushDispatchService;
+		this.transactionalEmailDispatchService = transactionalEmailDispatchService;
 	}
 
 	@Transactional
@@ -47,6 +50,18 @@ public class AppointmentNotificationService {
 		ScheduledNotification salonInbox = scheduledNotificationRepository.save(
 				ScheduledNotification.salonInboxDelivered(a, NotificationType.BOOKING_CREATED_FOR_SALON));
 		dispatchSalonBookingCreatedPush(a, salonInbox);
+	}
+
+	/** Dopo conferma titolare/operatore: notifica cliente (conferma + promemoria programmati). */
+	@Transactional
+	public void onBookingConfirmedBySalon(UUID appointmentId) {
+		if (!notificationProperties.isEnabled()) {
+			return;
+		}
+		Appointment a = appointmentRepository.findByIdWithGraph(appointmentId).orElse(null);
+		if (a == null || a.getConsumerProfile() == null) {
+			return;
+		}
 		scheduleConfirmationAndReminders(a, NotificationType.BOOKING_CONFIRMATION);
 	}
 
@@ -86,7 +101,10 @@ public class AppointmentNotificationService {
 			return;
 		}
 		cancelPendingForAppointment(appointmentId);
-		scheduleConfirmationAndReminders(a, NotificationType.BOOKING_UPDATED);
+		ScheduledNotification salonAlert = scheduledNotificationRepository.save(
+				ScheduledNotification.salonInboxDelivered(a, NotificationType.BOOKING_UPDATED));
+		dispatchSalonAppointmentChangeAlert(a, salonAlert, NotificationType.BOOKING_UPDATED);
+		scheduleRemindersOnly(a);
 	}
 
 	@Transactional
@@ -99,8 +117,9 @@ public class AppointmentNotificationService {
 		if (a == null || a.getConsumerProfile() == null) {
 			return;
 		}
-		scheduledNotificationRepository.save(
-				new ScheduledNotification(a, NotificationType.BOOKING_CANCELLED_BY_CONSUMER, Instant.now()));
+		ScheduledNotification salonAlert = scheduledNotificationRepository.save(
+				ScheduledNotification.salonInboxDelivered(a, NotificationType.BOOKING_CANCELLED_BY_CONSUMER));
+		dispatchSalonAppointmentChangeAlert(a, salonAlert, NotificationType.BOOKING_CANCELLED_BY_CONSUMER);
 	}
 
 	/**
@@ -168,7 +187,41 @@ public class AppointmentNotificationService {
 		String salon = a.getLocation().getName() != null ? a.getLocation().getName() : "Salone";
 		fcmPushDispatchService.dispatchForScheduledNotification(
 				salonInbox,
-				"Nuova prenotazione cliente — " + salon,
-				"Hai ricevuto una nuova prenotazione.");
+				"Richiesta prenotazione — " + salon,
+				"Conferma o rifiuta la richiesta del cliente.");
+	}
+
+	private void dispatchSalonAppointmentChangeAlert(
+			Appointment a, ScheduledNotification salonInbox, NotificationType type) {
+		if (a.getLocation() == null) {
+			return;
+		}
+		String salon = a.getLocation().getName() != null ? a.getLocation().getName() : "Salone";
+		String title = switch (type) {
+			case BOOKING_UPDATED -> "Prenotazione spostata — " + salon;
+			case BOOKING_CANCELLED_BY_CONSUMER -> "Prenotazione annullata — " + salon;
+			default -> "Aggiornamento prenotazione — " + salon;
+		};
+		String pushBody = switch (type) {
+			case BOOKING_UPDATED -> "Il cliente ha cambiato orario. Controlla l'agenda.";
+			case BOOKING_CANCELLED_BY_CONSUMER -> "Il cliente ha disdetto l'appuntamento.";
+			default -> "Controlla il centro notifiche del salone.";
+		};
+		fcmPushDispatchService.dispatchForScheduledNotification(salonInbox, title, pushBody);
+		transactionalEmailDispatchService.dispatchForBookingNotification(type, a, title, pushBody);
+	}
+
+	private void scheduleRemindersOnly(Appointment a) {
+		Instant now = Instant.now();
+		Instant start = a.getStart();
+		Instant t24 = start.minus(24, ChronoUnit.HOURS);
+		if (t24.isAfter(now)) {
+			scheduledNotificationRepository.save(new ScheduledNotification(a, NotificationType.REMINDER_24H, t24));
+		}
+		Instant t2 = start.minus(2, ChronoUnit.HOURS);
+		if (t2.isAfter(now)) {
+			scheduledNotificationRepository.save(new ScheduledNotification(a, NotificationType.REMINDER_1H, t2));
+		}
+		scheduleReviewInviteIfConsumerLinked(a);
 	}
 }

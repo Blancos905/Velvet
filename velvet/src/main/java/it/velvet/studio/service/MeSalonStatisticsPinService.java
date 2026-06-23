@@ -1,5 +1,6 @@
 package it.velvet.studio.service;
 
+import it.velvet.billing.service.SalonPremiumEntitlementService;
 import it.velvet.common.api.BusinessException;
 import it.velvet.security.auth.VelvetUserPrincipal;
 import it.velvet.studio.domain.StudioGroup;
@@ -17,14 +18,17 @@ public class MeSalonStatisticsPinService {
 	private final StudioGroupOwnerResolver studioGroupOwnerResolver;
 	private final StudioGroupRepository studioGroupRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final SalonPremiumEntitlementService salonPremiumEntitlementService;
 
 	public MeSalonStatisticsPinService(
 			StudioGroupOwnerResolver studioGroupOwnerResolver,
 			StudioGroupRepository studioGroupRepository,
-			PasswordEncoder passwordEncoder) {
+			PasswordEncoder passwordEncoder,
+			SalonPremiumEntitlementService salonPremiumEntitlementService) {
 		this.studioGroupOwnerResolver = studioGroupOwnerResolver;
 		this.studioGroupRepository = studioGroupRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.salonPremiumEntitlementService = salonPremiumEntitlementService;
 	}
 
 	public void verify(VelvetUserPrincipal principal, StatisticsPinVerifyRequest body) {
@@ -44,7 +48,7 @@ public class MeSalonStatisticsPinService {
 		}
 		StudioGroup group = studioGroupOwnerResolver.resolveStudioGroupForOwner(principal)
 				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Salone non trovato."));
-		if (!"PREMIUM".equals(StudioGroup.canonicalPlanTier(group.getPlanTier()))) {
+		if (!salonPremiumEntitlementService.hasActivePremium(group)) {
 			throw new BusinessException(
 					HttpStatus.BAD_REQUEST,
 					"PLAN_NOT_ELIGIBLE",
@@ -66,7 +70,7 @@ public class MeSalonStatisticsPinService {
 	private StudioGroup requirePremiumWithPin(VelvetUserPrincipal principal) {
 		StudioGroup group = studioGroupOwnerResolver.resolveStudioGroupForOwner(principal)
 				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Salone non trovato."));
-		if (!"PREMIUM".equals(StudioGroup.canonicalPlanTier(group.getPlanTier()))) {
+		if (!salonPremiumEntitlementService.hasActivePremium(group)) {
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "PLAN_NOT_ELIGIBLE", "Piano non idoneo al PIN statistiche.");
 		}
 		if (group.getStatisticsPinHash() == null || group.getStatisticsPinHash().isBlank()) {

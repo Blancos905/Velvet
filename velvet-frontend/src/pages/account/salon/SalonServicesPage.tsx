@@ -352,7 +352,7 @@ export default function SalonServicesPage() {
   });
 
   if (!isSalonTitolare) {
-    return <Navigate to="/account/home" replace />;
+    return <Navigate to="/account/prenotazioni" replace />;
   }
 
   return (

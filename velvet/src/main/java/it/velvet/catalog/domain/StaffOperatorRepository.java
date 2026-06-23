@@ -48,6 +48,33 @@ public interface StaffOperatorRepository extends JpaRepository<StaffOperator, UU
 
 	@Query(
 			"""
+					select o from StaffOperator o
+					join fetch o.location loc
+					join fetch loc.studioGroup
+					join o.consumerProfile cp
+					where lower(cp.keycloakSub) = lower(:keycloakSub)
+					""")
+	Optional<StaffOperator> findFetchedForInboxByConsumerKeycloakSub(@Param("keycloakSub") String keycloakSub);
+
+	/**
+	 * Come {@link #resolveLinkedOperatorId} ma con {@code location} e {@code studioGroup} già inizializzati
+	 * (necessario fuori da una transazione aperta, es. inbox notifiche/recensioni staff).
+	 */
+	default Optional<StaffOperator> resolveLinkedOperatorForInbox(UUID consumerProfileId, String keycloakSub) {
+		if (consumerProfileId != null) {
+			Optional<StaffOperator> byId = findFetchedForInboxByConsumerProfileId(consumerProfileId);
+			if (byId.isPresent()) {
+				return byId;
+			}
+		}
+		if (keycloakSub == null || keycloakSub.isBlank()) {
+			return Optional.empty();
+		}
+		return findFetchedForInboxByConsumerKeycloakSub(keycloakSub.trim());
+	}
+
+	@Query(
+			"""
 					select distinct o from StaffOperator o
 					join fetch o.location loc
 					join fetch loc.studioGroup sg
@@ -79,4 +106,12 @@ public interface StaffOperatorRepository extends JpaRepository<StaffOperator, UU
 	Optional<StaffOperator> findByIdAndStudioGroupId(
 			@Param("operatorId") UUID operatorId,
 			@Param("studioGroupId") UUID studioGroupId);
+
+	@Query(
+			"""
+					select cp.id from StaffOperator o
+					join o.consumerProfile cp
+					where o.id = :operatorId and cp.deletedAt is null
+					""")
+	Optional<UUID> findConsumerProfileIdByOperatorId(@Param("operatorId") UUID operatorId);
 }

@@ -8,20 +8,29 @@ const SPLASH_EXIT_S = 0.2;
 const LOGO_ROTATION_MS = SPLASH_VISIBLE_MS;
 
 type VelvetLoginSplashProps = {
-  onDismiss: () => void;
+  onDismiss?: () => void;
+  /** Se impostato, lo splash è controllato dal parent (es. cambio sezione account). */
+  active?: boolean;
 };
 
-export function VelvetLoginSplash({ onDismiss }: VelvetLoginSplashProps) {
-  const [visible, setVisible] = useState(true);
+export function VelvetLoginSplash({ onDismiss, active }: VelvetLoginSplashProps) {
+  const isControlled = active !== undefined;
+  const [entryVisible, setEntryVisible] = useState(true);
+  const show = isControlled ? active : entryVisible;
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setVisible(false), SPLASH_VISIBLE_MS);
+    if (isControlled) return undefined;
+    const timer = window.setTimeout(() => setEntryVisible(false), SPLASH_VISIBLE_MS);
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [isControlled]);
 
   return (
-    <AnimatePresence onExitComplete={onDismiss}>
-      {visible ? (
+    <AnimatePresence
+      onExitComplete={() => {
+        if (!show) onDismiss?.();
+      }}
+    >
+      {show ? (
         <motion.div
           key="velvet-login-splash"
           initial={{ opacity: 0 }}
@@ -29,7 +38,9 @@ export function VelvetLoginSplash({ onDismiss }: VelvetLoginSplashProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: SPLASH_EXIT_S, ease: "easeInOut" }}
           aria-hidden
-          className="velvet-login-splash"
+          className={["velvet-login-splash", isControlled ? "velvet-login-splash--elevated" : null]
+            .filter(Boolean)
+            .join(" ")}
         >
           <div className="velvet-login-splash__scene" aria-hidden>
             <div className="velvet-login-splash__bg-shift" />

@@ -57,6 +57,9 @@ export const SALON_OWNER_PREMIUM_CHECKLIST: readonly string[] = [
   "Serve un layout dedicato o un’integrazione esterna? Concorda il progetto con il team Luxury.",
 ];
 
+/** Giorni di prova gratuita Premium (allineato a Stripe Checkout). */
+export const SALON_PREMIUM_TRIAL_DAYS = 30;
+
 export const SALON_PLANS: SalonPlanDefinition[] = [
   {
     tier: "BASE",
@@ -71,7 +74,7 @@ export const SALON_PLANS: SalonPlanDefinition[] = [
   {
     tier: "PREMIUM",
     tagline:
-      "Abbonamento pensato per la vetrina completa: sito del salone personalizzabile, brand in evidenza e strumenti per gestire e misurare l’attività.",
+      "La vetrina che ti fa riconoscere subito: brand, sito del salone, statistiche e pannello web completo — ideali per crescere oltre il Free.",
     priceHint: "20 € al mese",
     priceValue: "20",
     pricePeriod: "al mese",

@@ -48,6 +48,7 @@ class _VelvetWebShellState extends State<VelvetWebShell> {
   late final WebViewController _controller;
   late final Key _webViewKey;
   var _loading = true;
+  var _hasFinishedInitialLoad = false;
   var _loadError = false;
   var _mainFrameRetryCount = 0;
   var _showPaywall = false;
@@ -117,8 +118,8 @@ class _VelvetWebShellState extends State<VelvetWebShell> {
       )
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageStarted: (_) {
-            if (mounted) {
+          onPageStarted: (url) {
+            if (mounted && _shouldShowPageLoadingOverlay(url)) {
               setState(() {
                 _loading = true;
                 _loadError = false;
@@ -163,8 +164,29 @@ class _VelvetWebShellState extends State<VelvetWebShell> {
   Future<void> _initializeFcm() async {
     if (_fcmInitialized) return;
     _fcmInitialized = true;
-    await VelvetFcmService.initialize(_sendTokenToWebView);
+    await VelvetFcmService.initialize(
+      _sendTokenToWebView,
+      onNotificationOpened: _forwardPushOpenToWebView,
+    );
     await _sendTokenToWebView(VelvetFcmService.currentToken);
+  }
+
+  Future<void> _forwardPushOpenToWebView(
+    Map<String, String> data, {
+    String? title,
+    String? body,
+  }) async {
+    final script = VelvetFcmWebBridge.deliverPushOpenScript(
+      data,
+      title: title,
+      body: body,
+    );
+    if (script.isEmpty) return;
+    try {
+      await _controller.runJavaScript(script);
+    } catch (e) {
+      debugPrint('VelvetWebShell: iniezione tap push FCM fallita: $e');
+    }
   }
 
   Future<void> _sendTokenToWebView(String? token) async {
@@ -298,6 +320,7 @@ class _VelvetWebShellState extends State<VelvetWebShell> {
   Future<void> _onPageFinished() async {
     if (!mounted) return;
     _mainFrameRetryCount = 0;
+    _hasFinishedInitialLoad = true;
     setState(() => _loading = false);
     await VelvetIosWebViewKeyboard.keepVisibleOnScroll();
     await _controller.runJavaScript(VelvetGeolocationWebBridge.installScript);
@@ -307,6 +330,7 @@ class _VelvetWebShellState extends State<VelvetWebShell> {
     );
     VelvetFcmService.notifyWebViewIfReady();
     await _sendTokenToWebView(VelvetFcmService.currentToken);
+    await _controller.runJavaScript(VelvetFcmWebBridge.flushPendingPushOpenScript);
     await _session?.syncFromWebView(_controller);
     await _refreshWebPathAndShell();
     await _applyFreeModeToWebView();
@@ -369,6 +393,18 @@ class _VelvetWebShellState extends State<VelvetWebShell> {
     if (!VelvetProfileMenuWebBridge.usesNativeProfileSheet(session)) return;
     if (VelvetProfileMenuWebBridge.itemsForSession(session).isEmpty) return;
     setState(() => _showProfileMenu = true);
+  }
+
+  bool _shouldShowPageLoadingOverlay(String url) {
+    if (!_hasFinishedInitialLoad) return true;
+    final uri = Uri.tryParse(url);
+    if (uri == null) return true;
+    if (uri.scheme != 'http' && uri.scheme != 'https') return true;
+    final base = Uri.tryParse(VelvetAppConfig.webBaseUrl);
+    if (base == null) return true;
+    if (uri.host != base.host) return true;
+    // Navigazione SPA in-app: niente overlay a tutto schermo (evita flash logo/spinner).
+    return false;
   }
 
   void _closeProfileMenu() {

@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAdminAuth } from "../auth/AdminAuthProvider";
+import { setPostLoginReturnPath } from "../lib/postLoginReturnPath";
 
 export function AdminProtectedRoute({ children }: { children: ReactNode }) {
   const { isAdminSession, isLoading } = useAdminAuth();
@@ -17,7 +18,9 @@ export function AdminProtectedRoute({ children }: { children: ReactNode }) {
   }
 
   if (!isAdminSession) {
-    return <Navigate to="/admin/login" replace state={{ from: `${location.pathname}${location.search}` }} />;
+    const returnPath = `${location.pathname}${location.search}`;
+    setPostLoginReturnPath(returnPath.startsWith("/admin") ? returnPath : "/admin/dashboard");
+    return <Navigate to="/account" replace />;
   }
 
   return <>{children}</>;

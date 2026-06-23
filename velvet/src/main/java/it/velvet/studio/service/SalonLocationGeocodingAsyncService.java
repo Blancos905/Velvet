@@ -68,7 +68,7 @@ public class SalonLocationGeocodingAsyncService {
 	public CompletableFuture<Integer> backfillMissingPremiumCoordinatesAsync(int maxLocations) {
 		int cap = Math.max(1, maxLocations);
 		List<Location> candidates = locationRepository.findAll().stream()
-				.filter(SalonLocationGeocodingService::isPremiumLocation)
+				.filter(salonLocationGeocodingService::isPremiumLocation)
 				.filter(loc -> loc.getLatitude() == null || loc.getLongitude() == null)
 				.limit(cap)
 				.toList();

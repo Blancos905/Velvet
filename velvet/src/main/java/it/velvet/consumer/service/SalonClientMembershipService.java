@@ -5,6 +5,7 @@ import it.velvet.catalog.domain.SalonClient;
 import it.velvet.catalog.domain.SalonClientRepository;
 import it.velvet.common.api.BusinessException;
 import it.velvet.consumer.domain.ConsumerProfile;
+import it.velvet.consumer.service.ConsumerB2CEligibility;
 import it.velvet.security.auth.VelvetUserPrincipal;
 import it.velvet.studio.domain.Location;
 import it.velvet.studio.domain.LocationRepository;
@@ -50,6 +51,7 @@ public class SalonClientMembershipService {
 	@Transactional
 	public SalonClient becomeClient(VelvetUserPrincipal principal, UUID locationId) {
 		ConsumerProfile consumer = consumerProfileService.requireActiveProfile(principal);
+		ConsumerB2CEligibility.assertMayActAsConsumer(consumer);
 		Location location = locationRepository.findById(locationId)
 				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Sede non trovata."));
 		Optional<SalonClient> linked =

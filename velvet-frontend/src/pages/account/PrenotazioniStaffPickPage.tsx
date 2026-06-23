@@ -17,7 +17,7 @@ export default function PrenotazioniStaffPickPage() {
   const { mergedStaffMembers, staffQuery, backendStaffAvailable } = useSalonStaffList();
 
   if (!isSalonTitolare) {
-    return <Navigate to="/account/home" replace />;
+    return <Navigate to="/account/prenotazioni" replace />;
   }
 
   if (staffQuery.isPending) {

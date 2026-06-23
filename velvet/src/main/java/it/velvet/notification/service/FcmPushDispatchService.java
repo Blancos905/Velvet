@@ -1,6 +1,8 @@
 package it.velvet.notification.service;
 
 import it.velvet.appointment.domain.Appointment;
+import it.velvet.catalog.domain.StaffOperator;
+import it.velvet.catalog.domain.StaffOperatorRepository;
 import it.velvet.consumer.domain.ConsumerProfile;
 import it.velvet.consumer.domain.ConsumerProfileRepository;
 import it.velvet.notification.domain.NotificationType;
@@ -32,14 +34,17 @@ public class FcmPushDispatchService {
 	private final NotificationService notificationService;
 	private final UserDeviceRepository userDeviceRepository;
 	private final ConsumerProfileRepository consumerProfileRepository;
+	private final StaffOperatorRepository staffOperatorRepository;
 
 	public FcmPushDispatchService(
 			NotificationService notificationService,
 			UserDeviceRepository userDeviceRepository,
-			ConsumerProfileRepository consumerProfileRepository) {
+			ConsumerProfileRepository consumerProfileRepository,
+			StaffOperatorRepository staffOperatorRepository) {
 		this.notificationService = notificationService;
 		this.userDeviceRepository = userDeviceRepository;
 		this.consumerProfileRepository = consumerProfileRepository;
+		this.staffOperatorRepository = staffOperatorRepository;
 	}
 
 	public void dispatchForScheduledNotification(ScheduledNotification n, String title, String body) {
@@ -54,10 +59,13 @@ public class FcmPushDispatchService {
 		Map<String, String> data = pushData(type, appointment.getId(), n.getId());
 
 		switch (type) {
-			case BOOKING_CREATED_FOR_SALON ->
-					resolveSalonOwnerProfileId(appointment).ifPresent(id -> sendToUser(id, title, body, data));
-			case BOOKING_CONFIRMATION, BOOKING_UPDATED, REMINDER_24H, REMINDER_1H, REVIEW_INVITE,
-					BOOKING_CANCELLED_BY_CONSUMER, BOOKING_CANCELLED_BY_SALON -> {
+			case BOOKING_CREATED_FOR_SALON, BOOKING_UPDATED, BOOKING_CANCELLED_BY_CONSUMER -> {
+				dispatchSalonSidePush(appointment, title, body, data);
+				if (type != NotificationType.BOOKING_CREATED_FOR_SALON && appointment.getConsumerProfile() != null) {
+					sendToUser(appointment.getConsumerProfile().getId(), title, body, data);
+				}
+			}
+			case BOOKING_CONFIRMATION, REMINDER_24H, REMINDER_1H, REVIEW_INVITE, BOOKING_CANCELLED_BY_SALON -> {
 				if (appointment.getConsumerProfile() != null) {
 					sendToUser(appointment.getConsumerProfile().getId(), title, body, data);
 				}
@@ -66,6 +74,16 @@ public class FcmPushDispatchService {
 				// Nessuna push per messaggi piattaforma / assistenza.
 			}
 		}
+	}
+
+	private void dispatchSalonSidePush(Appointment appointment, String title, String body, Map<String, String> data) {
+		Optional<UUID> ownerId = resolveSalonOwnerProfileId(appointment);
+		ownerId.ifPresent(id -> sendToUser(id, title, body, data));
+		resolveStaffOperatorProfileId(appointment).ifPresent(staffProfileId -> {
+			if (ownerId.isEmpty() || !ownerId.get().equals(staffProfileId)) {
+				sendToUser(staffProfileId, title, body, data);
+			}
+		});
 	}
 
 	private void sendToUser(UUID consumerProfileId, String title, String body, Map<String, String> data) {
@@ -80,6 +98,18 @@ public class FcmPushDispatchService {
 		for (UserDevice device : devices) {
 			notificationService.sendPushNotification(device.getFcmToken(), title, body, data);
 		}
+	}
+
+	private Optional<UUID> resolveStaffOperatorProfileId(Appointment appointment) {
+		StaffOperator operator = appointment.getOperator();
+		if (operator == null) {
+			return Optional.empty();
+		}
+		ConsumerProfile linked = operator.getConsumerProfile();
+		if (linked != null && linked.getDeletedAt() == null) {
+			return Optional.of(linked.getId());
+		}
+		return staffOperatorRepository.findConsumerProfileIdByOperatorId(operator.getId());
 	}
 
 	private Optional<UUID> resolveSalonOwnerProfileId(Appointment appointment) {

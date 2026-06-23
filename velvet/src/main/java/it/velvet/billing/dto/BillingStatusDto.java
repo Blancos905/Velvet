@@ -8,5 +8,6 @@ public record BillingStatusDto(
 		String subscriptionStatus,
 		Instant currentPeriodEnd,
 		boolean cancelAtPeriodEnd,
-		boolean premiumAccess) {
+		boolean premiumAccess,
+		boolean billingProfileComplete) {
 }

@@ -13,7 +13,8 @@ import org.springframework.context.annotation.Configuration;
 	VelvetRedisProperties.class,
 	VelvetSeoProperties.class,
 	VelvetStripeProperties.class,
-	VelvetLoggingProperties.class
+	VelvetLoggingProperties.class,
+	VelvetRegistrationProperties.class
 })
 public class VelvetPropertiesConfiguration {
 }

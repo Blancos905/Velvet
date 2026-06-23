@@ -1,23 +1,28 @@
 import type { SalonPlanTier } from "../data/salonPlans";
 
 /** Pagine hub account che in app mobile mostrano masthead + griglia bottoni (non overlay). */
-const NATIVE_ACCOUNT_HUB_PATHS = new Set([
-  "/account/home",
-  "/account/staff",
-  "/account/salone",
-]);
+const NATIVE_ACCOUNT_HUB_PATHS = new Set(["/account/staff", "/account/salone"]);
 
 export function normalizeAccountPath(pathname: string): string {
   return pathname.replace(/\/+$/, "") || "/";
 }
 
-export function isNativeAccountHubPath(pathname: string): boolean {
-  return NATIVE_ACCOUNT_HUB_PATHS.has(normalizeAccountPath(pathname));
+export type NativeAccountHubRole = {
+  isSalonTitolare: boolean;
+  isSalonStaff: boolean;
+};
+
+export function isNativeAccountHubPath(pathname: string, role?: NativeAccountHubRole): boolean {
+  const path = normalizeAccountPath(pathname);
+  if (NATIVE_ACCOUNT_HUB_PATHS.has(path)) return true;
+  const isConsumer = role && !role.isSalonTitolare && !role.isSalonStaff;
+  if (isConsumer && path === "/account/prenotazioni") return true;
+  return false;
 }
 
-/** Home hub titolare in app: Premium → panoramica salone; Free → benvenuto + menu. */
-export function nativeSalonOwnerHubPath(planTier: SalonPlanTier | undefined): string {
-  return planTier === "PREMIUM" ? "/account/salone" : "/account/home";
+/** Dashboard titolare: sempre panoramica salone (il titolare non ha hub personale separato). */
+export function nativeSalonOwnerHubPath(_planTier?: SalonPlanTier): string {
+  return "/account/salone";
 }
 
 export function nativeAccountHubFallbackPath(role: {
@@ -29,5 +34,5 @@ export function nativeAccountHubFallbackPath(role: {
   if (role.isSalonTitolare) {
     return nativeSalonOwnerHubPath(role.salonPlanTier);
   }
-  return "/account/home";
+  return "/account/prenotazioni";
 }

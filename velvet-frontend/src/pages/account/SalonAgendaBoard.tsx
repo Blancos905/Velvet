@@ -81,7 +81,7 @@ function agendaStatusTone(status: string): "confirmed" | "cancelled" | "pending"
   const s = status.trim().toUpperCase();
   if (s.includes("CONFERM") || s.includes("CONFIRM")) return "confirmed";
   if (s.includes("ANNULL") || s.includes("CANCEL")) return "cancelled";
-  if (s.includes("ATTES") || s.includes("PEND")) return "pending";
+  if (s.includes("ATTES") || s.includes("PEND") || s === "BOOKED") return "pending";
   if (s.includes("COMPLET")) return "completed";
   return "default";
 }

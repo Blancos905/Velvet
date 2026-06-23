@@ -8,6 +8,7 @@ import it.velvet.security.auth.VelvetUserPrincipal;
 import it.velvet.studio.dto.MeSalonReviewDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +35,7 @@ public class MeSalonReviewInboxService {
 	 * non espone ancora {@code ROLE_STAFF}.
 	 * Altri profili: 403.
 	 */
+	@Transactional(readOnly = true)
 	public List<MeSalonReviewDto> list(VelvetUserPrincipal principal) {
 		if (principal == null || principal.getSubject() == null || principal.getSubject().isBlank()) {
 			throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Permessi insufficienti per consultare le recensioni salone.");
@@ -54,7 +56,7 @@ public class MeSalonReviewInboxService {
 			throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Permessi insufficienti per consultare le recensioni salone.");
 		}
 		return staffOperatorRepository
-				.resolveLinkedOperatorId(profileId, sub != null ? sub : "")
+				.resolveLinkedOperatorForInbox(profileId, sub != null ? sub : "")
 				.map(op -> reviewRepository
 						.findByAppointment_Location_StudioGroup_IdAndAppointment_Operator_IdOrderByCreatedAtDesc(
 								op.getLocation().getStudioGroup().getId(), op.getId())

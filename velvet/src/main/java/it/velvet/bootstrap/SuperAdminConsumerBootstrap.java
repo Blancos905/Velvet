@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -50,6 +51,18 @@ public class SuperAdminConsumerBootstrap {
 	 * Se {@code velvet.super-admin.profile-*} sono valorizzati, aggiorna nome e telefono sul profilo consumer del super admin
 	 * (stessi campi usati da assistenza e PATCH pannello).
 	 */
+	/** Super admin: login {@code POST /api/v1/auth/login} non richiede conferma email separata. */
+	public static void markEmailVerified(ConsumerProfile p) {
+		if (p == null) {
+			return;
+		}
+		if (p.getEmailVerifiedAt() == null) {
+			p.setEmailVerifiedAt(Instant.now());
+		}
+		p.setEmailVerificationTokenHash(null);
+		p.setEmailVerificationExpiresAt(null);
+	}
+
 	public static void applyOptionalDisplayAndPhone(ConsumerProfile p, VelvetSuperAdminProperties props) {
 		if (p == null || props == null) {
 			return;
@@ -117,6 +130,7 @@ public class SuperAdminConsumerBootstrap {
 		ConsumerProfile p = new ConsumerProfile(SUPER_ADMIN_KEYCLOAK_SUB, email, "Super admin");
 		p.setPasswordHash(passwordEncoder.encode(plainPassword));
 		p.setSecurityRoles("ADMIN,CLIENT");
+		markEmailVerified(p);
 		applyOptionalDisplayAndPhone(p, superAdminProperties);
 		consumerProfileRepository.save(p);
 		log.info("Super admin: profilo consumer creato per login email ({}).", email);
@@ -128,6 +142,7 @@ public class SuperAdminConsumerBootstrap {
 			p.setPasswordHash(passwordEncoder.encode(plainPassword));
 		}
 		p.setSecurityRoles("ADMIN,CLIENT");
+		markEmailVerified(p);
 		applyOptionalDisplayAndPhone(p, superAdminProperties);
 		if (p.getDeletedAt() != null) {
 			p.setDeletedAt(null);
@@ -145,6 +160,7 @@ public class SuperAdminConsumerBootstrap {
 			p.setEmail(email);
 			p.setPasswordHash(hash);
 			p.setSecurityRoles("ADMIN,CLIENT");
+			markEmailVerified(p);
 			applyOptionalDisplayAndPhone(p, superAdminProperties);
 			if (p.getDeletedAt() != null) {
 				p.setDeletedAt(null);
@@ -162,6 +178,7 @@ public class SuperAdminConsumerBootstrap {
 			}
 			p.setPasswordHash(hash);
 			p.setSecurityRoles("ADMIN,CLIENT");
+			markEmailVerified(p);
 			applyOptionalDisplayAndPhone(p, superAdminProperties);
 			if (p.getDeletedAt() != null) {
 				p.setDeletedAt(null);
@@ -173,6 +190,7 @@ public class SuperAdminConsumerBootstrap {
 		ConsumerProfile p = new ConsumerProfile(SUPER_ADMIN_KEYCLOAK_SUB, email, "Super admin");
 		p.setPasswordHash(hash);
 		p.setSecurityRoles("ADMIN,CLIENT");
+		markEmailVerified(p);
 		applyOptionalDisplayAndPhone(p, superAdminProperties);
 		consumerProfileRepository.save(p);
 		log.info("Super admin: profilo consumer creato da credenziali persistite ({}).", email);

@@ -1,5 +1,6 @@
 package it.velvet.publicapi.dto;
 
+import it.velvet.billing.dto.RegistrationSalonBillingDetails;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -33,7 +34,20 @@ public record ConsumerRegistrationRequest(
 		/** Pubblico di riferimento: {@code MALE}, {@code FEMALE}; obbligatorio per {@code BASE} / {@code PREMIUM}. */
 		List<String> salonClientGenders,
 		@AssertTrue(message = "Accetta termini e informativa privacy") Boolean acceptedTermsAndPrivacy,
-		@Size(max = 40) String legalDocumentVersion) {
+		@Size(max = 40) String legalDocumentVersion,
+		/** Fatturazione abbonamento — obbligatori se {@code planTier = PREMIUM}. */
+		@Size(max = 200) String billingLegalName,
+		@Email @Size(max = 320) String billingEmail,
+		@Size(max = 16) String billingVatNumber,
+		@Size(max = 16) String billingFiscalCode,
+		@Pattern(regexp = "COMPANY|INDIVIDUAL", message = "Tipo soggetto: COMPANY o INDIVIDUAL") String billingSubjectType,
+		@Size(max = 200) String billingAddressLine1,
+		@Size(max = 12) String billingPostalCode,
+		@Size(max = 100) String billingCity,
+		@Size(max = 5) String billingProvince,
+		@Size(max = 2) String billingCountry,
+		@Size(max = 7) String billingSdiCode,
+		@Email @Size(max = 320) String billingPecEmail) {
 
 	public RegistrationSalonLocation salonLocationDetails() {
 		return new RegistrationSalonLocation(
@@ -43,6 +57,22 @@ public record ConsumerRegistrationRequest(
 				trimToNull(salonProvince()),
 				trimToNull(salonCountry()),
 				trimToNull(salonName()));
+	}
+
+	public RegistrationSalonBillingDetails billingDetails() {
+		return new RegistrationSalonBillingDetails(
+				trimToNull(billingLegalName()),
+				trimToNull(billingEmail()),
+				trimToNull(billingVatNumber()),
+				trimToNull(billingFiscalCode()),
+				trimToNull(billingSubjectType()),
+				trimToNull(billingAddressLine1()),
+				trimToNull(billingPostalCode()),
+				trimToNull(billingCity()),
+				trimToNull(billingProvince()),
+				trimToNull(billingCountry()),
+				trimToNull(billingSdiCode()),
+				trimToNull(billingPecEmail()));
 	}
 
 	private static String trimToNull(String s) {

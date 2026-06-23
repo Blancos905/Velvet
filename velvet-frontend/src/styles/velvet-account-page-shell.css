@@ -205,3 +205,21 @@
 .velvet-info-privacy__list li + li {
   margin-top: 0.55rem;
 }
+
+/** Checkout Premium / success Stripe — fuori dall'hub profilo salone. */
+.velvet-billing-flow-standalone {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(1rem, 4vh, 2.5rem) 1rem 2rem;
+}
+
+.velvet-billing-flow-standalone .velvet-account-page-shell {
+  width: min(720px, 100%);
+  margin: 0 auto;
+}
+
+.velvet-billing-flow-standalone .velvet-account-page-shell--billing-success {
+  width: min(640px, 100%);
+}

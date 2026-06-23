@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { AccountHubNavLink } from "./AccountHubNavLink";
 import { accountHubNavBtn } from "./accountHubNavBtn";
 
 const navBtn = accountHubNavBtn;
@@ -10,24 +10,24 @@ export function AccountHubNavPremiumSalonLinks() {
       className="velvet-account-hub__nav-scroll velvet-account-hub__nav-scroll--consumer-grid"
       aria-label="Strumenti piano Premium"
     >
-      <NavLink to="/account/salone/tuo-salone" className={navBtn()}>
+      <AccountHubNavLink to="/account/salone/tuo-salone" className={navBtn()}>
         Crea il tuo sito
-      </NavLink>
-      <NavLink to="/account/salone/brand" className={navBtn()}>
+      </AccountHubNavLink>
+      <AccountHubNavLink to="/account/salone/brand" className={navBtn()}>
         Brand e vetrina
-      </NavLink>
-      <NavLink to="/account/salone/posizione" className={navBtn()}>
+      </AccountHubNavLink>
+      <AccountHubNavLink to="/account/salone/posizione" className={navBtn()}>
         Posizione del salone
-      </NavLink>
-      <NavLink to="/account/salone/staff" className={navBtn()}>
+      </AccountHubNavLink>
+      <AccountHubNavLink to="/account/salone/staff" className={navBtn()}>
         Staff
-      </NavLink>
-      <NavLink to="/account/salone/statistiche" className={navBtn("velvet-account-hub__btn--salon-statistiche")}>
+      </AccountHubNavLink>
+      <AccountHubNavLink to="/account/salone/statistiche" className={navBtn("velvet-account-hub__btn--salon-statistiche")}>
         Statistiche
-      </NavLink>
-      <NavLink to="/account/salone" end className={navBtn()}>
+      </AccountHubNavLink>
+      <AccountHubNavLink to="/account/salone" end className={navBtn()}>
         Panoramica
-      </NavLink>
+      </AccountHubNavLink>
     </div>
   );
 }

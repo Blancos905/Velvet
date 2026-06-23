@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { AccountHubNavLink } from "./AccountHubNavLink";
 import { isVelvetNativeAppShell } from "../../hooks/useVelvetNativeAppShell";
 import { accountHubNavBtn } from "./accountHubNavBtn";
 
@@ -57,31 +57,31 @@ export function AccountHubNavOwnerConsumerLinks({
     >
       {showFreeSalonShortcuts ? (
         <>
-          <NavLink to="/account/salone" className={navBtn()}>
+          <AccountHubNavLink to="/account/salone" className={navBtn()}>
             Il mio salone
-          </NavLink>
-          <NavLink to="/account/salone/posizione" className={navBtn()}>
+          </AccountHubNavLink>
+          <AccountHubNavLink to="/account/salone/posizione" className={navBtn()}>
             Posizione del salone
-          </NavLink>
+          </AccountHubNavLink>
         </>
       ) : null}
       {showFreeSalonNativeHome ? (
-        <NavLink to="/account/salone" className={navBtn()}>
+        <AccountHubNavLink to="/account/salone" className={navBtn()}>
           Il mio salone
-        </NavLink>
+        </AccountHubNavLink>
       ) : null}
       {!isSalonTitolare ? (
-        <NavLink to="/" className={navBtn()}>
+        <AccountHubNavLink to="/" className={navBtn()}>
           Area di ricerca
-        </NavLink>
+        </AccountHubNavLink>
       ) : null}
       {isSalonTitolare ? (
-        <NavLink to="/account/salone/servizi" className={navBtn()}>
+        <AccountHubNavLink to="/account/salone/servizi" className={navBtn()}>
           <span className="velvet-account-hub__btn-notif">Aggiungi servizi</span>
-        </NavLink>
+        </AccountHubNavLink>
       ) : null}
       {isSalonTitolare ? (
-        <NavLink
+        <AccountHubNavLink
           to={showPremiumSalonNav ? "/account/salone/strumenti" : "/account/notifiche"}
           className={navBtn()}
           title="Centro notifiche salone: prenotazioni e messaggi in evidenza."
@@ -97,17 +97,17 @@ export function AccountHubNavOwnerConsumerLinks({
               </span>
             ) : null}
           </span>
-        </NavLink>
+        </AccountHubNavLink>
       ) : null}
-      <NavLink to="/account/prenotazioni" className={navBtn()}>
+      <AccountHubNavLink to="/account/prenotazioni" className={navBtn()}>
         {isSalonTitolare ? (
           <span className="velvet-account-hub__btn-notif">Agenda</span>
         ) : (
           "Prenotazioni"
         )}
-      </NavLink>
+      </AccountHubNavLink>
       {!isSalonTitolare ? (
-        <NavLink to="/account/chat" className={navBtn()} title="Messaggi con i saloni di cui sei cliente.">
+        <AccountHubNavLink to="/account/chat" className={navBtn()} title="Messaggi con i saloni di cui sei cliente.">
           <span className="velvet-account-hub__btn-notif">
             Chat
             {showClientChatNavPill ? (
@@ -116,10 +116,10 @@ export function AccountHubNavOwnerConsumerLinks({
               </span>
             ) : null}
           </span>
-        </NavLink>
+        </AccountHubNavLink>
       ) : null}
       {!isSalonTitolare ? (
-        <NavLink to="/account/notifiche" className={navBtn()}>
+        <AccountHubNavLink to="/account/notifiche" className={navBtn()}>
           <span className="velvet-account-hub__btn-notif">
             Notifiche
             {showConsumerNotificheNavPill ? (
@@ -128,18 +128,18 @@ export function AccountHubNavOwnerConsumerLinks({
               </span>
             ) : null}
           </span>
-        </NavLink>
+        </AccountHubNavLink>
       ) : null}
-      <NavLink to="/account/profilo" className={navBtn()}>
+      <AccountHubNavLink to="/account/profilo" className={navBtn()}>
         Profilo
-      </NavLink>
+      </AccountHubNavLink>
       {isSalonTitolare && !showPremiumSalonNav ? (
-        <NavLink to="/account/salone/staff" className={navBtn()}>
+        <AccountHubNavLink to="/account/salone/staff" className={navBtn()}>
           Staff
-        </NavLink>
+        </AccountHubNavLink>
       ) : null}
       {!isSalonTitolare ? (
-        <NavLink
+        <AccountHubNavLink
           to="/account/saloni-di-fiducia"
           className={navBtn()}
           title="Saloni presso cui sei registrato come cliente; il numerino segnala nuovi legami dall’ultima volta che hai aperto l’elenco."
@@ -155,9 +155,9 @@ export function AccountHubNavOwnerConsumerLinks({
               </span>
             ) : null}
           </span>
-        </NavLink>
+        </AccountHubNavLink>
       ) : null}
-      <NavLink to="/account/feedback-velvet" className={navBtn()}>
+      <AccountHubNavLink to="/account/feedback-velvet" className={navBtn()}>
         <span className="velvet-account-hub__btn-notif">
           Recensioni
           {showSalonReviewsNavPill || showClientReviewsNavPill ? (
@@ -172,9 +172,9 @@ export function AccountHubNavOwnerConsumerLinks({
             </span>
           ) : null}
         </span>
-      </NavLink>
+      </AccountHubNavLink>
       {showPremiumSalonNav ? (
-        <NavLink
+        <AccountHubNavLink
           to="/account/salone/clienti"
           className={navBtn()}
           title="Elenco clienti della sede; il numerino indica quanti clienti sono stati aggiunti dall’ultima volta che hai aperto questa pagina."
@@ -190,10 +190,10 @@ export function AccountHubNavOwnerConsumerLinks({
               </span>
             ) : null}
           </span>
-        </NavLink>
+        </AccountHubNavLink>
       ) : null}
       {showPremiumSalonNav ? (
-        <NavLink to="/account/chat" className={navBtn()} title="Chat con i clienti collegati al salone.">
+        <AccountHubNavLink to="/account/chat" className={navBtn()} title="Chat con i clienti collegati al salone.">
           <span className="velvet-account-hub__btn-notif">
             Chat
             {showOwnerChatNavPill ? (
@@ -202,14 +202,14 @@ export function AccountHubNavOwnerConsumerLinks({
               </span>
             ) : null}
           </span>
-        </NavLink>
+        </AccountHubNavLink>
       ) : null}
-      <NavLink to="/account/info-privacy" className={navBtn()} title="Informazioni sul trattamento dati e privacy.">
+      <AccountHubNavLink to="/account/info-privacy" className={navBtn()} title="Informazioni sul trattamento dati e privacy.">
         Info e privacy
-      </NavLink>
-      <NavLink to="/account/assistenza" className={navBtn()}>
+      </AccountHubNavLink>
+      <AccountHubNavLink to="/account/assistenza" className={navBtn()}>
         Assistenza
-      </NavLink>
+      </AccountHubNavLink>
     </div>
   );
 }

@@ -5,6 +5,7 @@ export const VELVET_POST_LOGIN_RETURN_KEY = "velvet_post_login_return";
 
 const ALLOWED_PREFIXES = [
   "/account",
+  "/admin",
   "/search",
   "/s/",
   "/piani",
@@ -19,6 +20,7 @@ function isAllowedInternalReturn(pathWithQuery: string): boolean {
   if (trimmed.includes("://")) return false;
   const path = trimmed.split("#")[0]?.split("?")[0] ?? "";
   if (path.startsWith("/auth/")) return false;
+  if (path === "/admin/login" || path === "/admin/register") return false;
   if (path === "/") return true;
   return ALLOWED_PREFIXES.some((p) => path === p || path.startsWith(p));
 }

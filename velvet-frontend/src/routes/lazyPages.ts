@@ -9,10 +9,7 @@ function lazyNamed<T extends ComponentType<unknown>>(
 }
 
 // —— Area account (dashboard titolare, vetrina, impostazioni) ——
-export const AccountLayout = lazyNamed(
-  () => import("../pages/account/AccountLayout"),
-  "AccountLayout",
-);
+// AccountLayout importato eager in App.tsx (shell account sempre pronta).
 export const AccountHomePage = lazy(() => import("../pages/account/AccountHomePage"));
 export const AccountSalonHomePage = lazy(() => import("../pages/account/AccountSalonHomePage"));
 export const StaffMemberHomePage = lazy(() => import("../pages/account/StaffMemberHomePage"));
@@ -56,13 +53,13 @@ export const AdminAssistenzaPage = lazy(() => import("../pages/admin/AdminAssist
 export const AdminSuperAdminProfilePage = lazy(
   () => import("../pages/admin/AdminSuperAdminProfilePage"),
 );
-export const AdminLoginPage = lazy(() => import("../pages/admin/AdminLoginPage"));
 export const AdminRegisterSuperAdminPage = lazy(
   () => import("../pages/admin/AdminRegisterSuperAdminPage"),
 );
 
 // —— Vetrina / ricerca / piani ——
 export const SalonPlansPage = lazy(() => import("../pages/SalonPlansPage"));
+export const SalonFreePremiumUpgradePage = lazy(() => import("../pages/SalonFreePremiumUpgradePage"));
 export const SearchPage = lazy(() => import("../pages/SearchPage"));
 export const SalonPage = lazy(() => import("../pages/SalonPage"));
 export const SalonExplorePage = lazy(() => import("../pages/SalonExplorePage"));

@@ -1,5 +1,5 @@
 const NATIVE_ACCOUNT_OVERLAY_TITLES: Record<string, string> = {
-  "/account/home": "Area personale",
+  "/account/home": "Panoramica salone",
   "/account/staff": "La mia agenda",
   "/account/salone": "Il mio salone",
   "/account/prenotazioni": "Prenotazioni",

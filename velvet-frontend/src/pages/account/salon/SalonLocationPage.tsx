@@ -69,7 +69,7 @@ export default function SalonLocationPage() {
   });
 
   if (!isSalonTitolare) {
-    return <Navigate to="/account/home" replace />;
+    return <Navigate to="/account/prenotazioni" replace />;
   }
 
   const showEditor = Boolean(meSalon.data?.provisioned);

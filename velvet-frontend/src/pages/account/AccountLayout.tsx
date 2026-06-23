@@ -1,17 +1,23 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { apiJson } from "../../api/client";
 import type { OrganizationDetail, SalonCatalogClientRow, SalonClientMembershipDto } from "../../api/types";
 import { useOptionalAdminAuth } from "../../auth/AdminAuthProvider";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
 import { SaloniLuxuryLogoMark } from "../../components/SaloniLuxuryLogoMark";
+import { AccountOutletRegion } from "../../components/AccountOutletRegion";
+import { AccountOutletSuspense } from "../../components/AccountOutletSuspense";
+import { AccountNavigationTransitionProvider } from "../../context/AccountNavigationTransitionContext";
 import { VelvetNativeAccountOverlay } from "../../components/VelvetNativeAccountOverlay";
 import { planDisplayName, parseSalonPlanTier } from "../../data/salonPlans";
 import { useEffectiveSalonPlanTier } from "../../hooks/useEffectiveSalonPlanTier";
+import { useSalonPremiumActive } from "../../hooks/useSalonFeaturePlanTier";
 import { useMeNotificationInboxQuery } from "../../hooks/useMeNotificationInbox";
 import { useMePendingReviewInvitesQuery } from "../../hooks/useMePendingReviewInvites";
 import { useMeSalonNotificationInboxQuery } from "../../hooks/useMeSalonNotificationInbox";
+import { useSalonBookingRequestAlerts } from "../../hooks/useSalonBookingRequestAlerts";
+import { useConsumerNotificationAlerts } from "../../hooks/useConsumerNotificationAlerts";
 import { useMeSalonReviewsQuery } from "../../hooks/useMeSalonReviews";
 import { useMeProfileQuery, resolveVelvetAccountGreetingName } from "../../hooks/useMeProfile";
 import { useMeSalonChatUnreadQuery } from "../../hooks/useMeSalonChatUnread";
@@ -20,6 +26,9 @@ import { useSalonShowcaseOwnerMigration } from "../../hooks/useSalonShowcaseOwne
 import { useMeStaffSalonQuery } from "../../hooks/useMeStaffSalon";
 import { useVelvetEmbeddedPanel } from "../../hooks/useVelvetEmbeddedPanel";
 import { isVelvetNativeAppShell } from "../../hooks/useVelvetNativeAppShell";
+import { openVelvetNotificationPopup, storePendingNotificationPopup } from "../../lib/velvetNotificationPopup";
+import { scrollAccountHubToContent } from "../../lib/accountHubScroll";
+import { prefetchCommonAccountRoutes } from "../../lib/prefetchAccountRoutes";
 import { nativeAccountOverlayTitle } from "../../lib/nativeAccountOverlayTitle";
 import {
   isNativeAccountHubPath,
@@ -40,6 +49,7 @@ import {
   writeTrustedSalonsLastSeenCount,
 } from "../../lib/trustedSalonsNavBadge";
 import {
+  CLIENT_REVIEW_PENDING_CHANGED_EVENT,
   countUnseenClientReviewPending,
   markClientReviewPendingSeen,
 } from "../../lib/clientReviewNotifications";
@@ -56,6 +66,7 @@ import "../../styles/account-hub-native-app.css";
 import "../../styles/salon-notifications.css";
 import { AccountHubNavOwnerConsumerLinks } from "./AccountHubNavOwnerConsumerLinks";
 import { AccountHubNavPremiumSalonLinks } from "./AccountHubNavPremiumSalonLinks";
+import { AccountHubNavLink } from "./AccountHubNavLink";
 import { SalonFreeWebPanelGate } from "./SalonFreeWebPanelGate";
 import { accountHubNavBtn as navBtn } from "./accountHubNavBtn";
 
@@ -65,12 +76,38 @@ export function AccountLayout() {
   const embedded = useVelvetEmbeddedPanel();
   const isNativeApp = isVelvetNativeAppShell();
   const queryClient = useQueryClient();
+  const hubBodyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    prefetchCommonAccountRoutes();
+  }, []);
+
+  useEffect(() => {
+    if (!location.pathname.startsWith("/account")) return;
+    if (embedded) return;
+
+    const scrollToContent = () => scrollAccountHubToContent(hubBodyRef.current);
+
+    const immediate = window.setTimeout(scrollToContent, 0);
+    const afterLazy = window.setTimeout(scrollToContent, 160);
+
+    return () => {
+      window.clearTimeout(immediate);
+      window.clearTimeout(afterLazy);
+    };
+  }, [embedded, location.pathname]);
   const { isSalonTitolare, isSalonStaff, isVelvetSuperAdmin, accessToken, userDisplayLabel, userEmail } = useVelvetAuth();
   const isAdminSession = useOptionalAdminAuth()?.isAdminSession ?? false;
   /** Sessione titolare emessa dal pannello super admin: JWT app senza ADMIN, token admin ancora in `sessionStorage`. */
   const isSuperAdminViewingAsSalonOwner = isAdminSession && isSalonTitolare && !isVelvetSuperAdmin;
   const salonTier = useEffectiveSalonPlanTier();
+  const isPremiumActive = useSalonPremiumActive();
+  /** Nav Premium: piano registrato PREMIUM (Brand, Statistiche, …). L’accesso alle pagine resta legato al pagamento. */
   const showPremiumSalonNav = isSalonTitolare && salonTier === "PREMIUM";
+  const salonPlanBadgeLabel =
+    isSalonTitolare && salonTier === "PREMIUM" && !isPremiumActive
+      ? "Premium · attiva abbonamento"
+      : `Piano ${planDisplayName(salonTier)}`;
   const meSalon = useMeSalonSummaryQuery();
   useSalonShowcaseOwnerMigration();
   const slugForClientsBadgeFallback = meSalon.data?.primaryLocationSlug?.trim() ?? "";
@@ -169,6 +206,8 @@ export function AccountLayout() {
     !isVelvetSuperAdmin && ((isSalonTitolare && !isSalonStaff) || isSalonStaff),
   );
   const notifInbox = useMeSalonNotificationInboxQuery(isSalonTitolare || isSalonStaff);
+  useSalonBookingRequestAlerts(isSalonTitolare || isSalonStaff);
+  useConsumerNotificationAlerts(!isSalonTitolare && !isSalonStaff && !isVelvetSuperAdmin);
   const consumerNotifInbox = useMeNotificationInboxQuery(!isSalonTitolare && !isSalonStaff && !isVelvetSuperAdmin);
   const pendingClientReviews = useMePendingReviewInvitesQuery(!isSalonTitolare && !isSalonStaff && !isVelvetSuperAdmin);
   /** In coda + inviate in evidenza (stesso totale mostrato nel centro notifiche). */
@@ -226,6 +265,11 @@ export function AccountLayout() {
 
   const clientReviewsNavEligible = !isSalonTitolare && !isSalonStaff && !isVelvetSuperAdmin;
   const [clientReviewBadgeLsTick, setClientReviewBadgeLsTick] = useState(0);
+  useEffect(() => {
+    const onPendingChanged = () => setClientReviewBadgeLsTick((n) => n + 1);
+    window.addEventListener(CLIENT_REVIEW_PENDING_CHANGED_EVENT, onPendingChanged);
+    return () => window.removeEventListener(CLIENT_REVIEW_PENDING_CHANGED_EVENT, onPendingChanged);
+  }, []);
   useEffect(() => {
     if (!clientReviewsNavEligible) return;
     const ids = pendingClientReviews.data?.map((r) => r.appointmentId).filter(Boolean) ?? [];
@@ -324,10 +368,20 @@ export function AccountLayout() {
     if (Notification.permission !== "granted") return;
     const delta = notifInboxAttentionTotal - prev;
     const qty = delta > 1 ? `${delta} nuove notifiche` : "Nuova notifica";
-    void new Notification("Saloni Luxury — Notifiche", {
-      body: `${qty} nel centro notifiche del salone.`,
+    const title = "Saloni Luxury — Notifiche";
+    const body = `${qty} nel centro notifiche del salone.`;
+    const browserNotification = new Notification(title, {
+      body,
       tag: "velvet-salon-notifications",
     });
+    browserNotification.onclick = (event) => {
+      event?.preventDefault?.();
+      browserNotification.close();
+      const popupPayload = { title, body, playSound: true as const };
+      storePendingNotificationPopup(popupPayload);
+      window.focus();
+      openVelvetNotificationPopup(popupPayload);
+    };
   }, [isSalonStaff, location.pathname, notifInboxAttentionTotal, showPremiumSalonNav]);
 
   useEffect(() => {
@@ -339,10 +393,20 @@ export function AccountLayout() {
     if (Notification.permission !== "granted") return;
     const delta = consumerNotifAttentionTotal - prev;
     const qty = delta > 1 ? `${delta} nuove notifiche` : "Nuova notifica";
-    void new Notification("Saloni Luxury — Notifiche", {
-      body: `${qty} nel tuo centro notifiche.`,
+    const title = "Saloni Luxury — Notifiche";
+    const body = `${qty} nel tuo centro notifiche.`;
+    const browserNotification = new Notification(title, {
+      body,
       tag: "velvet-consumer-notifications",
     });
+    browserNotification.onclick = (event) => {
+      event?.preventDefault?.();
+      browserNotification.close();
+      const popupPayload = { title, body, playSound: true as const };
+      storePendingNotificationPopup(popupPayload);
+      window.focus();
+      openVelvetNotificationPopup(popupPayload);
+    };
   }, [consumerNotifAttentionTotal, isSalonStaff, isSalonTitolare, isVelvetSuperAdmin, location.pathname]);
 
   /** Nome salone da DB/JWT (mai profilo utente); `hasNamedSalon` false → copy breve senza nome commerciale. */
@@ -404,7 +468,7 @@ export function AccountLayout() {
   const accountHubUsesVelvetPlansTheme =
     isSalonTitolare || isSalonStaff || (!isSalonTitolare && !isSalonStaff && !isVelvetSuperAdmin);
   const isNativeHubScreen =
-    isNativeApp && isNativeAccountHubPath(location.pathname);
+    isNativeApp && isNativeAccountHubPath(location.pathname, { isSalonTitolare, isSalonStaff });
   const accountHubClassName = [
     accountHubUsesVelvetPlansTheme ? "velvet-account-hub velvet-account-hub--velvet-plans" : "velvet-account-hub",
     isNativeHubScreen ? "velvet-account-hub--native-hub" : null,
@@ -414,9 +478,6 @@ export function AccountLayout() {
 
   const isAccountSubRoute =
     location.pathname !== "/account" && location.pathname.startsWith("/account/");
-
-  const hideNativeHubOutlet =
-    isNativeHubScreen && normalizeAccountPath(location.pathname) === "/account/home";
 
   const closeNativeAccountOverlay = useCallback(() => {
     if (location.key !== "default") {
@@ -432,7 +493,9 @@ export function AccountLayout() {
   if (embedded) {
     return (
       <div className="velvet-account-hub velvet-account-hub--embedded" aria-label="Pannello account incorporato">
-        <Outlet />
+        <AccountOutletSuspense>
+          <Outlet />
+        </AccountOutletSuspense>
       </div>
     );
   }
@@ -461,16 +524,34 @@ export function AccountLayout() {
 
   if (isNativeApp && isAccountSubRoute && !isNativeHubScreen) {
     return (
-      <VelvetNativeAccountOverlay
-        title={nativeAccountOverlayTitle(location.pathname)}
-        onClose={closeNativeAccountOverlay}
-      >
-        <Outlet />
-      </VelvetNativeAccountOverlay>
+      <AccountNavigationTransitionProvider>
+        <VelvetNativeAccountOverlay
+          title={nativeAccountOverlayTitle(location.pathname)}
+          onClose={closeNativeAccountOverlay}
+        >
+          <AccountOutletRegion variant="overlay">
+            <Outlet />
+          </AccountOutletRegion>
+        </VelvetNativeAccountOverlay>
+      </AccountNavigationTransitionProvider>
+    );
+  }
+
+  /** Checkout Premium e ringraziamento post-Stripe: pagina dedicata, senza hub profilo salone. */
+  if (isBillingCheckoutRoute && !isNativeApp) {
+    return (
+      <AccountNavigationTransitionProvider>
+        <main className="velvet-auth-page velvet-billing-flow-standalone" aria-label="Checkout Premium">
+          <AccountOutletRegion variant="embedded">
+            <Outlet />
+          </AccountOutletRegion>
+        </main>
+      </AccountNavigationTransitionProvider>
     );
   }
 
   return (
+    <AccountNavigationTransitionProvider>
     <div className={accountHubClassName} aria-label="Area account Luxury">
       <div className="velvet-account-hub__masthead">
         <div className="velvet-account-hub__masthead-inner">
@@ -478,7 +559,7 @@ export function AccountLayout() {
             {isSalonStaff ? (
               <span className="velvet-account-hub__plan velvet-account-hub__plan--staff">Staff salone</span>
             ) : isSalonTitolare ? (
-              <span className="velvet-account-hub__plan">Piano {planDisplayName(salonTier)}</span>
+              <span className="velvet-account-hub__plan">{salonPlanBadgeLabel}</span>
             ) : isVelvetSuperAdmin ? (
               <span className="velvet-account-hub__plan velvet-account-hub__plan--admin">Amministratore</span>
             ) : (
@@ -523,19 +604,10 @@ export function AccountLayout() {
                 </>
               ) : isSalonTitolare ? (
                 <>
-                  <p className="velvet-account-hub__reg">Account titolare</p>
-                  <p className="velvet-account-hub__greeting">
-                    {consumerGreeting ? (
-                      <>
-                        Ciao <strong>{consumerGreeting}</strong>
-                      </>
-                    ) : (
-                      "Ciao"
-                    )}
-                  </p>
+                  <p className="velvet-account-hub__reg">Il tuo salone</p>
                   {titolareSalonGreeting.hasNamedSalon ? (
-                    <p className="velvet-account-hub__salon-name">
-                      Salone <strong>{titolareSalonGreeting.salonName}</strong>
+                    <p className="velvet-account-hub__greeting">
+                      <strong>{titolareSalonGreeting.salonName}</strong>
                     </p>
                   ) : "salonHint" in titolareSalonGreeting && titolareSalonGreeting.salonHint === "pending" ? (
                     <p className="velvet-text-muted" style={{ marginTop: "0.2rem", fontSize: "0.88rem" }}>
@@ -611,7 +683,7 @@ export function AccountLayout() {
           <>
             <span className="velvet-account-hub__nav-label">Super admin</span>
             <div className="velvet-account-hub__nav-scroll">
-              <NavLink
+              <AccountHubNavLink
                 to="/admin/dashboard"
                 className={({ isActive }) =>
                   "velvet-account-hub__btn velvet-account-hub__btn--admin" +
@@ -619,7 +691,7 @@ export function AccountLayout() {
                 }
               >
                 Torna al pannello super admin
-              </NavLink>
+              </AccountHubNavLink>
             </div>
           </>
         ) : null}
@@ -627,7 +699,7 @@ export function AccountLayout() {
           <>
             <span className="velvet-account-hub__nav-label">Super admin</span>
             <div className="velvet-account-hub__nav-scroll">
-              <NavLink
+              <AccountHubNavLink
                 to="/admin/dashboard"
                 className={({ isActive }) =>
                   "velvet-account-hub__btn velvet-account-hub__btn--admin" +
@@ -635,22 +707,22 @@ export function AccountLayout() {
                 }
               >
                 Pannello di gestione
-              </NavLink>
-              <NavLink to="/account/profilo" className={navBtn()}>
+              </AccountHubNavLink>
+              <AccountHubNavLink to="/account/profilo" className={navBtn()}>
                 Profilo e sicurezza
-              </NavLink>
-              <NavLink to="/account/notifiche" className={navBtn()}>
+              </AccountHubNavLink>
+              <AccountHubNavLink to="/account/notifiche" className={navBtn()}>
                 Notifiche
-              </NavLink>
-              <NavLink to="/" className={navBtn("velvet-account-hub__btn--ghost")}>
+              </AccountHubNavLink>
+              <AccountHubNavLink to="/" className={navBtn("velvet-account-hub__btn--ghost")}>
                 Sito pubblico
-              </NavLink>
-              <NavLink to="/account/info-privacy" className={navBtn()} title="Informazioni sul trattamento dati e privacy.">
+              </AccountHubNavLink>
+              <AccountHubNavLink to="/account/info-privacy" className={navBtn()} title="Informazioni sul trattamento dati e privacy.">
                 Info e privacy
-              </NavLink>
-              <NavLink to="/account/assistenza" className={navBtn()}>
+              </AccountHubNavLink>
+              <AccountHubNavLink to="/account/assistenza" className={navBtn()}>
                 Assistenza
-              </NavLink>
+              </AccountHubNavLink>
             </div>
           </>
         ) : null}
@@ -660,13 +732,13 @@ export function AccountLayout() {
               {staffSalonMenuLabel}
             </span>
             <div className="velvet-account-hub__nav-scroll velvet-account-hub__nav-scroll--consumer-grid">
-              <NavLink to="/account/staff" end className={navBtn("velvet-account-hub__btn--sky")}>
+              <AccountHubNavLink to="/account/staff" end className={navBtn("velvet-account-hub__btn--sky")}>
                 La mia agenda
-              </NavLink>
-              <NavLink to="/account/profilo" className={navBtn()}>
+              </AccountHubNavLink>
+              <AccountHubNavLink to="/account/profilo" className={navBtn()}>
                 Profilo
-              </NavLink>
-              <NavLink to="/account/feedback-velvet" className={navBtn()}>
+              </AccountHubNavLink>
+              <AccountHubNavLink to="/account/feedback-velvet" className={navBtn()}>
                 <span className="velvet-account-hub__btn-notif">
                   Recensioni
                   {showSalonReviewsNavPill ? (
@@ -675,11 +747,11 @@ export function AccountLayout() {
                     </span>
                   ) : null}
                 </span>
-              </NavLink>
-              <NavLink to="/account/info-privacy" className={navBtn()} title="Informazioni sul trattamento dati e privacy.">
+              </AccountHubNavLink>
+              <AccountHubNavLink to="/account/info-privacy" className={navBtn()} title="Informazioni sul trattamento dati e privacy.">
                 Info e privacy
-              </NavLink>
-              <NavLink to="/account/notifiche" className={navBtn()}>
+              </AccountHubNavLink>
+              <AccountHubNavLink to="/account/notifiche" className={navBtn()}>
                 <span className="velvet-account-hub__btn-notif">
                   Notifiche
                   {showSalonNotificheNavPill ? (
@@ -691,9 +763,9 @@ export function AccountLayout() {
                     </span>
                   ) : null}
                 </span>
-              </NavLink>
+              </AccountHubNavLink>
               {staffSalonChatEligible ? (
-                <NavLink
+                <AccountHubNavLink
                   to="/account/salone/clienti"
                   className={navBtn()}
                   title="Elenco clienti della tua sede; da ogni scheda apri la chat Luxury."
@@ -709,9 +781,9 @@ export function AccountLayout() {
                       </span>
                     ) : null}
                   </span>
-                </NavLink>
+                </AccountHubNavLink>
               ) : null}
-              <NavLink
+              <AccountHubNavLink
                 to="/account/chat"
                 className={navBtn()}
                 title="Messaggi con i clienti della sede (con piano Premium dello studio vedi le conversazioni; altrimenti una breve spiegazione in pagina)."
@@ -724,15 +796,17 @@ export function AccountLayout() {
                     </span>
                   ) : null}
                 </span>
-              </NavLink>
-              <NavLink to="/account/assistenza" className={navBtn()}>
+              </AccountHubNavLink>
+              <AccountHubNavLink to="/account/assistenza" className={navBtn()}>
                 Assistenza
-              </NavLink>
+              </AccountHubNavLink>
             </div>
           </>
         ) : null}
-        {!isVelvetSuperAdmin && !isSalonStaff && showPremiumSalonNav ? (
-          <span className="velvet-account-hub__nav-label">Account Premium</span>
+        {!isVelvetSuperAdmin && !isSalonStaff && isSalonTitolare && showPremiumSalonNav ? (
+          <span className="velvet-account-hub__nav-label">
+            {titolareSalonGreeting.hasNamedSalon ? titolareSalonGreeting.salonName : "Il tuo salone"}
+          </span>
         ) : null}
         {!isVelvetSuperAdmin && !isSalonStaff ? (
           <>
@@ -761,8 +835,10 @@ export function AccountLayout() {
         ) : null}
       </nav>
 
-      <div className="velvet-account-hub__body">
-        {!hideNativeHubOutlet ? <Outlet /> : null}
+      <div id="velvet-account-hub-body" ref={hubBodyRef} className="velvet-account-hub__body">
+        <AccountOutletRegion>
+          <Outlet />
+        </AccountOutletRegion>
       </div>
 
       {readSalonClientsNavDebugEnabled() && isSalonTitolare && !isSalonStaff ? (
@@ -816,5 +892,6 @@ export function AccountLayout() {
         </div>
       ) : null}
     </div>
+    </AccountNavigationTransitionProvider>
   );
 }

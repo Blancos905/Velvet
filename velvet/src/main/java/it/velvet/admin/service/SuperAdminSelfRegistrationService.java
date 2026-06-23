@@ -84,6 +84,7 @@ public class SuperAdminSelfRegistrationService {
 			p.setEmail(email);
 			p.setPasswordHash(passwordHash);
 			p.setSecurityRoles("ADMIN,CLIENT");
+			SuperAdminConsumerBootstrap.markEmailVerified(p);
 			if (p.getDeletedAt() != null) {
 				p.setDeletedAt(null);
 			}
@@ -93,6 +94,7 @@ public class SuperAdminSelfRegistrationService {
 		ConsumerProfile p = new ConsumerProfile(SuperAdminConsumerBootstrap.SUPER_ADMIN_KEYCLOAK_SUB, email, "Super admin");
 		p.setPasswordHash(passwordHash);
 		p.setSecurityRoles("ADMIN,CLIENT");
+		SuperAdminConsumerBootstrap.markEmailVerified(p);
 		consumerProfileRepository.save(p);
 	}
 

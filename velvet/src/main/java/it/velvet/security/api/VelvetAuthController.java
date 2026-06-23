@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import it.velvet.common.api.BusinessException;
 import it.velvet.config.VelvetSecurityProperties;
 import it.velvet.consumer.service.VelvetAuthLoginService;
+import it.velvet.consumer.service.EmailVerificationConfirmResult;
+import it.velvet.consumer.service.VelvetEmailVerificationService;
 import it.velvet.consumer.service.VelvetPasswordResetService;
 import it.velvet.security.auth.VelvetRefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +30,7 @@ public class VelvetAuthController {
 
 	private final VelvetAuthLoginService velvetAuthLoginService;
 	private final VelvetPasswordResetService velvetPasswordResetService;
+	private final VelvetEmailVerificationService velvetEmailVerificationService;
 	private final VelvetRefreshTokenService velvetRefreshTokenService;
 	private final VelvetRefreshTokenCookieSupport refreshTokenCookieSupport;
 	private final VelvetSecurityProperties securityProperties;
@@ -35,11 +38,13 @@ public class VelvetAuthController {
 	public VelvetAuthController(
 			VelvetAuthLoginService velvetAuthLoginService,
 			VelvetPasswordResetService velvetPasswordResetService,
+			VelvetEmailVerificationService velvetEmailVerificationService,
 			VelvetRefreshTokenService velvetRefreshTokenService,
 			VelvetRefreshTokenCookieSupport refreshTokenCookieSupport,
 			VelvetSecurityProperties securityProperties) {
 		this.velvetAuthLoginService = velvetAuthLoginService;
 		this.velvetPasswordResetService = velvetPasswordResetService;
+		this.velvetEmailVerificationService = velvetEmailVerificationService;
 		this.velvetRefreshTokenService = velvetRefreshTokenService;
 		this.refreshTokenCookieSupport = refreshTokenCookieSupport;
 		this.securityProperties = securityProperties;
@@ -128,6 +133,43 @@ public class VelvetAuthController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@PostMapping("/email-verification/confirm")
+	@Operation(summary = "Conferma indirizzo email con token ricevuto via email di registrazione")
+	public ResponseEntity<EmailVerificationConfirmResponse> confirmEmailVerification(
+			@RequestBody @Valid EmailVerificationConfirmBody body,
+			HttpServletRequest request,
+			HttpServletResponse response) {
+		EmailVerificationConfirmResult result = velvetEmailVerificationService.confirmVerification(body.token(), request);
+		if (result.issuesSession()) {
+			boolean secure = refreshTokenCookieSupport.isSecureRequest(request);
+			refreshTokenCookieSupport.writeRefreshCookie(
+					response, result.refreshToken(), result.refreshTokenExpiresInDays(), secure);
+		}
+		return ResponseEntity.ok(
+				new EmailVerificationConfirmResponse(
+						result.message(),
+						result.accessToken(),
+						result.refreshToken(),
+						result.expiresInSeconds(),
+						result.nextPath()));
+	}
+
+	@PostMapping("/email-verification/resend")
+	@Operation(
+			summary = "Reinvia email di conferma registrazione",
+			description = """
+					Risposta sempre equivalente: se esiste un account attivo non ancora verificato, viene inviata un’email
+					(o log in dev). Non indica se l’email è registrata o già verificata.
+					""")
+	public ResponseEntity<EmailVerificationResendResponse> resendEmailVerification(
+			@RequestBody @Valid EmailVerificationResendBody body) {
+		velvetEmailVerificationService.resendVerification(body.email());
+		return ResponseEntity.accepted()
+				.body(
+						new EmailVerificationResendResponse(
+								"Se l’indirizzo è associato a un account in attesa di conferma, riceverai un’email con il link di attivazione."));
+	}
+
 	public record AuthLoginRequest(
 			@NotBlank @Size(max = 320) String email,
 			@NotBlank @Size(max = 200) String password) {
@@ -154,5 +196,26 @@ public class VelvetAuthController {
 			@NotBlank @Pattern(regexp = "[a-fA-F0-9]{64}") String token,
 			@NotBlank @Size(min = 8, max = 200) String newPassword,
 			@NotBlank @Size(min = 8, max = 200) String confirmPassword) {
+	}
+
+	public record EmailVerificationConfirmBody(@NotBlank @Pattern(regexp = "[a-fA-F0-9]{64}") String token) {
+	}
+
+	public record EmailVerificationConfirmResponse(
+			String message,
+			String accessToken,
+			String refreshToken,
+			Long expiresInSeconds,
+			String nextPath) {
+
+		public EmailVerificationConfirmResponse(String message) {
+			this(message, null, null, null, "/account");
+		}
+	}
+
+	public record EmailVerificationResendBody(@NotBlank @Email @Size(max = 320) String email) {
+	}
+
+	public record EmailVerificationResendResponse(String message) {
 	}
 }

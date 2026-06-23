@@ -39,6 +39,14 @@ public class StripeBillingPortalService {
 	}
 
 	public String createPortalSessionUrl(VelvetUserPrincipal principal) {
+		return createPortalSessionUrl(principal, false);
+	}
+
+	public String createCancelSubscriptionPortalSessionUrl(VelvetUserPrincipal principal) {
+		return createPortalSessionUrl(principal, true);
+	}
+
+	private String createPortalSessionUrl(VelvetUserPrincipal principal, boolean cancelSubscriptionFlow) {
 		if (!stripeProperties.configured()) {
 			throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "BILLING_DISABLED", "Pagamenti non ancora disponibili.");
 		}
@@ -47,12 +55,37 @@ public class StripeBillingPortalService {
 		BillingAccount account = billingAccountRepository.findByStudioGroup_Id(group.getId())
 				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "BILLING_NOT_FOUND", "Nessun profilo di fatturazione collegato."));
 		String frontendBase = frontendBaseUrl();
+		String returnUrl = frontendBase + stripeProperties.portalReturnPath();
 		try {
-			Session session = stripeClient.billingPortal().sessions().create(
-					SessionCreateParams.builder()
-							.setCustomer(account.getStripeCustomerId())
-							.setReturnUrl(frontendBase + stripeProperties.portalReturnPath())
-							.build());
+			SessionCreateParams.Builder params = SessionCreateParams.builder()
+					.setCustomer(account.getStripeCustomerId())
+					.setReturnUrl(returnUrl);
+			if (cancelSubscriptionFlow) {
+				String subscriptionId = account.getStripeSubscriptionId();
+				if (subscriptionId == null || subscriptionId.isBlank()) {
+					throw new BusinessException(
+							HttpStatus.CONFLICT,
+							"BILLING_NO_SUBSCRIPTION",
+							"Nessun abbonamento attivo da disdire.");
+				}
+				params.setFlowData(
+						SessionCreateParams.FlowData.builder()
+								.setType(SessionCreateParams.FlowData.Type.SUBSCRIPTION_CANCEL)
+								.setSubscriptionCancel(
+										SessionCreateParams.FlowData.SubscriptionCancel.builder()
+												.setSubscription(subscriptionId)
+												.build())
+								.setAfterCompletion(
+										SessionCreateParams.FlowData.AfterCompletion.builder()
+												.setType(SessionCreateParams.FlowData.AfterCompletion.Type.REDIRECT)
+												.setRedirect(
+														SessionCreateParams.FlowData.AfterCompletion.Redirect.builder()
+																.setReturnUrl(returnUrl)
+																.build())
+												.build())
+								.build());
+			}
+			Session session = stripeClient.billingPortal().sessions().create(params.build());
 			if (session.getUrl() == null || session.getUrl().isBlank()) {
 				throw new BusinessException(HttpStatus.BAD_GATEWAY, "STRIPE_ERROR", "Stripe non ha restituito l'URL del portale.");
 			}

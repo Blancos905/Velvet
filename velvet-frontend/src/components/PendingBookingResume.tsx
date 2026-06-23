@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { apiJson } from "../api/client";
 import type { AppointmentDto } from "../api/types";
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
+import { canBookOnlineAsConsumer } from "../lib/velvetConsumerBooking";
 import { notifySalonCatalogClientsChanged } from "../lib/salonCatalogClientsSync";
 
 const STORAGE_KEY = "velvet_pending_booking";
@@ -35,7 +36,7 @@ export function PendingBookingResume() {
 
   useEffect(() => {
     if (!isAuthenticated || isLoading || !accessToken || ran.current) return;
-    if (isSalonTitolare || isSalonStaff) {
+    if (!canBookOnlineAsConsumer(isSalonTitolare, isSalonStaff)) {
       sessionStorage.removeItem(STORAGE_KEY);
       return;
     }
@@ -68,7 +69,10 @@ export function PendingBookingResume() {
         await qc.invalidateQueries({ queryKey: ["me", "salon-clients"] });
         void qc.invalidateQueries({ queryKey: ["catalog", "clients"] });
         notifySalonCatalogClientsChanged();
-        navigate(`/account/prenotazioni/${res.id}`, { replace: true });
+        navigate(`/account/prenotazioni/${res.id}`, {
+          replace: true,
+          state: { bookingConfirmed: { startIso: res.start, serviceName: res.serviceName } },
+        });
       } catch (e) {
         sessionStorage.removeItem(STORAGE_KEY);
         ran.current = false;

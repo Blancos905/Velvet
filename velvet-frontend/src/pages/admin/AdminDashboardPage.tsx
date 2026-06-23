@@ -7,6 +7,7 @@ import { useAdminAuth } from "../../auth/AdminAuthProvider";
 import { SaloniLuxuryLogoMark } from "../../components/SaloniLuxuryLogoMark";
 import { StarRatingDisplay } from "../../components/StarRatingDisplay";
 import { extractSuperAdminProfileFromOverview } from "../../utils/superAdminOverviewProfile";
+import { parseSuperAdminCounts } from "./superAdminPlatformStats";
 import { AdminConsumerClientsSection } from "./AdminConsumerClientsSection";
 import { AdminSalonPlanSection } from "./AdminSalonPlanSection";
 import { AdminSuperAdminProfileSection } from "./AdminSuperAdminProfileSection";
@@ -78,6 +79,7 @@ export default function AdminDashboardPage() {
   });
 
   const profile = extractSuperAdminProfileFromOverview(overviewQ.data, accessToken);
+  const overviewCounts = overviewQ.data ? parseSuperAdminCounts(overviewQ.data.counts) : null;
   const welcomeDisplayName =
     profile.displayName?.trim() ||
     (profile.email?.includes("@") ? profile.email.split("@")[0] : profile.email)?.trim() ||
@@ -181,6 +183,37 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </section>
+
+      {overviewQ.isError ? (
+        <p className="velvet-alert velvet-alert--error velvet-admin-dashboard-generated" role="alert">
+          {overviewQ.error instanceof Error
+            ? overviewQ.error.message
+            : "Impossibile caricare la panoramica admin. Verifica che Spring sia attivo e che la sessione super admin sia valida."}
+        </p>
+      ) : null}
+
+      {overviewCounts ? (
+        <section className="velvet-admin-panel velvet-admin-dashboard-section" aria-label="Riepilogo piattaforma">
+          <div className="velvet-admin-dashboard-columns">
+            <div className="velvet-admin-dashboard-column">
+              <strong>{overviewCounts.consumerProfilesActive}</strong>
+              <span className="velvet-admin-muted">profili attivi</span>
+            </div>
+            <div className="velvet-admin-dashboard-column">
+              <strong>{overviewCounts.studioGroupsPaying}</strong>
+              <span className="velvet-admin-muted">saloni a pagamento</span>
+            </div>
+            <div className="velvet-admin-dashboard-column">
+              <strong>{overviewCounts.appointmentsTotal}</strong>
+              <span className="velvet-admin-muted">appuntamenti</span>
+            </div>
+            <div className="velvet-admin-dashboard-column">
+              <strong>{overviewCounts.salonClients}</strong>
+              <span className="velvet-admin-muted">clienti in anagrafica</span>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="velvet-admin-panel" aria-labelledby={`${baseId}-aree-h`}>
         <h2 id={`${baseId}-aree-h`} className="velvet-admin-section-title">

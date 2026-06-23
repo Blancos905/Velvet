@@ -2,6 +2,7 @@ import { apiUrl } from "../config/env";
 import { LEGAL_DOCUMENT_VERSION } from "../content/legalEntity";
 import { httpApiErrorMessage } from "./httpApiErrorMessage";
 import type { SalonPlanTier } from "../data/salonPlans";
+import type { SalonBillingProfilePayload } from "./billing";
 
 export type ConsumerRegistrationPayload = {
   email: string;
@@ -22,12 +23,19 @@ export type ConsumerRegistrationPayload = {
   salonBusinessTypes?: string[];
   /** Pubblico di riferimento (MALE, FEMALE); obbligatorio per BASE/PREMIUM lato backend. */
   salonClientGenders?: string[];
+  /** Dati fatturazione — obbligatori per PREMIUM. */
+  billing?: SalonBillingProfilePayload;
+};
+
+export type RegistrationCreatedResponse = {
+  message: string;
+  emailVerificationRequired?: boolean;
 };
 
 /**
  * Registrazione salone via backend pubblico — ruolo applicativo **OWNER**, non **CLIENT**.
  */
-export async function registerConsumerApi(payload: ConsumerRegistrationPayload): Promise<void> {
+export async function registerConsumerApi(payload: ConsumerRegistrationPayload): Promise<RegistrationCreatedResponse> {
   const body: Record<string, unknown> = {
     email: payload.email.trim().toLowerCase(),
     password: payload.password,
@@ -55,6 +63,21 @@ export async function registerConsumerApi(payload: ConsumerRegistrationPayload):
   if (payload.salonClientGenders != null && payload.salonClientGenders.length > 0) {
     body.salonClientGenders = payload.salonClientGenders;
   }
+  if (payload.billing) {
+    const b = payload.billing;
+    add("billingLegalName", b.legalName);
+    add("billingEmail", b.billingEmail);
+    add("billingVatNumber", b.vatNumber);
+    add("billingFiscalCode", b.fiscalCode);
+    add("billingSubjectType", b.subjectType);
+    add("billingAddressLine1", b.addressLine1);
+    add("billingPostalCode", b.postalCode);
+    add("billingCity", b.city);
+    add("billingProvince", b.province);
+    add("billingCountry", b.country);
+    add("billingSdiCode", b.sdiCode);
+    add("billingPecEmail", b.pecEmail);
+  }
 
   const controller = new AbortController();
   const timeoutMs = 45_000;
@@ -80,7 +103,24 @@ export async function registerConsumerApi(payload: ConsumerRegistrationPayload):
     window.clearTimeout(timeoutId);
   }
 
-  if (res.ok) return;
+  if (res.ok) {
+    try {
+      const j = (await res.json()) as RegistrationCreatedResponse;
+      if (typeof j.message === "string" && j.message.trim()) {
+        return {
+          message: j.message.trim(),
+          emailVerificationRequired: j.emailVerificationRequired !== false,
+        };
+      }
+    } catch {
+      /* body opzionale */
+    }
+    return {
+      message:
+        "Abbiamo inviato un'email di conferma. Clicca il link per attivare l'account titolare, poi accedi.",
+      emailVerificationRequired: true,
+    };
+  }
 
   const msg = await httpApiErrorMessage(res, "Registrazione non riuscita");
   throw new Error(msg);

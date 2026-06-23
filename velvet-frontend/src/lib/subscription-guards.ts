@@ -40,7 +40,6 @@ export const SUBSCRIPTION_GUARDS_SNAPSHOT = {
     publicPrefixes: ["/s/", "/search"],
     accountAllowedExactPaths: ["/account", "/account/salone"],
     accountAllowedPrefixes: [
-      "/account/home",
       "/account/prenotazioni",
       "/account/notifiche",
       "/account/info-privacy",
@@ -70,14 +69,23 @@ export const SUBSCRIPTION_GUARDS_SNAPSHOT = {
       "Piano Free — in app: Agenda, Notifiche, Aggiungi servizi (senza foto), Profilo, Info e privacy, Assistenza. Altre sezioni richiedono una configurazione account diversa.",
   },
   messages: {
-    freeOwnerWebPanel:
-      "Il tuo salone è attivo con il piano Free (registrazione dall'app Saloni Luxury). Per usufruire del pannello di gestione da browser è necessario passare a Premium.",
+    freeOwnerWebPanel: {
+      kicker: "Piano Free · Il tuo salone",
+      title: "Il pannello web è incluso in Premium",
+      lead:
+        "Hai attivato il piano Free dall'app Saloni Luxury. Da smartphone puoi già gestire agenda, servizi e profilo del salone.",
+      premiumHint:
+        "La gestione completa da browser — vetrina personalizzata, brand, statistiche, staff e strumenti avanzati — è riservata al piano Premium.",
+      freeAppFeatures: ["Agenda e appuntamenti", "Catalogo servizi", "Profilo, privacy e assistenza"],
+    },
   },
 } as const;
 
 export type SubscriptionGuardsSnapshot = typeof SUBSCRIPTION_GUARDS_SNAPSHOT;
 
-export const SALON_FREE_OWNER_WEB_PANEL_MESSAGE = SUBSCRIPTION_GUARDS_SNAPSHOT.messages.freeOwnerWebPanel;
+const { lead, premiumHint } = SUBSCRIPTION_GUARDS_SNAPSHOT.messages.freeOwnerWebPanel;
+
+export const SALON_FREE_OWNER_WEB_PANEL_MESSAGE = `${lead} ${premiumHint}`;
 
 const PREMIUM_FEATURES: ReadonlySet<SubscriptionFeature> = new Set([
   "owner.premium.brand",

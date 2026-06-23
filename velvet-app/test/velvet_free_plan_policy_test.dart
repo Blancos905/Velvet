@@ -25,9 +25,9 @@ void main() {
       expect(VelvetFreePlanPolicy.isPathAllowed('/account/salone/servizi'), isTrue);
     });
 
-    test('blocca notifiche e panoramica salone', () {
-      expect(VelvetFreePlanPolicy.isPathAllowed('/account/notifiche'), isFalse);
-      expect(VelvetFreePlanPolicy.isPathAllowed('/account/salone'), isFalse);
+    test('consente notifiche e panoramica salone', () {
+      expect(VelvetFreePlanPolicy.isPathAllowed('/account/notifiche'), isTrue);
+      expect(VelvetFreePlanPolicy.isPathAllowed('/account/salone'), isTrue);
     });
 
     test('messaggio paywall Premium', () {

@@ -176,7 +176,7 @@ export default function AccountInfoPrivacyPage() {
         </header>
 
         {!isSalonTitolare && !embedded ? (
-          <Link to="/account/home" className="velvet-link-back">
+          <Link to="/account/prenotazioni" className="velvet-link-back">
             ← Area account
           </Link>
         ) : null}

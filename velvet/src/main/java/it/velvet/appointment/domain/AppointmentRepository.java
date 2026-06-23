@@ -95,9 +95,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
 
 	@Query("""
 			select distinct a from Appointment a
-			join fetch a.location
+			join fetch a.location loc
+			left join fetch loc.studioGroup
 			join fetch a.service
-			join fetch a.operator
+			join fetch a.operator op
+			left join fetch op.consumerProfile
 			join fetch a.salonClient
 			left join fetch a.consumerProfile
 			where a.id = :id

@@ -47,6 +47,16 @@ public class ConsumerProfile {
 	@Column(name = "password_reset_expires_at")
 	private Instant passwordResetExpiresAt;
 
+	@Column(name = "email_verified_at")
+	private Instant emailVerifiedAt;
+
+	/** SHA-256 esadecimale (64 caratteri) del token inviato per email; nullo se nessuna conferma in corso. */
+	@Column(name = "email_verification_token_hash", length = 64)
+	private String emailVerificationTokenHash;
+
+	@Column(name = "email_verification_expires_at")
+	private Instant emailVerificationExpiresAt;
+
 	/** Valori applicativi separati da virgola, es. {@code CLIENT}, {@code OWNER}. */
 	@Column(name = "security_roles", length = 64)
 	private String securityRoles;
@@ -191,6 +201,30 @@ public class ConsumerProfile {
 
 	public void setPasswordResetExpiresAt(Instant passwordResetExpiresAt) {
 		this.passwordResetExpiresAt = passwordResetExpiresAt;
+	}
+
+	public Instant getEmailVerifiedAt() {
+		return emailVerifiedAt;
+	}
+
+	public void setEmailVerifiedAt(Instant emailVerifiedAt) {
+		this.emailVerifiedAt = emailVerifiedAt;
+	}
+
+	public String getEmailVerificationTokenHash() {
+		return emailVerificationTokenHash;
+	}
+
+	public void setEmailVerificationTokenHash(String emailVerificationTokenHash) {
+		this.emailVerificationTokenHash = emailVerificationTokenHash;
+	}
+
+	public Instant getEmailVerificationExpiresAt() {
+		return emailVerificationExpiresAt;
+	}
+
+	public void setEmailVerificationExpiresAt(Instant emailVerificationExpiresAt) {
+		this.emailVerificationExpiresAt = emailVerificationExpiresAt;
 	}
 
 	public String getSecurityRoles() {

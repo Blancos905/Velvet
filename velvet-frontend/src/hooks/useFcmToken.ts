@@ -9,11 +9,16 @@ import {
 } from "../api/fcmDevice";
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
 import { isVelvetNativeAppShell } from "./useVelvetNativeAppShell";
+import {
+  normalizePushNotificationOpen,
+  openVelvetNotificationPopup,
+} from "../lib/velvetNotificationPopup";
 
 declare global {
   interface Window {
     velvetFcmToken?: string;
     onVelvetFcmTokenReceived?: (token: string) => void;
+    onVelvetPushNotificationOpen?: (payload: Record<string, unknown>) => void;
   }
 }
 
@@ -77,10 +82,31 @@ export function useFcmToken(): void {
       syncToken(token);
     };
 
+    window.onVelvetPushNotificationOpen = (raw) => {
+      const payload = normalizePushNotificationOpen(raw);
+      if (payload) {
+        openVelvetNotificationPopup(payload);
+      }
+    };
+
     syncToken(window.velvetFcmToken);
+
+    if (typeof window.onVelvetPushNotificationOpen === "function") {
+      try {
+        const raw = sessionStorage.getItem("velvet_pending_push_open");
+        if (raw) {
+          const parsed = JSON.parse(raw) as Record<string, unknown>;
+          window.onVelvetPushNotificationOpen(parsed);
+          sessionStorage.removeItem("velvet_pending_push_open");
+        }
+      } catch {
+        /* ignore malformed pending push payload */
+      }
+    }
 
     return () => {
       delete window.onVelvetFcmTokenReceived;
+      delete window.onVelvetPushNotificationOpen;
     };
   }, [syncToken]);
 

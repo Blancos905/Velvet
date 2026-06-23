@@ -88,6 +88,19 @@ class MeSalonClientsControllerTest {
 	}
 
 	@Test
+	void becomeClient_ownerProfileForbidden() throws Exception {
+		String suffix = UUID.randomUUID().toString().substring(0, 8);
+		StudioGroup group = studioGroupRepository.save(new StudioGroup("Salone Owner Block " + suffix));
+		Location location = locationRepository.save(new Location(group, "slug-owner-block-" + suffix, "Salone", "MI"));
+		ConsumerProfile owner = saveOwner("sub-owner-block-" + suffix, "owner-block-" + suffix + "@test.com");
+
+		mockMvc.perform(put("/api/v1/me/salon-clients/" + location.getId()).header("Authorization", bearer(owner)))
+				.andExpect(status().isForbidden());
+
+		assertThat(salonClientRepository.findByLocation_IdAndConsumerProfile_Id(location.getId(), owner.getId())).isEmpty();
+	}
+
+	@Test
 	void becomeClient_tracksMembershipAndIsIdempotent() throws Exception {
 		String suffix = UUID.randomUUID().toString().substring(0, 8);
 		String email = "client-membership-" + suffix + "@test.com";

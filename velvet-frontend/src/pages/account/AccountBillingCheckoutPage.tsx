@@ -1,24 +1,30 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { fetchBillingStatus, startPremiumCheckout } from "../../api/billing";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
 import { NativePremiumBillingBlockedPanel } from "../../components/NativePremiumBillingBlockedPanel";
-import { SALON_PLANS } from "../../data/salonPlans";
+import {
+  SalonBillingProfileEditor,
+  useSalonBillingProfileComplete,
+} from "../../components/SalonBillingProfileEditor";
 import { useEffectiveSalonPlanTier } from "../../hooks/useEffectiveSalonPlanTier";
 import { isNativePremiumBillingBlocked } from "../../lib/nativePremiumUpgradePolicy";
 import "../../styles/velvet-account-page-shell.css";
+import "../../styles/velvet-profile-page.css";
 
 /**
- * Passo intermedio dopo registrazione Premium: reindirizza a Stripe Checkout se configurato,
- * altrimenti spiega che i pagamenti non sono ancora attivi sul server.
+ * Avvio pagamento Premium: se i dati fatturazione sono già in anagrafica (registrazione `/piani`),
+ * reindirizza subito a Stripe Checkout. Solo i passaggi Free → Premium mostrano il form fatturazione.
  */
 export default function AccountBillingCheckoutPage() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { isSalonTitolare, accessToken } = useVelvetAuth();
   const effectivePlan = useEffectiveSalonPlanTier();
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [redirecting, setRedirecting] = useState(false);
-  const autoStarted = useRef(false);
+  const autoCheckoutStartedRef = useRef(false);
 
   const billingStatus = useQuery({
     queryKey: ["me", "billing", "status", accessToken],
@@ -26,49 +32,70 @@ export default function AccountBillingCheckoutPage() {
     enabled: Boolean(isSalonTitolare && accessToken),
   });
 
-  const premiumPlan = SALON_PLANS.find((p) => p.tier === "PREMIUM");
-  const priceLabel = premiumPlan?.priceHint ?? "Premium";
+  const { isLoading: billingProfileLoading, isComplete: profileComplete } =
+    useSalonBillingProfileComplete(accessToken);
 
-  useEffect(() => {
-    if (!isSalonTitolare || !accessToken || autoStarted.current) return;
-    if (billingStatus.isPending) return;
+  const configured = billingStatus.data?.configured === true;
+  const hasActiveSubscription =
+    billingStatus.data?.subscriptionStatus === "active" ||
+    billingStatus.data?.subscriptionStatus === "trialing" ||
+    (effectivePlan === "PREMIUM" &&
+      billingStatus.data?.premiumAccess &&
+      billingStatus.data?.subscriptionStatus != null);
 
-    const status = billingStatus.data;
-    if (!status?.configured) return;
+  const handleCheckoutError = (err: unknown) => {
+    setRedirecting(false);
+    autoCheckoutStartedRef.current = false;
+    const message = err instanceof Error ? err.message : "Impossibile aprire il pagamento Stripe.";
+    if (message.includes("ALREADY_SUBSCRIBED") || message.toLowerCase().includes("già un abbonamento")) {
+      void queryClient.invalidateQueries({ queryKey: ["me", "billing"] });
+      navigate("/account/salone", { replace: true });
+      return;
+    }
+    setCheckoutError(message);
+  };
 
-    const hasActiveSubscription =
-      status.subscriptionStatus === "active" ||
-      status.subscriptionStatus === "trialing" ||
-      (effectivePlan === "PREMIUM" && status.premiumAccess && status.subscriptionStatus != null);
-
-    if (hasActiveSubscription) return;
-
-    autoStarted.current = true;
+  const goToStripe = () => {
+    if (!accessToken) return;
     setRedirecting(true);
     setCheckoutError(null);
-    void startPremiumCheckout(accessToken)
-      .catch((err: unknown) => {
-        autoStarted.current = false;
-        setRedirecting(false);
-        setCheckoutError(err instanceof Error ? err.message : "Impossibile aprire il pagamento Stripe.");
-      });
+    void startPremiumCheckout(accessToken).catch(handleCheckoutError);
+  };
+
+  useEffect(() => {
+    if (
+      autoCheckoutStartedRef.current ||
+      !configured ||
+      hasActiveSubscription ||
+      !profileComplete ||
+      !accessToken ||
+      billingStatus.isPending ||
+      billingProfileLoading
+    ) {
+      return;
+    }
+    autoCheckoutStartedRef.current = true;
+    setRedirecting(true);
+    setCheckoutError(null);
+    void startPremiumCheckout(accessToken).catch(handleCheckoutError);
   }, [
     accessToken,
-    billingStatus.data,
+    billingProfileLoading,
     billingStatus.isPending,
-    effectivePlan,
-    isSalonTitolare,
+    configured,
+    hasActiveSubscription,
+    profileComplete,
   ]);
 
   if (!isSalonTitolare) {
-    return <Navigate to="/account/home" replace />;
+    return <Navigate to="/account/salone" replace />;
   }
 
   if (isNativePremiumBillingBlocked()) {
     return <NativePremiumBillingBlockedPanel title="Accesso alla sezione" />;
   }
 
-  if (billingStatus.isPending) {
+  if (billingStatus.isPending || billingProfileLoading) {
     return (
       <div className="velvet-account-page-shell velvet-account-page-shell--narrow">
         <p aria-live="polite">Preparazione pagamento…</p>
@@ -76,25 +103,29 @@ export default function AccountBillingCheckoutPage() {
     );
   }
 
-  const configured = billingStatus.data?.configured === true;
-  const hasActiveSubscription =
-    billingStatus.data?.subscriptionStatus === "active" ||
-    billingStatus.data?.subscriptionStatus === "trialing";
-
   if (configured && hasActiveSubscription) {
     return <Navigate to="/account/salone" replace />;
   }
 
-  const retryCheckout = () => {
-    if (!accessToken) return;
-    setRedirecting(true);
-    setCheckoutError(null);
-    void startPremiumCheckout(accessToken)
-      .catch((err: unknown) => {
-        setRedirecting(false);
-        setCheckoutError(err instanceof Error ? err.message : "Impossibile aprire il pagamento Stripe.");
-      });
-  };
+  if (configured && profileComplete) {
+    return (
+      <div className="velvet-account-page-shell velvet-account-page-shell--narrow">
+        <p aria-live="polite">{redirecting ? "Reindirizzamento a Stripe…" : "Preparazione pagamento…"}</p>
+        {checkoutError ? (
+          <p className="velvet-alert velvet-alert--error" role="alert" style={{ marginTop: "1rem" }}>
+            {checkoutError}
+          </p>
+        ) : null}
+        {checkoutError ? (
+          <p style={{ marginTop: "0.75rem" }}>
+            <button type="button" className="velvet-btn velvet-btn--primary" onClick={goToStripe}>
+              Riprova pagamento Stripe
+            </button>
+          </p>
+        ) : null}
+      </div>
+    );
+  }
 
   return (
     <div className="velvet-account-page-shell velvet-account-page-shell--narrow">
@@ -102,60 +133,53 @@ export default function AccountBillingCheckoutPage() {
         <div className="velvet-account-page-shell__hero-inner">
           <h1 className="velvet-account-page-shell__hero-title">Attiva Premium</h1>
           <p className="velvet-account-page-shell__hero-sub">
-            Registrazione completata. Per sbloccare il piano Premium ({priceLabel}) completa il pagamento sicuro su
-            Stripe.
+            Completa i dati di fatturazione mancanti, poi procedi al pagamento sicuro su Stripe.
           </p>
         </div>
       </header>
 
+      <article className="velvet-profile-card velvet-profile-card--account" style={{ marginBottom: "1.25rem" }}>
+        <div className="velvet-profile-insert-panel">
+          <h2 className="velvet-section-title velvet-profile-card__title">Dati fatturazione</h2>
+          <SalonBillingProfileEditor
+            accessToken={accessToken}
+            context="checkout"
+            onSaved={() => {
+              void queryClient.invalidateQueries({ queryKey: ["me", "billing"] });
+              setCheckoutError(null);
+            }}
+          />
+        </div>
+      </article>
+
       {configured ? (
         <>
-          {redirecting ? (
-            <p aria-live="polite">Reindirizzamento a Stripe…</p>
-          ) : (
-            <p>
-              Se non vieni reindirizzato automaticamente, usa il pulsante qui sotto per aprire la pagina di pagamento.
-            </p>
-          )}
+          <p className="velvet-text-muted" style={{ margin: "0 0 1rem", lineHeight: 1.55 }}>
+            Salva i dati fatturazione per sbloccare il pagamento.
+          </p>
           {checkoutError ? (
             <p className="velvet-alert velvet-alert--error" role="alert">
               {checkoutError}
             </p>
           ) : null}
-          <p style={{ marginTop: "1rem" }}>
+          <p style={{ marginTop: "0.5rem" }}>
             <button
               type="button"
               className="velvet-btn velvet-btn--primary"
-              disabled={redirecting}
-              onClick={retryCheckout}
+              disabled={!profileComplete || redirecting}
+              onClick={goToStripe}
             >
-              {redirecting ? "Apertura…" : "Vai al pagamento Stripe"}
+              {redirecting ? "Reindirizzamento…" : "Continua al pagamento Stripe"}
             </button>
           </p>
         </>
       ) : (
         <div className="velvet-alert velvet-alert--error" role="alert">
           <p style={{ margin: 0 }}>
-            <strong>Pagamenti non ancora attivi su questo ambiente.</strong> Il backend non ha Stripe configurato
-            ({`VELVET_BILLING_ENABLED`}, chiave segreta e Price ID). Finché non sono impostati, dopo la registrazione
-            Premium non compare la pagina di pagamento.
-          </p>
-          <p style={{ margin: "0.75rem 0 0" }}>
-            In sviluppo: copia le variabili da{" "}
-            <code>velvet/spring-dev.local.env.example</code> in <code>velvet/spring-dev.local.env</code>, crea un
-            prodotto/prezzo in Stripe test mode e riavvia il backend. Poi ripeti la registrazione o usa «Vai al
-            pagamento» da panoramica salone.
+            <strong>Pagamenti non ancora attivi su questo ambiente.</strong> Configura Stripe sul server per procedere.
           </p>
         </div>
       )}
-
-      <p style={{ marginTop: "1.25rem" }}>
-        <Link to="/account/salone">Panoramica salone</Link>
-        {" · "}
-        <Link to="/account/profilo">Profilo</Link>
-        {" · "}
-        <Link to="/piani">Piani</Link>
-      </p>
     </div>
   );
 }

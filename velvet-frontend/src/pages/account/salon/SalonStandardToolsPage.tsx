@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { apiJson } from "../../../api/client";
 import type { MeSalonNotificationInbox, MeSalonNotificationTypeStat } from "../../../api/types";
 import { useVelvetAuth } from "../../../auth/VelvetAuthProvider";
+import { SalonNotificationMessageLine } from "../../../components/SalonNotificationMessageLine";
 import { useMeSalonNotificationInboxQuery } from "../../../hooks/useMeSalonNotificationInbox";
 import { useMeSalonNotificationMessagesQuery } from "../../../hooks/useMeSalonNotificationMessages";
 import "../../../styles/salon-notifications.css";
@@ -250,34 +251,13 @@ export default function SalonStandardToolsPage() {
                         ) : (
                           <ul className="velvet-salon-notif-detail__list" aria-label={`Messaggi: ${row.label}`}>
                             {messages.data?.map((m) => (
-                              <li key={m.id} className="velvet-salon-notif-detail__line">
-                                <span className="velvet-salon-notif-detail__text">{m.previewLine}</span>
-                                <span
-                                  style={{ display: "inline-flex", alignItems: "center", gap: "0.55rem" }}
-                                >
-                                  <span className="velvet-salon-notif-detail__meta" title={m.status}>
-                                    {m.status === "SENT" && m.sentAt
-                                      ? `Inviata ${new Date(m.sentAt).toLocaleString("it-IT")}`
-                                      : m.status === "PENDING"
-                                        ? "In coda"
-                                        : m.status}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    className="velvet-btn velvet-btn--secondary"
-                                    style={{ padding: "0.2rem 0.45rem", minWidth: "2rem" }}
-                                    title="Elimina notifica"
-                                    aria-label="Elimina notifica"
-                                    disabled={deleteMessageM.isPending && deletingMessageId === m.id}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      deleteMessageM.mutate(m.id);
-                                    }}
-                                  >
-                                    {deleteMessageM.isPending && deletingMessageId === m.id ? "..." : "Elimina"}
-                                  </button>
-                                </span>
-                              </li>
+                              <SalonNotificationMessageLine
+                                key={m.id}
+                                message={m}
+                                categoryLabel={row.label}
+                                deleting={deleteMessageM.isPending && deletingMessageId === m.id}
+                                onDelete={(messageId) => deleteMessageM.mutate(messageId)}
+                              />
                             ))}
                           </ul>
                         )}

@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import type { MeSalonNotificationMessage } from "../../api/types";
 import { useAdminAuth } from "../../auth/AdminAuthProvider";
 import { deleteAdminSupportInbox, fetchAdminSupportInbox } from "./adminSupportInboxApi";
+import { useAdminConfirmAction } from "./useAdminConfirmAction";
 import {
   extractEmailFromRichiedenteValue,
   formatRelativePastIt,
@@ -53,6 +54,7 @@ export default function AdminAssistenzaPage() {
   const [techOpen, setTechOpen] = useState<Set<string>>(() => new Set());
   const [pendingArchiveId, setPendingArchiveId] = useState<string | null>(null);
   const [copyFlash, setCopyFlash] = useState<string | null>(null);
+  const { showSuccess, actionBanner } = useAdminConfirmAction();
 
   const listQ = useQuery({
     queryKey: ["admin", "support-inbox", fromSalonsOnly ? "salons" : "all", accessToken],
@@ -73,6 +75,7 @@ export default function AdminAssistenzaPage() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["admin", "support-inbox"] });
       setPendingArchiveId(null);
+      showSuccess("Richiesta archiviata con successo.");
     },
   });
 
@@ -134,6 +137,7 @@ export default function AdminAssistenzaPage() {
 
   return (
     <div className="velvet-admin-panel velvet-admin-panel--support-inbox">
+      {actionBanner}
       <p className="velvet-admin-support-page__back">
         <Link to="/admin/dashboard" className="velvet-admin-back-link">
           ← Panoramica
@@ -384,7 +388,7 @@ export default function AdminAssistenzaPage() {
                   <div className="velvet-admin-support-inbox-item__actions">
                     {pendingArchiveId === m.id ? (
                       <div className="velvet-admin-support-archive-confirm">
-                        <span>Archiviare questa richiesta?</span>
+                        <span>Sei sicuro di voler archiviare questa richiesta?</span>
                         <button
                           type="button"
                           className="velvet-admin-btn velvet-admin-btn--danger"

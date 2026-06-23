@@ -98,7 +98,7 @@ export function VelvetEuropeanContactFields({
             value={phoneLocal}
             onChange={(ev) => onPhoneLocalChange(normalizeEuropeanLocalPhone(ev.target.value))}
             disabled={disabled}
-            placeholder="Numero senza prefisso"
+            placeholder="Numero"
           />
         </div>
       </div>

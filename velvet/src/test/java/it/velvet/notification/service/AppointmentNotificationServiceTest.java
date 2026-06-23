@@ -25,6 +25,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +42,9 @@ class AppointmentNotificationServiceTest {
 	@Mock
 	private FcmPushDispatchService fcmPushDispatchService;
 
+	@Mock
+	private TransactionalEmailDispatchService transactionalEmailDispatchService;
+
 	@Captor
 	private ArgumentCaptor<ScheduledNotification> scheduledCaptor;
 
@@ -52,7 +56,11 @@ class AppointmentNotificationServiceTest {
 		notificationProperties = new VelvetNotificationProperties();
 		notificationProperties.setEnabled(true);
 		service = new AppointmentNotificationService(
-				scheduledNotificationRepository, appointmentRepository, notificationProperties, fcmPushDispatchService);
+				scheduledNotificationRepository,
+				appointmentRepository,
+				notificationProperties,
+				fcmPushDispatchService,
+				transactionalEmailDispatchService);
 	}
 
 	private void stubSavePassthrough() {
@@ -61,19 +69,31 @@ class AppointmentNotificationServiceTest {
 	}
 
 	@Test
-	void onConsumerBookingCreated_schedulesConfirmation24hAnd2hReminders() {
+	void onConsumerBookingCreated_onlySalonAlertUntilConfirmed() {
+		stubSavePassthrough();
+		Appointment appointment = mockConsumerAppointmentOnly();
+
+		service.onConsumerBookingCreated(appointment.getId());
+
+		assertThat(savedTypes()).containsExactly(NotificationType.BOOKING_CREATED_FOR_SALON);
+		verify(scheduledNotificationRepository, never()).cancelAllPendingForAppointment(
+				any(), any(), any());
+	}
+
+	@Test
+	void onBookingConfirmedBySalon_schedulesConfirmation24hAnd2hReminders() {
 		stubSavePassthrough();
 		Instant start = Instant.now().plus(26, ChronoUnit.HOURS);
 		Appointment appointment = mockAppointmentWithConsumer(start);
 
-		service.onConsumerBookingCreated(appointment.getId());
+		service.onBookingConfirmedBySalon(appointment.getId());
 
 		assertThat(savedTypes()).contains(
-				NotificationType.BOOKING_CREATED_FOR_SALON,
 				NotificationType.BOOKING_CONFIRMATION,
 				NotificationType.REMINDER_24H,
 				NotificationType.REMINDER_1H,
 				NotificationType.REVIEW_INVITE);
+		assertThat(savedTypes()).doesNotContain(NotificationType.BOOKING_CREATED_FOR_SALON);
 		verify(scheduledNotificationRepository).cancelAllPendingForAppointment(
 				eq(appointment.getId()),
 				eq(QueuedNotificationStatus.PENDING),
@@ -81,12 +101,12 @@ class AppointmentNotificationServiceTest {
 	}
 
 	@Test
-	void onConsumerBookingCreated_reminder24hScheduledExactly24HoursBeforeStart() {
+	void onBookingConfirmedBySalon_reminder24hScheduledExactly24HoursBeforeStart() {
 		stubSavePassthrough();
-		Instant start = Instant.parse("2026-06-15T14:00:00Z");
+		Instant start = Instant.now().plus(26, ChronoUnit.HOURS);
 		Appointment appointment = mockAppointmentWithConsumer(start);
 
-		service.onConsumerBookingCreated(appointment.getId());
+		service.onBookingConfirmedBySalon(appointment.getId());
 
 		ScheduledNotification reminder24h = findSaved(NotificationType.REMINDER_24H);
 		assertThat(reminder24h.getScheduledAt()).isEqualTo(start.minus(24, ChronoUnit.HOURS));
@@ -95,12 +115,12 @@ class AppointmentNotificationServiceTest {
 	}
 
 	@Test
-	void onConsumerBookingCreated_reminder2hScheduledExactly2HoursBeforeStart() {
+	void onBookingConfirmedBySalon_reminder2hScheduledExactly2HoursBeforeStart() {
 		stubSavePassthrough();
-		Instant start = Instant.parse("2026-06-15T14:00:00Z");
+		Instant start = Instant.now().plus(26, ChronoUnit.HOURS);
 		Appointment appointment = mockAppointmentWithConsumer(start);
 
-		service.onConsumerBookingCreated(appointment.getId());
+		service.onBookingConfirmedBySalon(appointment.getId());
 
 		ScheduledNotification reminder2h = findSaved(NotificationType.REMINDER_1H);
 		assertThat(reminder2h.getScheduledAt()).isEqualTo(start.minus(2, ChronoUnit.HOURS));
@@ -108,36 +128,36 @@ class AppointmentNotificationServiceTest {
 	}
 
 	@Test
-	void onConsumerBookingCreated_skips24hReminderWhenAppointmentWithin24Hours() {
+	void onBookingConfirmedBySalon_skips24hReminderWhenAppointmentWithin24Hours() {
 		stubSavePassthrough();
 		Instant start = Instant.now().plus(10, ChronoUnit.HOURS);
 		mockAppointmentWithConsumer(start);
 
-		service.onConsumerBookingCreated(UUID.randomUUID());
+		service.onBookingConfirmedBySalon(UUID.randomUUID());
 
 		assertThat(savedTypes()).doesNotContain(NotificationType.REMINDER_24H);
 		assertThat(savedTypes()).contains(NotificationType.REMINDER_1H);
 	}
 
 	@Test
-	void onConsumerBookingCreated_skipsBothRemindersWhenAppointmentWithin2Hours() {
+	void onBookingConfirmedBySalon_skipsBothRemindersWhenAppointmentWithin2Hours() {
 		stubSavePassthrough();
 		Instant start = Instant.now().plus(90, ChronoUnit.MINUTES);
 		mockAppointmentWithConsumer(start);
 
-		service.onConsumerBookingCreated(UUID.randomUUID());
+		service.onBookingConfirmedBySalon(UUID.randomUUID());
 
 		assertThat(savedTypes()).doesNotContain(NotificationType.REMINDER_24H, NotificationType.REMINDER_1H);
 		assertThat(savedTypes()).contains(NotificationType.BOOKING_CONFIRMATION);
 	}
 
 	@Test
-	void onConsumerBookingCreated_only2hReminderWhenBetween2And24HoursFromNow() {
+	void onBookingConfirmedBySalon_only2hReminderWhenBetween2And24HoursFromNow() {
 		stubSavePassthrough();
 		Instant start = Instant.now().plus(5, ChronoUnit.HOURS);
 		mockAppointmentWithConsumer(start);
 
-		service.onConsumerBookingCreated(UUID.randomUUID());
+		service.onBookingConfirmedBySalon(UUID.randomUUID());
 
 		List<NotificationType> types = savedTypes();
 		assertThat(types).doesNotContain(NotificationType.REMINDER_24H);
@@ -154,14 +174,17 @@ class AppointmentNotificationServiceTest {
 
 		service.onConsumerBookingRescheduled(appointment.getId());
 
-		verify(scheduledNotificationRepository, org.mockito.Mockito.atLeast(2))
-				.cancelAllPendingForAppointment(
-						eq(appointment.getId()),
-						eq(QueuedNotificationStatus.PENDING),
-						eq(QueuedNotificationStatus.CANCELLED));
+		verify(scheduledNotificationRepository).cancelAllPendingForAppointment(
+				eq(appointment.getId()),
+				eq(QueuedNotificationStatus.PENDING),
+				eq(QueuedNotificationStatus.CANCELLED));
 		assertThat(savedTypes()).contains(NotificationType.BOOKING_UPDATED);
 		assertThat(savedTypes()).contains(NotificationType.REMINDER_24H, NotificationType.REMINDER_1H);
 		assertThat(savedTypes()).doesNotContain(NotificationType.BOOKING_CREATED_FOR_SALON);
+		ScheduledNotification updated = findSaved(NotificationType.BOOKING_UPDATED);
+		assertThat(updated.getStatus()).isEqualTo(QueuedNotificationStatus.SENT);
+		verify(fcmPushDispatchService).dispatchForScheduledNotification(
+				org.mockito.Mockito.eq(updated), org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString());
 	}
 
 	@Test
@@ -176,6 +199,10 @@ class AppointmentNotificationServiceTest {
 				eq(QueuedNotificationStatus.PENDING),
 				eq(QueuedNotificationStatus.CANCELLED));
 		assertThat(savedTypes()).containsExactly(NotificationType.BOOKING_CANCELLED_BY_CONSUMER);
+		ScheduledNotification cancelled = findSaved(NotificationType.BOOKING_CANCELLED_BY_CONSUMER);
+		assertThat(cancelled.getStatus()).isEqualTo(QueuedNotificationStatus.SENT);
+		verify(fcmPushDispatchService).dispatchForScheduledNotification(
+				org.mockito.Mockito.eq(cancelled), org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString());
 	}
 
 	@Test
@@ -225,6 +252,9 @@ class AppointmentNotificationServiceTest {
 		UUID id = UUID.randomUUID();
 		when(appointment.getId()).thenReturn(id);
 		when(appointment.getConsumerProfile()).thenReturn(org.mockito.Mockito.mock(ConsumerProfile.class));
+		it.velvet.studio.domain.Location location = org.mockito.Mockito.mock(it.velvet.studio.domain.Location.class);
+		lenient().when(location.getName()).thenReturn("Sede Test");
+		lenient().when(appointment.getLocation()).thenReturn(location);
 		when(appointmentRepository.findByIdWithGraph(any())).thenReturn(Optional.of(appointment));
 		return appointment;
 	}

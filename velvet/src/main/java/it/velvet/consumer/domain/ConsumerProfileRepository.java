@@ -22,6 +22,10 @@ public interface ConsumerProfileRepository extends JpaRepository<ConsumerProfile
 
 	Optional<ConsumerProfile> findByPasswordResetTokenHashAndPasswordResetExpiresAtAfter(String passwordResetTokenHash, Instant now);
 
+	Optional<ConsumerProfile> findByEmailVerificationTokenHashAndEmailVerificationExpiresAtAfter(
+			String emailVerificationTokenHash,
+			Instant now);
+
 	long countByDeletedAtIsNull();
 
 	@Query("""

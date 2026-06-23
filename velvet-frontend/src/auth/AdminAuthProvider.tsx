@@ -7,29 +7,22 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { apiJson } from "../api/client";
 import { isVelvetAccessTokenExpired } from "../lib/velvetAccessTokenExpiry";
+import { notifyVelvetSessionEnded } from "../lib/velvetLoginFormReset";
 import { velvetJwtHintsFromAccessToken } from "../lib/velvetJwtHintsFromAccessToken";
 import {
   clearAdminAccessToken,
-  readAdminAccessToken,
+  resolveValidAdminAccessToken,
+  VELVET_ACCESS_TOKEN_KEY,
   VELVET_ADMIN_SESSION_CHANGED_EVENT,
   VELVET_SUPER_ADMIN_TOKEN_KEY,
-  writeAdminAccessToken,
 } from "./adminSession";
 import { useVelvetSessionExpiryWatchdog } from "./useVelvetSessionExpiryWatchdog";
-
-type AdminAuthLoginResponse = {
-  accessToken: string;
-  tokenType: string;
-  expiresInSeconds: number;
-};
 
 export type AdminAuthContextValue = {
   accessToken: string | undefined;
   isAdminSession: boolean;
   isLoading: boolean;
-  signInWithUsernamePassword: (username: string, password: string) => Promise<void>;
   signOut: () => void;
 };
 
@@ -46,33 +39,32 @@ export function useAdminAuth(): AdminAuthContextValue {
   return v;
 }
 
-function readValidAdminAccessToken(): string | undefined {
-  const raw = readAdminAccessToken();
-  if (!raw) return undefined;
-  if (isVelvetAccessTokenExpired(raw)) {
-    clearAdminAccessToken();
-    return undefined;
-  }
-  return raw;
-}
-
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
-  const [accessToken, setAccessToken] = useState<string | undefined>(() => readValidAdminAccessToken());
-  const [isLoading, setIsLoading] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | undefined>(() => resolveValidAdminAccessToken());
 
   const signOut = useCallback(() => {
+    const hadSession =
+      Boolean(accessToken) ||
+      (typeof sessionStorage !== "undefined" &&
+        (sessionStorage.getItem(VELVET_SUPER_ADMIN_TOKEN_KEY) || sessionStorage.getItem(VELVET_ACCESS_TOKEN_KEY)));
     clearAdminAccessToken();
     setAccessToken(undefined);
-  }, []);
+    if (hadSession) {
+      notifyVelvetSessionEnded();
+    }
+  }, [accessToken]);
 
   useVelvetSessionExpiryWatchdog(accessToken, signOut);
 
   useEffect(() => {
-    const syncFromStorage = () => setAccessToken(readValidAdminAccessToken());
+    const syncFromStorage = () => setAccessToken(resolveValidAdminAccessToken());
     syncFromStorage();
     const onStorage = (e: StorageEvent) => {
-      if (e.storageArea === sessionStorage && e.key === VELVET_SUPER_ADMIN_TOKEN_KEY) {
-        setAccessToken(e.newValue ?? undefined);
+      if (
+        e.storageArea === sessionStorage &&
+        (e.key === VELVET_SUPER_ADMIN_TOKEN_KEY || e.key === VELVET_ACCESS_TOKEN_KEY)
+      ) {
+        syncFromStorage();
       }
     };
     window.addEventListener("storage", onStorage);
@@ -81,24 +73,6 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener(VELVET_ADMIN_SESSION_CHANGED_EVENT, syncFromStorage);
     };
-  }, []);
-
-  const signInWithUsernamePassword = useCallback(async (username: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const body = await apiJson<AdminAuthLoginResponse>("/api/v1/admin/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ username: username.trim(), password }),
-      });
-      const roles = velvetJwtHintsFromAccessToken(body.accessToken).realmRoles;
-      if (!roles.includes("ADMIN")) {
-        throw new Error("Risposta login non valida: ruolo admin assente.");
-      }
-      writeAdminAccessToken(body.accessToken);
-      setAccessToken(body.accessToken);
-    } finally {
-      setIsLoading(false);
-    }
   }, []);
 
   const value = useMemo<AdminAuthContextValue>(() => {
@@ -110,11 +84,10 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     return {
       accessToken,
       isAdminSession,
-      isLoading,
-      signInWithUsernamePassword,
+      isLoading: false,
       signOut,
     };
-  }, [accessToken, isLoading, signInWithUsernamePassword, signOut]);
+  }, [accessToken, signOut]);
 
   return <AdminAuthContext.Provider value={value}>{children}</AdminAuthContext.Provider>;
 }

@@ -5,6 +5,7 @@ import { apiFetch, apiJson } from "../../api/client";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
 import { DEFAULT_IT_PHONE_PREFIX, optionalPhoneForRegisterApi } from "../../lib/itPhoneDefaults";
 import { velvetPostConsumerSessionPath } from "../../lib/velvetPostConsumerSessionPath";
+import { useAdminConfirmAction } from "./useAdminConfirmAction";
 
 const CLIENTS_PAGE_SIZE = 10;
 
@@ -60,9 +61,14 @@ type Props = {
   headingId: string;
 };
 
+function consumerRowLabel(row: SuperAdminConsumerRow): string {
+  return row.email?.trim() || row.displayName?.trim() || "cliente";
+}
+
 export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }: Props) {
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { confirm, showSuccess, confirmDialog, actionBanner } = useAdminConfirmAction();
   const { signInWithIssuedToken } = useVelvetAuth();
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState("");
@@ -178,6 +184,8 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
 
   return (
     <>
+      {confirmDialog}
+      {actionBanner}
       <section className="velvet-admin-panel velvet-admin-premium-card" aria-labelledby={headingId}>
         <h2 id={headingId} className="velvet-admin-section-title">
           Clienti Saloni Luxury
@@ -303,7 +311,16 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
                           className="velvet-admin-btn velvet-admin-btn--danger velvet-admin-premium-card__action-btn"
                           disabled={Boolean(row.deletedAt) || deleteM.isPending}
                           onClick={() => {
-                            if (window.confirm("Soft-delete di questo profilo?")) deleteM.mutate(row.id);
+                            const label = consumerRowLabel(row);
+                            confirm({
+                              title: "Elimina cliente",
+                              message: `Sei sicuro di voler eliminare il cliente «${label}»? Il profilo verrà disattivato (soft-delete) e non sarà più utilizzabile per l'accesso.`,
+                              confirmLabel: "Sì, elimina cliente",
+                              onConfirm: async () => {
+                                await deleteM.mutateAsync(row.id);
+                                showSuccess(`Cliente «${label}» eliminato con successo.`);
+                              },
+                            });
                           }}
                         >
                           Elimina

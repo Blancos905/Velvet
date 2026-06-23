@@ -95,6 +95,13 @@ class MeSalonControllerTest {
 		return consumerProfileRepository.save(p);
 	}
 
+	private ConsumerProfile saveClient(String sub, String email, String displayName) {
+		ConsumerProfile p = new ConsumerProfile(sub, email, displayName);
+		p.setPasswordHash(passwordEncoder.encode("x"));
+		p.setSecurityRoles("CLIENT");
+		return consumerProfileRepository.save(p);
+	}
+
 	private String bearer(ConsumerProfile p) {
 		return "Bearer " + velvetTokenService.createAccessToken(p);
 	}
@@ -289,6 +296,64 @@ class MeSalonControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.types[0].type").value("BOOKING_CONFIRMATION"))
 				.andExpect(jsonPath("$.types[0].sent").value(2));
+	}
+
+	/** Prenotazione consumatore con operatore esplicito: inbox + messaggio per l'operatore collegato, non per altri operatori. */
+	@Test
+	void consumerBooking_withExplicitOperator_staffLinkedReceivesSalonNotification() throws Exception {
+		String suffix = UUID.randomUUID().toString().substring(0, 8);
+		String ownerEmail = "owner-consumer-book-" + suffix + "@test.com";
+		String slug = "slug-consumer-book-" + suffix;
+		StudioGroup group = studioGroupRepository.save(new StudioGroup("Salone Consumer Book", ownerEmail, "PREMIUM"));
+		Location location = locationRepository.save(new Location(group, slug, "Sede", "MI"));
+		SalonService service = salonServiceRepository.save(new SalonService(location, "Taglio", 30, 3000));
+		StaffOperator operatorA = staffOperatorRepository.save(new StaffOperator(location, "Op A"));
+		StaffOperator operatorB = staffOperatorRepository.save(new StaffOperator(location, "Op B"));
+		ConsumerProfile staff = saveStaff("sub-staff-cbook-" + suffix, "staff-cbook-" + suffix + "@test.com");
+		operatorA.setConsumerProfile(staff);
+		staffOperatorRepository.save(operatorA);
+
+		ConsumerProfile client = saveClient("sub-client-cbook-" + suffix, "client-cbook-" + suffix + "@test.com", "Luca");
+		ZoneId zone = ZoneId.of("Europe/Rome");
+		LocalDate bookDay = LocalDate.now(zone).plusDays(6);
+		Instant startsAt = bookDay.atTime(10, 0).atZone(zone).toInstant();
+
+		mockMvc.perform(post("/api/v1/me/appointments")
+						.header("Authorization", bearer(client))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{
+								  "organizationSlug": "%s",
+								  "serviceId": "%s",
+								  "operatorId": "%s",
+								  "start": "%s"
+								}
+								"""
+								.formatted(slug, service.getId(), operatorA.getId(), startsAt)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.status").value("BOOKED"));
+
+		mockMvc.perform(get("/api/v1/me/salon/notifications").header("Authorization", bearer(staff)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.types[0].type").value("BOOKING_CONFIRMATION"))
+				.andExpect(jsonPath("$.types[0].sent").value(1));
+
+		mockMvc.perform(get("/api/v1/me/salon/notifications/messages")
+						.param("bucket", "BOOKING_CONFIRMATION")
+						.header("Authorization", bearer(staff)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].notificationType").value("BOOKING_CREATED_FOR_SALON"))
+				.andExpect(jsonPath("$[0].clientName").value("Luca"))
+				.andExpect(jsonPath("$[0].previewLine", org.hamcrest.Matchers.containsString("in attesa di conferma")));
+
+		ConsumerProfile staffB = saveStaff("sub-staff-cbook-b-" + suffix, "staff-cbook-b-" + suffix + "@test.com");
+		operatorB.setConsumerProfile(staffB);
+		staffOperatorRepository.save(operatorB);
+
+		mockMvc.perform(get("/api/v1/me/salon/notifications").header("Authorization", bearer(staffB)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.types[0].type").value("BOOKING_CONFIRMATION"))
+				.andExpect(jsonPath("$.types[0].sent").value(0));
 	}
 
 	/** Titolare elimina una notifica: sparisce anche dall'inbox dell'operatore collegato. */

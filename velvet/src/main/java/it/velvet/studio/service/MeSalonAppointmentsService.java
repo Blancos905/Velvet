@@ -118,6 +118,18 @@ public class MeSalonAppointmentsService {
 	}
 
 	@Transactional
+	public AppointmentDto confirmForOwner(VelvetUserPrincipal principal, UUID appointmentId) {
+		Appointment a = requireOwnerAppointment(principal, appointmentId);
+		return AppointmentDto.from(appointmentBookingService.confirmBookingAsSalon(a));
+	}
+
+	@Transactional
+	public void rejectForOwner(VelvetUserPrincipal principal, UUID appointmentId) {
+		Appointment a = requireOwnerAppointment(principal, appointmentId);
+		appointmentBookingService.rejectBookingAsSalon(a);
+	}
+
+	@Transactional
 	public AppointmentDto createForOwner(
 			VelvetUserPrincipal principal,
 			UUID salonClientId,

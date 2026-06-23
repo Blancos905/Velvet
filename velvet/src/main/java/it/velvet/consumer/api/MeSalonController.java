@@ -222,6 +222,24 @@ public class MeSalonController {
 		return meSalonAppointmentsService.rescheduleForOwner(principal, id, body.newStart());
 	}
 
+	@PostMapping("/appointments/{id}/confirm")
+	@Operation(summary = "Accetta una richiesta prenotazione cliente (stato BOOKED → CONFIRMED)")
+	@PreAuthorize("hasAuthority('ROLE_OWNER')")
+	public AppointmentDto confirmAppointmentForOwner(
+			@AuthenticationPrincipal VelvetUserPrincipal principal,
+			@PathVariable UUID id) {
+		return meSalonAppointmentsService.confirmForOwner(principal, id);
+	}
+
+	@PostMapping("/appointments/{id}/reject")
+	@Operation(summary = "Rifiuta una richiesta prenotazione cliente (stato BOOKED → CANCELLED)")
+	@PreAuthorize("hasAuthority('ROLE_OWNER')")
+	public void rejectAppointmentForOwner(
+			@AuthenticationPrincipal VelvetUserPrincipal principal,
+			@PathVariable UUID id) {
+		meSalonAppointmentsService.rejectForOwner(principal, id);
+	}
+
 	@GetMapping("/staff")
 	@Operation(summary = "Elenco staff (prima sede)")
 	@PreAuthorize("hasAuthority('ROLE_OWNER')")

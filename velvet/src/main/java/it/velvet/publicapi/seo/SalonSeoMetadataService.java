@@ -1,5 +1,6 @@
 package it.velvet.publicapi.seo;
 
+import it.velvet.billing.service.SalonPremiumEntitlementService;
 import it.velvet.publicapi.dto.PublicDtos.OrganizationDetailDto;
 import it.velvet.review.domain.ReviewRepository;
 import it.velvet.studio.domain.Location;
@@ -21,16 +22,19 @@ public class SalonSeoMetadataService {
 	private final PublicOrganizationService publicOrganizationService;
 	private final ReviewRepository reviewRepository;
 	private final SalonSeoSiteContext siteContext;
+	private final SalonPremiumEntitlementService salonPremiumEntitlementService;
 
 	public SalonSeoMetadataService(
 			LocationRepository locationRepository,
 			PublicOrganizationService publicOrganizationService,
 			ReviewRepository reviewRepository,
-			SalonSeoSiteContext siteContext) {
+			SalonSeoSiteContext siteContext,
+			SalonPremiumEntitlementService salonPremiumEntitlementService) {
 		this.locationRepository = locationRepository;
 		this.publicOrganizationService = publicOrganizationService;
 		this.reviewRepository = reviewRepository;
 		this.siteContext = siteContext;
+		this.salonPremiumEntitlementService = salonPremiumEntitlementService;
 	}
 
 	@Transactional(readOnly = true)
@@ -39,7 +43,7 @@ public class SalonSeoMetadataService {
 		if (slug.isEmpty()) {
 			return Optional.empty();
 		}
-		Optional<Location> locationOpt = locationRepository.findBySlug(slug).filter(SalonSeoMetadataService::isPremiumLocation);
+		Optional<Location> locationOpt = locationRepository.findBySlug(slug).filter(this::isPremiumLocation);
 		if (locationOpt.isEmpty()) {
 			return Optional.empty();
 		}
@@ -78,11 +82,11 @@ public class SalonSeoMetadataService {
 		return rawSlug.trim().toLowerCase(Locale.ROOT);
 	}
 
-	private static boolean isPremiumLocation(Location location) {
+	private boolean isPremiumLocation(Location location) {
 		if (location == null || location.getStudioGroup() == null) {
 			return false;
 		}
-		return "PREMIUM".equals(StudioGroup.canonicalPlanTier(location.getStudioGroup().getPlanTier()));
+		return salonPremiumEntitlementService.hasActivePremium(location.getStudioGroup());
 	}
 
 	private record RatingSummary(Double average, Long count) {

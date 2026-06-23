@@ -1,5 +1,6 @@
 package it.velvet.studio.service;
 
+import it.velvet.billing.service.SalonPremiumEntitlementService;
 import it.velvet.catalog.domain.SalonService;
 import it.velvet.catalog.domain.SalonServiceRepository;
 import it.velvet.catalog.domain.StaffOperatorRepository;
@@ -19,6 +20,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +38,8 @@ class PublicOrganizationServiceGeoSearchTest {
 	private ReviewRepository reviewRepository;
 	@Mock
 	private SalonLocationGeocodingService salonLocationGeocodingService;
+	@Mock
+	private SalonPremiumEntitlementService salonPremiumEntitlementService;
 
 	private PublicOrganizationService service;
 
@@ -47,7 +51,13 @@ class PublicOrganizationServiceGeoSearchTest {
 				staffOperatorRepository,
 				consumerProfileRepository,
 				reviewRepository,
-				salonLocationGeocodingService);
+				salonLocationGeocodingService,
+				salonPremiumEntitlementService);
+		lenient().when(salonPremiumEntitlementService.hasActivePremium(org.mockito.ArgumentMatchers.any()))
+				.thenAnswer(inv -> {
+					StudioGroup group = inv.getArgument(0);
+					return group != null && "PREMIUM".equalsIgnoreCase(group.getPlanTier());
+				});
 	}
 
 	@Test

@@ -61,6 +61,13 @@ export function humanizePostRegistrationAuthError(err: unknown): string {
   const raw = errorMessage(err);
   const t = raw.toLowerCase();
   if (
+    t.includes("conferma l'indirizzo email") ||
+    t.includes("email_not_verified") ||
+    t.includes("non ancora verificato")
+  ) {
+    return raw;
+  }
+  if (
     t.includes("invalid_grant") ||
     t.includes("unauthorized_client") ||
     t.includes("invalid_client") ||

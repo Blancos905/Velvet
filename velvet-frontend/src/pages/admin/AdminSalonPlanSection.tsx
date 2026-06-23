@@ -9,6 +9,7 @@ import { partnerContactEmail } from "../../config/env";
 import { formatSalonCityForDisplay } from "../../lib/formatSalonCityForDisplay";
 import { DEFAULT_IT_PHONE_PREFIX, optionalPhoneForRegisterApi } from "../../lib/itPhoneDefaults";
 import { velvetPostConsumerSessionPath } from "../../lib/velvetPostConsumerSessionPath";
+import { useAdminConfirmAction } from "./useAdminConfirmAction";
 
 const SALON_PLAN_PAGE_SIZE = 10;
 
@@ -89,6 +90,7 @@ export function AdminSalonPlanSection({
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { signInWithIssuedToken } = useVelvetAuth();
+  const { confirm, showSuccess, confirmDialog, actionBanner } = useAdminConfirmAction();
 
   const [page, setPage] = useState(0);
   const [salonSearch, setSalonSearch] = useState("");
@@ -280,8 +282,48 @@ export function AdminSalonPlanSection({
     createSalonM.mutate();
   };
 
+  const askDeleteSalon = (row: SuperAdminRecentSalonRowDto) => {
+    confirm({
+      variant: "danger",
+      title: "Elimina salone",
+      subject: row.name,
+      subjectLabel: "Salone",
+      message:
+        "Stai per rimuovere definitivamente questo salone dalla piattaforma Velvet. Conferma solo se sei certo di voler procedere.",
+      warningNotes: [
+        "Sedi, staff, prenotazioni e dati operativi collegati verranno eliminati.",
+        "L'operazione non può essere annullata da questa schermata.",
+      ],
+      confirmLabel: "Sì, elimina salone",
+      onConfirm: async () => {
+        await deleteSalonM.mutateAsync(row.studioGroupId);
+        showSuccess(`Salone «${row.name}» eliminato con successo.`);
+      },
+    });
+  };
+
+  const askDeleteStaffOperator = (
+    row: SuperAdminRecentSalonRowDto,
+    op: NonNullable<SuperAdminRecentSalonRowDto["staff"]>[number],
+  ) => {
+    confirm({
+      title: "Elimina operatore",
+      message: `Sei sicuro di voler eliminare l'operatore «${op.displayName}» dal salone «${row.name}»? Se collegato a un account di accesso, verrà rimosso anche quello.`,
+      confirmLabel: "Sì, elimina operatore",
+      onConfirm: async () => {
+        await deleteStaffOperatorM.mutateAsync({
+          studioGroupId: row.studioGroupId,
+          operatorId: op.operatorId,
+        });
+        showSuccess(`Operatore «${op.displayName}» eliminato con successo.`);
+      },
+    });
+  };
+
   return (
     <>
+      {confirmDialog}
+      {actionBanner}
       <section className="velvet-admin-panel velvet-admin-premium-card" aria-labelledby={headingId}>
         <h2 id={headingId} className="velvet-admin-section-title">
           {title}
@@ -496,18 +538,25 @@ export function AdminSalonPlanSection({
                                     type="button"
                                     className="velvet-admin-btn velvet-admin-btn--danger velvet-admin-premium-card__action-btn velvet-admin-premium-card__salon-row-login"
                                     disabled={deleteSalonM.isPending || salonOwnerLoginM.isPending}
-                                    onClick={() => {
-                                      if (window.confirm(`Eliminare il salone ${row.name}?`)) {
-                                        deleteSalonM.mutate(row.studioGroupId);
-                                      }
-                                    }}
+                                    onClick={() => askDeleteSalon(row)}
                                   >
                                     {deleteSalonM.isPending && deleteSalonM.variables === row.studioGroupId
                                       ? "Eliminazione…"
                                       : "Elimina"}
                                   </button>
                                 </>
-                              ) : null}
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="velvet-admin-btn velvet-admin-btn--danger velvet-admin-premium-card__action-btn velvet-admin-premium-card__salon-row-login"
+                                  disabled={deleteSalonM.isPending || salonOwnerLoginM.isPending}
+                                  onClick={() => askDeleteSalon(row)}
+                                >
+                                  {deleteSalonM.isPending && deleteSalonM.variables === row.studioGroupId
+                                    ? "Eliminazione…"
+                                    : "Elimina"}
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -575,11 +624,7 @@ export function AdminSalonPlanSection({
                                     type="button"
                                     className="velvet-admin-btn velvet-admin-btn--danger velvet-admin-premium-card__action-btn"
                                     disabled={deleteSalonM.isPending || salonOwnerLoginM.isPending}
-                                    onClick={() => {
-                                      if (window.confirm(`Eliminare il salone ${row.name}?`)) {
-                                        deleteSalonM.mutate(row.studioGroupId);
-                                      }
-                                    }}
+                                    onClick={() => askDeleteSalon(row)}
                                   >
                                     Cancella
                                   </button>
@@ -640,19 +685,7 @@ export function AdminSalonPlanSection({
                                               deleteSalonM.isPending ||
                                               salonOwnerLoginM.isPending
                                             }
-                                            onClick={() => {
-                                              if (
-                                                !window.confirm(
-                                                  `Eliminare l’operatore «${op.displayName}» da questo salone? L’account di accesso collegato verrà rimosso se presente.`,
-                                                )
-                                              ) {
-                                                return;
-                                              }
-                                              deleteStaffOperatorM.mutate({
-                                                studioGroupId: row.studioGroupId,
-                                                operatorId: op.operatorId,
-                                              });
-                                            }}
+                                            onClick={() => askDeleteStaffOperator(row, op)}
                                           >
                                             {deleteStaffOperatorM.isPending &&
                                             deleteStaffOperatorM.variables?.operatorId === op.operatorId

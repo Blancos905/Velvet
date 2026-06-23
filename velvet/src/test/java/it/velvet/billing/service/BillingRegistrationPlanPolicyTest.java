@@ -10,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BillingRegistrationPlanPolicyTest {
 
 	@Test
-	void premiumRegistrationStaysBaseWhenBillingConfigured() {
+	void premiumRegistrationStaysPremiumWhenBillingConfigured() {
 		var props = new VelvetStripeProperties(true, "sk_test_x", "whsec_x", "price_x", null, null, null);
 		var policy = new BillingRegistrationPlanPolicy(props);
-		assertEquals("BASE", policy.effectiveProvisionPlanTier("PREMIUM"));
+		assertEquals("PREMIUM", policy.effectiveProvisionPlanTier("PREMIUM"));
 		assertTrue(policy.billingCheckoutRequiredForPremiumRegistration("PREMIUM"));
 	}
 

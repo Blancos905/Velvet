@@ -5,6 +5,7 @@ import { apiFetch, apiJson } from "../../api/client";
 import { useAdminAuth } from "../../auth/AdminAuthProvider";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
 import { velvetPostConsumerSessionPath } from "../../lib/velvetPostConsumerSessionPath";
+import { useAdminConfirmAction } from "./useAdminConfirmAction";
 
 type ConsumerSessionResponse = {
   accessToken: string;
@@ -49,6 +50,7 @@ export default function AdminConsumersPage() {
   const navigate = useNavigate();
   const { signInWithIssuedToken } = useVelvetAuth();
   const qc = useQueryClient();
+  const { confirm, showSuccess, confirmDialog, actionBanner } = useAdminConfirmAction();
   const [page, setPage] = useState(0);
 
   const listQ = useQuery({
@@ -88,6 +90,8 @@ export default function AdminConsumersPage() {
 
   return (
     <div className="velvet-admin-panel">
+      {confirmDialog}
+      {actionBanner}
       <h1 className="velvet-admin-page-title">Profili consumatore</h1>
       <p className="velvet-admin-muted">
         Elenco da database: soft-delete se necessario. Il piano è solo informativo qui: non si applica upgrade a Premium
@@ -144,7 +148,16 @@ export default function AdminConsumersPage() {
                       className="velvet-admin-btn velvet-admin-btn--danger"
                       disabled={Boolean(row.deletedAt) || deleteM.isPending || consumerLoginM.isPending}
                       onClick={() => {
-                        if (window.confirm("Soft-delete di questo profilo?")) deleteM.mutate(row.id);
+                        const label = row.email?.trim() || row.displayName?.trim() || "profilo";
+                        confirm({
+                          title: "Elimina profilo",
+                          message: `Sei sicuro di voler eliminare il profilo «${label}»? Il profilo verrà disattivato (soft-delete).`,
+                          confirmLabel: "Sì, elimina profilo",
+                          onConfirm: async () => {
+                            await deleteM.mutateAsync(row.id);
+                            showSuccess(`Profilo «${label}» eliminato con successo.`);
+                          },
+                        });
                       }}
                     >
                       Elimina

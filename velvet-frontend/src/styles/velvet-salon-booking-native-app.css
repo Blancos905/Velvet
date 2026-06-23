@@ -609,6 +609,7 @@
 @media (prefers-reduced-motion: reduce) {
   .velvet-booking-slots-modal__backdrop,
   .velvet-booking-slots-modal__dialog,
+  .velvet-booking-confirm-modal__dialog,
   .velvet-booking-slots-modal__grid li,
   .velvet-booking-slots-modal__slot {
     animation: none;
@@ -698,6 +699,43 @@
 /* Conferma prenotazione slot (sostituisce window.confirm in WebView nativa) */
 .velvet-booking-confirm-modal__backdrop {
   z-index: 250;
+  align-items: center;
+  padding:
+    max(1rem, env(safe-area-inset-top))
+    max(1rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-left));
+}
+
+.velvet-booking-confirm-modal__dialog {
+  width: min(100%, 22.5rem);
+  max-width: 22.5rem;
+  height: auto;
+  max-height: min(85dvh, calc(100% - 2rem));
+  padding: 1rem 1.1rem 1.15rem;
+  border-radius: 22px;
+  box-shadow:
+    0 18px 56px rgba(0, 0, 0, 0.62),
+    0 4px 28px rgba(154, 52, 18, 0.35),
+    0 0 0 1px #000000,
+    inset 0 1px 0 rgba(255, 247, 237, 0.22);
+  animation: velvet-booking-confirm-modal-dialog-in 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.velvet-booking-confirm-modal__dialog .velvet-booking-slots-modal__handle {
+  display: none;
+}
+
+@keyframes velvet-booking-confirm-modal-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .velvet-booking-confirm-modal__title {
@@ -767,6 +805,12 @@
   line-height: 1.45;
   text-align: center;
   color: rgba(253, 186, 116, 0.92);
+}
+
+.velvet-booking-confirm-modal__hint--service {
+  margin-bottom: 0.35rem;
+  font-weight: 700;
+  color: rgba(253, 230, 200, 0.96);
 }
 
 .velvet-booking-confirm-modal__actions {

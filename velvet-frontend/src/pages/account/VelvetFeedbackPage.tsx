@@ -9,7 +9,12 @@ import { useMePendingReviewInvitesQuery } from "../../hooks/useMePendingReviewIn
 import { useMeReviewHistoryQuery } from "../../hooks/useMeReviewHistory";
 import { useMeSalonReviewsQuery } from "../../hooks/useMeSalonReviews";
 import { isVelvetUnauthorizedError } from "../../lib/authErrors";
-import { markClientReviewPendingSeen } from "../../lib/clientReviewNotifications";
+import {
+  CLIENT_REVIEW_PENDING_CHANGED_EVENT,
+  dismissClientReviewPending,
+  markClientReviewPendingSeen,
+  readDismissedClientReviewPendingIds,
+} from "../../lib/clientReviewNotifications";
 import { velvetJwtHintsFromAccessToken } from "../../lib/velvetJwtHintsFromAccessToken";
 import "../../styles/velvet-consumer-bookings-page.css";
 import "../../styles/velvet-feedback-page.css";
@@ -30,9 +35,19 @@ export default function VelvetFeedbackPage() {
   const [comment, setComment] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccessInviteId, setSubmitSuccessInviteId] = useState<string | null>(null);
+  const [dismissedInviteTick, setDismissedInviteTick] = useState(0);
+
+  useEffect(() => {
+    const onPendingChanged = () => setDismissedInviteTick((n) => n + 1);
+    window.addEventListener(CLIENT_REVIEW_PENDING_CHANGED_EVENT, onPendingChanged);
+    return () => window.removeEventListener(CLIENT_REVIEW_PENDING_CHANGED_EVENT, onPendingChanged);
+  }, []);
 
   /** L’API restituisce solo appuntamenti già nella finestra «fine visita + offset» (default 2 h). */
-  const eligiblePendingInvites = pendingInvites.data ?? [];
+  const eligiblePendingInvites = useMemo(() => {
+    const dismissed = readDismissedClientReviewPendingIds();
+    return (pendingInvites.data ?? []).filter((invite) => !dismissed.has(invite.appointmentId));
+  }, [pendingInvites.data, dismissedInviteTick]);
 
   const submitReviewM = useMutation({
     mutationFn: ({
@@ -96,9 +111,11 @@ export default function VelvetFeedbackPage() {
           <span className="velvet-consumer-bookings-dash__headline-pre">Le mie </span>
           <span className="velvet-consumer-bookings-dash__headline-accent">recensioni</span>
         </h1>
-        <p className="velvet-page-subtitle" style={{ margin: 0 }}>
-          {sub}
-        </p>
+        {sub.trim() ? (
+          <p className="velvet-page-subtitle" style={{ margin: 0 }}>
+            {sub}
+          </p>
+        ) : null}
       </div>
     </header>
   );
@@ -108,7 +125,7 @@ export default function VelvetFeedbackPage() {
       <div className="velvet-feedback-page velvet-feedback-page--denied">
         {feedbackHero("Accesso riservato agli account cliente, titolare o operatore salone.")}
         <p className="velvet-text-muted">Questa pagina non è disponibile per il tuo profilo attuale.</p>
-        <Link to="/account/home" className="velvet-btn velvet-btn--primary">
+        <Link to="/account" className="velvet-btn velvet-btn--primary">
           Torna all&apos;account
         </Link>
       </div>
@@ -190,9 +207,7 @@ export default function VelvetFeedbackPage() {
 
   return (
     <div className="velvet-feedback-page velvet-feedback-page--client">
-      {feedbackHero(
-        "Dopo la visita, valuta salone e operatore con cui hai prenotato: le richieste compaiono qui quando è passato il tempo configurato dal backend (di default 2 ore dalla fine dell’appuntamento).",
-      )}
+      {feedbackHero("")}
 
       {pendingInvites.isPending ? (
         <div className="velvet-surface-card velvet-feedback-page__panel">
@@ -328,6 +343,22 @@ export default function VelvetFeedbackPage() {
                             }}
                           >
                             Valuta ora
+                          </button>
+                          <button
+                            type="button"
+                            className="velvet-btn velvet-btn--secondary velvet-feedback-invite-card__cancel"
+                            onClick={() => {
+                              dismissClientReviewPending([invite.appointmentId]);
+                              if (activeInviteId === invite.appointmentId) {
+                                setActiveInviteId(null);
+                                setSubmitError(null);
+                                setComment("");
+                                setRating(5);
+                                setStaffRating(5);
+                              }
+                            }}
+                          >
+                            Non valutare
                           </button>
                         </div>
                       )}

@@ -8,7 +8,7 @@ import "../../../styles/velvet-salon-staff-agenda-page.css";
 
 export default function SalonStaffAgendaPage() {
   const { staffId } = useParams<{ staffId: string }>();
-  const { isSalonTitolare } = useVelvetAuth();
+  const { isSalonTitolare, isSalonStaff } = useVelvetAuth();
   const { mergedStaffMembers, staffQuery } = useSalonStaffList();
 
   const member = useMemo(() => {
@@ -17,7 +17,7 @@ export default function SalonStaffAgendaPage() {
   }, [mergedStaffMembers, staffId]);
 
   if (!isSalonTitolare) {
-    return <Navigate to="/account/home" replace />;
+    return <Navigate to={isSalonStaff ? "/account/staff" : "/account/salone"} replace />;
   }
 
   if (!staffId) {

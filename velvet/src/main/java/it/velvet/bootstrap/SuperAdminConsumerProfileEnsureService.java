@@ -66,6 +66,7 @@ public class SuperAdminConsumerProfileEnsureService {
 			existing.setKeycloakSub(SuperAdminConsumerBootstrap.SUPER_ADMIN_KEYCLOAK_SUB);
 			existing.setPasswordHash(cred.getPasswordHash());
 			existing.setSecurityRoles("ADMIN,CLIENT");
+			SuperAdminConsumerBootstrap.markEmailVerified(existing);
 			SuperAdminConsumerBootstrap.applyOptionalDisplayAndPhone(existing, superAdminProperties);
 			if (existing.getDeletedAt() != null) {
 				existing.setDeletedAt(null);
@@ -77,6 +78,7 @@ public class SuperAdminConsumerProfileEnsureService {
 		ConsumerProfile p = new ConsumerProfile(SuperAdminConsumerBootstrap.SUPER_ADMIN_KEYCLOAK_SUB, email, "Super admin");
 		p.setPasswordHash(cred.getPasswordHash());
 		p.setSecurityRoles("ADMIN,CLIENT");
+		SuperAdminConsumerBootstrap.markEmailVerified(p);
 		SuperAdminConsumerBootstrap.applyOptionalDisplayAndPhone(p, superAdminProperties);
 		consumerProfileRepository.save(p);
 		log.info("Super admin ensure: creato consumer_profiles per assistenza (email {}).", email);

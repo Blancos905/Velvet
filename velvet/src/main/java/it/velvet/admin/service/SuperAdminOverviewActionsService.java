@@ -12,6 +12,8 @@ import it.velvet.catalog.domain.StaffOperatorRepository;
 import it.velvet.common.api.BusinessException;
 import it.velvet.consumer.domain.ConsumerProfile;
 import it.velvet.consumer.domain.ConsumerProfileRepository;
+import it.velvet.consumer.domain.PendingRegistrationRepository;
+import it.velvet.consumer.service.ConsumerAccountService;
 import it.velvet.consumer.service.SalonOwnerRoleAlignmentService;
 import it.velvet.consumer.service.VelvetAccountRegistrationService;
 import it.velvet.config.VelvetSecurityProperties;
@@ -69,6 +71,8 @@ public class SuperAdminOverviewActionsService {
 	private final StaffOperatorRepository staffOperatorRepository;
 	private final AppointmentRepository appointmentRepository;
 	private final SuperAdminProfileAccessNotificationService profileAccessNotificationService;
+	private final PendingRegistrationRepository pendingRegistrationRepository;
+	private final ConsumerAccountService consumerAccountService;
 
 	public SuperAdminOverviewActionsService(
 			StudioGroupRepository studioGroupRepository,
@@ -86,7 +90,9 @@ public class SuperAdminOverviewActionsService {
 			PlatformReviewRepository platformReviewRepository,
 			StaffOperatorRepository staffOperatorRepository,
 			AppointmentRepository appointmentRepository,
-			SuperAdminProfileAccessNotificationService profileAccessNotificationService) {
+			SuperAdminProfileAccessNotificationService profileAccessNotificationService,
+			PendingRegistrationRepository pendingRegistrationRepository,
+			ConsumerAccountService consumerAccountService) {
 		this.studioGroupRepository = studioGroupRepository;
 		this.locationRepository = locationRepository;
 		this.accountRegistrationService = accountRegistrationService;
@@ -103,6 +109,8 @@ public class SuperAdminOverviewActionsService {
 		this.staffOperatorRepository = staffOperatorRepository;
 		this.appointmentRepository = appointmentRepository;
 		this.profileAccessNotificationService = profileAccessNotificationService;
+		this.pendingRegistrationRepository = pendingRegistrationRepository;
+		this.consumerAccountService = consumerAccountService;
 	}
 
 	@Transactional(readOnly = true)
@@ -243,7 +251,7 @@ public class SuperAdminOverviewActionsService {
 		ConsumerRegistrationValidator.requireSalonLocationForFreePlan(tier, location);
 
 		String ownerEmail = body.email().trim().toLowerCase(Locale.ROOT);
-		String ownerSub = accountRegistrationService.registerSalonOwner(
+		String ownerSub = accountRegistrationService.registerSalonOwnerImmediate(
 				body.email(),
 				body.password(),
 				body.firstName(),
@@ -267,6 +275,8 @@ public class SuperAdminOverviewActionsService {
 	public void deleteSalon(UUID studioGroupId) {
 		StudioGroup group = studioGroupRepository.findById(studioGroupId)
 				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Salone non trovato."));
+		String ownerEmail = normalizeOwnerEmail(group.getOwnerEmail());
+		String ownerSub = trimToNull(group.getOwnerKeycloakSub());
 
 		jdbcTemplate.update(
 				"""
@@ -336,8 +346,72 @@ public class SuperAdminOverviewActionsService {
 				where location_id in (select id from locations where studio_group_id = ?)
 				""",
 				group.getId());
+		jdbcTemplate.update("delete from salon_billing_profiles where studio_group_id = ?", group.getId());
+		jdbcTemplate.update("delete from billing_accounts where studio_group_id = ?", group.getId());
 		jdbcTemplate.update("delete from locations where studio_group_id = ?", group.getId());
 		jdbcTemplate.update("delete from studio_groups where id = ?", group.getId());
+
+		if (ownerEmail != null) {
+			pendingRegistrationRepository.findByEmailIgnoreCase(ownerEmail).ifPresent(pendingRegistrationRepository::delete);
+		}
+		removeOwnerAccountAfterSalonDeletion(ownerEmail, ownerSub);
+	}
+
+	/**
+	 * Chiude l'account titolare collegato al salone eliminato, così la stessa email può registrarsi di nuovo.
+	 * Non tocca profili super admin né titolari con un altro studio attivo sulla stessa email.
+	 */
+	private void removeOwnerAccountAfterSalonDeletion(String ownerEmail, String ownerSub) {
+		if (ownerSub != null) {
+			consumerProfileRepository.findByKeycloakSub(ownerSub).ifPresent(this::softDeleteSalonOwnerIfAllowed);
+			return;
+		}
+		if (ownerEmail == null) {
+			return;
+		}
+		consumerProfileRepository
+				.findFirstByEmailIgnoreCaseAndDeletedAtIsNullOrderByCreatedAtDesc(ownerEmail)
+				.ifPresent(this::softDeleteSalonOwnerIfAllowed);
+	}
+
+	private void softDeleteSalonOwnerIfAllowed(ConsumerProfile profile) {
+		if (profile.getDeletedAt() != null) {
+			return;
+		}
+		if (hasAdminRole(profile.getSecurityRoles())) {
+			return;
+		}
+		String email = profile.getEmail();
+		if (email != null && !email.isBlank()) {
+			String norm = email.trim().toLowerCase(Locale.ROOT);
+			if (studioGroupRepository.findByOwnerEmailIgnoreCase(norm).isPresent()) {
+				return;
+			}
+		}
+		String sub = profile.getKeycloakSub();
+		if (sub == null || sub.isBlank()) {
+			return;
+		}
+		consumerAccountService.deleteAccount(sub);
+	}
+
+	private static boolean hasAdminRole(String securityRolesCsv) {
+		if (securityRolesCsv == null || securityRolesCsv.isBlank()) {
+			return false;
+		}
+		for (String part : securityRolesCsv.split("[,;\\s]+")) {
+			if ("ADMIN".equalsIgnoreCase(part.trim())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static String normalizeOwnerEmail(String raw) {
+		if (raw == null || raw.isBlank()) {
+			return null;
+		}
+		return raw.trim().toLowerCase(Locale.ROOT);
 	}
 
 	/**

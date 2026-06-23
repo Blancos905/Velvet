@@ -371,7 +371,7 @@ export default function SalonStaffPage() {
   });
 
   if (!isSalonTitolare) {
-    return <Navigate to="/account/home" replace />;
+    return <Navigate to="/account/prenotazioni" replace />;
   }
 
   const onPickPhoto = async (file: File | null) => {

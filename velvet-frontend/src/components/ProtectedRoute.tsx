@@ -1,15 +1,35 @@
-import { useId, useEffect, useState, type ReactNode } from "react";
+import { useId, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
+import { VELVET_ACCESS_TOKEN_KEY } from "../auth/adminSession";
 import {
   clearPostLoginReturnPath,
   consumePostLoginReturnPath,
   normalizePostLoginReturnPath,
   setPostLoginReturnPath,
+  VELVET_POST_LOGIN_RETURN_KEY,
 } from "../lib/postLoginReturnPath";
+import {
+  isPremiumSalonRegistrationPending,
+  PREMIUM_SALON_POST_LOGIN_PATH,
+  readIntendedSalonPlanFromSession,
+} from "../lib/salonRegistrationPostLogin";
 import { humanizePostRegistrationAuthError } from "../utils/oidcErrors";
+import { velvetJwtHintsFromAccessToken } from "../lib/velvetJwtHintsFromAccessToken";
 import { hasPendingBooking } from "./PendingBookingResume";
 import { VelvetEntrySplashGate } from "./VelvetEntrySplashGate";
+import {
+  scheduleVelvetLoginFormDomClear,
+  VELVET_CLEAR_LOGIN_FORM_KEY,
+  VELVET_SESSION_ENDED_EVENT,
+} from "../lib/velvetLoginFormReset";
+
+function shouldSwitchAwayFromSuperAdminSession(): boolean {
+  if (typeof sessionStorage === "undefined") return false;
+  const pendingReturn = sessionStorage.getItem(VELVET_POST_LOGIN_RETURN_KEY);
+  if (pendingReturn === PREMIUM_SALON_POST_LOGIN_PATH) return true;
+  return isPremiumSalonRegistrationPending();
+}
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const formId = useId();
@@ -17,15 +37,83 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const passFieldId = `${formId}-pass`;
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, isLoading, signInWithPassword } = useVelvetAuth();
+  const { isAuthenticated, isLoading, isVelvetSuperAdmin, isSalonTitolare, signInWithPassword, signOutForAccountSwitch } =
+    useVelvetAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [loginFormKey, setLoginFormKey] = useState(0);
+  const switchingSessionRef = useRef(false);
+  const wasAuthenticatedRef = useRef(false);
+
+  const clearLoginFields = () => {
+    setEmail("");
+    setPassword("");
+    setShowPassword(false);
+    setError(null);
+    setLoginFormKey((k) => k + 1);
+  };
+
+  useEffect(() => {
+    const onSessionEnded = () => clearLoginFields();
+    window.addEventListener(VELVET_SESSION_ENDED_EVENT, onSessionEnded);
+    return () => window.removeEventListener(VELVET_SESSION_ENDED_EVENT, onSessionEnded);
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (wasAuthenticatedRef.current && !isAuthenticated) {
+      clearLoginFields();
+    }
+    wasAuthenticatedRef.current = isAuthenticated;
+  }, [isAuthenticated, isLoading]);
 
   useEffect(() => {
     if (isLoading || isAuthenticated) return;
+    let shouldClear = false;
+    try {
+      shouldClear = sessionStorage.getItem(VELVET_CLEAR_LOGIN_FORM_KEY) === "1";
+      if (shouldClear) sessionStorage.removeItem(VELVET_CLEAR_LOGIN_FORM_KEY);
+    } catch {
+      /* ignore */
+    }
+    if (!shouldClear) return;
+    clearLoginFields();
+    scheduleVelvetLoginFormDomClear(clearLoginFields);
+  }, [isAuthenticated, isLoading]);
+
+  useEffect(() => {
+    if (isLoading || !isAuthenticated || !isVelvetSuperAdmin) return;
+    if (!shouldSwitchAwayFromSuperAdminSession()) {
+      navigate("/admin/dashboard", { replace: true });
+      return;
+    }
+    if (switchingSessionRef.current) return;
+    switchingSessionRef.current = true;
+    void signOutForAccountSwitch().finally(() => {
+      switchingSessionRef.current = false;
+    });
+  }, [isAuthenticated, isLoading, isVelvetSuperAdmin, navigate, signOutForAccountSwitch]);
+
+  useEffect(() => {
+    if (isLoading || !isAuthenticated || isVelvetSuperAdmin || !isSalonTitolare) return;
+    const path = location.pathname.replace(/\/+$/, "") || "/";
+    if (path === PREMIUM_SALON_POST_LOGIN_PATH || path === "/account/billing/success") return;
+    const ret = sessionStorage.getItem(VELVET_POST_LOGIN_RETURN_KEY);
+    if (ret === PREMIUM_SALON_POST_LOGIN_PATH) {
+      navigate(PREMIUM_SALON_POST_LOGIN_PATH, { replace: true });
+    }
+  }, [isAuthenticated, isLoading, isSalonTitolare, isVelvetSuperAdmin, location.pathname, navigate]);
+
+  useEffect(() => {
+    if (isLoading || isAuthenticated) return;
+    const intendedPlan = readIntendedSalonPlanFromSession();
+    if (intendedPlan === "PREMIUM") {
+      setPostLoginReturnPath(PREMIUM_SALON_POST_LOGIN_PATH);
+      return;
+    }
     setPostLoginReturnPath(`${location.pathname}${location.search}`);
   }, [isAuthenticated, isLoading, location.pathname, location.search]);
 
@@ -76,6 +164,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
             </p>
           ) : null}
           <form
+            key={loginFormKey}
             className="velvet-auth-form"
             noValidate
             onSubmit={(e) => {
@@ -90,12 +179,34 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
               void (async () => {
                 try {
                   await signInWithPassword(u, password);
+                  clearLoginFields();
+                  const tok =
+                    typeof sessionStorage !== "undefined"
+                      ? sessionStorage.getItem(VELVET_ACCESS_TOKEN_KEY)
+                      : null;
+                  if (velvetJwtHintsFromAccessToken(tok ?? undefined).realmRoles.includes("ADMIN")) {
+                    const adminReturn = consumePostLoginReturnPath();
+                    navigate(
+                      adminReturn && adminReturn.startsWith("/admin") ? adminReturn : "/admin/dashboard",
+                      { replace: true },
+                    );
+                    return;
+                  }
                   if (hasPendingBooking()) {
                     clearPostLoginReturnPath();
                   } else {
                     const ret = consumePostLoginReturnPath();
                     if (ret && ret !== "/account") {
                       navigate(normalizePostLoginReturnPath(ret), { replace: true });
+                      return;
+                    }
+                    const intendedPlan = readIntendedSalonPlanFromSession();
+                    if (intendedPlan === "PREMIUM") {
+                      navigate(PREMIUM_SALON_POST_LOGIN_PATH, { replace: true });
+                      return;
+                    }
+                    if (ret === "/account") {
+                      navigate("/account", { replace: true });
                     }
                   }
                 } catch (err) {
@@ -189,6 +300,19 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
       </main>
       </VelvetEntrySplashGate>
     );
+  }
+
+  if (isAuthenticated && isVelvetSuperAdmin) {
+    if (shouldSwitchAwayFromSuperAdminSession()) {
+      return (
+        <main className="velvet-auth-page">
+          <div className="velvet-auth-card">
+            <p className="velvet-auth-loading">Accedi con l&apos;account del salone per continuare…</p>
+          </div>
+        </main>
+      );
+    }
+    return null;
   }
 
   return <>{children}</>;

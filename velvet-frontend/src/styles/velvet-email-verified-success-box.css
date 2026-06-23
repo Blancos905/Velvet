@@ -1,0 +1,349 @@
+@keyframes velvet-email-verified-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(74, 222, 128, 0.28),
+      0 8px 32px rgba(0, 0, 0, 0.45),
+      0 0 28px rgba(34, 197, 94, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(134, 239, 172, 0.45),
+      0 14px 44px rgba(0, 0, 0, 0.52),
+      0 0 48px rgba(34, 197, 94, 0.22);
+  }
+}
+
+@keyframes velvet-email-verified-icon-pop {
+  0% {
+    transform: scale(0.82);
+    opacity: 0.6;
+  }
+  55% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes velvet-email-verified-burst {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@keyframes velvet-email-verified-shimmer {
+  0% {
+    transform: translateX(-120%) rotate(12deg);
+    opacity: 0;
+  }
+  35% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translateX(140%) rotate(12deg);
+    opacity: 0;
+  }
+}
+
+@keyframes velvet-email-verified-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.velvet-email-verified-box {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 0.5rem 0 0.25rem;
+  padding: 1.75rem 1.5rem 1.55rem;
+  border-radius: 1.35rem;
+  border: 2px solid rgba(74, 222, 128, 0.42);
+  background:
+    radial-gradient(ellipse 90% 60% at 50% -20%, rgba(74, 222, 128, 0.18), transparent 58%),
+    radial-gradient(ellipse 70% 45% at 100% 100%, rgba(251, 146, 60, 0.1), transparent 50%),
+    linear-gradient(168deg, rgba(16, 24, 18, 0.96) 0%, rgba(0, 0, 0, 0.98) 52%, rgba(12, 18, 14, 0.96) 100%);
+  text-align: center;
+  animation: velvet-email-verified-pulse 5s ease-in-out infinite;
+}
+
+.velvet-email-verified-box--pending {
+  border-color: rgba(251, 146, 60, 0.45);
+  background:
+    radial-gradient(ellipse 85% 55% at 50% -15%, rgba(251, 146, 60, 0.16), transparent 58%),
+    linear-gradient(168deg, rgba(20, 20, 20, 0.95) 0%, rgba(0, 0, 0, 0.98) 55%, rgba(18, 18, 18, 0.96) 100%);
+  animation: velvet-email-confirm-pulse 4.5s ease-in-out infinite;
+}
+
+.velvet-email-verified-box__glow {
+  position: absolute;
+  inset: -35% -25%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 25% 25%, rgba(74, 222, 128, 0.14), transparent 42%),
+    radial-gradient(circle at 78% 72%, rgba(253, 186, 116, 0.1), transparent 46%);
+}
+
+.velvet-email-verified-box__burst {
+  position: absolute;
+  left: 50%;
+  top: 2.4rem;
+  width: 5.5rem;
+  height: 5.5rem;
+  margin-left: -2.75rem;
+  border-radius: 999px;
+  border: 2px solid rgba(134, 239, 172, 0.35);
+  pointer-events: none;
+  z-index: 0;
+  animation: velvet-email-verified-burst 1.8s ease-out infinite;
+}
+
+.velvet-email-verified-box > *:not(.velvet-email-verified-box__glow):not(.velvet-email-verified-box__burst) {
+  position: relative;
+  z-index: 1;
+}
+
+.velvet-email-verified-box::before {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 0;
+  height: 3px;
+  border-radius: 0 0 4px 4px;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(90deg, transparent, rgba(74, 222, 128, 0.35), #4ade80, #86efac, #4ade80, transparent);
+  box-shadow: 0 0 18px rgba(74, 222, 128, 0.4);
+}
+
+.velvet-email-verified-box::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 45%,
+    rgba(74, 222, 128, 0.07) 50%,
+    transparent 55%
+  );
+  animation: velvet-email-verified-shimmer 7.5s ease-in-out infinite;
+}
+
+.velvet-email-verified-box__icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  margin: 0 auto 1rem;
+  border-radius: 999px;
+  border: 2px solid rgba(134, 239, 172, 0.55);
+  background:
+    radial-gradient(circle at 35% 30%, rgba(134, 239, 172, 0.35), rgba(34, 197, 94, 0.12) 55%, rgba(0, 0, 0, 0.35) 100%);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.35),
+    0 0 32px rgba(74, 222, 128, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  animation: velvet-email-verified-icon-pop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.velvet-email-verified-box__icon {
+  width: 2.15rem;
+  height: 2.15rem;
+  color: #bbf7d0;
+  filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.45));
+}
+
+.velvet-email-verified-box__spinner {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 1rem;
+  border-radius: 999px;
+  border: 3px solid rgba(251, 146, 60, 0.2);
+  border-top-color: #fb923c;
+  animation: velvet-email-verified-spinner 0.85s linear infinite;
+}
+
+.velvet-email-verified-box__kicker {
+  margin: 0 0 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(134, 239, 172, 0.82);
+}
+
+.velvet-email-verified-box--pending .velvet-email-verified-box__kicker {
+  color: rgba(253, 186, 116, 0.82);
+}
+
+.velvet-email-verified-box__title {
+  margin: 0 0 0.55rem;
+  font-size: clamp(1.4rem, 3.6vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #86efac;
+  text-shadow: 0 0 28px rgba(74, 222, 128, 0.35);
+}
+
+.velvet-email-verified-box--pending .velvet-email-verified-box__title {
+  color: #fb923c;
+  text-shadow: 0 0 28px rgba(243, 112, 33, 0.35);
+}
+
+.velvet-email-verified-box__lead {
+  margin: 0 auto 1.1rem;
+  max-width: 24rem;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: rgba(220, 252, 231, 0.88);
+}
+
+.velvet-email-verified-box--pending .velvet-email-verified-box__lead {
+  color: rgba(253, 186, 116, 0.88);
+}
+
+.velvet-email-verified-box__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 auto 1.25rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  background: rgba(20, 83, 45, 0.35);
+  color: #bbf7d0;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.velvet-email-verified-box__badge-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: #4ade80;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.75);
+}
+
+.velvet-email-verified-box__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.velvet-email-verified-box__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0.68rem 1.2rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition:
+    transform 0.32s cubic-bezier(0.34, 1.46, 0.64, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease,
+    color 0.25s ease,
+    background 0.3s ease;
+}
+
+.velvet-email-verified-box__cta--primary {
+  border: 2px solid rgba(134, 239, 172, 0.5);
+  color: #052e16;
+  background: linear-gradient(180deg, #bbf7d0 0%, #4ade80 48%, #22c55e 100%);
+  box-shadow:
+    0 4px 0 rgba(20, 83, 45, 0.45),
+    0 10px 28px rgba(34, 197, 94, 0.28);
+}
+
+.velvet-email-verified-box__cta--primary:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow:
+    0 5px 0 rgba(20, 83, 45, 0.42),
+    0 14px 36px rgba(34, 197, 94, 0.38);
+}
+
+.velvet-email-verified-box__cta--secondary {
+  border: 2px solid rgba(251, 146, 60, 0.32);
+  color: #fb923c;
+  background: rgba(0, 0, 0, 0.32);
+  box-shadow: inset 0 1px 0 rgba(251, 146, 60, 0.1);
+}
+
+.velvet-email-verified-box__cta--secondary:hover {
+  transform: translateY(-2px);
+  border-color: rgba(253, 186, 116, 0.55);
+  color: #fdba74;
+  background: rgba(251, 146, 60, 0.08);
+}
+
+.velvet-email-verified-box__cta:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.velvet-email-verified-box__cta:focus-visible {
+  outline: 2px solid #4ade80;
+  outline-offset: 3px;
+}
+
+@media (min-width: 480px) {
+  .velvet-email-verified-box__actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .velvet-email-verified-box__cta {
+    flex: 1 1 0;
+    max-width: 12.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .velvet-email-verified-box,
+  .velvet-email-verified-box--pending,
+  .velvet-email-verified-box::after,
+  .velvet-email-verified-box__burst,
+  .velvet-email-verified-box__icon-wrap,
+  .velvet-email-verified-box__spinner {
+    animation: none !important;
+  }
+
+  .velvet-email-verified-box__cta:hover {
+    transform: none;
+  }
+}
+
+/* reuse pending pulse from confirm box */
+@keyframes velvet-email-confirm-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(251, 146, 60, 0.35),
+      0 8px 32px rgba(0, 0, 0, 0.45),
+      0 0 24px rgba(243, 112, 33, 0.12);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(253, 186, 116, 0.55),
+      0 12px 40px rgba(0, 0, 0, 0.5),
+      0 0 40px rgba(243, 112, 33, 0.22);
+  }
+}

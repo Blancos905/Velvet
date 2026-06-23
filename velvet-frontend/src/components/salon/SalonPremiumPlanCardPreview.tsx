@@ -1,7 +1,10 @@
-import {
-  SALON_PREMIUM_PANORAMA_FEATURES,
-  SALON_PREMIUM_PANORAMA_STEPS,
-} from "../../data/salonPremiumPanoramaContent";
+import type { LucideIcon } from "lucide-react";
+import { BarChart2, Bell, Globe, Users } from "lucide-react";
+import { SALON_PREMIUM_PANORAMA_FEATURES } from "../../data/salonPremiumPanoramaContent";
+
+const FEATURE_ICONS: LucideIcon[] = [Globe, Bell, Users, BarChart2];
+
+const FEATURE_LABELS = ["Brand & vetrina", "Notifiche", "Staff & agenda", "Statistiche"] as const;
 
 /**
  * Anteprima statica (pagina `/piani`, card Premium) allineata ai blocchi della panoramica salone Premium.
@@ -9,25 +12,28 @@ import {
 export function SalonPremiumPlanCardPreview() {
   return (
     <div className="velvet-plan-premium-preview">
-      <div className="velvet-plan-premium-preview__row">
+      <header className="velvet-plan-premium-preview__head">
+        <h3 className="velvet-plan-premium-preview__title">Cosa include</h3>
         <span className="velvet-plan-premium-preview__chip">4 aree</span>
-      </div>
+      </header>
 
-      <ul className="velvet-plan-premium-preview__features">
-        {SALON_PREMIUM_PANORAMA_FEATURES.map((f) => (
-          <li key={f.text} className="velvet-plan-premium-preview__feature">
-            {f.text}
-          </li>
-        ))}
-      </ul>
+      <ul className="velvet-plan-premium-preview__grid" aria-label="Funzionalità Premium">
+        {SALON_PREMIUM_PANORAMA_FEATURES.map((f, i) => {
+          const Icon = FEATURE_ICONS[i] ?? Globe;
+          const label = FEATURE_LABELS[i] ?? f.text.split(".")[0];
 
-      <ul className="velvet-plan-premium-preview__steps">
-        {SALON_PREMIUM_PANORAMA_STEPS.map((s) => (
-          <li key={s.id} className="velvet-plan-premium-preview__step">
-            <span className="velvet-plan-premium-preview__step-text">{s.text}</span>
-            <span className="velvet-plan-premium-preview__step-action">{s.actionLabel}</span>
-          </li>
-        ))}
+          return (
+            <li key={f.text} className="velvet-plan-premium-preview__item">
+              <span className="velvet-plan-premium-preview__icon" aria-hidden>
+                <Icon strokeWidth={2.1} />
+              </span>
+              <div className="velvet-plan-premium-preview__item-body">
+                <span className="velvet-plan-premium-preview__item-label">{label}</span>
+                <span className="velvet-plan-premium-preview__item-text">{f.text}</span>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

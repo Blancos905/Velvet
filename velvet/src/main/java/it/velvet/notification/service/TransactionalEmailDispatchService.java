@@ -60,7 +60,13 @@ public class TransactionalEmailDispatchService {
 			return;
 		}
 		if (!mailProperties.isEnabled()) {
-			log.debug("Email transazionale saltata: velvet.mail.enabled=false (type={}).", type);
+			log.info(
+					"[Velvet email] non inviata (velvet.mail.enabled=false): type={} appointmentId={} to={} subject={}. "
+							+ "In dev configura SMTP in velvet/spring-dev.local.env e riavvia il backend.",
+					type,
+					appointment.getId(),
+					resolveRecipientEmail(type, appointment),
+					subject);
 			return;
 		}
 		if (javaMailSender == null) {

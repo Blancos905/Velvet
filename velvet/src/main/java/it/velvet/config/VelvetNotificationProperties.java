@@ -24,6 +24,12 @@ public class VelvetNotificationProperties {
 	/** Validità del link di reimpostazione (minuti). */
 	private int passwordResetTokenTtlMinutes = 60;
 
+	/** Path pagina conferma email registrazione (query {@code token}). */
+	private String emailVerificationPath = "/conferma-email";
+
+	/** Validità del link di conferma email (minuti). */
+	private int emailVerificationTokenTtlMinutes = 1440;
+
 	/** Ore dopo la fine appuntamento ({@code endsAt}) per l'invito recensione in-app. */
 	private int reviewInviteOffsetHours = 2;
 
@@ -75,6 +81,24 @@ public class VelvetNotificationProperties {
 
 	public void setPasswordResetTokenTtlMinutes(int passwordResetTokenTtlMinutes) {
 		this.passwordResetTokenTtlMinutes = passwordResetTokenTtlMinutes;
+	}
+
+	public String getEmailVerificationPath() {
+		return emailVerificationPath == null || emailVerificationPath.isBlank()
+				? "/conferma-email"
+				: emailVerificationPath;
+	}
+
+	public void setEmailVerificationPath(String emailVerificationPath) {
+		this.emailVerificationPath = emailVerificationPath;
+	}
+
+	public int getEmailVerificationTokenTtlMinutes() {
+		return emailVerificationTokenTtlMinutes <= 0 ? 1440 : emailVerificationTokenTtlMinutes;
+	}
+
+	public void setEmailVerificationTokenTtlMinutes(int emailVerificationTokenTtlMinutes) {
+		this.emailVerificationTokenTtlMinutes = emailVerificationTokenTtlMinutes;
 	}
 
 	public int getReviewInviteOffsetHours() {

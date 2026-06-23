@@ -5,7 +5,8 @@ import it.velvet.studio.domain.StudioGroup;
 import org.springframework.stereotype.Component;
 
 /**
- * Con billing Stripe attivo, la registrazione Premium crea salone in piano Free finché il webhook non conferma il pagamento.
+ * Piano richiesto in registrazione: {@code PREMIUM} resta {@code PREMIUM} anche con Stripe attivo.
+ * Le funzionalità Premium sono sbloccate solo dopo pagamento ({@link SalonPremiumEntitlementService}).
  */
 @Component
 public class BillingRegistrationPlanPolicy {
@@ -17,12 +18,6 @@ public class BillingRegistrationPlanPolicy {
 	}
 
 	public String effectiveProvisionPlanTier(String requestedPlanTier) {
-		if (!stripeProperties.configured()) {
-			return StudioGroup.canonicalPlanTier(requestedPlanTier);
-		}
-		if ("PREMIUM".equalsIgnoreCase(requestedPlanTier != null ? requestedPlanTier.trim() : "")) {
-			return "BASE";
-		}
 		return StudioGroup.canonicalPlanTier(requestedPlanTier);
 	}
 

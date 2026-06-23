@@ -18,7 +18,9 @@ import type {
   SalonClientMembershipDto,
 } from "../api/types";
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
+import { canBookOnlineAsConsumer } from "../lib/velvetConsumerBooking";
 import { savePendingBooking } from "../components/PendingBookingResume";
+import { BookingConfirmedModal } from "../components/BookingConfirmedModal";
 import { setPostLoginReturnPath } from "../lib/postLoginReturnPath";
 import { notifySalonCatalogClientsChanged } from "../lib/salonCatalogClientsSync";
 import {
@@ -203,7 +205,8 @@ export default function SalonPage() {
   const [searchParams] = useSearchParams();
   const { isAuthenticated, accessToken, isSalonTitolare, isSalonStaff } = useVelvetAuth();
   /** Solo account cliente B2C: titolare e staff salone gestiscono l'agenda, non prenotano come clienti. */
-  const canBookAsClient = !isSalonTitolare && !isSalonStaff;
+  const canBookAsClient = canBookOnlineAsConsumer(isSalonTitolare, isSalonStaff);
+  const showConsumerBookingFlow = !isAuthenticated || canBookAsClient;
   const isNativeApp = isVelvetNativeAppShell();
   const bookingSlotsModalTitleId = useId();
   const bookingLoginModalTitleId = useId();
@@ -222,6 +225,7 @@ export default function SalonPage() {
   const [bookingSlotsModalOpen, setBookingSlotsModalOpen] = useState(false);
   const [bookingLoginModalOpen, setBookingLoginModalOpen] = useState(false);
   const [bookingConfirmSlot, setBookingConfirmSlot] = useState<string | null>(null);
+  const [bookingSuccess, setBookingSuccess] = useState<{ appointmentId: string; startIso: string } | null>(null);
   const [bookingMsg, setBookingMsg] = useState<string | null>(null);
   const [salonClientFeedback, setSalonClientFeedback] = useState<string | null>(null);
   const [salonClientFeedbackIsError, setSalonClientFeedbackIsError] = useState(false);
@@ -364,6 +368,14 @@ export default function SalonPage() {
     if (!servicesQ.data.some((x) => x.id === sid)) return;
     setServiceId(sid);
     if (searchParams.get("prenota") !== "1" || bookingResumeHandledRef.current) return;
+    if (isAuthenticated && !canBookAsClient) {
+      bookingResumeHandledRef.current = true;
+      const params = new URLSearchParams(window.location.search);
+      params.delete("prenota");
+      const qs = params.toString();
+      window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+      return;
+    }
     bookingResumeHandledRef.current = true;
     skipSingleOperatorAutoAdvanceRef.current = true;
     setOperatorId("");
@@ -378,7 +390,7 @@ export default function SalonPage() {
     params.delete("prenota");
     const qs = params.toString();
     window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
-  }, [searchParams, servicesQ.data]);
+  }, [searchParams, servicesQ.data, isAuthenticated, canBookAsClient]);
 
   const operatorsQ = useQuery({
     queryKey: ["org", "operators", s, serviceId],
@@ -427,6 +439,7 @@ export default function SalonPage() {
   }, [buildSalonBookingLoginReturnPath]);
 
   const onBookServiceFromShowcase = useCallback((id: string) => {
+    if (!showConsumerBookingFlow) return;
     setServiceId(id);
     setOperatorId("");
     setSelectedAvailabilityDate("");
@@ -438,10 +451,11 @@ export default function SalonPage() {
       if (!bookingSection) return;
       bookingSection.scrollIntoView({ behavior: "smooth", block: "start" });
     });
-  }, []);
+  }, [showConsumerBookingFlow]);
 
   const onSelectServiceForBooking = useCallback(
     (id: string) => {
+      if (!showConsumerBookingFlow) return;
       if (!id.trim()) {
         setServiceId("");
         setShowBookingAgenda(false);
@@ -449,7 +463,7 @@ export default function SalonPage() {
       }
       onBookServiceFromShowcase(id);
     },
-    [onBookServiceFromShowcase],
+    [onBookServiceFromShowcase, showConsumerBookingFlow],
   );
 
   useEffect(() => {
@@ -687,11 +701,8 @@ export default function SalonPage() {
       void qc.invalidateQueries({ queryKey: ["catalog", "clients"] });
       notifySalonCatalogClientsChanged();
       void qc.invalidateQueries({ queryKey: ["me", "notifications"] });
-      setBookingMsg(
-        "Prenotazione confermata. Conferma e promemoria compariranno in Notifiche (profilo), come per la email di conferma.",
-      );
       if (isNativeApp) setBookingSlotsModalOpen(false);
-      navigate(`/account/prenotazioni/${res.id}`);
+      setBookingSuccess({ appointmentId: res.id, startIso });
     } catch (e) {
       setBookingMsg(e instanceof Error ? e.message : "Errore");
     }
@@ -760,10 +771,10 @@ export default function SalonPage() {
               photoObjectPosition: showcase.servicePhotoObjectPositions[x.id] ?? "50% 50%",
             }))}
             selectedServiceId={serviceId || null}
-            onSelectService={onSelectServiceForBooking}
+            onSelectService={showConsumerBookingFlow ? onSelectServiceForBooking : undefined}
             detachedPublicLayout
             serviceListVariant="cards"
-            onBookService={onBookServiceFromShowcase}
+            onBookService={showConsumerBookingFlow ? onBookServiceFromShowcase : undefined}
             themeClass="velvet-salon-showcase--t-brand-hero"
             siteFullscreenBleed
             allowEmptyPreview
@@ -976,7 +987,19 @@ export default function SalonPage() {
             </section>
 
             <div id="velvet-salon-booking" className="velvet-salon-public-page__booking">
-            {showBookingAgenda ? (
+            {!showConsumerBookingFlow ? (
+              <div className="velvet-salon-booking-warm-card">
+                <p className="velvet-salon-booking-warm-card__text" role="status">
+                  Sei connesso con un account salone: la prenotazione online è riservata ai clienti registrati. Per fissare
+                  un appuntamento usa l&apos;agenda in area account oppure registrati come cliente con un&apos;altra email.
+                </p>
+                <div className="velvet-salon-public-meta__actions" style={{ marginTop: 12 }}>
+                  <Link to="/account/prenotazioni" className="velvet-salon-public-meta__btn">
+                    Vai all&apos;agenda salone
+                  </Link>
+                </div>
+              </div>
+            ) : showBookingAgenda ? (
               <div className="velvet-booking-agenda-full velvet-booking-agenda-full--warm">
                 {bookingFlowStep === "operators" ? (
                   <div className="velvet-booking-operator-step velvet-booking-operator-step--warm">
@@ -1244,25 +1267,16 @@ export default function SalonPage() {
               </div>
             ) : null}
 
-            {bookingMsg && (
+            {bookingMsg && showConsumerBookingFlow && !bookingMsg.includes("confermata") && (
               <p
-                className={`velvet-alert ${bookingMsg.includes("confermata") ? "velvet-alert--success" : "velvet-alert--error"}`}
+                className="velvet-alert velvet-alert--error"
                 style={{ marginTop: 16 }}
-                role="status"
+                role="alert"
               >
                 {bookingMsg}
               </p>
             )}
           </div>
-
-          {isAuthenticated && !canBookAsClient && (
-            <div className="velvet-salon-booking-warm-card">
-              <p className="velvet-salon-booking-warm-card__text" role="status">
-                Sei connesso con un account salone: la prenotazione online è riservata ai clienti. Per prenotare qui, registrati
-                come cliente con un&apos;altra email oppure gestisci gli appuntamenti dall&apos;agenda in area account.
-              </p>
-            </div>
-          )}
 
           {isAuthenticated && accessToken && canBookAsClient && (
             <div
@@ -1341,7 +1355,6 @@ export default function SalonPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="velvet-booking-slots-modal__glow" aria-hidden="true" />
-              <div className="velvet-booking-slots-modal__handle" aria-hidden="true" />
               <div className="velvet-booking-slots-modal__head">
                 <button
                   type="button"
@@ -1390,6 +1403,20 @@ export default function SalonPage() {
           </div>,
           document.body,
         )}
+      {bookingSuccess ? (
+        <BookingConfirmedModal
+          startIso={bookingSuccess.startIso}
+          timeZone={salonTimeZone}
+          serviceName={selectedService?.name}
+          pendingApproval
+          onClose={() => setBookingSuccess(null)}
+          onViewAppointment={() => {
+            const id = bookingSuccess.appointmentId;
+            setBookingSuccess(null);
+            navigate(`/account/prenotazioni/${id}`);
+          }}
+        />
+      ) : null}
       {bookingLoginModalOpen &&
         createPortal(
           <div

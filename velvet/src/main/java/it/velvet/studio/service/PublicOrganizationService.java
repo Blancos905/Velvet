@@ -1,5 +1,6 @@
 package it.velvet.studio.service;
 
+import it.velvet.billing.service.SalonPremiumEntitlementService;
 import it.velvet.catalog.domain.SalonService;
 import it.velvet.catalog.domain.SalonServiceRepository;
 import it.velvet.catalog.domain.StaffOperator;
@@ -51,6 +52,7 @@ public class PublicOrganizationService {
 	private final ConsumerProfileRepository consumerProfileRepository;
 	private final ReviewRepository reviewRepository;
 	private final SalonLocationGeocodingService salonLocationGeocodingService;
+	private final SalonPremiumEntitlementService salonPremiumEntitlementService;
 
 	public PublicOrganizationService(
 			LocationRepository locationRepository,
@@ -58,13 +60,15 @@ public class PublicOrganizationService {
 			StaffOperatorRepository staffOperatorRepository,
 			ConsumerProfileRepository consumerProfileRepository,
 			ReviewRepository reviewRepository,
-			SalonLocationGeocodingService salonLocationGeocodingService) {
+			SalonLocationGeocodingService salonLocationGeocodingService,
+			SalonPremiumEntitlementService salonPremiumEntitlementService) {
 		this.locationRepository = locationRepository;
 		this.salonServiceRepository = salonServiceRepository;
 		this.staffOperatorRepository = staffOperatorRepository;
 		this.consumerProfileRepository = consumerProfileRepository;
 		this.reviewRepository = reviewRepository;
 		this.salonLocationGeocodingService = salonLocationGeocodingService;
+		this.salonPremiumEntitlementService = salonPremiumEntitlementService;
 	}
 
 	@Transactional(readOnly = true)
@@ -145,7 +149,7 @@ public class PublicOrganizationService {
 			raw = locationRepository.findTop50ByOrderByNameAsc();
 		}
 		return raw.stream()
-				.filter(PublicOrganizationService::isPremiumLocation)
+				.filter(this::isPremiumLocation)
 				.toList();
 	}
 
@@ -237,7 +241,7 @@ public class PublicOrganizationService {
 	public List<OrganizationSummaryDto> topRatedPremiumSummaries(int limit) {
 		int cap = Math.min(Math.max(limit, 1), 20);
 		List<Location> all = locationRepository.findAll().stream()
-				.filter(PublicOrganizationService::isPremiumLocation)
+				.filter(this::isPremiumLocation)
 				.toList();
 		if (all.isEmpty()) {
 			return List.of();
@@ -731,7 +735,7 @@ public class PublicOrganizationService {
 			return List.of();
 		}
 		return locationRepository.findPremiumLocationsDeclaringBusinessTypeCode(type.name()).stream()
-				.filter(PublicOrganizationService::isPremiumLocation)
+				.filter(this::isPremiumLocation)
 				.toList();
 	}
 
@@ -818,7 +822,7 @@ public class PublicOrganizationService {
 		return union.stream().map(locById::get).filter(Objects::nonNull).toList();
 	}
 
-	private static List<Location> distinctPremiumLocationsFromServiceRows(List<SalonService> rows) {
+	private List<Location> distinctPremiumLocationsFromServiceRows(List<SalonService> rows) {
 		if (rows == null || rows.isEmpty()) {
 			return List.of();
 		}
@@ -836,13 +840,13 @@ public class PublicOrganizationService {
 		return out;
 	}
 
-	private static Set<UUID> distinctPremiumLocationIdsFromServiceRows(List<SalonService> rows) {
+	private Set<UUID> distinctPremiumLocationIdsFromServiceRows(List<SalonService> rows) {
 		if (rows == null || rows.isEmpty()) {
 			return Set.of();
 		}
 		return rows.stream()
 				.map(SalonService::getLocation)
-				.filter(PublicOrganizationService::isPremiumLocation)
+				.filter(this::isPremiumLocation)
 				.map(Location::getId)
 				.filter(Objects::nonNull)
 				.collect(Collectors.toCollection(LinkedHashSet::new));
@@ -1009,11 +1013,10 @@ public class PublicOrganizationService {
 		return requireBySlug(slug).getId();
 	}
 
-	private static boolean isPremiumLocation(Location loc) {
+	private boolean isPremiumLocation(Location loc) {
 		if (loc == null || loc.getStudioGroup() == null) {
 			return false;
 		}
-		String plan = StudioGroup.canonicalPlanTier(loc.getStudioGroup().getPlanTier());
-		return "PREMIUM".equals(plan);
+		return salonPremiumEntitlementService.hasActivePremium(loc.getStudioGroup());
 	}
 }

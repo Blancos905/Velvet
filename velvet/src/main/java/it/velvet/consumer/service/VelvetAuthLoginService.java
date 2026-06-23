@@ -24,6 +24,7 @@ public class VelvetAuthLoginService {
 	private final VelvetSecurityProperties securityProperties;
 	private final SalonOwnerRoleAlignmentService salonOwnerRoleAlignmentService;
 	private final SecurityAuditService securityAuditService;
+	private final VelvetEmailVerificationService velvetEmailVerificationService;
 
 	public VelvetAuthLoginService(
 			ConsumerProfileRepository consumerProfileRepository,
@@ -32,7 +33,8 @@ public class VelvetAuthLoginService {
 			VelvetRefreshTokenService velvetRefreshTokenService,
 			VelvetSecurityProperties securityProperties,
 			SalonOwnerRoleAlignmentService salonOwnerRoleAlignmentService,
-			SecurityAuditService securityAuditService) {
+			SecurityAuditService securityAuditService,
+			VelvetEmailVerificationService velvetEmailVerificationService) {
 		this.consumerProfileRepository = consumerProfileRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.velvetTokenService = velvetTokenService;
@@ -40,6 +42,7 @@ public class VelvetAuthLoginService {
 		this.securityProperties = securityProperties;
 		this.salonOwnerRoleAlignmentService = salonOwnerRoleAlignmentService;
 		this.securityAuditService = securityAuditService;
+		this.velvetEmailVerificationService = velvetEmailVerificationService;
 	}
 
 	public AuthLoginResult login(String email, String password, HttpServletRequest request) {
@@ -55,6 +58,19 @@ public class VelvetAuthLoginService {
 				|| !passwordEncoder.matches(password, p.getPasswordHash())) {
 			securityAuditService.record("AUTH_LOGIN", "FAIL", norm, p != null ? p.getId() : null, request, "invalid_credentials");
 			throw new BusinessException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Email o password non validi.");
+		}
+		try {
+			velvetEmailVerificationService.assertMayLogin(p);
+		}
+		catch (BusinessException ex) {
+			securityAuditService.record(
+					"AUTH_LOGIN",
+					"FAIL",
+					norm,
+					p.getId(),
+					request,
+					ex.getCode() != null ? ex.getCode() : "email_not_verified");
+			throw ex;
 		}
 		salonOwnerRoleAlignmentService.alignAfterSuccessfulPasswordLogin(p);
 		ConsumerProfile forToken = consumerProfileRepository.findById(p.getId()).orElse(p);

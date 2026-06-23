@@ -1,8 +1,8 @@
 package it.velvet.studio.service;
 
+import it.velvet.billing.service.SalonPremiumEntitlementService;
 import it.velvet.publicapi.service.PostalLocateService;
 import it.velvet.studio.domain.Location;
-import it.velvet.studio.domain.StudioGroup;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
@@ -16,9 +16,13 @@ import java.util.Optional;
 public class SalonLocationGeocodingService {
 
 	private final PostalLocateService postalLocateService;
+	private final SalonPremiumEntitlementService salonPremiumEntitlementService;
 
-	public SalonLocationGeocodingService(PostalLocateService postalLocateService) {
+	public SalonLocationGeocodingService(
+			PostalLocateService postalLocateService,
+			SalonPremiumEntitlementService salonPremiumEntitlementService) {
 		this.postalLocateService = postalLocateService;
+		this.salonPremiumEntitlementService = salonPremiumEntitlementService;
 	}
 
 	/**
@@ -81,11 +85,10 @@ public class SalonLocationGeocodingService {
 		return raw != null ? raw.trim() : "";
 	}
 
-	public static boolean isPremiumLocation(Location loc) {
+	public boolean isPremiumLocation(Location loc) {
 		if (loc == null || loc.getStudioGroup() == null) {
 			return false;
 		}
-		String plan = StudioGroup.canonicalPlanTier(loc.getStudioGroup().getPlanTier());
-		return "PREMIUM".equals(plan);
+		return salonPremiumEntitlementService.hasActivePremium(loc.getStudioGroup());
 	}
 }

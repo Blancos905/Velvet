@@ -70,6 +70,7 @@ public class MeSalonNotificationInboxService {
 			DateTimeFormatter.ofPattern("d MMMM uuuu", Locale.ITALIAN);
 	private static final DateTimeFormatter IT_TIME = DateTimeFormatter.ofPattern("HH:mm");
 
+	@Transactional(readOnly = true)
 	public MeSalonNotificationInboxDto resolve(VelvetUserPrincipal principal) {
 		if (principal == null || principal.getSubject() == null || principal.getSubject().isBlank()) {
 			return emptyInbox();
@@ -89,6 +90,7 @@ public class MeSalonNotificationInboxService {
 	 * Il titolare conferma di aver consultato le email già inviate: fino a questo istante spariscono da conteggi «Inviate»
 	 * e dall'elenco espanso; restano in database e ricompaiono se ne arrivano di nuove dopo l'ack.
 	 */
+	@Transactional
 	public MeSalonNotificationInboxDto acknowledgeSentInbox(VelvetUserPrincipal principal) {
 		if (principal == null || principal.getSubject() == null || principal.getSubject().isBlank()) {
 			return emptyInbox();
@@ -107,6 +109,7 @@ public class MeSalonNotificationInboxService {
 	}
 
 	/** Conferma consultazione di una categoria: azzera quella riga fino a nuove notifiche successive. */
+	@Transactional
 	public MeSalonNotificationInboxDto acknowledgeBucketInbox(VelvetUserPrincipal principal, String bucketParam) {
 		if (principal == null || principal.getSubject() == null || principal.getSubject().isBlank()) {
 			return emptyInbox();
@@ -130,6 +133,7 @@ public class MeSalonNotificationInboxService {
 	 * Non applica l'ack di consultazione: il titolare/lo staff vedono tutte le righe non eliminate e possono
 	 * rimuoverle singolarmente; l'ack bucket azzera solo i conteggi in inbox fino a nuovi messaggi.
 	 */
+	@Transactional(readOnly = true)
 	public List<MeSalonNotificationMessageDto> listMessagesForBucket(VelvetUserPrincipal principal, String bucketParam) {
 		if (principal == null || principal.getSubject() == null || principal.getSubject().isBlank()) {
 			return List.of();
@@ -197,7 +201,7 @@ public class MeSalonNotificationInboxService {
 			return Optional.empty();
 		}
 		return staffOperatorRepository
-				.resolveLinkedOperatorId(profileId, sub != null ? sub : "")
+				.resolveLinkedOperatorForInbox(profileId, sub != null ? sub : "")
 				.map(op -> new SalonNotificationInboxActor(op.getLocation().getStudioGroup(), op));
 	}
 
@@ -350,7 +354,8 @@ public class MeSalonNotificationInboxService {
 									operatorName)
 							+ ".";
 			case BOOKING_CREATED_FOR_SALON ->
-					withOperator(clientName + " ha prenotato il " + dateStr + " alle " + timeStr, operatorName) + ".";
+					withOperator(clientName + " ha richiesto il " + dateStr + " alle " + timeStr, operatorName)
+							+ " — in attesa di conferma.";
 			case REMINDER_24H ->
 					withOperator("Promemoria: " + clientName + " — appuntamento il " + dateStr + " alle " + timeStr, operatorName)
 							+ ".";

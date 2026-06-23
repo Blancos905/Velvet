@@ -6,22 +6,36 @@ import { useVelvetAuth } from "../auth/VelvetAuthProvider";
 import { registerConsumerApi } from "../api/registerConsumer";
 import { SaloniLuxuryLogoMark } from "../components/SaloniLuxuryLogoMark";
 import { SalonPremiumPlanCardPreview } from "../components/salon/SalonPremiumPlanCardPreview";
+import { SalonPlanPremiumTrialPanel } from "../components/salon/SalonPlanPremiumTrialPanel";
 import { SalonPremiumOwnerInfoPrivacyModal } from "../components/salon/SalonPremiumOwnerInfoPrivacyModal";
 import { VelvetEuropeanContactFields } from "../components/VelvetEuropeanContactFields";
+import { VelvetFreePlanAppNoticeBox } from "../components/VelvetFreePlanAppNoticeBox";
+import { VelvetRegistrationEmailConfirmBox } from "../components/VelvetRegistrationEmailConfirmBox";
+import { VelvetEmailVerifiedSuccessBox } from "../components/VelvetEmailVerifiedSuccessBox";
+import {
+  SalonBillingProfileFields,
+  type SalonBillingProfileFieldValues,
+} from "../components/SalonBillingProfileFields";
 import { partnerContactEmail } from "../config/env";
 import { SALON_BUSINESS_TYPE_OPTIONS } from "../data/salonBusinessTypes";
 import { SALON_CLIENT_GENDER_OPTIONS } from "../data/salonClientGenders";
-import { SALON_PLANS, planDisplayName, type SalonPlanTier } from "../data/salonPlans";
+import { SALON_PLANS, SALON_PREMIUM_TRIAL_DAYS, planDisplayName, type SalonPlanTier } from "../data/salonPlans";
 import {
   DEFAULT_EUROPEAN_COUNTRY_CODE,
   EUROPEAN_PHONE_COUNTRIES,
   europeanCountryByCode,
 } from "../data/europeanPhonePrefixes";
 import { optionalEuropeanPhoneForRegisterApi } from "../lib/europeanPhone";
+import {
+  loginReturnPathForSalonRegistration,
+  setPostLoginPathForSalonRegistration,
+} from "../lib/salonRegistrationPostLogin";
+import { toBillingProfilePayload, validateSalonBillingProfileForm } from "../lib/salonBillingProfileValidation";
 import { isFeatureEnabled, resolveSubscriptionSurface } from "../lib/subscription-guards";
 import { useVelvetNativeAppShell } from "../hooks/useVelvetNativeAppShell";
-import { isNativePremiumBillingBlocked, NATIVE_PREMIUM_BILLING_BLOCKED_MESSAGE } from "../lib/nativePremiumUpgradePolicy";
-import { humanizeOidcNetworkError, humanizePostRegistrationAuthError } from "../utils/oidcErrors";
+import { humanizeOidcNetworkError } from "../utils/oidcErrors";
+import "../styles/velvet-email-confirm-box.css";
+import "../styles/velvet-salon-plans-register.css";
 import "../styles/velvet-search-page.css";
 
 function validateRequiredSalonLocation(s: {
@@ -46,7 +60,11 @@ export default function SalonPlansPage() {
   const [freePlanNoticeOpen, setFreePlanNoticeOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorHint, setErrorHint] = useState<string | null>(null);
-  const [infoHint, setInfoHint] = useState<string | null>(null);
+  const [registrationComplete, setRegistrationComplete] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [registeredPlanTier, setRegisteredPlanTier] = useState<SalonPlanTier | null>(null);
+  const [registrationNeedsEmailConfirm, setRegistrationNeedsEmailConfirm] = useState(true);
+  const [registrationSuccessMessage, setRegistrationSuccessMessage] = useState<string | null>(null);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -71,15 +89,30 @@ export default function SalonPlansPage() {
   const [salonCountry, setSalonCountry] = useState(DEFAULT_EUROPEAN_COUNTRY_CODE);
   const [salonBusinessTypes, setSalonBusinessTypes] = useState<Set<string>>(() => new Set());
   const [salonClientGenders, setSalonClientGenders] = useState<Set<string>>(() => new Set());
+  const [billingSameAsSalon, setBillingSameAsSalon] = useState(true);
+  const [billing, setBilling] = useState<SalonBillingProfileFieldValues>({
+    legalName: "",
+    billingEmail: "",
+    vatNumber: "",
+    fiscalCode: "",
+    subjectType: "",
+    addressLine1: "",
+    postalCode: "",
+    city: "",
+    province: "",
+    country: DEFAULT_EUROPEAN_COUNTRY_CODE,
+    sdiCode: "",
+    pecEmail: "",
+  });
 
   const formId = useId();
   const salonTypesLegendId = `${formId}-salon-types-legend`;
   const salonClientGendersLegendId = `${formId}-salon-client-genders-legend`;
+  const billingLegendId = `${formId}-billing-legend`;
   const titleId = `${formId}-title`;
 
   const openRegistration = (tier: SalonPlanTier) => {
     setErrorHint(null);
-    setInfoHint(null);
     if (!isFeatureEnabled("owner.web.freeRegistration", tier, { surface: resolveSubscriptionSurface(isNativeApp) })) {
       setFreePlanNoticeOpen(true);
       return;
@@ -104,6 +137,44 @@ export default function SalonPlansPage() {
     setSalonCountry(DEFAULT_EUROPEAN_COUNTRY_CODE);
     setSalonBusinessTypes(new Set());
     setSalonClientGenders(new Set());
+    setBillingSameAsSalon(true);
+    setBilling({
+      legalName: "",
+      billingEmail: "",
+      vatNumber: "",
+      fiscalCode: "",
+      subjectType: "",
+      addressLine1: "",
+      postalCode: "",
+      city: "",
+      province: "",
+      country: DEFAULT_EUROPEAN_COUNTRY_CODE,
+      sdiCode: "",
+      pecEmail: "",
+    });
+  };
+
+  const patchBilling = <K extends keyof SalonBillingProfileFieldValues>(
+    key: K,
+    value: SalonBillingProfileFieldValues[K],
+  ) => {
+    setBilling((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const resolveBillingForSubmit = (): SalonBillingProfileFieldValues => {
+    const base = billingSameAsSalon
+      ? {
+          ...billing,
+          legalName: billing.legalName.trim() || salonName.trim(),
+          billingEmail: billing.billingEmail.trim() || email.trim().toLowerCase(),
+          addressLine1: salonAddressLine1.trim(),
+          postalCode: salonPostalCode.trim(),
+          city: salonCity.trim(),
+          province: salonProvince.trim().toUpperCase(),
+          country: salonCountry.trim() || DEFAULT_EUROPEAN_COUNTRY_CODE,
+        }
+      : billing;
+    return base;
   };
 
   const closeModal = () => {
@@ -120,7 +191,6 @@ export default function SalonPlansPage() {
     e.preventDefault();
     if (modalPlan == null) return;
     setErrorHint(null);
-    setInfoHint(null);
 
     /* Evitiamo di dipendere dalla validazione HTML5: con modale overlay il browser spesso non mostra il tooltip nativo
        e sembra che il pulsante «non faccia nulla». */
@@ -173,11 +243,21 @@ export default function SalonPlansPage() {
       }
     }
 
+    if (modalPlan === "PREMIUM") {
+      const billingValues = resolveBillingForSubmit();
+      const billingErr = validateSalonBillingProfileForm(billingValues);
+      if (billingErr) {
+        setErrorHint(billingErr);
+        return;
+      }
+    }
+
     setSubmitting(true);
     void (async () => {
       try {
         const emailNorm = email.trim().toLowerCase();
-        await registerConsumerApi({
+        const billingPayload = modalPlan === "PREMIUM" ? toBillingProfilePayload(resolveBillingForSubmit()) : undefined;
+        const result = await registerConsumerApi({
           email: emailNorm,
           password,
           firstName,
@@ -196,26 +276,24 @@ export default function SalonPlansPage() {
                 salonClientGenders: [...salonClientGenders].sort(),
               }
             : {}),
+          ...(modalPlan === "PREMIUM" && billingPayload ? { billing: billingPayload } : {}),
         });
         await queryClient.invalidateQueries({ queryKey: ["orgs"] });
         await queryClient.invalidateQueries({ queryKey: ["me"] });
-        try {
+        setPostLoginPathForSalonRegistration(modalPlan);
+        if (result.emailVerificationRequired === false) {
           await signInWithPassword(emailNorm, password);
-          const requestedPremium = modalPlan === "PREMIUM";
-          setModalPlan(null);
-          if (requestedPremium) {
-            if (isNativePremiumBillingBlocked()) {
-              setInfoHint(NATIVE_PREMIUM_BILLING_BLOCKED_MESSAGE);
-              navigate("/account/salone", { replace: true });
-              return;
-            }
-            navigate("/account/billing/checkout", { replace: true });
-            return;
-          }
-          navigate("/account", { replace: true });
-        } catch (authErr) {
-          setErrorHint(humanizePostRegistrationAuthError(authErr));
+          navigate(loginReturnPathForSalonRegistration(modalPlan), { replace: true });
+          setSubmitting(false);
+          return;
         }
+        setRegisteredPlanTier(modalPlan);
+        setRegistrationNeedsEmailConfirm(result.emailVerificationRequired !== false);
+        setRegistrationSuccessMessage(result.message);
+        setModalPlan(null);
+        setRegistrationComplete(true);
+        setRegisteredEmail(emailNorm);
+        setErrorHint(null);
       } catch (err) {
         setErrorHint(humanizeOidcNetworkError(err));
       } finally {
@@ -234,74 +312,73 @@ export default function SalonPlansPage() {
           <>
             {freePlanNoticeOpen ? (
               <div
-                className="velvet-plans-modal-root"
+                className="velvet-plans-modal-root velvet-plans-modal-root--free-notice"
                 role="presentation"
                 onMouseDown={(ev) => ev.target === ev.currentTarget && closeFreePlanNotice()}
               >
                 <div
-                  className="velvet-plans-modal velvet-plans-modal--free-notice"
                   role="dialog"
                   aria-modal="true"
                   aria-labelledby={`${titleId}-free-notice`}
+                  onMouseDown={(ev) => ev.stopPropagation()}
                 >
-                  <div className="velvet-plans-modal__head">
-                    <h2 id={`${titleId}-free-notice`} className="velvet-plans-modal__title">
-                      Piano Free
-                    </h2>
-                    <button
-                      type="button"
-                      className="velvet-plans-modal__close"
-                      onClick={closeFreePlanNotice}
-                      aria-label="Chiudi"
-                    >
-                      ×
-                    </button>
-                  </div>
-                  <div className="velvet-plan-premium-preview velvet-plan-premium-preview--modal-free">
-                    <p className="velvet-plans-modal__free-body">
-                      Per accedere al piano Free scarica e registrati dall&apos;app Saloni Luxury.
-                    </p>
-                  </div>
-                  <div className="velvet-plans-modal__actions">
-                    <button type="button" className="velvet-plan-cta" onClick={closeFreePlanNotice}>
-                      Chiudi
-                    </button>
-                  </div>
+                  <VelvetFreePlanAppNoticeBox
+                    titleId={`${titleId}-free-notice`}
+                    onClose={closeFreePlanNotice}
+                  />
                 </div>
               </div>
             ) : null}
             {modalPlan != null ? (
-              <div className="velvet-plans-modal-root" role="presentation" onMouseDown={(ev) => ev.target === ev.currentTarget && closeModal()}>
-                <div
-                  className={`velvet-plans-modal velvet-plans-modal--salon-register${modalPlan === "PREMIUM" ? " velvet-plans-modal--salon-register-premium" : ""}${wideModal ? " velvet-plans-modal--wide" : ""}`}
+              <div
+                className="velvet-plans-modal-root velvet-plans-modal-root--salon-register"
+                role="presentation"
+                onMouseDown={(ev) => ev.target === ev.currentTarget && closeModal()}
+              >
+                <section
+                  className={`velvet-email-confirm-box velvet-salon-register-box${modalPlan === "PREMIUM" ? " velvet-salon-register-box--premium" : ""}${wideModal ? " velvet-salon-register-box--wide" : ""}`}
                   role="dialog"
                   aria-modal="true"
                   aria-labelledby={titleId}
+                  onMouseDown={(ev) => ev.stopPropagation()}
                 >
-                  <div className="velvet-plans-modal__head">
-                    <h2 id={titleId} className="velvet-plans-modal__title">
-                      <span className="velvet-plans-modal__title-kicker">Registrazione</span>
-                      <span className="velvet-plans-modal__title-sep" aria-hidden>
-                        {" "}
-                        —{" "}
-                      </span>
-                      <span className="velvet-plans-modal__title-plan">piano {modalPlanName}</span>
-                    </h2>
-                    <button type="button" className="velvet-plans-modal__close" onClick={closeModal} disabled={submitting} aria-label="Chiudi">
-                      ×
-                    </button>
+                  <div className="velvet-email-confirm-box__glow" aria-hidden />
+                  <button
+                    type="button"
+                    className="velvet-salon-register-box__close"
+                    onClick={closeModal}
+                    disabled={submitting}
+                    aria-label="Chiudi"
+                  >
+                    ×
+                  </button>
+                  <div className="velvet-email-confirm-box__icon-wrap" aria-hidden>
+                    <svg className="velvet-email-confirm-box__icon" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M4 8.5V18a2 2 0 002 2h12a2 2 0 002-2V8.5M4 8.5L12 13l8-4.5M4 8.5l8-4.5 8 4.5"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9 14h6M9 17h4"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                      />
+                    </svg>
                   </div>
+                  <p className="velvet-email-confirm-box__kicker">Registrazione titolare</p>
+                  <h2 id={titleId} className="velvet-email-confirm-box__title">
+                    Piano {modalPlanName}
+                  </h2>
                   {errorHint ? (
-                    <p className="velvet-alert velvet-alert--error velvet-plans-modal__alert" role="alert">
+                    <p className="velvet-alert velvet-alert--error velvet-salon-register-box__alert" role="alert">
                       {errorHint}
                     </p>
                   ) : null}
-                  {infoHint ? (
-                    <p className="velvet-alert velvet-alert--success velvet-plans-modal__alert" role="status">
-                      {infoHint}
-                    </p>
-                  ) : null}
-                  <form className="velvet-plans-modal__form" noValidate onSubmit={onSubmitRegistration}>
+                  <form className="velvet-salon-register-box__form velvet-plans-modal__form" noValidate onSubmit={onSubmitRegistration}>
                     <label className="velvet-plans-field">
                       <span>Nome</span>
                       <input
@@ -505,6 +582,41 @@ export default function SalonPlansPage() {
                       </>
                     ) : null}
 
+                    {modalPlan === "PREMIUM" ? (
+                      <>
+                        <label className="velvet-plans-field velvet-plans-field--full velvet-plans-field--check">
+                          <input
+                            type="checkbox"
+                            checked={billingSameAsSalon}
+                            onChange={(ev) => setBillingSameAsSalon(ev.target.checked)}
+                            disabled={submitting}
+                          />
+                          <span>Usa lo stesso indirizzo della sede per la fatturazione</span>
+                        </label>
+                        <SalonBillingProfileFields
+                          legendId={billingLegendId}
+                          variant="register"
+                          disabled={submitting}
+                          disableAddressFields={billingSameAsSalon}
+                          values={
+                            billingSameAsSalon
+                              ? {
+                                  ...billing,
+                                  legalName: billing.legalName.trim() || salonName.trim(),
+                                  billingEmail: billing.billingEmail.trim() || email.trim().toLowerCase(),
+                                  addressLine1: salonAddressLine1.trim(),
+                                  postalCode: salonPostalCode.trim(),
+                                  city: salonCity.trim(),
+                                  province: salonProvince.trim().toUpperCase(),
+                                  country: salonCountry.trim() || DEFAULT_EUROPEAN_COUNTRY_CODE,
+                                }
+                              : billing
+                          }
+                          onChange={patchBilling}
+                        />
+                      </>
+                    ) : null}
+
                     <div className="velvet-plans-password-pair">
                       <label className="velvet-plans-field">
                         <span>Password</span>
@@ -675,16 +787,25 @@ export default function SalonPlansPage() {
                         Leggi info e privacy
                       </button>
                     </div>
-                    <div className="velvet-plans-modal__actions">
-                      <button type="button" className="velvet-plan-cta velvet-plan-cta--secondary" onClick={closeModal} disabled={submitting}>
+                    <div className="velvet-salon-register-box__actions velvet-email-confirm-box__actions">
+                      <button
+                        type="button"
+                        className="velvet-email-confirm-box__cta velvet-email-confirm-box__cta--secondary"
+                        onClick={closeModal}
+                        disabled={submitting}
+                      >
                         Annulla
                       </button>
-                      <button type="submit" className="velvet-plan-cta" disabled={submitting}>
+                      <button
+                        type="submit"
+                        className="velvet-email-confirm-box__cta velvet-email-confirm-box__cta--primary"
+                        disabled={submitting}
+                      >
                         {submitting ? "Creazione account…" : "Crea account e continua"}
                       </button>
                     </div>
                   </form>
-                </div>
+                </section>
               </div>
             ) : null}
           </>,
@@ -737,6 +858,22 @@ export default function SalonPlansPage() {
         <h1 className="velvet-page-title">
           <span className="velvet-search-hero__title-text">Scegli il piano e registrati</span>
         </h1>
+        {!isNativeApp && !registrationComplete ? (
+          <div className="velvet-plans-page__lead-box">
+            <div className="velvet-plans-page__lead-glow" aria-hidden />
+            <p className="velvet-plans-page__lead-eyebrow">
+              <span className="velvet-plans-page__lead-badge">{SALON_PREMIUM_TRIAL_DAYS} giorni gratis</span>
+              <span className="velvet-plans-page__lead-eyebrow-text">Prova Premium senza rischio</span>
+            </p>
+            <p className="velvet-plans-page__lead">
+              Metti online il tuo salone con <strong>sito dedicato</strong> e <strong>galleria servizi</strong>: tieni
+              le <strong>statistiche</strong> sotto controllo e gestisci lo <strong>staff</strong> da un unico pannello.
+            </p>
+            <p className="velvet-plans-page__lead-note">
+              Nessun addebito oggi · disdici quando vuoi, prima del rinnovo
+            </p>
+          </div>
+        ) : null}
       </header>
 
       {errorHint && (
@@ -744,11 +881,30 @@ export default function SalonPlansPage() {
           {errorHint}
         </p>
       )}
-      {infoHint && (
-        <p className="velvet-alert velvet-alert--success" role="status">
-          {infoHint}
-        </p>
-      )}
+      {registrationComplete ? (
+        <div className="velvet-plans-wrap" style={{ maxWidth: "520px", margin: "0 auto 1.5rem" }}>
+          {registrationNeedsEmailConfirm ? (
+            <VelvetRegistrationEmailConfirmBox
+              email={registeredEmail}
+              accountLabel="titolare salone"
+              loginReturnPath={loginReturnPathForSalonRegistration(registeredPlanTier ?? undefined)}
+            />
+          ) : (
+            <VelvetEmailVerifiedSuccessBox
+              message={
+                registrationSuccessMessage ??
+                (registeredPlanTier === "PREMIUM"
+                  ? "Salone registrato. Completa il pagamento Premium su Stripe."
+                  : "Salone registrato. Accedi con le credenziali del salone.")
+              }
+              loginReturnPath={loginReturnPathForSalonRegistration(registeredPlanTier ?? undefined)}
+              primaryCtaLabel={
+                registeredPlanTier === "PREMIUM" ? "Vai al pagamento Premium" : "Vai all'accesso"
+              }
+            />
+          )}
+        </div>
+      ) : null}
 
       <div className="velvet-plans-grid">
         {SALON_PLANS.map((p) => {
@@ -760,25 +916,29 @@ export default function SalonPlansPage() {
               className={`velvet-plan-card${p.highlighted ? " velvet-plan-card--featured" : ""}`}
             >
               <h2 className="velvet-plan-card__name">{name}</h2>
-              <div
-                className="velvet-plan-card__price-block"
-                aria-label={[p.priceHint, p.pricePeriod].filter(Boolean).join(". ")}
-              >
-                <div className="velvet-plan-card__price-orbit" aria-hidden />
-                <div className="velvet-plan-card__price-row">
-                  {p.priceValue != null && p.priceValue !== "" ? (
-                    <>
-                      <span className="velvet-plan-card__price-value">{p.priceValue}</span>
-                      <span className="velvet-plan-card__price-euro">€</span>
-                    </>
-                  ) : (
-                    <span className="velvet-plan-card__price-value velvet-plan-card__price-value--label">{p.priceHint}</span>
-                  )}
+              {p.tier === "PREMIUM" ? (
+                <SalonPlanPremiumTrialPanel plan={p} variant="card" />
+              ) : (
+                <div
+                  className="velvet-plan-card__price-block"
+                  aria-label={[p.priceHint, p.pricePeriod].filter(Boolean).join(". ")}
+                >
+                  <div className="velvet-plan-card__price-orbit" aria-hidden />
+                  <div className="velvet-plan-card__price-row">
+                    {p.priceValue != null && p.priceValue !== "" ? (
+                      <>
+                        <span className="velvet-plan-card__price-value">{p.priceValue}</span>
+                        <span className="velvet-plan-card__price-euro">€</span>
+                      </>
+                    ) : (
+                      <span className="velvet-plan-card__price-value velvet-plan-card__price-value--label">{p.priceHint}</span>
+                    )}
+                  </div>
+                  {p.pricePeriod != null && p.pricePeriod.length > 0 ? (
+                    <p className="velvet-plan-card__price-period">{p.pricePeriod}</p>
+                  ) : null}
                 </div>
-                {p.pricePeriod != null && p.pricePeriod.length > 0 ? (
-                  <p className="velvet-plan-card__price-period">{p.pricePeriod}</p>
-                ) : null}
-              </div>
+              )}
               <p className="velvet-plan-card__tagline">{p.tagline}</p>
               {p.tier === "PREMIUM" ? (
                 <SalonPremiumPlanCardPreview />
@@ -791,9 +951,19 @@ export default function SalonPlansPage() {
               )}
               <button type="button" className="velvet-plan-cta" onClick={() => openRegistration(p.tier)}>
                 <span className="velvet-plan-card__cta-line">
-                  <span className="velvet-plan-card__cta-lead">Registrati</span>{" "}
-                  <span className="velvet-plan-card__cta-mid">con piano</span>{" "}
-                  <span className="velvet-plan-card__cta-plan">{name}</span>
+                  {p.tier === "PREMIUM" ? (
+                    <>
+                      <span className="velvet-plan-card__cta-lead">Prova gratis</span>{" "}
+                      <span className="velvet-plan-card__cta-mid">{SALON_PREMIUM_TRIAL_DAYS} giorni</span>{" "}
+                      <span className="velvet-plan-card__cta-plan">{name}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="velvet-plan-card__cta-lead">Registrati</span>{" "}
+                      <span className="velvet-plan-card__cta-mid">con piano</span>{" "}
+                      <span className="velvet-plan-card__cta-plan">{name}</span>
+                    </>
+                  )}
                 </span>
               </button>
             </article>

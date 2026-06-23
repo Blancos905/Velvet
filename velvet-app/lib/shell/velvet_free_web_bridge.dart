@@ -263,15 +263,16 @@ window.velvetAppRebuildFreeOwnerNav = function velvetAppRebuildFreeOwnerNav() {
   var items = [
     { href: '/account/salone/servizi', label: 'Aggiungi servizi', allowed: true },
     { href: '/account/prenotazioni', label: 'Agenda', allowed: true },
-    { href: '/account/assistenza', label: 'Assistenza', allowed: true },
+    { href: '/account/notifiche', label: 'Notifiche', allowed: true },
     { href: '/account/info-privacy', label: 'Info e privacy', allowed: true },
+    { href: '/account/assistenza', label: 'Assistenza', allowed: true },
     { href: '/account/profilo', label: 'Profilo', allowed: true },
     { href: '/account/salone/tuo-salone', label: 'Crea il tuo sito', allowed: false },
     { href: '/account/salone/brand', label: 'Brand e vetrina', allowed: false },
     { href: '/account/salone/posizione', label: 'Posizione del salone', allowed: false },
     { href: '/account/salone/staff', label: 'Staff', allowed: false },
     { href: '/account/salone/statistiche', label: 'Statistiche', allowed: false, extra: 'velvet-account-hub__btn--salon-statistiche' },
-    { href: '/account/salone', label: 'Panoramica', allowed: false }
+    { href: '/account/salone', label: 'Panoramica', allowed: true }
   ];
 
   Array.from(nav.children).forEach(function(el) {

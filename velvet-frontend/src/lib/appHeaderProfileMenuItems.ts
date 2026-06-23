@@ -7,7 +7,7 @@ export type AppHeaderProfileMenuItem = {
 };
 
 export const CONSUMER_PROFILE_MENU_ITEMS: AppHeaderProfileMenuItem[] = [
-  { label: "Il tuo account", to: "/account/home" },
+  { label: "Il tuo account", to: "/account/prenotazioni" },
   { label: "Informazioni", to: "/account/profilo" },
   { label: "Prenotazioni", to: "/account/prenotazioni" },
   { label: "Chat", to: "/account/chat" },
@@ -19,10 +19,9 @@ export const CONSUMER_PROFILE_MENU_ITEMS: AppHeaderProfileMenuItem[] = [
 
 export const SUPER_ADMIN_PROFILE_MENU_ITEMS: AppHeaderProfileMenuItem[] = [
   { label: "Gestione piattaforma", to: "/admin/dashboard" },
-  { label: "Profilo e sicurezza", to: "/account/profilo" },
-  { label: "Notifiche", to: "/account/notifiche" },
-  { label: "Info e privacy", to: "/account/info-privacy" },
-  { label: "Assistenza", to: "/account/assistenza" },
+  { label: "Profilo e sicurezza", to: "/admin/profilo" },
+  { label: "Messaggi", to: "/admin/messaggi" },
+  { label: "Assistenza", to: "/admin/assistenza" },
   { label: "Logout", logout: true },
 ];
 
@@ -39,6 +38,8 @@ export function ownerProfileMenuItems(planTier: SalonPlanTier): AppHeaderProfile
   if (planTier === "PREMIUM") {
     return [
       { label: "Il mio salone", to: "/account/salone" },
+      { label: "Crea il tuo sito", to: "/account/salone/tuo-salone" },
+      { label: "Brand e vetrina", to: "/account/salone/brand" },
       { label: "Agenda", to: "/account/prenotazioni" },
       { label: "Notifiche", to: "/account/notifiche" },
       { label: "Profilo", to: "/account/profilo" },
