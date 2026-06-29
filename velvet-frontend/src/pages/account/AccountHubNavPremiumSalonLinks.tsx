@@ -7,7 +7,7 @@ const navBtn = accountHubNavBtn;
 export function AccountHubNavPremiumSalonLinks() {
   return (
     <div
-      className="velvet-account-hub__nav-scroll velvet-account-hub__nav-scroll--consumer-grid"
+      className="luxury-account-hub__nav-scroll luxury-account-hub__nav-scroll--consumer-grid"
       aria-label="Strumenti piano Premium"
     >
       <AccountHubNavLink to="/account/salone/tuo-salone" className={navBtn()}>
@@ -22,7 +22,7 @@ export function AccountHubNavPremiumSalonLinks() {
       <AccountHubNavLink to="/account/salone/staff" className={navBtn()}>
         Staff
       </AccountHubNavLink>
-      <AccountHubNavLink to="/account/salone/statistiche" className={navBtn("velvet-account-hub__btn--salon-statistiche")}>
+      <AccountHubNavLink to="/account/salone/statistiche" className={navBtn("luxury-account-hub__btn--salon-statistiche")}>
         Statistiche
       </AccountHubNavLink>
       <AccountHubNavLink to="/account/salone" end className={navBtn()}>

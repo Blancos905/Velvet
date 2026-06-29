@@ -15,7 +15,7 @@ class TransactionalEmailDeliverabilityTest {
 
 	@Test
 	void shouldSkipBeforeSmtp_allowsRealDomains() {
-		assertThat(TransactionalEmailDeliverability.shouldSkipBeforeSmtp("mario.rossi@gmail.com")).isFalse();
+		assertThat(TransactionalEmailDeliverability.shouldSkipBeforeSmtp("mario.rossi@outlook.com")).isFalse();
 		assertThat(TransactionalEmailDeliverability.shouldSkipBeforeSmtp("cliente@saloniluxury.it")).isFalse();
 	}
 

@@ -35,7 +35,7 @@ public class MeDataExportController {
 		Map<String, Object> body = mePersonalDataExportService.exportForPrincipal(principal);
 		return ResponseEntity.ok()
 				.header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
-						.filename("saloni-velvet-data-export.json")
+						.filename("saloni-luxury-data-export.json")
 						.build()
 						.toString())
 				.body(body);

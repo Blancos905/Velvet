@@ -28,14 +28,17 @@ public class StripeSubscriptionSyncService {
 	private final BillingAccountRepository billingAccountRepository;
 	private final StudioGroupRepository studioGroupRepository;
 	private final com.stripe.StripeClient stripeClient;
+	private final SalonSubscriptionLifecycleService subscriptionLifecycleService;
 
 	public StripeSubscriptionSyncService(
 			BillingAccountRepository billingAccountRepository,
 			StudioGroupRepository studioGroupRepository,
-			com.stripe.StripeClient stripeClient) {
+			com.stripe.StripeClient stripeClient,
+			SalonSubscriptionLifecycleService subscriptionLifecycleService) {
 		this.billingAccountRepository = billingAccountRepository;
 		this.studioGroupRepository = studioGroupRepository;
 		this.stripeClient = stripeClient;
+		this.subscriptionLifecycleService = subscriptionLifecycleService;
 	}
 
 	@Transactional
@@ -55,6 +58,7 @@ public class StripeSubscriptionSyncService {
 		BillingAccount account = billingAccountRepository.findByStudioGroup_Id(studioGroupId)
 				.orElseGet(() -> findOrCreateByCustomer(subscription, group));
 
+		boolean wasCancelAtPeriodEnd = account.isCancelAtPeriodEnd();
 		account.setStripeSubscriptionId(subscription.getId());
 		account.setSubscriptionStatus(normalizeStatus(subscription.getStatus()));
 		account.setCancelAtPeriodEnd(Boolean.TRUE.equals(subscription.getCancelAtPeriodEnd()));
@@ -65,6 +69,7 @@ public class StripeSubscriptionSyncService {
 		if (priceId != null) {
 			account.setStripePriceId(priceId);
 		}
+		subscriptionLifecycleService.onSubscriptionSynced(account, wasCancelAtPeriodEnd);
 		account.setSyncedAt(Instant.now());
 		billingAccountRepository.save(account);
 

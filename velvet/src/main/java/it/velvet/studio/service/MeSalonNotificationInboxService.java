@@ -253,7 +253,7 @@ public class MeSalonNotificationInboxService {
 		if (n.getType() == NotificationType.ADMIN_PLATFORM_MESSAGE) {
 			String title = n.getPlatformMessageSubject() != null && !n.getPlatformMessageSubject().isBlank()
 					? n.getPlatformMessageSubject().trim()
-					: "Velvet";
+					: "Saloni Luxury";
 			String body = n.getPlatformMessageBody() != null ? n.getPlatformMessageBody().trim() : "";
 			String preview = body.length() > 280 ? body.substring(0, 277) + "…" : body;
 			return new MeSalonNotificationMessageDto(
@@ -264,7 +264,7 @@ public class MeSalonNotificationInboxService {
 					n.getSentAt(),
 					null,
 					title,
-					preview.isEmpty() ? "Messaggio da Velvet." : preview);
+					preview.isEmpty() ? "Messaggio da Saloni Luxury." : preview);
 		}
 		Appointment a = n.getAppointment();
 		if (a == null) {
@@ -308,7 +308,7 @@ public class MeSalonNotificationInboxService {
 			case REMINDER_24H -> "Promemoria appuntamento inviato.";
 			case REMINDER_1H -> "Promemoria (circa 2 ore prima) inviato.";
 			case REVIEW_INVITE -> "Invito recensione inviato.";
-			case ADMIN_PLATFORM_MESSAGE -> "Messaggio da Velvet.";
+			case ADMIN_PLATFORM_MESSAGE -> "Messaggio da Saloni Luxury.";
 			case SUPPORT_REQUEST_TO_VELVET -> "Richiesta assistenza.";
 		};
 	}
@@ -372,7 +372,7 @@ public class MeSalonNotificationInboxService {
 			case REVIEW_INVITE ->
 					withOperator("Invito recensione: " + clientName + " — servizio il " + dateStr + " alle " + timeStr, operatorName)
 							+ ".";
-			case ADMIN_PLATFORM_MESSAGE -> "Messaggio da Velvet.";
+			case ADMIN_PLATFORM_MESSAGE -> "Messaggio da Saloni Luxury.";
 			case SUPPORT_REQUEST_TO_VELVET -> "Richiesta assistenza.";
 		};
 	}
@@ -451,7 +451,7 @@ public class MeSalonNotificationInboxService {
 			case BOOKING_CONFIRMATION -> "Email — prenotazioni e conferme clienti";
 			case BOOKING_UPDATED -> "Email — prenotazione aggiornata";
 			case BOOKING_CANCELLED -> "Email — annullamento prenotazione";
-			case SYSTEM -> "Messaggi Velvet";
+			case SYSTEM -> "Messaggi Saloni Luxury";
 		};
 	}
 

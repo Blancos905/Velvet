@@ -1,6 +1,15 @@
+import {
+  getOrCreateCookieVisitorId,
+  recordCookieConsentOnServer,
+  type CookieConsentRegistryAction,
+} from "../api/cookieConsentRegistry";
+import { LEGAL_DOCUMENT_VERSION } from "../content/legalEntity";
+
 /** Preferenze cookie / tecnologie simili (Linee guida Garante 2021). */
 
 export const COOKIE_CONSENT_STORAGE_KEY = "velvet.cookie-consent.v2";
+
+export type { CookieConsentRegistryAction as CookieConsentAction };
 
 export type CookieConsentCategory = "necessary" | "maps" | "editorial";
 
@@ -52,11 +61,26 @@ export function readCookieConsent(): CookieConsentPreferences | null {
   }
 }
 
-export function writeCookieConsent(prefs: CookieConsentPreferences): void {
+export function writeCookieConsent(
+  prefs: CookieConsentPreferences,
+  action: CookieConsentRegistryAction = "custom",
+): void {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, JSON.stringify(prefs));
     window.dispatchEvent(new CustomEvent("velvet:cookie-consent", { detail: prefs }));
+    const visitorId = getOrCreateCookieVisitorId();
+    if (visitorId) {
+      recordCookieConsentOnServer({
+        visitorId,
+        version: 2,
+        decidedAt: prefs.decidedAt,
+        action,
+        maps: prefs.maps,
+        editorial: prefs.editorial,
+        policyVersion: LEGAL_DOCUMENT_VERSION,
+      });
+    }
   } catch {
     /* ignore quota / private mode */
   }

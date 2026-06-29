@@ -11,38 +11,38 @@ export function SalonFreeWebPanelGate() {
     SUBSCRIPTION_GUARDS_SNAPSHOT.messages.freeOwnerWebPanel;
 
   return (
-    <main className="velvet-auth-page velvet-free-web-panel-gate" aria-labelledby="velvet-free-web-panel-gate-title">
-      <div className="velvet-auth-card velvet-free-web-panel-gate__card">
-        <div className="velvet-free-web-panel-gate__mark">
+    <main className="luxury-auth-page luxury-free-web-panel-gate" aria-labelledby="luxury-free-web-panel-gate-title">
+      <div className="luxury-auth-card luxury-free-web-panel-gate__card">
+        <div className="luxury-free-web-panel-gate__mark">
           <SaloniLuxuryLogoMark variant="default" />
         </div>
-        <p className="velvet-free-web-panel-gate__kicker">{kicker}</p>
-        <h1 id="velvet-free-web-panel-gate-title" className="velvet-auth-title velvet-free-web-panel-gate__title">
+        <p className="luxury-free-web-panel-gate__kicker">{kicker}</p>
+        <h1 id="luxury-free-web-panel-gate-title" className="luxury-auth-title luxury-free-web-panel-gate__title">
           {title}
         </h1>
-        <p className="velvet-free-web-panel-gate__lead">{lead}</p>
+        <p className="luxury-free-web-panel-gate__lead">{lead}</p>
 
-        <div className="velvet-free-web-panel-gate__panel" aria-label="Cosa include il piano Free in app">
-          <p className="velvet-free-web-panel-gate__panel-label">Disponibile ora in app</p>
-          <ul className="velvet-free-web-panel-gate__feature-list">
+        <div className="luxury-free-web-panel-gate__panel" aria-label="Cosa include il piano Free in app">
+          <p className="luxury-free-web-panel-gate__panel-label">Disponibile ora in app</p>
+          <ul className="luxury-free-web-panel-gate__feature-list">
             {freeAppFeatures.map((feature) => (
               <li key={feature}>{feature}</li>
             ))}
           </ul>
         </div>
 
-        <div className="velvet-free-web-panel-gate__premium-panel">
-          <span className="velvet-free-web-panel-gate__premium-badge" aria-hidden>
+        <div className="luxury-free-web-panel-gate__premium-panel">
+          <span className="luxury-free-web-panel-gate__premium-badge" aria-hidden>
             Premium
           </span>
-          <p className="velvet-free-web-panel-gate__premium-copy">{premiumHint}</p>
+          <p className="luxury-free-web-panel-gate__premium-copy">{premiumHint}</p>
         </div>
 
-        <div className="velvet-free-web-panel-gate__actions">
-          <Link to="/piani/premium-prova" className="velvet-btn velvet-btn--primary velvet-free-web-panel-gate__cta">
+        <div className="luxury-free-web-panel-gate__actions">
+          <Link to="/piani/premium-prova" className="luxury-btn luxury-btn--primary luxury-free-web-panel-gate__cta">
             Scopri Premium e provalo gratis
           </Link>
-          <Link to="/" className="velvet-free-web-panel-gate__back">
+          <Link to="/" className="luxury-free-web-panel-gate__back">
             Torna al sito
           </Link>
         </div>

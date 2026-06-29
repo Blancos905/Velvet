@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
 import { BUG_AREA_MAP, resolveBugAreasFromText } from "../../data/bugAreaMap";
-import "../../styles/velvet-bug-map.css";
+import "../../styles/luxury-bug-map.css";
 
 function PathList({ paths }: { paths: string[] }) {
   if (paths.length === 0) {
-    return <p className="velvet-bug-map__empty">—</p>;
+    return <p className="luxury-bug-map__empty">—</p>;
   }
   return (
-    <ul className="velvet-bug-map__path-list">
+    <ul className="luxury-bug-map__path-list">
       {paths.map((path) => (
         <li key={path}>
           <code>{path}</code>
@@ -57,16 +57,16 @@ export default function BugMapPage() {
   };
 
   return (
-    <main className="velvet-bug-map">
-      <header className="velvet-bug-map__header">
-        <p className="velvet-bug-map__eyebrow">Solo sviluppo</p>
+    <main className="luxury-bug-map">
+      <header className="luxury-bug-map__header">
+        <p className="luxury-bug-map__eyebrow">Solo sviluppo</p>
         <h1>Mappa bug Luxury</h1>
-        <p className="velvet-bug-map__lead">
+        <p className="luxury-bug-map__lead">
           In chat puoi scrivere solo <code>/piani</code>, <code>@piani</code> o{" "}
           <code>@piani c&apos;è un bug, controlla</code>. Se puoi, aggiungi <em>Atteso … / Ottenuto …</em>.
         </p>
-        <label className="velvet-bug-map__search">
-          <span className="velvet-bug-map__search-label">Prova un segnale reale (route, @tag, parola chiave)</span>
+        <label className="luxury-bug-map__search">
+          <span className="luxury-bug-map__search-label">Prova un segnale reale (route, @tag, parola chiave)</span>
           <input
             type="search"
             value={query}
@@ -75,38 +75,38 @@ export default function BugMapPage() {
             autoComplete="off"
           />
         </label>
-        <p className="velvet-bug-map__count">
+        <p className="luxury-bug-map__count">
           {filtered.length} aree
           {query.trim() ? ` per «${query.trim()}»` : ` · ${BUG_AREA_MAP.length} totali`}
         </p>
       </header>
 
-      <div className="velvet-bug-map__grid">
+      <div className="luxury-bug-map__grid">
         {filtered.map((entry) => {
           const routes = routeExamples(entry);
           const routeKey = `${entry.tag}:route`;
           const tagKey = `${entry.tag}:tag`;
           const primaryRoute = routes[0] ?? entry.surfaces[0];
           return (
-            <article key={entry.tag} className="velvet-bug-map__card">
-              <div className="velvet-bug-map__card-head">
-                <span className="velvet-bug-map__tag">@{entry.tag}</span>
+            <article key={entry.tag} className="luxury-bug-map__card">
+              <div className="luxury-bug-map__card-head">
+                <span className="luxury-bug-map__tag">@{entry.tag}</span>
                 <h2>{entry.label}</h2>
               </div>
-              <p className="velvet-bug-map__surfaces">
+              <p className="luxury-bug-map__surfaces">
                 {entry.surfaces.map((surface) => (
                   <code key={surface}>{surface}</code>
                 ))}
               </p>
               {entry.aliases.length > 0 ? (
-                <p className="velvet-bug-map__aliases">
+                <p className="luxury-bug-map__aliases">
                   {entry.aliases.map((alias) => (
                     <span key={alias}>{alias}</span>
                   ))}
                 </p>
               ) : null}
-              <div className="velvet-bug-map__example-row">
-                <code className="velvet-bug-map__example">{entry.example}</code>
+              <div className="luxury-bug-map__example-row">
+                <code className="luxury-bug-map__example">{entry.example}</code>
                 <button type="button" onClick={() => copyText(tagKey, entry.example)}>
                   {copiedKey === tagKey ? "Copiato" : "Copia @tag"}
                 </button>

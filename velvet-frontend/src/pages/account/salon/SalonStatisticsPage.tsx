@@ -304,25 +304,25 @@ export default function SalonStatisticsPage() {
     <>
       <span
         className={
-          "velvet-stats-delta " +
+          "luxury-stats-delta " +
           (trendUpBookings
-            ? "velvet-stats-delta--up"
+            ? "luxury-stats-delta--up"
             : trendDownBookings
-              ? "velvet-stats-delta--down"
-              : "velvet-stats-delta--flat")
+              ? "luxury-stats-delta--down"
+              : "luxury-stats-delta--flat")
         }
       >
         {trendUpBookings ? "↑" : trendDownBookings ? "↓" : "→"}{" "}
         {monthDelta > 0 ? `+${monthDelta}` : monthDelta} vs mese precedente
         {pctVsPrevious != null ? (
-          <span className="velvet-stats-delta__pct">
+          <span className="luxury-stats-delta__pct">
             {" "}
             ({pctVsPrevious > 0 ? "+" : ""}
             {pctVsPrevious}%)
           </span>
         ) : null}
       </span>
-      <span className="velvet-stats-chart-card__compare-note">
+      <span className="luxury-stats-chart-card__compare-note">
         Questo mese: {currentMonthCount} · Mese scorso: {previousMonthCount}
       </span>
     </>
@@ -364,42 +364,42 @@ export default function SalonStatisticsPage() {
 
   return (
     <SalonStandardSectionGuard>
-      <div className="velvet-stats-page velvet-stats-dash velvet-stats-dash--metrics-pro velvet-stats-dash--base44">
-        <div className="velvet-stats-dash__shell">
-          <header className="velvet-stats-dash__header velvet-stats-dash__header--bordered">
-            <div className="velvet-stats-dash__header-inner">
+      <div className="luxury-stats-page luxury-stats-dash luxury-stats-dash--metrics-pro luxury-stats-dash--base44">
+        <div className="luxury-stats-dash__shell">
+          <header className="luxury-stats-dash__header luxury-stats-dash__header--bordered">
+            <div className="luxury-stats-dash__header-inner">
               <div>
-                <p className="velvet-stats-dash__eyebrow">Piano Premium</p>
-                <h1 className="velvet-stats-dash__title-h1 velvet-stats-dash__title-h1--playfair">Statistiche Salone</h1>
+                <p className="luxury-stats-dash__eyebrow">Piano Premium</p>
+                <h1 className="luxury-stats-dash__title-h1 luxury-stats-dash__title-h1--playfair">Statistiche Salone</h1>
               </div>
-              <div className="velvet-stats-dash__period">
-                <ClockIcon className="velvet-stats-dash__period-icon" strokeWidth={2} aria-hidden />
-                <span className="velvet-stats-dash__period-label">{label}</span>
+              <div className="luxury-stats-dash__period">
+                <ClockIcon className="luxury-stats-dash__period-icon" strokeWidth={2} aria-hidden />
+                <span className="luxury-stats-dash__period-label">{label}</span>
               </div>
             </div>
           </header>
 
           {meSalonQ.isLoading ? (
-            <div className="velvet-stats-metric-card velvet-stats-dash__loading">
-              <p className="velvet-stats-metric-muted" style={{ margin: 0 }}>
+            <div className="luxury-stats-metric-card luxury-stats-dash__loading">
+              <p className="luxury-stats-metric-muted" style={{ margin: 0 }}>
                 Caricamento profilo salone…
               </p>
             </div>
           ) : q.isPending ? (
-            <div className="velvet-stats-metric-card velvet-stats-dash__loading">
-              <p className="velvet-stats-metric-muted" style={{ margin: 0 }}>
+            <div className="luxury-stats-metric-card luxury-stats-dash__loading">
+              <p className="luxury-stats-metric-muted" style={{ margin: 0 }}>
                 Caricamento statistiche…
               </p>
             </div>
           ) : q.isError ? (
-            <div className="velvet-stats-metric-card velvet-stats-dash__loading">
-              <p className="velvet-alert velvet-alert--error" role="alert" style={{ margin: 0 }}>
+            <div className="luxury-stats-metric-card luxury-stats-dash__loading">
+              <p className="luxury-alert luxury-alert--error" role="alert" style={{ margin: 0 }}>
                 {q.error instanceof Error ? q.error.message : "Errore caricamento statistiche"}
               </p>
             </div>
           ) : (
-            <main className="velvet-stats-dash__main velvet-stats-dash__main--spaced">
-              <section className="velvet-stats-dash__kpi" aria-label="Indicatori principali">
+            <main className="luxury-stats-dash__main luxury-stats-dash__main--spaced">
+              <section className="luxury-stats-dash__kpi" aria-label="Indicatori principali">
                 <StatCard
                   icon={Users}
                   label="Clienti Totali"
@@ -441,44 +441,44 @@ export default function SalonStatisticsPage() {
               </section>
 
               <article
-                className="velvet-stats-pro-card velvet-stats-dash__pdf-report"
+                className="luxury-stats-pro-card luxury-stats-dash__pdf-report"
                 aria-labelledby="stats-pdf-report-title"
               >
-                <div className="velvet-stats-pro-card__head">
-                  <span className="velvet-stats-pro-card__label" id="stats-pdf-report-title">
+                <div className="luxury-stats-pro-card__head">
+                  <span className="luxury-stats-pro-card__label" id="stats-pdf-report-title">
                     Report PDF ricavi
                   </span>
-                  <span className="velvet-stats-pro-card__icon-wrap" aria-hidden>
-                    <FileDownIcon className="velvet-stats-pro-card__icon" strokeWidth={2} />
+                  <span className="luxury-stats-pro-card__icon-wrap" aria-hidden>
+                    <FileDownIcon className="luxury-stats-pro-card__icon" strokeWidth={2} />
                   </span>
                 </div>
-                <div className="velvet-stats-dash__pdf-month">
-                  <div className="velvet-stats-dash__pdf-month-head">
-                    <span className="velvet-stats-dash__pdf-section-label">Mese corrente</span>
-                    <span className="velvet-stats-dash__pdf-month-period">
+                <div className="luxury-stats-dash__pdf-month">
+                  <div className="luxury-stats-dash__pdf-month-head">
+                    <span className="luxury-stats-dash__pdf-section-label">Mese corrente</span>
+                    <span className="luxury-stats-dash__pdf-month-period">
                       {label.charAt(0).toUpperCase() + label.slice(1)}
                     </span>
                   </div>
-                  <p className="velvet-stats-dash__pdf-month-hint">
+                  <p className="luxury-stats-dash__pdf-month-hint">
                     Intervallo dati: {from} — {to} (stessi appuntamenti usati per le card sopra).
                   </p>
                   <button
                     type="button"
-                    className="velvet-stats-dash__pdf-btn"
+                    className="luxury-stats-dash__pdf-btn"
                     disabled={q.isPending}
                     onClick={onDownloadMonthlyPdf}
                   >
                     {q.isPending ? "Caricamento…" : "Scarica PDF mese"}
                   </button>
                 </div>
-                <p className="velvet-stats-dash__pdf-section-label velvet-stats-dash__pdf-section-label--spaced">
+                <p className="luxury-stats-dash__pdf-section-label luxury-stats-dash__pdf-section-label--spaced">
                   Semestre
                 </p>
-                <div className="velvet-stats-dash__pdf-controls">
-                  <label className="velvet-stats-dash__pdf-field">
-                    <span className="velvet-stats-dash__pdf-field-label">Anno</span>
+                <div className="luxury-stats-dash__pdf-controls">
+                  <label className="luxury-stats-dash__pdf-field">
+                    <span className="luxury-stats-dash__pdf-field-label">Anno</span>
                     <select
-                      className="velvet-stats-dash__pdf-select"
+                      className="luxury-stats-dash__pdf-select"
                       value={reportYear}
                       onChange={(e) => setReportYear(Number(e.target.value))}
                     >
@@ -489,10 +489,10 @@ export default function SalonStatisticsPage() {
                       ))}
                     </select>
                   </label>
-                  <label className="velvet-stats-dash__pdf-field">
-                    <span className="velvet-stats-dash__pdf-field-label">Semestre</span>
+                  <label className="luxury-stats-dash__pdf-field">
+                    <span className="luxury-stats-dash__pdf-field-label">Semestre</span>
                     <select
-                      className="velvet-stats-dash__pdf-select"
+                      className="luxury-stats-dash__pdf-select"
                       value={reportSemester}
                       onChange={(e) => setReportSemester(Number(e.target.value) as 1 | 2)}
                     >
@@ -502,7 +502,7 @@ export default function SalonStatisticsPage() {
                   </label>
                   <button
                     type="button"
-                    className="velvet-stats-dash__pdf-btn"
+                    className="luxury-stats-dash__pdf-btn"
                     disabled={semesterPdfQ.isPending || semesterPdfQ.isError || !semesterPdfQ.data}
                     onClick={onDownloadSemesterPdf}
                   >
@@ -510,7 +510,7 @@ export default function SalonStatisticsPage() {
                   </button>
                 </div>
                 {semesterPdfQ.isError ? (
-                  <p className="velvet-stats-dash__pdf-error" role="alert">
+                  <p className="luxury-stats-dash__pdf-error" role="alert">
                     {semesterPdfQ.error instanceof Error
                       ? semesterPdfQ.error.message
                       : "Errore nel caricamento dati periodo"}
@@ -519,7 +519,7 @@ export default function SalonStatisticsPage() {
               </article>
 
               {/* Stessa riga del Base44 Home: BookingsChart | RevenueChart */}
-              <div className="velvet-stats-dash__charts">
+              <div className="luxury-stats-dash__charts">
                 <BookingsChart
                   title="Prenotazioni per mese"
                   subtitle="Ultimi 5 mesi — confronto con il mese precedente"
@@ -539,23 +539,23 @@ export default function SalonStatisticsPage() {
                 />
               </div>
 
-              <div className="velvet-stats-dash__triple">
+              <div className="luxury-stats-dash__triple">
                 <TopServices rows={serviceRows} totalBookings={serviceBookingsTotal} />
                 <StaffPerformance rows={staffPerfRows} loading={staffQuery.isPending || q.isPending} />
                 <ClientRetention returningPct={returningPct} loading={historyQ.isPending || q.isPending} />
               </div>
 
-              <section className="velvet-stats-dash__banner">
-                <div className="velvet-stats-dash__banner-deco" aria-hidden />
-                <div className="velvet-stats-dash__banner-inner">
-                  <div className="velvet-stats-dash__banner-icon-wrap">
-                    <TrendingIcon className="velvet-stats-dash__banner-icon" strokeWidth={2} aria-hidden />
+              <section className="luxury-stats-dash__banner">
+                <div className="luxury-stats-dash__banner-deco" aria-hidden />
+                <div className="luxury-stats-dash__banner-inner">
+                  <div className="luxury-stats-dash__banner-icon-wrap">
+                    <TrendingIcon className="luxury-stats-dash__banner-icon" strokeWidth={2} aria-hidden />
                   </div>
                   <div>
-                    <h3 className="velvet-stats-dash__banner-title">
+                    <h3 className="luxury-stats-dash__banner-title">
                       {bannerPositive ? "Il tuo salone sta crescendo!" : "Panoramica aggiornata"}
                     </h3>
-                    <p className="velvet-stats-dash__banner-text">{bannerBody}</p>
+                    <p className="luxury-stats-dash__banner-text">{bannerBody}</p>
                   </div>
                 </div>
               </section>

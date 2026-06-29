@@ -1,0 +1,1130 @@
+/**
+ * Account salone — pagina Servizi (listino + foto vetrina locale).
+ * Complementare a .luxury-brand-service-* in luxury-salon-showcase.css
+ * Hero + card allineati a Clienti / Notifiche (zinc, solo accento arancio).
+ */
+
+.luxury-salon-services-operator-pick {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.luxury-salon-services-operator-pick__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.luxury-salon-services-list__operators {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+}
+
+/* Hero pagina servizi — stesso linguaggio della pagina Clienti */
+.luxury-account-page-shell--salon-services .luxury-account-page-shell__hero {
+  border-radius: 0 0 22px 22px;
+  margin-left: clamp(-0.5rem, -1vw, 0);
+  margin-right: clamp(-0.5rem, -1vw, 0);
+  padding: clamp(1.25rem, 4vw, 2rem) clamp(0.5rem, 2vw, 1rem) clamp(1.35rem, 3.5vw, 1.85rem);
+  border: 1px solid rgba(63, 63, 70, 0.5);
+  background:
+    radial-gradient(120% 80% at 15% 0%, rgba(249, 115, 22, 0.14) 0%, transparent 55%),
+    radial-gradient(90% 60% at 100% 30%, rgba(251, 191, 36, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(39, 39, 42, 0.55) 0%, rgba(24, 24, 27, 0.2) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 24px 48px rgba(0, 0, 0, 0.28);
+}
+
+.luxury-account-page-shell--salon-services .luxury-account-page-shell__hero-glow {
+  inset: -40% -20% auto -20%;
+  height: 120%;
+  background: radial-gradient(ellipse 55% 45% at 50% 0%, rgba(249, 115, 22, 0.22) 0%, transparent 65%);
+  opacity: 0.85;
+}
+
+.luxury-salon-services-hero__headline {
+  position: relative;
+  margin: 0 0 0.45rem;
+  display: block;
+  font-size: clamp(2.15rem, 7vw, 3.75rem);
+  font-weight: 850;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.luxury-salon-services-hero__headline-pre {
+  display: inline;
+  color: #fafafa;
+  text-shadow:
+    0 0 40px rgba(250, 250, 250, 0.12),
+    0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.luxury-salon-services-hero__headline-accent {
+  display: inline;
+  background: linear-gradient(
+    105deg,
+    #fb923c 0%,
+    #f97316 28%,
+    #fdba74 52%,
+    #f97316 78%,
+    #ea580c 100%
+  );
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 14px rgba(249, 115, 22, 0.35));
+  animation: luxury-salon-services-hero-shimmer 10s ease-in-out infinite;
+}
+
+@keyframes luxury-salon-services-hero-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.luxury-salon-services-hero__headline::after {
+  content: "";
+  display: block;
+  width: min(12rem, 55%);
+  height: 4px;
+  margin-top: 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.95) 0%, rgba(251, 191, 36, 0.5) 55%, transparent 100%);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-services-hero__headline-accent {
+    animation: none;
+    background-position: 50% 50%;
+  }
+}
+
+/* Hero — Brand e vetrina (SalonBrandPage), stesso linguaggio di Servizi */
+.luxury-account-page-shell--salon-brand .luxury-account-page-shell__hero {
+  border-radius: 0 0 22px 22px;
+  margin-left: clamp(-0.5rem, -1vw, 0);
+  margin-right: clamp(-0.5rem, -1vw, 0);
+  padding: clamp(1.25rem, 4vw, 2rem) clamp(0.5rem, 2vw, 1rem) clamp(1.35rem, 3.5vw, 1.85rem);
+  border: 1px solid rgba(63, 63, 70, 0.5);
+  background:
+    radial-gradient(120% 80% at 15% 0%, rgba(249, 115, 22, 0.14) 0%, transparent 55%),
+    radial-gradient(90% 60% at 100% 30%, rgba(251, 191, 36, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(39, 39, 42, 0.55) 0%, rgba(24, 24, 27, 0.2) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 24px 48px rgba(0, 0, 0, 0.28);
+}
+
+.luxury-account-page-shell--salon-brand .luxury-account-page-shell__hero-glow {
+  inset: -40% -20% auto -20%;
+  height: 120%;
+  background: radial-gradient(ellipse 55% 45% at 50% 0%, rgba(249, 115, 22, 0.22) 0%, transparent 65%);
+  opacity: 0.85;
+}
+
+.luxury-salon-brand-hero__headline {
+  position: relative;
+  margin: 0 0 0.45rem;
+  display: block;
+  font-size: clamp(2.15rem, 7vw, 3.75rem);
+  font-weight: 850;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.luxury-salon-brand-hero__headline-pre {
+  display: inline;
+  color: #fafafa;
+  text-shadow:
+    0 0 40px rgba(250, 250, 250, 0.12),
+    0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.luxury-salon-brand-hero__headline-accent {
+  display: inline;
+  background: linear-gradient(
+    105deg,
+    #fb923c 0%,
+    #f97316 28%,
+    #fdba74 52%,
+    #f97316 78%,
+    #ea580c 100%
+  );
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 14px rgba(249, 115, 22, 0.35));
+  animation: luxury-salon-brand-hero-shimmer 10s ease-in-out infinite;
+}
+
+@keyframes luxury-salon-brand-hero-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.luxury-salon-brand-hero__headline::after {
+  content: "";
+  display: block;
+  width: min(12rem, 55%);
+  height: 4px;
+  margin-top: 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.95) 0%, rgba(251, 191, 36, 0.5) 55%, transparent 100%);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-brand-hero__headline-accent {
+    animation: none;
+    background-position: 50% 50%;
+  }
+}
+
+/* Hero — Posizione del salone (SalonLocationPage), stesso linguaggio di Servizi */
+.luxury-account-page-shell--salon-location .luxury-account-page-shell__hero {
+  border-radius: 0 0 22px 22px;
+  margin-left: clamp(-0.5rem, -1vw, 0);
+  margin-right: clamp(-0.5rem, -1vw, 0);
+  padding: clamp(1.25rem, 4vw, 2rem) clamp(0.5rem, 2vw, 1rem) clamp(1.35rem, 3.5vw, 1.85rem);
+  border: 1px solid rgba(63, 63, 70, 0.5);
+  background:
+    radial-gradient(120% 80% at 15% 0%, rgba(249, 115, 22, 0.14) 0%, transparent 55%),
+    radial-gradient(90% 60% at 100% 30%, rgba(251, 191, 36, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(39, 39, 42, 0.55) 0%, rgba(24, 24, 27, 0.2) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 24px 48px rgba(0, 0, 0, 0.28);
+}
+
+.luxury-account-page-shell--salon-location .luxury-account-page-shell__hero-glow {
+  inset: -40% -20% auto -20%;
+  height: 120%;
+  background: radial-gradient(ellipse 55% 45% at 50% 0%, rgba(249, 115, 22, 0.22) 0%, transparent 65%);
+  opacity: 0.85;
+}
+
+.luxury-salon-location-hero__headline {
+  position: relative;
+  margin: 0 0 0.45rem;
+  display: block;
+  font-size: clamp(2.15rem, 7vw, 3.75rem);
+  font-weight: 850;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.luxury-salon-location-hero__headline-pre {
+  display: inline;
+  color: #fafafa;
+  text-shadow:
+    0 0 40px rgba(250, 250, 250, 0.12),
+    0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.luxury-salon-location-hero__headline-accent {
+  display: inline;
+  background: linear-gradient(
+    105deg,
+    #fb923c 0%,
+    #f97316 28%,
+    #fdba74 52%,
+    #f97316 78%,
+    #ea580c 100%
+  );
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 14px rgba(249, 115, 22, 0.35));
+  animation: luxury-salon-location-hero-shimmer 10s ease-in-out infinite;
+}
+
+@keyframes luxury-salon-location-hero-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.luxury-salon-location-hero__headline::after {
+  content: "";
+  display: block;
+  width: min(12rem, 55%);
+  height: 4px;
+  margin-top: 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.95) 0%, rgba(251, 191, 36, 0.5) 55%, transparent 100%);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-location-hero__headline-accent {
+    animation: none;
+    background-position: 50% 50%;
+  }
+}
+
+/* Hero — Staff (SalonStaffPage), stesso linguaggio di Servizi */
+.luxury-account-page-shell--salon-staff .luxury-account-page-shell__hero {
+  border-radius: 0 0 22px 22px;
+  margin-left: clamp(-0.5rem, -1vw, 0);
+  margin-right: clamp(-0.5rem, -1vw, 0);
+  padding: clamp(1.25rem, 4vw, 2rem) clamp(0.5rem, 2vw, 1rem) clamp(1.35rem, 3.5vw, 1.85rem);
+  border: 1px solid rgba(63, 63, 70, 0.5);
+  background:
+    radial-gradient(120% 80% at 15% 0%, rgba(249, 115, 22, 0.14) 0%, transparent 55%),
+    radial-gradient(90% 60% at 100% 30%, rgba(251, 191, 36, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(39, 39, 42, 0.55) 0%, rgba(24, 24, 27, 0.2) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 24px 48px rgba(0, 0, 0, 0.28);
+}
+
+.luxury-account-page-shell--salon-staff .luxury-account-page-shell__hero-glow {
+  inset: -40% -20% auto -20%;
+  height: 120%;
+  background: radial-gradient(ellipse 55% 45% at 50% 0%, rgba(249, 115, 22, 0.22) 0%, transparent 65%);
+  opacity: 0.85;
+}
+
+.luxury-salon-staff-hero__headline {
+  position: relative;
+  margin: 0 0 0.45rem;
+  display: block;
+  font-size: clamp(2.15rem, 7vw, 3.75rem);
+  font-weight: 850;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.luxury-salon-staff-hero__headline-pre {
+  display: inline;
+  color: #fafafa;
+  text-shadow:
+    0 0 40px rgba(250, 250, 250, 0.12),
+    0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.luxury-salon-staff-hero__headline-accent {
+  display: inline;
+  background: linear-gradient(
+    105deg,
+    #fb923c 0%,
+    #f97316 28%,
+    #fdba74 52%,
+    #f97316 78%,
+    #ea580c 100%
+  );
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 14px rgba(249, 115, 22, 0.35));
+  animation: luxury-salon-staff-hero-shimmer 10s ease-in-out infinite;
+}
+
+@keyframes luxury-salon-staff-hero-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.luxury-salon-staff-hero__headline::after {
+  content: "";
+  display: block;
+  width: min(12rem, 55%);
+  height: 4px;
+  margin-top: 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.95) 0%, rgba(251, 191, 36, 0.5) 55%, transparent 100%);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-staff-hero__headline-accent {
+    animation: none;
+    background-position: 50% 50%;
+  }
+}
+
+/* Hero — Panoramica salone (AccountSalonHomePage), stesso linguaggio di Servizi */
+.luxury-account-page-shell--salon-panorama .luxury-account-page-shell__hero {
+  border-radius: 0 0 22px 22px;
+  margin-left: clamp(-0.5rem, -1vw, 0);
+  margin-right: clamp(-0.5rem, -1vw, 0);
+  padding: clamp(1.25rem, 4vw, 2rem) clamp(0.5rem, 2vw, 1rem) clamp(1.35rem, 3.5vw, 1.85rem);
+  border: 1px solid rgba(63, 63, 70, 0.5);
+  background:
+    radial-gradient(120% 80% at 15% 0%, rgba(249, 115, 22, 0.14) 0%, transparent 55%),
+    radial-gradient(90% 60% at 100% 30%, rgba(251, 191, 36, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(39, 39, 42, 0.55) 0%, rgba(24, 24, 27, 0.2) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 24px 48px rgba(0, 0, 0, 0.28);
+}
+
+.luxury-account-page-shell--salon-panorama .luxury-account-page-shell__hero-glow {
+  inset: -40% -20% auto -20%;
+  height: 120%;
+  background: radial-gradient(ellipse 55% 45% at 50% 0%, rgba(249, 115, 22, 0.22) 0%, transparent 65%);
+  opacity: 0.85;
+}
+
+.luxury-salon-panorama-hero__headline {
+  position: relative;
+  margin: 0 0 0.45rem;
+  display: block;
+  font-size: clamp(2.15rem, 7vw, 3.75rem);
+  font-weight: 850;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.luxury-salon-panorama-hero__headline-pre {
+  display: inline;
+  color: #fafafa;
+  text-shadow:
+    0 0 40px rgba(250, 250, 250, 0.12),
+    0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.luxury-salon-panorama-hero__headline-accent {
+  display: inline;
+  background: linear-gradient(
+    105deg,
+    #fb923c 0%,
+    #f97316 28%,
+    #fdba74 52%,
+    #f97316 78%,
+    #ea580c 100%
+  );
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 14px rgba(249, 115, 22, 0.35));
+  animation: luxury-salon-panorama-hero-shimmer 10s ease-in-out infinite;
+}
+
+@keyframes luxury-salon-panorama-hero-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.luxury-salon-panorama-hero__headline::after {
+  content: "";
+  display: block;
+  width: min(12rem, 55%);
+  height: 4px;
+  margin-top: 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.95) 0%, rgba(251, 191, 36, 0.5) 55%, transparent 100%);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-panorama-hero__headline-accent {
+    animation: none;
+    background-position: 50% 50%;
+  }
+}
+
+.luxury-salon-services-page {
+  --luxury-svc-accent: rgba(251, 191, 36, 0.55);
+  --luxury-svc-accent-soft: rgba(253, 186, 116, 0.22);
+  --luxury-svc-surface: rgba(24, 24, 27, 0.72);
+  --luxury-svc-surface-elevated: rgba(39, 39, 42, 0.45);
+  max-width: 720px;
+  position: relative;
+  isolation: isolate;
+  padding: clamp(0.85rem, 2.2vw, 1.25rem);
+  border-radius: clamp(14px, 2.4vw, 22px);
+  border: 1px solid rgba(63, 63, 70, 0.55);
+  background: linear-gradient(170deg, rgba(30, 30, 33, 0.55) 0%, rgba(24, 24, 27, 0.72) 52%, rgba(18, 18, 21, 0.82) 100%);
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.luxury-salon-services-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 68% 52% at 0% 0%, rgba(249, 115, 22, 0.08), transparent 62%),
+    radial-gradient(ellipse 52% 42% at 100% 10%, rgba(251, 191, 36, 0.06), transparent 58%);
+}
+
+.luxury-salon-services-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+.luxury-salon-services-page .luxury-salon-services-form-card {
+  margin-top: 0;
+  margin-bottom: 1.35rem;
+  border: 2px solid #000000;
+}
+
+.luxury-salon-services-page .luxury-salon-services-list-card {
+  margin-top: 0;
+}
+
+/** Lista servizi: stessa shell interattiva del form; larghezza piena sotto il page max-width. */
+.luxury-salon-services-page .luxury-salon-services-list-card.luxury-salon-services-form-card {
+  max-width: none;
+}
+
+@media (max-width: 520px) {
+  .luxury-salon-services-page {
+    padding: 0.72rem;
+    border-radius: 14px;
+  }
+}
+
+.luxury-salon-services-page__hint-strong {
+  color: #fef3c7;
+  font-weight: 600;
+}
+
+.luxury-salon-services-page__alert-spaced {
+  margin-bottom: 0.85rem;
+}
+
+/* Card form “Aggiungi servizio” — stessa superficie delle card Clienti */
+.luxury-salon-services-form-card {
+  position: relative;
+  isolation: isolate;
+  margin-bottom: 1.35rem;
+  max-width: 520px;
+  border-radius: 18px;
+  border: 2px solid #000000;
+  background: linear-gradient(165deg, rgba(30, 30, 33, 0.98) 0%, rgba(24, 24, 27, 0.99) 100%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.luxury-salon-services-form-card::before,
+.luxury-salon-services-form-card::after {
+  content: none;
+}
+
+.luxury-salon-services-form-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.luxury-salon-services-form-card:focus-within {
+  border-color: #000000;
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(249, 115, 22, 0.12);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-services-form-card:hover {
+    border-color: #000000;
+    box-shadow:
+      0 22px 48px rgba(0, 0, 0, 0.42),
+      0 0 0 1px rgba(249, 115, 22, 0.22);
+    transform: translateY(-2px);
+  }
+
+  .luxury-salon-services-form-card:active {
+    transform: translateY(-1px);
+    transition-duration: 0.12s;
+  }
+}
+
+.luxury-salon-services-form-card > .luxury-card-title,
+.luxury-salon-services-form-card > .luxury-personal-builder__card-intro > .luxury-card-title {
+  margin-bottom: clamp(0.65rem, 1.8vw, 0.9rem);
+}
+
+.luxury-salon-services-form-card .luxury-soft-field {
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.22s ease,
+    transform 0.25s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+.luxury-salon-services-form-card .luxury-soft-field:hover:not(:disabled):not(:focus) {
+  border-color: rgba(82, 82, 91, 0.85);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+}
+
+.luxury-salon-services-form-card .luxury-soft-field:focus {
+  outline: none;
+  border-color: rgba(249, 115, 22, 0.55);
+  box-shadow:
+    0 0 0 3px rgba(249, 115, 22, 0.12),
+    0 10px 30px rgba(0, 0, 0, 0.35);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.luxury-salon-services-form-card .luxury-form-label {
+  transition:
+    color 0.22s ease,
+    letter-spacing 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.22s ease;
+}
+
+.luxury-salon-services-form-card .luxury-form-label:has(.luxury-soft-field:focus) {
+  color: rgba(254, 243, 199, 0.98);
+  letter-spacing: 0.04em;
+  transform: translateX(2px);
+}
+
+.luxury-salon-services-form-card .luxury-soft-field:active:not(:disabled) {
+  transform: scale(0.997);
+}
+
+.luxury-salon-services-form-card .luxury-btn--primary {
+  position: relative;
+  transition:
+    transform 0.28s cubic-bezier(0.34, 1.45, 0.64, 1),
+    filter 0.22s ease,
+    box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.luxury-salon-services-form-card .luxury-btn--primary:not(:disabled) {
+  animation: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-services-form-card .luxury-btn--primary:hover:not(:disabled) {
+    animation: none;
+    transform: translateY(-4px) scale(1.045);
+    filter: brightness(1.1) saturate(1.05);
+    box-shadow:
+      0 14px 40px rgba(194, 65, 12, 0.55),
+      0 0 36px rgba(251, 191, 36, 0.35),
+      0 0 60px rgba(249, 115, 22, 0.15);
+  }
+
+  .luxury-salon-services-form-card .luxury-btn--primary:active:not(:disabled) {
+    transform: translateY(-1px) scale(1.02);
+    filter: brightness(1.05);
+  }
+}
+
+.luxury-salon-services-form {
+  display: grid;
+  gap: 0.9rem;
+  padding-top: 0.15rem;
+}
+
+.luxury-salon-services-form-card .luxury-salon-services-photo-panel {
+  transition:
+    border-color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s ease,
+    background 0.26s ease,
+    transform 0.3s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+.luxury-salon-services-form-card .luxury-salon-services-photo-panel__legend {
+  transition: color 0.22s ease, text-shadow 0.28s ease;
+}
+
+.luxury-salon-services-form-card .luxury-salon-services-photo-panel__actions .luxury-btn {
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.45, 0.64, 1),
+    filter 0.2s ease,
+    box-shadow 0.22s ease;
+}
+
+/* Brand — griglia immagini sito */
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-services-form-card .luxury-salon-services-photo-panel:hover {
+    transform: translateY(-2px) scale(1.01);
+    border-color: rgba(249, 115, 22, 0.42);
+    border-style: solid;
+    background: rgba(30, 30, 33, 0.75);
+    box-shadow:
+      0 0 0 1px rgba(249, 115, 22, 0.12),
+      0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  .luxury-salon-services-form-card .luxury-salon-services-photo-panel:hover .luxury-salon-services-photo-panel__legend {
+    animation: none;
+    color: #fffbeb;
+    text-shadow: 0 0 18px rgba(251, 191, 36, 0.35);
+  }
+
+  .luxury-salon-services-form-card .luxury-salon-services-photo-panel__actions .luxury-btn:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.luxury-salon-services-form__label-tight {
+  margin-top: 0.35rem;
+}
+
+.luxury-salon-services-form__textarea {
+  resize: vertical;
+  min-height: 5.75rem;
+  line-height: 1.55;
+}
+
+/* Blocco foto nuovo servizio */
+.luxury-salon-services-photo-panel {
+  margin-top: 0.15rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(63, 63, 70, 0.75);
+  background: rgba(24, 24, 27, 0.55);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.luxury-salon-services-photo-panel:hover {
+  border-color: rgba(249, 115, 22, 0.35);
+  background: rgba(30, 30, 33, 0.72);
+  box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.08);
+}
+
+.luxury-salon-services-photo-panel__legend {
+  display: block;
+  margin-bottom: 0.55rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(254, 243, 199, 0.95);
+}
+
+.luxury-salon-services-photo-panel__legend-sub {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: rgba(161, 161, 170, 0.95);
+  line-height: 1.45;
+}
+
+.luxury-salon-services-photo-panel__row {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.luxury-salon-services-photo-panel__row .luxury-brand-service-thumb {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.luxury-salon-services-photo-panel__thumb-placeholder {
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(113, 113, 122, 0.95);
+}
+
+.luxury-salon-services-photo-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.luxury-salon-services-photo-panel__actions .luxury-btn {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.luxury-salon-services-hidden-file {
+  display: none;
+}
+
+.luxury-salon-services-form__alert {
+  margin: 0;
+}
+
+/* Lista servizi */
+.luxury-salon-services-list-card .luxury-card-title {
+  margin-top: 0;
+  margin-bottom: clamp(0.55rem, 1.5vw, 0.75rem);
+}
+
+.luxury-salon-services-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.luxury-salon-services-list__item {
+  padding: 0.75rem 0.95rem;
+  border-radius: 12px;
+  background: var(--luxury-svc-surface-elevated);
+  border: 1px solid var(--luxury-svc-accent-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.luxury-salon-services-list__item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(249, 115, 22, 0.35);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+}
+
+.luxury-salon-services-list__item .luxury-brand-service-photo-row {
+  align-items: flex-start;
+}
+
+.luxury-salon-services-list__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.luxury-salon-services-list__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.luxury-salon-services-list__name {
+  font-weight: 600;
+  color: #fffbeb;
+  font-size: 1.02rem;
+  letter-spacing: 0.01em;
+}
+
+.luxury-salon-services-list__meta {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+  font-size: 0.9rem;
+  color: rgba(203, 213, 225, 0.92);
+  white-space: normal;
+}
+
+.luxury-salon-services-list__meta > span {
+  line-height: 1.3;
+}
+
+.luxury-salon-services-list__desc {
+  margin: 0.4rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: rgba(148, 163, 184, 0.98);
+  white-space: pre-wrap;
+}
+
+.luxury-salon-services-list__editor {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.luxury-salon-services-list__toolbar {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.luxury-salon-services-list__toolbar .luxury-btn {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.luxury-salon-services-list__toolbar label.luxury-btn {
+  cursor: pointer;
+}
+
+.luxury-salon-services-list__crop-controls {
+  margin-top: 0.55rem;
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid rgba(63, 63, 70, 0.6);
+  background: rgba(24, 24, 27, 0.55);
+}
+
+.luxury-salon-services-list__crop-label {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(226, 232, 240, 0.95);
+}
+
+.luxury-salon-services-list__crop-label input[type="range"] {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.luxury-salon-services-list__thumb-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.88);
+}
+
+.luxury-salon-services-empty {
+  margin: 0;
+  line-height: 1.6;
+  padding: 0.5rem 0;
+}
+
+.luxury-salon-services-page .luxury-page-subtitle {
+  margin-bottom: 1.15rem;
+  max-width: 52ch;
+}
+
+.luxury-salon-services-photo-panel:focus-within {
+  border-color: rgba(249, 115, 22, 0.45);
+  box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.12);
+}
+
+.luxury-salon-services-list__item:focus-within {
+  border-color: rgba(249, 115, 22, 0.45);
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-services-list__item,
+  .luxury-salon-services-photo-panel {
+    transition: none;
+  }
+
+  .luxury-salon-services-list__item:hover {
+    transform: none;
+  }
+
+  .luxury-salon-services-form-card {
+    transition: none;
+  }
+
+  .luxury-salon-services-form-card:hover,
+  .luxury-salon-services-form-card:active {
+    transform: none;
+  }
+
+  .luxury-salon-services-form-card .luxury-card-title,
+  .luxury-salon-services-form-card .luxury-soft-field,
+  .luxury-salon-services-form-card .luxury-btn--primary,
+  .luxury-salon-services-form-card .luxury-form-label,
+  .luxury-salon-services-form-card .luxury-salon-services-photo-panel,
+  .luxury-salon-services-form-card .luxury-salon-services-photo-panel__actions .luxury-btn,
+  .luxury-salon-services-form-card .luxury-brand-site-slot,
+  .luxury-salon-services-form-card .luxury-brand-site-slot__btn {
+    transition: none;
+  }
+
+  .luxury-salon-services-form-card .luxury-form-label:has(.luxury-soft-field:focus) {
+    transform: none;
+  }
+
+  .luxury-salon-services-form-card .luxury-soft-field:focus {
+    transform: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .luxury-salon-services-form-card .luxury-salon-services-photo-panel:hover {
+      transform: none;
+    }
+
+    .luxury-salon-services-form-card .luxury-btn--primary:hover:not(:disabled),
+    .luxury-salon-services-form-card .luxury-btn--primary:active:not(:disabled) {
+      transform: none;
+    }
+
+    .luxury-salon-services-form-card .luxury-salon-services-photo-panel__actions .luxury-btn:hover {
+      transform: none;
+    }
+
+    .luxury-salon-services-form-card .luxury-brand-site-slot:hover,
+    .luxury-salon-services-form-card .luxury-brand-site-slot__toolbar .luxury-brand-site-slot__btn:hover:not(:disabled) {
+      transform: none;
+    }
+  }
+}
+
+@media (max-width: 520px) {
+  .luxury-salon-services-list__head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Brand e vetrina (SalonBrandPage): stesso contenitore/schede max-width di Crea il tuo sito */
+.luxury-salon-services-page.luxury-brand-account .luxury-salon-services-form-card {
+  max-width: 520px;
+}
+
+.luxury-brand-account__stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.15rem, 2.5vw, 1.65rem);
+  margin-top: 0.25rem;
+}
+
+.luxury-brand-account__alert-spaced {
+  margin-bottom: 0.85rem;
+}
+
+.luxury-brand-account__lede {
+  margin: 0 0 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.luxury-brand-account__logo-block {
+  margin-bottom: 0.75rem;
+}
+
+.luxury-brand-account__btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.luxury-brand-account__file-trigger {
+  cursor: pointer;
+  margin: 0;
+}
+
+.luxury-brand-account__placeholder-label {
+  font-size: 0.9rem;
+}
+
+/* Posizione del salone (SalonLocationPage) */
+.luxury-salon-services-page.luxury-salon-location-account .luxury-salon-services-form-card {
+  max-width: 520px;
+}
+
+.luxury-salon-location-account__stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.15rem, 2.5vw, 1.65rem);
+  margin-top: 0.25rem;
+}
+
+/* Staff salone (SalonStaffPage) */
+.luxury-salon-services-page.luxury-salon-staff-account .luxury-salon-services-form-card {
+  max-width: 520px;
+}
+
+.luxury-salon-staff-account__stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.15rem, 2.5vw, 1.65rem);
+  margin-top: 0.25rem;
+}
+
+.luxury-salon-staff-account__alert-spaced {
+  margin-bottom: 0.85rem;
+}
+
+/* Panoramica salone (`/account/salone`, AccountSalonHomePage) */
+.luxury-salon-services-page.luxury-salon-panorama-account .luxury-salon-services-form-card {
+  max-width: min(520px, 100%);
+}
+
+.luxury-salon-panorama-account__stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.15rem, 2.5vw, 1.65rem);
+  margin-top: 0.25rem;
+}
+
+.luxury-salon-panorama-account__link-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.luxury-salon-panorama-account__link-grid .luxury-salon-services-form-card {
+  max-width: none;
+}
+
+.luxury-salon-panorama-account__link-tile {
+  display: block;
+  margin-top: 0;
+  text-decoration: none;
+  color: #fffbeb;
+  font-weight: 600;
+  max-width: none;
+}
+
+.luxury-salon-panorama-account__link-tile .luxury-salon-panorama-account__link-desc {
+  display: block;
+  margin-top: 8px;
+  font-weight: 400;
+  font-size: 0.9rem;
+  opacity: 0.78;
+}
+
+/* Chat (SalonLuxuryChatPage): contenitore leggero; la card principale è .luxury-salon-chat__shell */
+.luxury-salon-services-page.luxury-salon-chat-account {
+  max-width: min(1320px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+  padding: clamp(0.5rem, 2vw, 1rem);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.luxury-salon-services-page.luxury-salon-chat-account::before {
+  display: none;
+}

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import type { LegalCitation } from "../../content/legalReferences";
 import { useVelvetEmbeddedPanel } from "../../hooks/useVelvetEmbeddedPanel";
-import "../../styles/velvet-legal-public.css";
+import "../../styles/luxury-legal-public.css";
 
 export type LegalDocumentSection = {
   heading: string;
@@ -21,10 +21,10 @@ export type LegalDocumentLayoutProps = {
 export function LegalCitationList({ citations }: { citations: LegalCitation[] }) {
   if (!citations.length) return null;
   return (
-    <ul className="velvet-legal-public__citations">
+    <ul className="luxury-legal-public__citations">
       {citations.map((citation) => (
         <li key={citation.id}>
-          <a href={citation.href} target="_blank" rel="noopener noreferrer" className="velvet-legal-public__citation-link">
+          <a href={citation.href} target="_blank" rel="noopener noreferrer" className="luxury-legal-public__citation-link">
             {citation.label}
           </a>
         </li>
@@ -44,30 +44,30 @@ export function LegalDocumentLayout({
   const embedded = useVelvetEmbeddedPanel();
   return (
     <main
-      className={`velvet-page-main velvet-search-page velvet-legal-public${embedded ? " velvet-legal-public--embedded" : ""}`}
+      className={`luxury-page-main luxury-search-page luxury-legal-public${embedded ? " luxury-legal-public--embedded" : ""}`}
     >
-      <div className="velvet-legal-public__shell">
+      <div className="luxury-legal-public__shell">
         {!embedded ? (
-          <div className="velvet-search-back-row">
-            <Link to="/" className="velvet-search-back">
+          <div className="luxury-search-back-row">
+            <Link to="/" className="luxury-search-back">
               ← Home
             </Link>
           </div>
         ) : null}
 
-        <header className="velvet-legal-public__header">
-          <p className="velvet-legal-public__kicker">Documenti legali</p>
-          <h1 className="velvet-legal-public__title">{title}</h1>
-          <p className="velvet-legal-public__subtitle">{subtitle}</p>
-          <p className="velvet-legal-public__updated">Ultimo aggiornamento: {updatedAt}</p>
+        <header className="luxury-legal-public__header">
+          <p className="luxury-legal-public__kicker">Documenti legali</p>
+          <h1 className="luxury-legal-public__title">{title}</h1>
+          <p className="luxury-legal-public__subtitle">{subtitle}</p>
+          <p className="luxury-legal-public__updated">Ultimo aggiornamento: {updatedAt}</p>
         </header>
 
-        <div className="velvet-legal-public__body">
+        <div className="luxury-legal-public__body">
           {sections.map((section) => (
-            <section key={section.heading} className="velvet-legal-public__section">
-              <h2 className="velvet-legal-public__section-title">{section.heading}</h2>
+            <section key={section.heading} className="luxury-legal-public__section">
+              <h2 className="luxury-legal-public__section-title">{section.heading}</h2>
               {section.paragraphs.map((paragraph) => (
-                <p key={paragraph} className="velvet-legal-public__text">
+                <p key={paragraph} className="luxury-legal-public__text">
                   {paragraph}
                 </p>
               ))}
@@ -76,9 +76,9 @@ export function LegalDocumentLayout({
           ))}
           {children}
           {storeRequirements?.length ? (
-            <section className="velvet-legal-public__section velvet-legal-public__section--store">
-              <h2 className="velvet-legal-public__section-title">Riferimenti per App Store e Google Play</h2>
-              <p className="velvet-legal-public__text">
+            <section className="luxury-legal-public__section luxury-legal-public__section--store">
+              <h2 className="luxury-legal-public__section-title">Riferimenti per App Store e Google Play</h2>
+              <p className="luxury-legal-public__text">
                 Gli store richiedono che l’informativa pubblicata sia coerente con le dichiarazioni inserite in App Store Connect e
                 Play Console (etichette privacy / Data safety).
               </p>
@@ -87,30 +87,30 @@ export function LegalDocumentLayout({
           ) : null}
         </div>
 
-        <nav className="velvet-legal-public__nav" aria-label="Altri documenti legali">
-          <p className="velvet-legal-public__nav-title">Documenti legali</p>
-          <Link to="/privacy/clienti" className="velvet-legal-public__nav-link">
+        <nav className="luxury-legal-public__nav" aria-label="Altri documenti legali">
+          <p className="luxury-legal-public__nav-title">Documenti legali</p>
+          <Link to="/privacy/clienti" className="luxury-legal-public__nav-link">
             Privacy clienti (B2C)
           </Link>
-          <Link to="/privacy/staff" className="velvet-legal-public__nav-link">
+          <Link to="/privacy/staff" className="luxury-legal-public__nav-link">
             Privacy staff
           </Link>
-          <Link to="/privacy" className="velvet-legal-public__nav-link">
+          <Link to="/privacy" className="luxury-legal-public__nav-link">
             Privacy saloni (B2B)
           </Link>
-          <Link to="/termini" className="velvet-legal-public__nav-link">
+          <Link to="/termini" className="luxury-legal-public__nav-link">
             Termini di servizio
           </Link>
-          <Link to="/privacy/scelte" className="velvet-legal-public__nav-link">
+          <Link to="/privacy/scelte" className="luxury-legal-public__nav-link">
             Scelte privacy
           </Link>
-          <Link to="/privacy/cookie" className="velvet-legal-public__nav-link">
+          <Link to="/privacy/cookie" className="luxury-legal-public__nav-link">
             Informativa cookie
           </Link>
-          <Link to="/privacy/elimina-account" className="velvet-legal-public__nav-link">
+          <Link to="/privacy/elimina-account" className="luxury-legal-public__nav-link">
             Elimina account
           </Link>
-          <Link to="/legale" className="velvet-legal-public__nav-link">
+          <Link to="/legale" className="luxury-legal-public__nav-link">
             Indice documenti
           </Link>
         </nav>

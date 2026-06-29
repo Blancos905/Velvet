@@ -23,7 +23,7 @@ export function SalonStandardSectionGuard({ children }: { children: ReactNode })
     billingStatus.isSuccess &&
     !isPremiumActive
   ) {
-    return <Navigate to="/account/billing/checkout" replace />;
+    return <Navigate to="/account/salone" replace />;
   }
 
   if (

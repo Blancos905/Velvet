@@ -25,4 +25,10 @@ public class BillingRegistrationPlanPolicy {
 		return stripeProperties.configured()
 				&& "PREMIUM".equalsIgnoreCase(requestedPlanTier != null ? requestedPlanTier.trim() : "");
 	}
+
+	public String salonOwnerPostConfirmPath(String requestedPlanTier) {
+		return billingCheckoutRequiredForPremiumRegistration(requestedPlanTier)
+				? "/account/billing/checkout"
+				: "/account/salone";
+	}
 }

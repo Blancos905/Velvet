@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import "../styles/velvet-login-splash.css";
+import "../styles/luxury-login-splash.css";
 
 const LOGO = "/logo-saloni-luxury.png";
 const SPLASH_VISIBLE_MS = 1800;
@@ -32,26 +32,26 @@ export function VelvetLoginSplash({ onDismiss, active }: VelvetLoginSplashProps)
     >
       {show ? (
         <motion.div
-          key="velvet-login-splash"
+          key="luxury-login-splash"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: SPLASH_EXIT_S, ease: "easeInOut" }}
           aria-hidden
-          className={["velvet-login-splash", isControlled ? "velvet-login-splash--elevated" : null]
+          className={["luxury-login-splash", isControlled ? "luxury-login-splash--elevated" : null]
             .filter(Boolean)
             .join(" ")}
         >
-          <div className="velvet-login-splash__scene" aria-hidden>
-            <div className="velvet-login-splash__bg-shift" />
-            <div className="velvet-login-splash__bg-mesh" />
-            <div className="velvet-login-splash__bg-orb velvet-login-splash__bg-orb--a" />
-            <div className="velvet-login-splash__bg-orb velvet-login-splash__bg-orb--b" />
-            <div className="velvet-login-splash__bg-orb velvet-login-splash__bg-orb--c" />
-            <div className="velvet-login-splash__bg-ring" />
-            <div className="velvet-login-splash__bg-line velvet-login-splash__bg-line--left" />
-            <div className="velvet-login-splash__bg-line velvet-login-splash__bg-line--right" />
-            <div className="velvet-login-splash__bg-vignette" />
+          <div className="luxury-login-splash__scene" aria-hidden>
+            <div className="luxury-login-splash__bg-shift" />
+            <div className="luxury-login-splash__bg-mesh" />
+            <div className="luxury-login-splash__bg-orb luxury-login-splash__bg-orb--a" />
+            <div className="luxury-login-splash__bg-orb luxury-login-splash__bg-orb--b" />
+            <div className="luxury-login-splash__bg-orb luxury-login-splash__bg-orb--c" />
+            <div className="luxury-login-splash__bg-ring" />
+            <div className="luxury-login-splash__bg-line luxury-login-splash__bg-line--left" />
+            <div className="luxury-login-splash__bg-line luxury-login-splash__bg-line--right" />
+            <div className="luxury-login-splash__bg-vignette" />
           </div>
 
           <motion.div
@@ -62,16 +62,16 @@ export function VelvetLoginSplash({ onDismiss, active }: VelvetLoginSplashProps)
               opacity: { duration: 0.45, ease: "easeOut" },
               rotate: { duration: LOGO_ROTATION_MS / 1000, ease: "linear" },
             }}
-            className="velvet-login-splash__badge"
+            className="luxury-login-splash__badge"
           >
-            <div className="velvet-login-splash__badge-halo" aria-hidden />
-            <div className="velvet-login-splash__badge-content">
-              <div className="velvet-login-splash__logo-shell">
-                <img className="velvet-login-splash__logo" src={LOGO} alt="" width={160} height={160} decoding="async" />
+            <div className="luxury-login-splash__badge-halo" aria-hidden />
+            <div className="luxury-login-splash__badge-content">
+              <div className="luxury-login-splash__logo-shell">
+                <img className="luxury-login-splash__logo" src={LOGO} alt="" width={160} height={160} decoding="async" />
               </div>
-              <div className="velvet-login-splash__text">
-                <span className="velvet-login-splash__saloni">Saloni</span>
-                <span className="velvet-login-splash__velvet">Luxury</span>
+              <div className="luxury-login-splash__text">
+                <span className="luxury-login-splash__saloni">Saloni</span>
+                <span className="luxury-login-splash__velvet">Luxury</span>
               </div>
             </div>
           </motion.div>

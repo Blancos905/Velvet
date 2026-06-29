@@ -228,10 +228,10 @@ fi
 mark_done "App Flutter shell WebView (velvet-app) con default VELVET_WEB_BASE_URL=https://saloniluxury.it"
 
 ANDROID_GRADLE="$ROOT_DIR/velvet-app/android/app/build.gradle.kts"
-if grep -q 'signingConfigs.getByName("debug")' "$ANDROID_GRADLE" 2>/dev/null; then
-  mark_todo "Android release: configurare keystore produzione (oggi firma debug in buildTypes.release)"
+if grep -q 'GradleException' "$ANDROID_GRADLE" 2>/dev/null || ! grep -q 'signingConfigs.getByName("debug")' "$ANDROID_GRADLE" 2>/dev/null; then
+  mark_done "Android release rifiuta build senza keystore produzione"
 else
-  mark_done "Android release configurato con signing produzione"
+  mark_todo "Android release: configurare keystore produzione (oggi firma debug in buildTypes.release)"
 fi
 
 if grep -q 'usesCleartextTraffic="true"' "$ROOT_DIR/velvet-app/android/app/src/main/AndroidManifest.xml" 2>/dev/null; then

@@ -46,20 +46,20 @@ export function AdminHScroll({ children, label, className = "" }: AdminHScrollPr
   };
 
   return (
-    <div className={`velvet-admin-hscroll ${className}`.trim()} role="group" aria-label={label}>
+    <div className={`luxury-admin-hscroll ${className}`.trim()} role="group" aria-label={label}>
       <button
         type="button"
-        className="velvet-admin-hscroll__fab velvet-admin-hscroll__fab--prev"
+        className="luxury-admin-hscroll__fab luxury-admin-hscroll__fab--prev"
         aria-label={`Scorri a sinistra: ${label}`}
         disabled={!canPrev}
         onClick={() => go(-1)}
       />
-      <div ref={trackRef} className="velvet-admin-hscroll__track">
+      <div ref={trackRef} className="luxury-admin-hscroll__track">
         {children}
       </div>
       <button
         type="button"
-        className="velvet-admin-hscroll__fab velvet-admin-hscroll__fab--next"
+        className="luxury-admin-hscroll__fab luxury-admin-hscroll__fab--next"
         aria-label={`Scorri a destra: ${label}`}
         disabled={!canNext}
         onClick={() => go(1)}

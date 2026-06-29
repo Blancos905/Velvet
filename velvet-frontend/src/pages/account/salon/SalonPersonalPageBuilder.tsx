@@ -24,9 +24,9 @@ import {
   writeSalonPersonalPageDataAsync,
   type SalonPersonalPageData,
 } from "../../../lib/salonPersonalPageStorage";
-import "../../../styles/velvet-account-page-shell.css";
-import "../../../styles/velvet-account-salon-services.css";
-import "../../../styles/velvet-salon-personal-builder.css";
+import "../../../styles/luxury-account-page-shell.css";
+import "../../../styles/luxury-account-salon-services.css";
+import "../../../styles/luxury-salon-personal-builder.css";
 import { SalonStandardSectionGuard } from "./SalonStandardSectionGuard";
 
 export default function SalonPersonalPageBuilder() {
@@ -236,57 +236,57 @@ export default function SalonPersonalPageBuilder() {
   return (
     <SalonStandardSectionGuard>
       <>
-        <div className="velvet-account-page-shell velvet-account-page-shell--narrow velvet-account-page-shell--personal-builder">
-          <header className="velvet-account-page-shell__hero">
-            <div className="velvet-account-page-shell__hero-glow" aria-hidden />
-            <div className="velvet-account-page-shell__hero-inner">
-              <Link to="/account/salone" className="velvet-link-back">
+        <div className="luxury-account-page-shell luxury-account-page-shell--narrow luxury-account-page-shell--personal-builder">
+          <header className="luxury-account-page-shell__hero">
+            <div className="luxury-account-page-shell__hero-glow" aria-hidden />
+            <div className="luxury-account-page-shell__hero-inner">
+              <Link to="/account/salone" className="luxury-link-back">
                 ← Panoramica salone
               </Link>
-              <h1 className="velvet-personal-builder-hero__headline">
-                <span className="velvet-personal-builder-hero__headline-pre">Crea il </span>
-                <span className="velvet-personal-builder-hero__headline-accent">tuo sito</span>
+              <h1 className="luxury-personal-builder-hero__headline">
+                <span className="luxury-personal-builder-hero__headline-pre">Crea il </span>
+                <span className="luxury-personal-builder-hero__headline-accent">tuo sito</span>
               </h1>
-              <p className="velvet-account-page-shell__hero-sub">
+              <p className="luxury-account-page-shell__hero-sub">
                 Titoli, testi, gallery e bottone prenotazione: compaiono sulla pagina pubblica del salone e in Esplora.
               </p>
             </div>
           </header>
         </div>
 
-        <div className="velvet-salon-services-page velvet-personal-builder">
+        <div className="luxury-salon-services-page luxury-personal-builder">
           {!slug ? (
-            <p className="velvet-alert velvet-alert--error" role="alert">
+            <p className="luxury-alert luxury-alert--error" role="alert">
               Slug salone non disponibile. Completa prima registrazione/provisioning.
             </p>
           ) : null}
 
-          <div className="velvet-personal-builder__stack">
-            <section className="velvet-surface-card velvet-salon-services-form-card" aria-labelledby="vpb-hero-heading">
-              <div className="velvet-personal-builder__card-intro">
-                <p className="velvet-personal-builder__eyebrow">Intestazione</p>
-                <h2 id="vpb-hero-heading" className="velvet-card-title">
+          <div className="luxury-personal-builder__stack">
+            <section className="luxury-surface-card luxury-salon-services-form-card" aria-labelledby="vpb-hero-heading">
+              <div className="luxury-personal-builder__card-intro">
+                <p className="luxury-personal-builder__eyebrow">Intestazione</p>
+                <h2 id="vpb-hero-heading" className="luxury-card-title">
                   Hero in alto
                 </h2>
-                <p className="velvet-text-muted velvet-personal-builder__card-hint">
+                <p className="luxury-text-muted luxury-personal-builder__card-hint">
                   Titolo e sottotitolo compaiono come prima impressione nella pagina pubblica.
                 </p>
               </div>
-              <div className="velvet-personal-builder__fields">
-                <label className="velvet-form-label">
+              <div className="luxury-personal-builder__fields">
+                <label className="luxury-form-label">
                   Titolo hero
                   <input
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={state.heroTitle}
                     onChange={(e) => setState((p) => ({ ...p, heroTitle: e.target.value }))}
                     placeholder="Es. Benvenuto nel nostro salone"
                   />
                 </label>
 
-                <label className="velvet-form-label">
+                <label className="luxury-form-label">
                   Sottotitolo
                   <textarea
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={state.heroSubtitle}
                     onChange={(e) => setState((p) => ({ ...p, heroSubtitle: e.target.value }))}
                     placeholder="Un breve testo di presentazione"
@@ -296,18 +296,18 @@ export default function SalonPersonalPageBuilder() {
               </div>
             </section>
 
-            <section className="velvet-surface-card velvet-salon-services-form-card" aria-labelledby="vpb-story-heading">
-              <div className="velvet-personal-builder__card-intro">
-                <p className="velvet-personal-builder__eyebrow">Contenuti</p>
-                <h2 id="vpb-story-heading" className="velvet-card-title">
+            <section className="luxury-surface-card luxury-salon-services-form-card" aria-labelledby="vpb-story-heading">
+              <div className="luxury-personal-builder__card-intro">
+                <p className="luxury-personal-builder__eyebrow">Contenuti</p>
+                <h2 id="vpb-story-heading" className="luxury-card-title">
                   Storia e valori
                 </h2>
               </div>
-              <div className="velvet-personal-builder__fields">
-                <label className="velvet-form-label">
+              <div className="luxury-personal-builder__fields">
+                <label className="luxury-form-label">
                   Introduzione titolare/team
                   <textarea
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={state.ownerIntro}
                     onChange={(e) => setState((p) => ({ ...p, ownerIntro: e.target.value }))}
                     placeholder="Es. Ciao sono..., insieme al mio team..."
@@ -315,10 +315,10 @@ export default function SalonPersonalPageBuilder() {
                   />
                 </label>
 
-                <label className="velvet-form-label">
+                <label className="luxury-form-label">
                   Chi siamo
                   <textarea
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={state.about}
                     onChange={(e) => setState((p) => ({ ...p, about: e.target.value }))}
                     placeholder="Racconta storia, stile e filosofia del salone"
@@ -326,10 +326,10 @@ export default function SalonPersonalPageBuilder() {
                   />
                 </label>
 
-                <label className="velvet-form-label">
+                <label className="luxury-form-label">
                   Punti di forza
                   <textarea
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={state.strengths}
                     onChange={(e) => setState((p) => ({ ...p, strengths: e.target.value }))}
                     placeholder="Es. Colore su misura, pieghe evento, consulenza personalizzata"
@@ -339,29 +339,29 @@ export default function SalonPersonalPageBuilder() {
               </div>
             </section>
 
-            <section className="velvet-surface-card velvet-salon-services-form-card" aria-labelledby="vpb-practical-heading">
-              <div className="velvet-personal-builder__card-intro">
-                <p className="velvet-personal-builder__eyebrow">Operatività</p>
-                <h2 id="vpb-practical-heading" className="velvet-card-title">
+            <section className="luxury-surface-card luxury-salon-services-form-card" aria-labelledby="vpb-practical-heading">
+              <div className="luxury-personal-builder__card-intro">
+                <p className="luxury-personal-builder__eyebrow">Operatività</p>
+                <h2 id="vpb-practical-heading" className="luxury-card-title">
                   Orari, contatti e prenotazione
                 </h2>
               </div>
-              <div className="velvet-personal-builder__fields">
-                <div className="velvet-personal-builder__row-2">
-                  <label className="velvet-form-label">
+              <div className="luxury-personal-builder__fields">
+                <div className="luxury-personal-builder__row-2">
+                  <label className="luxury-form-label">
                     Apertura mattina (agenda)
                     <input
-                      className="velvet-soft-field"
+                      className="luxury-soft-field"
                       type="time"
                       value={bookingOpenTime}
                       onChange={(e) => onBookingOpenTimeChange(e.target.value)}
                       required
                     />
                   </label>
-                  <label className="velvet-form-label">
+                  <label className="luxury-form-label">
                     Chiusura mattina (pausa)
                     <input
-                      className="velvet-soft-field"
+                      className="luxury-soft-field"
                       type="time"
                       value={bookingMorningEndTime}
                       onChange={(e) => setBookingMorningEndTime(e.target.value)}
@@ -369,21 +369,21 @@ export default function SalonPersonalPageBuilder() {
                     />
                   </label>
                 </div>
-                <div className="velvet-personal-builder__row-2">
-                  <label className="velvet-form-label">
+                <div className="luxury-personal-builder__row-2">
+                  <label className="luxury-form-label">
                     Apertura pomeriggio
                     <input
-                      className="velvet-soft-field"
+                      className="luxury-soft-field"
                       type="time"
                       value={bookingAfternoonStartTime}
                       onChange={(e) => setBookingAfternoonStartTime(e.target.value)}
                       placeholder="Es. 14:30"
                     />
                   </label>
-                  <label className="velvet-form-label">
+                  <label className="luxury-form-label">
                     Chiusura pomeriggio (agenda)
                     <input
-                      className="velvet-soft-field"
+                      className="luxury-soft-field"
                       type="time"
                       value={bookingCloseTime}
                       onChange={(e) => onBookingCloseTimeChange(e.target.value)}
@@ -391,14 +391,14 @@ export default function SalonPersonalPageBuilder() {
                     />
                   </label>
                 </div>
-                <p className="velvet-text-muted velvet-personal-builder__hours-hint">
+                <p className="luxury-text-muted luxury-personal-builder__hours-hint">
                   Compila chiusura mattina e apertura pomeriggio se il salone fa pausa: in quella fascia il cliente non può prenotare.
                 </p>
 
-                <label className="velvet-form-label">
+                <label className="luxury-form-label">
                   Testo orari (pagina pubblica)
                   <textarea
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={state.openingHours}
                     onChange={(e) => onOpeningHoursTextChange(e.target.value)}
                     placeholder="Es. Martedi - Sabato 08:30 - 19:00"
@@ -406,10 +406,10 @@ export default function SalonPersonalPageBuilder() {
                   />
                 </label>
 
-                <label className="velvet-form-label">
+                <label className="luxury-form-label">
                   Nota contatti
                   <textarea
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={state.contactsNote}
                     onChange={(e) => setState((p) => ({ ...p, contactsNote: e.target.value }))}
                     placeholder="Es. Scrivici su WhatsApp per consulenza rapida"
@@ -417,10 +417,10 @@ export default function SalonPersonalPageBuilder() {
                   />
                 </label>
 
-                <label className="velvet-form-label">
+                <label className="luxury-form-label">
                   Testo prenotazione
                   <textarea
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={state.bookingNote}
                     onChange={(e) => setState((p) => ({ ...p, bookingNote: e.target.value }))}
                     placeholder="Es. Prenota come e quando vuoi..."
@@ -428,10 +428,10 @@ export default function SalonPersonalPageBuilder() {
                   />
                 </label>
 
-                <label className="velvet-form-label">
+                <label className="luxury-form-label">
                   Etichetta bottone prenota
                   <input
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={state.bookingCtaLabel}
                     onChange={(e) => setState((p) => ({ ...p, bookingCtaLabel: e.target.value }))}
                     placeholder="Es. Prenota ora"
@@ -440,27 +440,27 @@ export default function SalonPersonalPageBuilder() {
               </div>
             </section>
 
-            <section className="velvet-surface-card velvet-salon-services-form-card" aria-labelledby="vpb-social-heading">
-              <div className="velvet-personal-builder__card-intro">
-                <p className="velvet-personal-builder__eyebrow">Social</p>
-                <h2 id="vpb-social-heading" className="velvet-card-title">
+            <section className="luxury-surface-card luxury-salon-services-form-card" aria-labelledby="vpb-social-heading">
+              <div className="luxury-personal-builder__card-intro">
+                <p className="luxury-personal-builder__eyebrow">Social</p>
+                <h2 id="vpb-social-heading" className="luxury-card-title">
                   Link esterni
                 </h2>
               </div>
-              <div className="velvet-personal-builder__row-2">
-                <label className="velvet-form-label">
+              <div className="luxury-personal-builder__row-2">
+                <label className="luxury-form-label">
                   Instagram
                   <input
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={state.instagramUrl}
                     onChange={(e) => setState((p) => ({ ...p, instagramUrl: e.target.value }))}
                     placeholder="https://instagram.com/..."
                   />
                 </label>
-                <label className="velvet-form-label">
+                <label className="luxury-form-label">
                   Facebook
                   <input
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={state.facebookUrl}
                     onChange={(e) => setState((p) => ({ ...p, facebookUrl: e.target.value }))}
                     placeholder="https://facebook.com/..."
@@ -469,21 +469,21 @@ export default function SalonPersonalPageBuilder() {
               </div>
             </section>
 
-            <fieldset className="velvet-surface-card velvet-salon-services-form-card velvet-personal-builder__gallery">
-              <legend className="velvet-card-title">Gallery (6 immagini)</legend>
-              <div className="velvet-personal-builder__gallery-inner">
-                <div className="velvet-personal-builder__gallery-grid">
+            <fieldset className="luxury-surface-card luxury-salon-services-form-card luxury-personal-builder__gallery">
+              <legend className="luxury-card-title">Gallery (6 immagini)</legend>
+              <div className="luxury-personal-builder__gallery-inner">
+                <div className="luxury-personal-builder__gallery-grid">
                   {showcase.exploreGalleryImageDataUrls.map((img, idx) => (
-                    <div key={idx} className="velvet-personal-builder__gallery-slot">
-                      <span className="velvet-personal-builder__gallery-slot-label">Immagine {idx + 1}</span>
+                    <div key={idx} className="luxury-personal-builder__gallery-slot">
+                      <span className="luxury-personal-builder__gallery-slot-label">Immagine {idx + 1}</span>
                       {img ? (
-                        <img className="velvet-personal-builder__gallery-thumb" src={img} alt="" />
+                        <img className="luxury-personal-builder__gallery-thumb" src={img} alt="" />
                       ) : (
-                        <div className="velvet-personal-builder__gallery-placeholder" aria-hidden />
+                        <div className="luxury-personal-builder__gallery-placeholder" aria-hidden />
                       )}
                       <input type="file" accept="image/*" onChange={(e) => void onGalleryImage(idx, e.currentTarget.files?.[0] ?? null)} />
                       {img ? (
-                        <button type="button" className="velvet-btn velvet-btn--secondary" onClick={() => clearGalleryImage(idx)}>
+                        <button type="button" className="luxury-btn luxury-btn--secondary" onClick={() => clearGalleryImage(idx)}>
                           Rimuovi
                         </button>
                       ) : null}
@@ -493,15 +493,15 @@ export default function SalonPersonalPageBuilder() {
               </div>
             </fieldset>
 
-            <div className="velvet-surface-card velvet-salon-services-form-card">
-              <h2 className="velvet-card-title">Salva e anteprima</h2>
-              <div className="velvet-personal-builder__actions">
-                <button type="button" className="velvet-btn velvet-btn--primary" onClick={onSave} disabled={!slug}>
+            <div className="luxury-surface-card luxury-salon-services-form-card">
+              <h2 className="luxury-card-title">Salva e anteprima</h2>
+              <div className="luxury-personal-builder__actions">
+                <button type="button" className="luxury-btn luxury-btn--primary" onClick={onSave} disabled={!slug}>
                   Salva home personale
                 </button>
                 {publicHref ? (
                   <Link
-                    className="velvet-btn velvet-btn--secondary velvet-personal-builder__btn-public"
+                    className="luxury-btn luxury-btn--secondary luxury-personal-builder__btn-public"
                     to={publicHref}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -515,7 +515,7 @@ export default function SalonPersonalPageBuilder() {
 
           {feedback ? (
             <p
-              className={`velvet-alert velvet-personal-builder__feedback ${feedback.kind === "error" ? "velvet-alert--error" : "velvet-alert--success"}`}
+              className={`luxury-alert luxury-personal-builder__feedback ${feedback.kind === "error" ? "luxury-alert--error" : "luxury-alert--success"}`}
               role={feedback.kind === "error" ? "alert" : "status"}
             >
               {feedback.text}

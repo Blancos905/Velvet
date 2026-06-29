@@ -27,9 +27,9 @@ export default function AdminRegisterSuperAdminPage() {
 
   if (authLoading) {
     return (
-      <main className="velvet-auth-page">
-        <div className="velvet-auth-card">
-          <p className="velvet-auth-loading">Caricamento…</p>
+      <main className="luxury-auth-page">
+        <div className="luxury-auth-card">
+          <p className="luxury-auth-loading">Caricamento…</p>
         </div>
       </main>
     );
@@ -40,32 +40,32 @@ export default function AdminRegisterSuperAdminPage() {
   }
 
   return (
-    <main className="velvet-auth-page">
-      <div className="velvet-auth-card velvet-admin-login-card">
-        <h1 className="velvet-auth-title">Crea super admin</h1>
-        <p className="velvet-admin-login-hint">
+    <main className="luxury-auth-page">
+      <div className="luxury-auth-card luxury-admin-login-card">
+        <h1 className="luxury-auth-title">Crea super admin</h1>
+        <p className="luxury-admin-login-hint">
           Prima installazione: servono il token di setup sul server (<code>VELVET_SUPER_ADMIN_SETUP_TOKEN</code>) e nessun
           super admin già definito in variabili d’ambiente o in database.
         </p>
-        {availQ.isLoading ? <p className="velvet-auth-loading">Verifica disponibilità…</p> : null}
+        {availQ.isLoading ? <p className="luxury-auth-loading">Verifica disponibilità…</p> : null}
         {availQ.isError ? (
-          <p className="velvet-alert velvet-alert--error velvet-auth-alert" role="alert">
+          <p className="luxury-alert luxury-alert--error luxury-auth-alert" role="alert">
             {availQ.error instanceof Error ? availQ.error.message : "Errore di rete."}
           </p>
         ) : null}
         {availQ.data && !availQ.data.available ? (
-          <p className="velvet-admin-muted" role="status">
+          <p className="luxury-admin-muted" role="status">
             La registrazione guidata non è attiva. Configura solo il token di setup senza username/password super admin in
             env, oppure accedi se hai già le credenziali.
           </p>
         ) : null}
         {error ? (
-          <p className="velvet-alert velvet-alert--error velvet-auth-alert" role="alert">
+          <p className="luxury-alert luxury-alert--error luxury-auth-alert" role="alert">
             {error}
           </p>
         ) : null}
         <form
-          className="velvet-auth-form"
+          className="luxury-auth-form"
           noValidate
           onSubmit={(e) => {
             e.preventDefault();
@@ -111,8 +111,8 @@ export default function AdminRegisterSuperAdminPage() {
             })();
           }}
         >
-          <div className="velvet-auth-field">
-            <label htmlFor={tokenId} className="velvet-auth-label">
+          <div className="luxury-auth-field">
+            <label htmlFor={tokenId} className="luxury-auth-label">
               Token di setup
             </label>
             <input
@@ -123,11 +123,11 @@ export default function AdminRegisterSuperAdminPage() {
               value={setupToken}
               onChange={(ev) => setSetupToken(ev.target.value)}
               disabled={submitting || availQ.data?.available === false}
-              className="velvet-auth-input"
+              className="luxury-auth-input"
             />
           </div>
-          <div className="velvet-auth-field">
-            <label htmlFor={emailId} className="velvet-auth-label">
+          <div className="luxury-auth-field">
+            <label htmlFor={emailId} className="luxury-auth-label">
               Email (login)
             </label>
             <input
@@ -138,11 +138,11 @@ export default function AdminRegisterSuperAdminPage() {
               value={email}
               onChange={(ev) => setEmail(ev.target.value)}
               disabled={submitting || availQ.data?.available === false}
-              className="velvet-auth-input"
+              className="luxury-auth-input"
             />
           </div>
-          <div className="velvet-auth-field">
-            <label htmlFor={passId} className="velvet-auth-label">
+          <div className="luxury-auth-field">
+            <label htmlFor={passId} className="luxury-auth-label">
               Password
             </label>
             <input
@@ -153,11 +153,11 @@ export default function AdminRegisterSuperAdminPage() {
               value={password}
               onChange={(ev) => setPassword(ev.target.value)}
               disabled={submitting || availQ.data?.available === false}
-              className="velvet-auth-input"
+              className="luxury-auth-input"
             />
           </div>
-          <div className="velvet-auth-field">
-            <label htmlFor={pass2Id} className="velvet-auth-label">
+          <div className="luxury-auth-field">
+            <label htmlFor={pass2Id} className="luxury-auth-label">
               Ripeti password
             </label>
             <input
@@ -168,18 +168,18 @@ export default function AdminRegisterSuperAdminPage() {
               value={password2}
               onChange={(ev) => setPassword2(ev.target.value)}
               disabled={submitting || availQ.data?.available === false}
-              className="velvet-auth-input"
+              className="luxury-auth-input"
             />
           </div>
           <button
             type="submit"
-            className="velvet-auth-submit"
+            className="luxury-auth-submit"
             disabled={submitting || availQ.data?.available === false}
           >
             {submitting ? "Creazione…" : "Crea super admin"}
           </button>
         </form>
-        <p className="velvet-admin-muted" style={{ marginTop: "1rem", textAlign: "center" }}>
+        <p className="luxury-admin-muted" style={{ marginTop: "1rem", textAlign: "center" }}>
           <Link to="/account">Ho già un account — accedi</Link>
         </p>
       </div>

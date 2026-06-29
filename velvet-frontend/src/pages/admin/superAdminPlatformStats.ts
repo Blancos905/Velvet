@@ -62,6 +62,9 @@ export function parseSuperAdminCounts(raw: unknown): SuperAdminCountsDto | null 
     studioGroupsPaying: num(c.studioGroupsPaying),
     studioGroupsPayingPremium: num(c.studioGroupsPayingPremium),
     studioGroupsPayingBase: num(c.studioGroupsPayingBase),
+    studioGroupsSubscribedPaying: num(c.studioGroupsSubscribedPaying),
+    studioGroupsSubscribedTrial: num(c.studioGroupsSubscribedTrial),
+    studioGroupsSubscribedCancelled: num(c.studioGroupsSubscribedCancelled),
   };
 }
 

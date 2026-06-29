@@ -1,0 +1,87 @@
+.luxury-account-outlet-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 8rem;
+  padding: 1.5rem 1rem;
+}
+
+.luxury-account-outlet-loading__spinner {
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  border-top-color: rgba(249, 115, 22, 0.92);
+  border-radius: 50%;
+  animation: luxury-account-outlet-loading-spin 0.7s linear infinite;
+}
+
+.luxury-account-outlet-loading--retain {
+  position: relative;
+  display: block;
+  min-height: 0;
+  padding: 0;
+}
+
+.luxury-account-outlet-loading__progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(249, 115, 22, 0.35),
+    rgba(253, 186, 116, 0.95),
+    rgba(249, 115, 22, 0.35),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: luxury-account-outlet-loading-progress 0.9s linear infinite;
+  pointer-events: none;
+}
+
+.luxury-account-outlet-loading__previous {
+  position: relative;
+  z-index: 1;
+  opacity: 0.72;
+  filter: saturate(0.92);
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+@keyframes luxury-account-outlet-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes luxury-account-outlet-loading-progress {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.luxury-native-account-overlay__body .luxury-account-outlet-loading {
+  min-height: 12rem;
+}
+
+.luxury-native-account-overlay__body .luxury-account-outlet-loading--retain {
+  min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-account-outlet-loading__spinner {
+    animation: none;
+    border-top-color: rgba(249, 115, 22, 0.92);
+  }
+
+  .luxury-account-outlet-loading__progress {
+    animation: none;
+    background: rgba(249, 115, 22, 0.75);
+  }
+}

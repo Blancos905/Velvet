@@ -26,7 +26,15 @@ import { editorialBackgroundImage } from "../lib/editorialMedia";
 import { prefetchSalonPublicPage } from "../lib/prefetchSalonPublicPage";
 import type { SalonOrgNavState } from "../lib/publicOrganizationDetail";
 import type { SalonClientGenderId } from "../data/salonClientGenders";
-import "../styles/velvet-home.css";
+import { SALON_BUSINESS_TYPE_OPTIONS, type SalonBusinessTypeId } from "../data/salonBusinessTypes";
+import "../styles/luxury-home.css";
+
+/** Etichette plurali per il filtro tipologia in home («Affina la zona»). */
+const HOME_BUSINESS_TYPE_FILTER_LABELS: Record<SalonBusinessTypeId, string> = {
+  HAIR: "Parrucchieri",
+  BEAUTY: "Estetisti",
+  MASSAGE: "Massaggiatori",
+};
 
 /** Raggio (km) per i tag «Oppure un tocco»: saloni con coordinate entro questo raggio dalla posizione GPS. */
 const QUICK_NEAR_RADIUS_KM = 25;
@@ -202,10 +210,10 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
               letterSpacing: "0.16em",
               textTransform: "uppercase",
               margin: "0 0 0.75rem",
-              color: "var(--velvet-orange)",
+              color: "var(--luxury-orange)",
             }}
           >
-            SaloniLuxury
+            Saloni Luxury
           </p>
           <h2
             style={{
@@ -214,12 +222,12 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
               lineHeight: 1.18,
               margin: 0,
               letterSpacing: "-0.03em",
-              color: "var(--velvet-surface)",
+              color: "var(--luxury-surface)",
             }}
           >
             Rompi la routine.
             <br />
-            <span style={{ color: "var(--velvet-orange)" }}>Prenota</span> il tuo momento di relax.
+            <span style={{ color: "var(--luxury-orange)" }}>Prenota</span> il tuo momento di relax.
           </h2>
           <p
             style={{
@@ -228,7 +236,7 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
               lineHeight: 1.55,
               opacity: 0.9,
               maxWidth: 400,
-              color: "var(--velvet-surface)",
+              color: "var(--luxury-surface)",
             }}
           >
             Parrucchieri, estetica e benessere: trova il salone giusto e prenota in sicurezza.
@@ -245,7 +253,7 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
             letterSpacing: "0.16em",
             textTransform: "uppercase",
             margin: "0 0 0.75rem",
-            color: "var(--velvet-orange)",
+            color: "var(--luxury-orange)",
           }}
         >
           {slide.eyebrow}
@@ -257,11 +265,11 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
             lineHeight: 1.18,
             margin: 0,
             letterSpacing: "-0.03em",
-            color: "var(--velvet-surface)",
+            color: "var(--luxury-surface)",
           }}
         >
           {slide.titleBefore}
-          <span style={{ color: "var(--velvet-orange)" }}>{slide.titleHighlight}</span>
+          <span style={{ color: "var(--luxury-orange)" }}>{slide.titleHighlight}</span>
           {slide.titleAfter}
         </h2>
         <p
@@ -271,7 +279,7 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
             lineHeight: 1.55,
             opacity: 0.92,
             maxWidth: 420,
-            color: "var(--velvet-surface)",
+            color: "var(--luxury-surface)",
           }}
         >
           {slide.body}
@@ -283,11 +291,11 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
   return (
     <div
       className={
-        nativeApp ? "velvet-hero-carousel velvet-hero-carousel--native-app" : "velvet-hero-carousel"
+        nativeApp ? "luxury-hero-carousel luxury-hero-carousel--native-app" : "luxury-hero-carousel"
       }
       role="region"
       aria-roledescription="carousel"
-      aria-label="In evidenza SaloniLuxury"
+      aria-label="In evidenza Saloni Luxury"
       onMouseEnter={nativeApp ? undefined : () => setPaused(true)}
       onMouseLeave={nativeApp ? undefined : () => setPaused(false)}
       style={{
@@ -298,21 +306,21 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
         position: "relative",
       }}
     >
-      <div className="velvet-hero-carousel-viewport">
+      <div className="luxury-hero-carousel-viewport">
         <div
-          className="velvet-hero-carousel-track"
+          className="luxury-hero-carousel-track"
           style={{ transform: `translateX(-${index * 100}%)` }}
         >
           {slides.map((slide, slideIndex) => (
             <div
               key={slide.id}
-              className="velvet-hero-carousel-slide"
+              className="luxury-hero-carousel-slide"
               style={{ minWidth: "100%", flexShrink: 0 }}
               aria-hidden={slideIndex !== index}
             >
               {slide.kind === "brand" ? (
                 <div
-                  className="velvet-hero-story"
+                  className="luxury-hero-story"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "minmax(0, 1.25fr) minmax(200px, 0.75fr)",
@@ -334,7 +342,7 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
                     {textBlock(slide)}
                   </div>
                   <div
-                    className="velvet-hero-story-accent"
+                    className="luxury-hero-story-accent"
                     aria-hidden
                     style={{
                       minHeight: 140,
@@ -345,7 +353,7 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
                 </div>
               ) : (
                 <div
-                  className="velvet-hero-slide-photo"
+                  className="luxury-hero-slide-photo"
                   style={{
                     position: "relative",
                     minHeight: "clamp(240px, 42vw, 360px)",
@@ -375,7 +383,7 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
           <>
             <button
               type="button"
-              className="velvet-hero-carousel-nav velvet-carousel-prev"
+              className="luxury-hero-carousel-nav luxury-carousel-prev"
               onClick={() => go(-1)}
               aria-label="Slide precedente"
             >
@@ -383,14 +391,14 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
             </button>
             <button
               type="button"
-              className="velvet-hero-carousel-nav velvet-carousel-next"
+              className="luxury-hero-carousel-nav luxury-carousel-next"
               onClick={() => go(1)}
               aria-label="Slide successiva"
             >
               <span aria-hidden>›</span>
             </button>
 
-            <div className="velvet-carousel-dots-wrap" role="tablist" aria-label="Seleziona slide">
+            <div className="luxury-carousel-dots-wrap" role="tablist" aria-label="Seleziona slide">
               {slides.map((s, i) => (
                 <button
                   key={s.id}
@@ -399,7 +407,7 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
                   aria-selected={i === index}
                   aria-label={`Slide ${i + 1} di ${n}`}
                   onClick={() => setIndex(i)}
-                  className={i === index ? "velvet-carousel-dot is-active" : "velvet-carousel-dot"}
+                  className={i === index ? "luxury-carousel-dot is-active" : "luxury-carousel-dot"}
                 />
               ))}
             </div>
@@ -417,7 +425,7 @@ function trendCardBg(image: string): string {
 function HomeMegaSearchLensIcon() {
   return (
     <svg
-      className="velvet-mega-submit__icon"
+      className="luxury-mega-submit__icon"
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden
@@ -441,16 +449,17 @@ export default function HomePage() {
   const mapsAllowed = useMapsCookieAllowed();
   const trendingGroups = isNativeApp ? trendIdeaGroupsForNativeApp() : TRENDING_GROUPS;
   const trendingGridClass = isNativeApp
-    ? "velvet-trending-grid velvet-trending-grid--native-four"
-    : "velvet-trending-grid velvet-trending-grid--three";
+    ? "luxury-trending-grid luxury-trending-grid--native-four"
+    : "luxury-trending-grid luxury-trending-grid--three";
   const { isAuthenticated, realmRoles } = useVelvetAuth();
-  /** Suggerimenti rapidi legati a geolocalizzazione: solo account cliente (JWT con ruolo CLIENT). */
+  /** Suggerimenti rapidi «Oppure un tocco»: solo account cliente (JWT con ruolo CLIENT). */
   const canUseQuickGeolocationTags = isAuthenticated && realmRoles.includes("CLIENT");
   const [salonName, setSalonName] = useState("");
   const [country, setCountry] = useState<CountryCode>("IT");
   /** Città: testo libero, oppure valore `country|cap|city` se scelto dai suggerimenti. */
   const [cityInput, setCityInput] = useState("");
   const [capInput, setCapInput] = useState("");
+  const [businessTypeFilter, setBusinessTypeFilter] = useState<SalonBusinessTypeId | "">("");
   const [quickSuggestionsOpen, setQuickSuggestionsOpen] = useState(false);
   const lastGeoCoordsRef = useRef<{ lat: number; lng: number } | null>(null);
 
@@ -624,6 +633,7 @@ export default function HomePage() {
       near?: { lat: number; lng: number; km: number };
       sortRating?: boolean;
       salonClientGenders?: SalonClientGenderId[];
+      salonBusinessTypes?: SalonBusinessTypeId[];
     },
   ) => {
     const p = new URLSearchParams();
@@ -640,9 +650,26 @@ export default function HomePage() {
         p.append("salonClientGender", gender);
       }
     }
+    if (opts?.salonBusinessTypes) {
+      for (const bt of opts.salonBusinessTypes) {
+        p.append("businessType", bt);
+      }
+    }
     if (opts?.sortRating) p.set("sort", "rating");
     const qs = p.toString();
     nav(qs ? `/search?${qs}` : "/search");
+  };
+
+  type HomeSearchOpts = {
+    near?: { lat: number; lng: number; km: number };
+    sortRating?: boolean;
+    salonClientGenders?: SalonClientGenderId[];
+    salonBusinessTypes?: SalonBusinessTypeId[];
+  };
+
+  const withBusinessTypeFilter = (opts?: HomeSearchOpts): HomeSearchOpts | undefined => {
+    if (!businessTypeFilter) return opts;
+    return { ...opts, salonBusinessTypes: [businessTypeFilter] };
   };
 
   const buildNearSearchOptions = (): { near: { lat: number; lng: number; km: number } } | undefined => {
@@ -824,7 +851,7 @@ export default function HomePage() {
         setFormHint(error);
         return;
       }
-      goSearch(salonName, city, buildNearSearchOptions());
+      goSearch(salonName, city, withBusinessTypeFilter(buildNearSearchOptions()));
     } finally {
       setCapLookupSubmitting(false);
     }
@@ -832,27 +859,27 @@ export default function HomePage() {
 
   return (
     <>
-      <section className="velvet-hero-wrap">
-        <div className="velvet-home-inner">
-          <h1 className="velvet-home-title">
-            <span className="velvet-home-title__text">Trova il tuo salone</span>
+      <section className="luxury-hero-wrap">
+        <div className="luxury-home-inner">
+          <h1 className="luxury-home-title">
+            <span className="luxury-home-title__text">Trova il tuo salone</span>
           </h1>
-          <p className="velvet-home-lead velvet-home-lead--epigraph">
-            <span className="velvet-home-lead__quote" aria-hidden="true">
+          <p className="luxury-home-lead luxury-home-lead--epigraph">
+            <span className="luxury-home-lead__quote" aria-hidden="true">
               «
             </span>
-            <span className="velvet-home-lead__text">Prendersi cura non è vanità: è ascolto.</span>
-            <span className="velvet-home-lead__quote velvet-home-lead__quote--end" aria-hidden="true">
+            <span className="luxury-home-lead__text">Prendersi cura non è vanità: è ascolto.</span>
+            <span className="luxury-home-lead__quote luxury-home-lead__quote--end" aria-hidden="true">
               »
             </span>
           </p>
 
-          <form onSubmit={onSearch} className="velvet-home-form">
-            <label htmlFor="velvet-mega-q" className="visually-hidden">
+          <form onSubmit={onSearch} className="luxury-home-form">
+            <label htmlFor="luxury-mega-q" className="visually-hidden">
               Cerca
             </label>
             <div
-              className="velvet-mega-search-wrap"
+              className="luxury-mega-search-wrap"
               onFocusCapture={() => setMegaFocused(true)}
               onBlurCapture={(e) => {
                 const next = e.relatedTarget as Node | null;
@@ -863,16 +890,16 @@ export default function HomePage() {
               <div
                 className={
                   isNativeApp
-                    ? "velvet-mega-search velvet-mega-search--native-app"
-                    : "velvet-mega-search"
+                    ? "luxury-mega-search luxury-mega-search--native-app"
+                    : "luxury-mega-search"
                 }
               >
                 <input
-                  id="velvet-mega-q"
+                  id="luxury-mega-q"
                   value={salonName}
                   onChange={(e) => setSalonName(e.target.value)}
                   placeholder="Cerca salone o servizio…"
-                  className="velvet-mega-input"
+                  className="luxury-mega-input"
                   autoComplete="organization"
                   enterKeyHint="search"
                 />
@@ -880,14 +907,14 @@ export default function HomePage() {
                   type="submit"
                   className={
                     isNativeApp
-                      ? "velvet-mega-submit velvet-mega-submit--icon-only"
-                      : "velvet-mega-submit"
+                      ? "luxury-mega-submit luxury-mega-submit--icon-only"
+                      : "luxury-mega-submit"
                   }
                   disabled={capLookupSubmitting}
                   aria-label="Cerca salone"
                 >
                   {capLookupSubmitting ? (
-                    <span className="velvet-mega-submit__loading" aria-hidden>
+                    <span className="luxury-mega-submit__loading" aria-hidden>
                       …
                     </span>
                   ) : isNativeApp ? (
@@ -898,46 +925,46 @@ export default function HomePage() {
                 </button>
               </div>
               {megaFocused && debouncedSalonName.trim().length >= 1 ? (
-                <div className="velvet-mega-live-sheet" role="listbox" aria-label="Suggerimenti saloni">
+                <div className="luxury-mega-live-sheet" role="listbox" aria-label="Suggerimenti saloni">
                   {liveSalonPreview.isFetching ? (
-                    <div className="velvet-mega-live-loading" aria-live="polite">
-                      <span className="velvet-mega-live-dot" />
+                    <div className="luxury-mega-live-loading" aria-live="polite">
+                      <span className="luxury-mega-live-dot" />
                       Ricerca in corso…
                     </div>
                   ) : null}
                   {!liveSalonPreview.isFetching && liveSalonPreview.data && liveSalonPreview.data.length === 0 ? (
-                    <div className="velvet-mega-live-empty-state" role="status">
-                      <p className="velvet-mega-live-empty-state__title">Nessun salone trovato</p>
-                      <p className="velvet-mega-live-empty-state__lead">
+                    <div className="luxury-mega-live-empty-state" role="status">
+                      <p className="luxury-mega-live-empty-state__title">Nessun salone trovato</p>
+                      <p className="luxury-mega-live-empty-state__lead">
                         Per «{debouncedSalonName.trim()}». Prova altre parole o usa Cerca con CAP e comune.
                       </p>
                     </div>
                   ) : null}
                   {liveSalonPreview.data && liveSalonPreview.data.length > 0 ? (
-                    <ul className="velvet-mega-live-list">
+                    <ul className="luxury-mega-live-list">
                       {liveSalonPreview.data.slice(0, 8).map((o) => (
-                        <li key={o.id} className="velvet-mega-live-item">
+                        <li key={o.id} className="luxury-mega-live-item">
                           <Link
                             to={`/s/${encodeURIComponent(o.slug)}`}
                             state={{ orgPreview: o } satisfies SalonOrgNavState}
                             onMouseEnter={() => prefetchSalonPublicPage(queryClient, o.slug)}
                             onFocus={() => prefetchSalonPublicPage(queryClient, o.slug)}
-                            className="velvet-mega-live-hit"
+                            className="luxury-mega-live-hit"
                             role="option"
                           >
                             <SearchHitLogoAvatar
                               slug={o.slug}
                               name={o.name}
-                              avatarClass="velvet-mega-live-avatar"
-                              logoExtraClass="velvet-mega-live-avatar--logo"
+                              avatarClass="luxury-mega-live-avatar"
+                              logoExtraClass="luxury-mega-live-avatar--logo"
                             />
-                            <span className="velvet-mega-live-hit-text">
-                              <span className="velvet-mega-live-name">{o.name}</span>
+                            <span className="luxury-mega-live-hit-text">
+                              <span className="luxury-mega-live-name">{o.name}</span>
                               {o.city ? (
-                                <span className="velvet-mega-live-city">{formatSalonCityForDisplay(o.city) ?? o.city}</span>
+                                <span className="luxury-mega-live-city">{formatSalonCityForDisplay(o.city) ?? o.city}</span>
                               ) : null}
                             </span>
-                            <span className="velvet-mega-live-arrow" aria-hidden>
+                            <span className="luxury-mega-live-arrow" aria-hidden>
                               →
                             </span>
                           </Link>
@@ -946,16 +973,16 @@ export default function HomePage() {
                     </ul>
                   ) : null}
                   {liveSalonPreview.data && liveSalonPreview.data.length > 0 ? (
-                    <div className="velvet-mega-live-footer">
+                    <div className="luxury-mega-live-footer">
                       <button
                         type="button"
-                        className="velvet-mega-live-seeall"
+                        className="luxury-mega-live-seeall"
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => {
                           const query = debouncedSalonName.trim();
                           if (!query) return;
                           setFormHint(null);
-                          goSearch(query);
+                          goSearch(query, undefined, withBusinessTypeFilter());
                         }}
                       >
                         Vedi tutti
@@ -966,28 +993,28 @@ export default function HomePage() {
               ) : null}
             </div>
             {formHint && (
-              <p className="velvet-cap-hint" role="alert" style={{ margin: "0.5rem 0 0" }}>
+              <p className="luxury-cap-hint" role="alert" style={{ margin: "0.5rem 0 0" }}>
                 {formHint}
               </p>
             )}
 
-            <div className="velvet-search-filters">
-              <div className="velvet-search-filters-panel">
-                <p className="velvet-search-filters-head">Affina la zona</p>
-                <div className="velvet-search-filters-grid">
-                  <div className="velvet-filter-field">
-                    <label htmlFor="velvet-country" className="velvet-filter-label">
+            <div className="luxury-search-filters">
+              <div className="luxury-search-filters-panel">
+                <p className="luxury-search-filters-head">Affina la zona</p>
+                <div className="luxury-search-filters-grid">
+                  <div className="luxury-filter-field">
+                    <label htmlFor="luxury-country" className="luxury-filter-label">
                       Nazioni
                     </label>
                     <select
-                      id="velvet-country"
+                      id="luxury-country"
                       value={country}
                       onChange={(e) => {
                         setCountry(e.target.value as CountryCode);
                         setCityInput("");
                         setCapInput("");
                       }}
-                      className="velvet-soft-select"
+                      className="luxury-soft-select"
                     >
                       {COUNTRIES.map((co) => (
                         <option key={co.code} value={co.code}>
@@ -998,14 +1025,14 @@ export default function HomePage() {
                   </div>
                   <div
                     ref={cityFieldRef}
-                    className={`velvet-filter-field velvet-cap-field${citySuggestOpen ? " velvet-cap-field--suggest-open" : ""}`}
+                    className={`luxury-filter-field luxury-cap-field${citySuggestOpen ? " luxury-cap-field--suggest-open" : ""}`}
                   >
-                    <label htmlFor="velvet-city" className="velvet-filter-label">
+                    <label htmlFor="luxury-city" className="luxury-filter-label">
                       Citta o comune
                     </label>
-                    <div className="velvet-cap-input-wrap">
+                    <div className="luxury-cap-input-wrap">
                       <input
-                        id="velvet-city"
+                        id="luxury-city"
                         type="text"
                         value={cityInput}
                         onFocus={() => {
@@ -1020,17 +1047,17 @@ export default function HomePage() {
                           }
                         }}
                         placeholder="Città o comune"
-                        className="velvet-cap-text-input"
+                        className="luxury-cap-text-input"
                         autoComplete="off"
                       />
                     </div>
                     {citySuggestOpen ? (
-                      <ul className="velvet-cap-suggestions" aria-label="Suggerimenti citta e comuni">
+                      <ul className="luxury-cap-suggestions" aria-label="Suggerimenti citta e comuni">
                         {cityPlaceSuggestionRows.map((row) => (
                           <li key={row.key}>
                             <button
                               type="button"
-                              className="velvet-cap-suggestion-btn"
+                              className="luxury-cap-suggestion-btn"
                               onMouseDown={(ev) => ev.preventDefault()}
                               onClick={() => {
                                 setCityInput(row.label);
@@ -1048,15 +1075,15 @@ export default function HomePage() {
                   </div>
                   <div
                     ref={capFieldRef}
-                    className={`velvet-filter-field velvet-cap-field${capCitySuggestions.length > 0 && !capSuggestDismissed ? " velvet-cap-field--suggest-open" : ""}`}
+                    className={`luxury-filter-field luxury-cap-field${capCitySuggestions.length > 0 && !capSuggestDismissed ? " luxury-cap-field--suggest-open" : ""}`}
                   >
-                    <label htmlFor="velvet-cap" className="velvet-filter-label">
+                    <label htmlFor="luxury-cap" className="luxury-filter-label">
                       CAP
                     </label>
-                    <div className="velvet-cap-input-row">
-                      <div className="velvet-cap-input-wrap">
+                    <div className="luxury-cap-input-row">
+                      <div className="luxury-cap-input-wrap">
                         <input
-                          id="velvet-cap"
+                          id="luxury-cap"
                           type="text"
                           inputMode="numeric"
                           autoComplete="postal-code"
@@ -1070,44 +1097,42 @@ export default function HomePage() {
                             setCapInput(e.target.value);
                             if (cityInput.trim()) setCityInput("");
                           }}
-                          className="velvet-cap-text-input"
-                          aria-describedby={!cityInput.trim() && capDigits.length > 0 ? "velvet-cap-status" : undefined}
+                          className="luxury-cap-text-input"
+                          aria-describedby={!cityInput.trim() && capDigits.length > 0 ? "luxury-cap-status" : undefined}
                         />
                       </div>
-                      {canUseQuickGeolocationTags ? (
-                        <button
-                          type="button"
-                          className="velvet-cap-geo-btn"
-                          disabled={geoLoading}
-                          aria-busy={geoLoading}
-                          title="Compila CAP e comune dalla tua posizione"
-                          aria-label="Geolocalizza: compila CAP e comune dalla posizione attuale"
-                          onClick={handleGeoLocateForFilters}
-                        >
-                          {geoLoading ? (
-                            <span className="velvet-cap-geo-btn__spinner" aria-hidden />
-                          ) : (
-                            <svg
-                              className="velvet-cap-geo-btn__icon"
-                              viewBox="0 0 24 24"
-                              width={22}
-                              height={22}
-                              aria-hidden
-                              fill="currentColor"
-                            >
-                              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z" />
-                            </svg>
-                          )}
-                        </button>
-                      ) : null}
+                      <button
+                        type="button"
+                        className="luxury-cap-geo-btn"
+                        disabled={geoLoading}
+                        aria-busy={geoLoading}
+                        title="Compila CAP e comune dalla tua posizione"
+                        aria-label="Geolocalizza: compila CAP e comune dalla posizione attuale"
+                        onClick={handleGeoLocateForFilters}
+                      >
+                        {geoLoading ? (
+                          <span className="luxury-cap-geo-btn__spinner" aria-hidden />
+                        ) : (
+                          <svg
+                            className="luxury-cap-geo-btn__icon"
+                            viewBox="0 0 24 24"
+                            width={22}
+                            height={22}
+                            aria-hidden
+                            fill="currentColor"
+                          >
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z" />
+                          </svg>
+                        )}
+                      </button>
                     </div>
                     {capCitySuggestions.length > 0 && !capSuggestDismissed && (
-                      <ul className="velvet-cap-suggestions" aria-label="Suggerimenti localita da CAP">
+                      <ul className="luxury-cap-suggestions" aria-label="Suggerimenti localita da CAP">
                         {capCitySuggestions.map((item) => (
                           <li key={`${country}-${item.cap}-${item.city}`}>
                             <button
                               type="button"
-                              className="velvet-cap-suggestion-btn"
+                              className="luxury-cap-suggestion-btn"
                               onClick={() => {
                                 setCapInput(item.cap);
                                 setCityInput(item.city);
@@ -1122,7 +1147,7 @@ export default function HomePage() {
                       </ul>
                     )}
                     {capLen > 0 && !cityInput.trim() && capDigits.length > 0 && (
-                      <p id="velvet-cap-status" className="velvet-cap-hint" role="status">
+                      <p id="luxury-cap-status" className="luxury-cap-hint" role="status">
                         {capDigits.length < capLen && (
                           <>CAP: {capDigits.length}/{capLen} cifre — al completamento mostriamo il comune.</>
                         )}
@@ -1141,17 +1166,35 @@ export default function HomePage() {
                       </p>
                     )}
                   </div>
+                  <div className="luxury-filter-field">
+                    <label htmlFor="luxury-business-type" className="luxury-filter-label">
+                      Tipologia
+                    </label>
+                    <select
+                      id="luxury-business-type"
+                      value={businessTypeFilter}
+                      onChange={(e) => setBusinessTypeFilter(e.target.value as SalonBusinessTypeId | "")}
+                      className="luxury-soft-select"
+                    >
+                      <option value="">Tutte le tipologie</option>
+                      {SALON_BUSINESS_TYPE_OPTIONS.map((opt) => (
+                        <option key={opt.id} value={opt.id}>
+                          {HOME_BUSINESS_TYPE_FILTER_LABELS[opt.id]}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="velvet-quick-tags-section">
+            <div className="luxury-quick-tags-section">
               <button
                 type="button"
-                className="velvet-quick-tags-toggle"
-                id="velvet-quick-tags-trigger"
+                className="luxury-quick-tags-toggle"
+                id="luxury-quick-tags-trigger"
                 aria-expanded={canUseQuickGeolocationTags ? quickSuggestionsOpen : false}
-                aria-controls={canUseQuickGeolocationTags ? "velvet-quick-tags-panel" : undefined}
+                aria-controls={canUseQuickGeolocationTags ? "luxury-quick-tags-panel" : undefined}
                 disabled={!canUseQuickGeolocationTags}
                 title={
                   canUseQuickGeolocationTags
@@ -1164,24 +1207,24 @@ export default function HomePage() {
                 }}
               >
                 Oppure un tocco
-                <span className="velvet-quick-tags-chevron" aria-hidden>
+                <span className="luxury-quick-tags-chevron" aria-hidden>
                   ▾
                 </span>
               </button>
               {!canUseQuickGeolocationTags ? (
-                <p className="velvet-quick-tags-login-hint">
+                <p className="luxury-quick-tags-login-hint">
                   {isAuthenticated ? (
                     <>
                       Per trovare il salone più vicino a te serve un account{" "}
                       <strong>cliente</strong>.{" "}
-                      <Link to="/registrati" className="velvet-link-inline">
+                      <Link to="/registrati" className="luxury-link-inline">
                         Registrati come cliente
                       </Link>{" "}
                       oppure accedi con un profilo cliente.
                     </>
                   ) : (
                     <>
-                      <Link to="/account" className="velvet-link-inline">
+                      <Link to="/account" className="luxury-link-inline">
                         Accedi
                       </Link>{" "}
                       per trovare il salone più vicino a te.
@@ -1191,23 +1234,23 @@ export default function HomePage() {
               ) : null}
               {quickSuggestionsOpen && canUseQuickGeolocationTags && (
                 <div
-                  className="velvet-quick-tags-panel"
-                  id="velvet-quick-tags-panel"
+                  className="luxury-quick-tags-panel"
+                  id="luxury-quick-tags-panel"
                   role="region"
-                  aria-labelledby="velvet-quick-tags-trigger"
+                  aria-labelledby="luxury-quick-tags-trigger"
                 >
-                  <p className="velvet-quick-tags-near-hint">
+                  <p className="luxury-quick-tags-near-hint">
                     Con la tua posizione, cerchiamo saloni entro circa <strong>{QUICK_NEAR_RADIUS_KM} km</strong>.
                   </p>
                   {QUICK_SUGGEST_GROUPS.map((group) => (
-                    <div key={group.id} className="velvet-quick-tags-group">
-                      <p className="velvet-quick-tags-group-label">{group.label}</p>
-                      <div className="velvet-quick-tags-row">
+                    <div key={group.id} className="luxury-quick-tags-group">
+                      <p className="luxury-quick-tags-group-label">{group.label}</p>
+                      <div className="luxury-quick-tags-row">
                         {group.tags.map((t) => (
                           <button
                             key={t.label}
                             type="button"
-                            className="velvet-quick-tag"
+                            className="luxury-quick-tag"
                             onClick={() => {
                               void (async () => {
                                 if (!mapsAllowed) {
@@ -1256,18 +1299,18 @@ export default function HomePage() {
         <HeroStoryCarousel nativeApp={isNativeApp} editorialAllowed={editorialAllowed} />
       </section>
 
-      <section className="velvet-trending-section">
-        <h2 className="velvet-trending-title">Idee per la tua prossima visita</h2>
-        <div className="velvet-trending-groups">
+      <section className="luxury-trending-section">
+        <h2 className="luxury-trending-title">Idee per la tua prossima visita</h2>
+        <div className="luxury-trending-groups">
           {trendingGroups.map((group) => (
-            <div key={group.id} className="velvet-trending-group">
-              <h3 className="velvet-trending-subtitle">{group.heading}</h3>
+            <div key={group.id} className="luxury-trending-group">
+              <h3 className="luxury-trending-subtitle">{group.heading}</h3>
               <div className={trendingGridClass}>
                 {group.items.map((t) => (
                   <Link
                     key={t.id}
                     to={`/idee/${group.id}/${t.id}`}
-                    className={`velvet-trend-card${editorialAllowed ? " velvet-trend-card--photo" : ""}`}
+                    className={`luxury-trend-card${editorialAllowed ? " luxury-trend-card--photo" : ""}`}
                     style={
                       editorialAllowed
                         ? { backgroundImage: trendCardBg(t.image) }
@@ -1275,7 +1318,7 @@ export default function HomePage() {
                     }
                     aria-label={`${t.title}. ${t.imageAlt}`}
                   >
-                    <span className="velvet-trend-card-label" aria-hidden="true">
+                    <span className="luxury-trend-card-label" aria-hidden="true">
                       {t.title}
                     </span>
                   </Link>
@@ -1286,47 +1329,47 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="velvet-partner-strip" aria-labelledby="velvet-partner-heading">
-        <div className="velvet-partner-wave" aria-hidden />
-        <div className="velvet-partner-inner">
-          <div className="velvet-partner-copy">
-            <h2 id="velvet-partner-heading" className="velvet-partner-title">
+      <section className="luxury-partner-strip" aria-labelledby="luxury-partner-heading">
+        <div className="luxury-partner-wave" aria-hidden />
+        <div className="luxury-partner-inner">
+          <div className="luxury-partner-copy">
+            <h2 id="luxury-partner-heading" className="luxury-partner-title">
               Hai un salone? Portalo tra i professionisti su Saloni Luxury.
             </h2>
-            <p className="velvet-partner-lead">
+            <p className="luxury-partner-lead">
               Aumenta la visibilità, gestisci gli appuntamenti e fatti prenotare online da clienti che cercano
               parrucchieri, centri benessere ed estetica nella loro zona — con un&apos;esperienza chiara per te e per chi
               entra in salone.
             </p>
-            <div className="velvet-partner-cta-row">
-              <Link to="/registrati" className="velvet-partner-cta">
+            <div className="luxury-partner-cta-row">
+              <Link to="/registrati" className="luxury-partner-cta">
                 Registrati come cliente
               </Link>
-              <PartnerSignupLink className="velvet-partner-cta velvet-partner-cta--plans">
+              <PartnerSignupLink className="luxury-partner-cta luxury-partner-cta--plans">
                 Diventa partner (salone)
               </PartnerSignupLink>
             </div>
           </div>
-          <div className="velvet-partner-visual" aria-hidden>
-            <div className="velvet-partner-device velvet-partner-device--tablet">
-              <div className="velvet-partner-cal-bar" />
-              <div className="velvet-partner-cal-cells">
+          <div className="luxury-partner-visual" aria-hidden>
+            <div className="luxury-partner-device luxury-partner-device--tablet">
+              <div className="luxury-partner-cal-bar" />
+              <div className="luxury-partner-cal-cells">
                 {Array.from({ length: 12 }).map((_, i) => (
-                  <span key={i} className={`velvet-partner-slot velvet-partner-slot--${(i % 4) + 1}`} />
+                  <span key={i} className={`luxury-partner-slot luxury-partner-slot--${(i % 4) + 1}`} />
                 ))}
               </div>
             </div>
-            <div className="velvet-partner-device velvet-partner-device--phone">
-              <div className="velvet-partner-toast">
-                <span className="velvet-partner-toast-dot" />
+            <div className="luxury-partner-device luxury-partner-device--phone">
+              <div className="luxury-partner-toast">
+                <span className="luxury-partner-toast-dot" />
                 Nuova prenotazione
-                <span className="velvet-partner-toast-meta">Oggi · 15:00</span>
+                <span className="luxury-partner-toast-meta">Oggi · 15:00</span>
               </div>
-              <div className="velvet-partner-phone-body">
-                <div className="velvet-partner-cal-bar velvet-partner-cal-bar--sm" />
-                <div className="velvet-partner-cal-cells velvet-partner-cal-cells--sm">
+              <div className="luxury-partner-phone-body">
+                <div className="luxury-partner-cal-bar luxury-partner-cal-bar--sm" />
+                <div className="luxury-partner-cal-cells luxury-partner-cal-cells--sm">
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <span key={i} className={`velvet-partner-slot velvet-partner-slot--${(i % 3) + 1}`} />
+                    <span key={i} className={`luxury-partner-slot luxury-partner-slot--${(i % 3) + 1}`} />
                   ))}
                 </div>
               </div>

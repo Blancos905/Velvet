@@ -49,15 +49,15 @@ export default function AccountConsumerHomePage() {
   const greeting = greetingName ? `Ciao ${greetingName}` : "Il tuo spazio Saloni Luxury";
 
   return (
-    <div className="velvet-consumer-home">
-      <h1 className="velvet-page-title">{greeting}</h1>
-      <p className="velvet-page-subtitle">Ecco la lista dei tuoi appuntamenti.</p>
+    <div className="luxury-consumer-home">
+      <h1 className="luxury-page-title">{greeting}</h1>
+      <p className="luxury-page-subtitle">Ecco la lista dei tuoi appuntamenti.</p>
       {bookingConfirmed && (
-        <p className="velvet-alert velvet-alert--success velvet-consumer-home__confirm" role="status">
+        <p className="luxury-alert luxury-alert--success luxury-consumer-home__confirm" role="status">
           Prenotazione confermata con successo.
           <button
             type="button"
-            className="velvet-link-inline"
+            className="luxury-link-inline"
             onClick={() => {
               const next = new URLSearchParams(searchParams);
               next.delete("booking");
@@ -69,35 +69,35 @@ export default function AccountConsumerHomePage() {
         </p>
       )}
 
-      {appointmentsQ.isLoading && <p className="velvet-text-muted">Caricamento…</p>}
+      {appointmentsQ.isLoading && <p className="luxury-text-muted">Caricamento…</p>}
       {appointmentsQ.error && (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {appointmentsQ.error instanceof Error ? appointmentsQ.error.message : "Errore"}
         </p>
       )}
       {appointmentsQ.data && upcomingPreview.length === 0 && (
-        <div className="velvet-surface-card velvet-consumer-home__empty">
-          <p className="velvet-consumer-home__empty-text">
+        <div className="luxury-surface-card luxury-consumer-home__empty">
+          <p className="luxury-consumer-home__empty-text">
             Non hai ancora visite in programma.{" "}
-            <Link className="velvet-link-inline" to="/search">
+            <Link className="luxury-link-inline" to="/search">
               Cerca un salone
             </Link>{" "}
             e prenota il tuo prossimo momento.
           </p>
         </div>
       )}
-      <ul className="velvet-consumer-home__appointments-list">
+      <ul className="luxury-consumer-home__appointments-list">
         {upcomingPreview.map((a) => (
-          <li key={a.id} className="velvet-surface-card velvet-consumer-home__appointment-item">
-            <Link to={`/account/prenotazioni/${a.id}`} className="velvet-link-inline velvet-consumer-home__appointment-title">
+          <li key={a.id} className="luxury-surface-card luxury-consumer-home__appointment-item">
+            <Link to={`/account/prenotazioni/${a.id}`} className="luxury-link-inline luxury-consumer-home__appointment-title">
               {a.serviceName}
             </Link>
-            <p className="velvet-consumer-home__appointment-meta">
+            <p className="luxury-consumer-home__appointment-meta">
               {a.locationName} · {formatWhen(a.start)} · {formatPriceEUR(a.priceCents)}
             </p>
             {(a.canConsumerCancel || a.canConsumerReschedule) && (
-              <p className="velvet-consumer-home__appointment-manage">
-                <Link to={`/account/prenotazioni/${a.id}`} className="velvet-link-inline">
+              <p className="luxury-consumer-home__appointment-manage">
+                <Link to={`/account/prenotazioni/${a.id}`} className="luxury-link-inline">
                   Modifica orario o disdici
                 </Link>
               </p>
@@ -106,8 +106,8 @@ export default function AccountConsumerHomePage() {
         ))}
       </ul>
       {appointmentsQ.data && appointmentsQ.data.length > 3 && (
-        <p className="velvet-consumer-home__all-link-wrap">
-          <Link className="velvet-link-inline" to="/account/prenotazioni">
+        <p className="luxury-consumer-home__all-link-wrap">
+          <Link className="luxury-link-inline" to="/account/prenotazioni">
             Vedi tutte le prenotazioni
           </Link>
         </p>

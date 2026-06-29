@@ -44,12 +44,13 @@ export const AccountBillingSuccessPage = lazy(
   () => import("../pages/account/AccountBillingSuccessPage"),
 );
 export const VelvetFeedbackPage = lazy(() => import("../pages/account/VelvetFeedbackPage"));
-export const SalonVelvetChatPage = lazy(() => import("../pages/account/SalonVelvetChatPage"));
+export const SalonLuxuryChatPage = lazy(() => import("../pages/account/SalonLuxuryChatPage"));
 
 // —— Admin ——
 export const AdminLayout = lazyNamed(() => import("../pages/admin/AdminLayout"), "AdminLayout");
 export const AdminDashboardPage = lazy(() => import("../pages/admin/AdminDashboardPage"));
 export const AdminAssistenzaPage = lazy(() => import("../pages/admin/AdminAssistenzaPage"));
+export const AdminFiscalInvoicesPage = lazy(() => import("../pages/admin/AdminFiscalInvoicesPage"));
 export const AdminSuperAdminProfilePage = lazy(
   () => import("../pages/admin/AdminSuperAdminProfilePage"),
 );

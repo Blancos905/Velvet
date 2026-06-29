@@ -1,0 +1,8 @@
+# Copia in android/key.properties (gitignored) e valorizza prima del build Play Store.
+# Genera keystore + key.properties con: ./scripts/setup-android-release-signing.sh
+#
+# storeFile è relativo alla cartella android/
+storePassword=CHANGE_ME_STORE_PASSWORD
+keyPassword=CHANGE_ME_KEY_PASSWORD
+keyAlias=upload
+storeFile=upload-keystore.jks

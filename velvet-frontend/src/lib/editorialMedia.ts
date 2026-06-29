@@ -1,7 +1,17 @@
 /** Utility per rispettare il consenso cookie «editorial» (immagini Unsplash / terze parti). */
 
+function isFirstPartyMediaUrl(url: string): boolean {
+  const t = url.trim();
+  if (!t) return false;
+  if (t.startsWith("/")) return true;
+  if (typeof window !== "undefined" && t.startsWith(window.location.origin)) return true;
+  return false;
+}
+
 export function editorialImageUrl(url: string | undefined, allowed: boolean): string | undefined {
-  if (!allowed || !url?.trim()) return undefined;
+  if (!url?.trim()) return undefined;
+  if (isFirstPartyMediaUrl(url)) return url;
+  if (!allowed) return undefined;
   return url;
 }
 

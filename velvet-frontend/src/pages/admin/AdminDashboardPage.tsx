@@ -10,6 +10,7 @@ import { extractSuperAdminProfileFromOverview } from "../../utils/superAdminOver
 import { parseSuperAdminCounts } from "./superAdminPlatformStats";
 import { AdminConsumerClientsSection } from "./AdminConsumerClientsSection";
 import { AdminSalonPlanSection } from "./AdminSalonPlanSection";
+import { AdminSalonSubscriptionSection } from "./AdminSalonSubscriptionSection";
 import { AdminSuperAdminProfileSection } from "./AdminSuperAdminProfileSection";
 import SuperAdminStatisticsSection from "./SuperAdminStatisticsSection";
 
@@ -57,7 +58,7 @@ export default function AdminDashboardPage() {
   const qc = useQueryClient();
   const baseId = useId();
   const [selectedArea, setSelectedArea] = useState<
-    "premium" | "free" | "clienti" | "recensioni" | "profilo" | "statistiche"
+    "premium" | "free" | "abbonamenti" | "clienti" | "recensioni" | "profilo" | "statistiche"
   >("premium");
   const [reviewsPage, setReviewsPage] = useState(0);
   const [platformReviewsPage, setPlatformReviewsPage] = useState(0);
@@ -156,26 +157,26 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="velvet-admin-dashboard">
+    <div className="luxury-admin-dashboard">
       <section
-        className="velvet-admin-welcome-card velvet-admin-welcome-card--minimal"
+        className="luxury-admin-welcome-card luxury-admin-welcome-card--minimal"
         aria-labelledby={`${baseId}-welcome-h`}
       >
-        <div className="velvet-admin-welcome-card__aurora" aria-hidden />
-        <div className="velvet-admin-welcome-card__shine" aria-hidden />
-        <div className="velvet-admin-welcome-card__inner">
-          <div className="velvet-admin-welcome-card__mark">
+        <div className="luxury-admin-welcome-card__aurora" aria-hidden />
+        <div className="luxury-admin-welcome-card__shine" aria-hidden />
+        <div className="luxury-admin-welcome-card__inner">
+          <div className="luxury-admin-welcome-card__mark">
             <SaloniLuxuryLogoMark variant="default" />
           </div>
-          <div className="velvet-admin-welcome-card__copy velvet-admin-welcome-card__copy--minimal">
-            <h1 id={`${baseId}-welcome-h`} className="velvet-admin-welcome-card__title velvet-admin-welcome-card__title--welcome">
+          <div className="luxury-admin-welcome-card__copy luxury-admin-welcome-card__copy--minimal">
+            <h1 id={`${baseId}-welcome-h`} className="luxury-admin-welcome-card__title luxury-admin-welcome-card__title--welcome">
               Benvenuto, super admin
             </h1>
-            <p className="velvet-admin-welcome-card__welcome-name">
+            <p className="luxury-admin-welcome-card__welcome-name">
               {overviewQ.isLoading ? (
-                <span className="velvet-admin-muted">Caricamento…</span>
+                <span className="luxury-admin-muted">Caricamento…</span>
               ) : overviewQ.isError ? (
-                <span className="velvet-admin-muted">Super admin</span>
+                <span className="luxury-admin-muted">Super admin</span>
               ) : (
                 welcomeDisplayName
               )}
@@ -185,7 +186,7 @@ export default function AdminDashboardPage() {
       </section>
 
       {overviewQ.isError ? (
-        <p className="velvet-alert velvet-alert--error velvet-admin-dashboard-generated" role="alert">
+        <p className="luxury-alert luxury-alert--error luxury-admin-dashboard-generated" role="alert">
           {overviewQ.error instanceof Error
             ? overviewQ.error.message
             : "Impossibile caricare la panoramica admin. Verifica che Spring sia attivo e che la sessione super admin sia valida."}
@@ -193,36 +194,44 @@ export default function AdminDashboardPage() {
       ) : null}
 
       {overviewCounts ? (
-        <section className="velvet-admin-panel velvet-admin-dashboard-section" aria-label="Riepilogo piattaforma">
-          <div className="velvet-admin-dashboard-columns">
-            <div className="velvet-admin-dashboard-column">
+        <section className="luxury-admin-panel luxury-admin-dashboard-section" aria-label="Riepilogo piattaforma">
+          <div className="luxury-admin-dashboard-columns">
+            <div className="luxury-admin-dashboard-column">
               <strong>{overviewCounts.consumerProfilesActive}</strong>
-              <span className="velvet-admin-muted">profili attivi</span>
+              <span className="luxury-admin-muted">profili attivi</span>
             </div>
-            <div className="velvet-admin-dashboard-column">
-              <strong>{overviewCounts.studioGroupsPaying}</strong>
-              <span className="velvet-admin-muted">saloni a pagamento</span>
+            <div className="luxury-admin-dashboard-column">
+              <strong>{overviewCounts.studioGroupsSubscribedPaying ?? 0}</strong>
+              <span className="luxury-admin-muted">abbonati paganti</span>
             </div>
-            <div className="velvet-admin-dashboard-column">
+            <div className="luxury-admin-dashboard-column">
+              <strong>{overviewCounts.studioGroupsSubscribedTrial ?? 0}</strong>
+              <span className="luxury-admin-muted">in prova</span>
+            </div>
+            <div className="luxury-admin-dashboard-column">
+              <strong>{overviewCounts.studioGroupsSubscribedCancelled ?? 0}</strong>
+              <span className="luxury-admin-muted">disdetta</span>
+            </div>
+            <div className="luxury-admin-dashboard-column">
               <strong>{overviewCounts.appointmentsTotal}</strong>
-              <span className="velvet-admin-muted">appuntamenti</span>
+              <span className="luxury-admin-muted">appuntamenti</span>
             </div>
-            <div className="velvet-admin-dashboard-column">
+            <div className="luxury-admin-dashboard-column">
               <strong>{overviewCounts.salonClients}</strong>
-              <span className="velvet-admin-muted">clienti in anagrafica</span>
+              <span className="luxury-admin-muted">clienti in anagrafica</span>
             </div>
           </div>
         </section>
       ) : null}
 
-      <section className="velvet-admin-panel" aria-labelledby={`${baseId}-aree-h`}>
-        <h2 id={`${baseId}-aree-h`} className="velvet-admin-section-title">
+      <section className="luxury-admin-panel" aria-labelledby={`${baseId}-aree-h`}>
+        <h2 id={`${baseId}-aree-h`} className="luxury-admin-section-title">
           Aree rapide
         </h2>
-        <div className="velvet-admin-subchips" role="toolbar" aria-label="Filtri super admin">
+        <div className="luxury-admin-subchips" role="toolbar" aria-label="Filtri super admin">
           <button
             type="button"
-            className={`velvet-admin-subchip ${selectedArea === "premium" ? "is-active" : ""}`}
+            className={`luxury-admin-subchip ${selectedArea === "premium" ? "is-active" : ""}`}
             aria-pressed={selectedArea === "premium"}
             onClick={() => setSelectedArea("premium")}
           >
@@ -230,7 +239,7 @@ export default function AdminDashboardPage() {
           </button>
           <button
             type="button"
-            className={`velvet-admin-subchip ${selectedArea === "free" ? "is-active" : ""}`}
+            className={`luxury-admin-subchip ${selectedArea === "free" ? "is-active" : ""}`}
             aria-pressed={selectedArea === "free"}
             onClick={() => setSelectedArea("free")}
           >
@@ -238,7 +247,15 @@ export default function AdminDashboardPage() {
           </button>
           <button
             type="button"
-            className={`velvet-admin-subchip ${selectedArea === "clienti" ? "is-active" : ""}`}
+            className={`luxury-admin-subchip ${selectedArea === "abbonamenti" ? "is-active" : ""}`}
+            aria-pressed={selectedArea === "abbonamenti"}
+            onClick={() => setSelectedArea("abbonamenti")}
+          >
+            Abbonamenti
+          </button>
+          <button
+            type="button"
+            className={`luxury-admin-subchip ${selectedArea === "clienti" ? "is-active" : ""}`}
             aria-pressed={selectedArea === "clienti"}
             onClick={() => setSelectedArea("clienti")}
           >
@@ -246,7 +263,7 @@ export default function AdminDashboardPage() {
           </button>
           <button
             type="button"
-            className={`velvet-admin-subchip ${selectedArea === "recensioni" ? "is-active" : ""}`}
+            className={`luxury-admin-subchip ${selectedArea === "recensioni" ? "is-active" : ""}`}
             aria-pressed={selectedArea === "recensioni"}
             onClick={() => setSelectedArea("recensioni")}
           >
@@ -254,7 +271,7 @@ export default function AdminDashboardPage() {
           </button>
           <button
             type="button"
-            className={`velvet-admin-subchip ${selectedArea === "profilo" ? "is-active" : ""}`}
+            className={`luxury-admin-subchip ${selectedArea === "profilo" ? "is-active" : ""}`}
             aria-pressed={selectedArea === "profilo"}
             onClick={() => setSelectedArea("profilo")}
           >
@@ -262,7 +279,7 @@ export default function AdminDashboardPage() {
           </button>
           <button
             type="button"
-            className={`velvet-admin-subchip ${selectedArea === "statistiche" ? "is-active" : ""}`}
+            className={`luxury-admin-subchip ${selectedArea === "statistiche" ? "is-active" : ""}`}
             aria-pressed={selectedArea === "statistiche"}
             onClick={() => setSelectedArea("statistiche")}
           >
@@ -270,7 +287,7 @@ export default function AdminDashboardPage() {
           </button>
           <Link
             to="/admin/messaggi"
-            className="velvet-admin-subchip"
+            className="luxury-admin-subchip"
             title="Richieste dal modulo Assistenza inviate da titolari di salone e da staff"
           >
             Messaggi
@@ -294,7 +311,7 @@ export default function AdminDashboardPage() {
           paginationAriaLabel="Paginazione saloni premium"
           modalCreateTitle="Registrazione — piano Premium"
           modalCreateIntro={
-            <p className="velvet-plans-modal__intro">
+            <p className="luxury-plans-modal__intro">
               <strong>Questo modulo non è per i clienti che prenotano</strong> (loro hanno ruolo applicativo{" "}
               <code style={{ fontSize: "0.85em", color: "rgba(253, 186, 116, 0.9)" }}>CLIENT</code>). Qui crei
               l&apos;accesso: dopo la registrazione il backend assegna{" "}
@@ -328,7 +345,7 @@ export default function AdminDashboardPage() {
           paginationAriaLabel="Paginazione saloni free"
           modalCreateTitle="Registrazione — piano Free (BASE)"
           modalCreateIntro={
-            <p className="velvet-plans-modal__intro">
+            <p className="luxury-plans-modal__intro">
               <strong>Questo modulo non è per i clienti che prenotano</strong> (loro hanno ruolo applicativo{" "}
               <code style={{ fontSize: "0.85em", color: "rgba(253, 186, 116, 0.9)" }}>CLIENT</code>). Qui crei
               l&apos;accesso titolare (
@@ -340,6 +357,22 @@ export default function AdminDashboardPage() {
           }
           createSuccessMessage="Salone free creato con successo."
           createErrorDefault="Creazione salone free fallita."
+          onEditSalon={(row) => {
+            setEditingSalon(row);
+            setEditSalonForm({
+              ownerEmail: row.ownerEmail ?? "",
+              salonName: row.name,
+              salonCity: row.primaryLocationCity ?? "",
+            });
+          }}
+        />
+      ) : null}
+      {selectedArea === "abbonamenti" && accessToken ? (
+        <AdminSalonSubscriptionSection
+          accessToken={accessToken}
+          counts={overviewCounts}
+          idPrefix={`${baseId}-abbonamenti`}
+          headingId={`${baseId}-abbonamenti-h`}
           onEditSalon={(row) => {
             setEditingSalon(row);
             setEditSalonForm({
@@ -368,16 +401,16 @@ export default function AdminDashboardPage() {
       ) : null}
 
       {selectedArea === "recensioni" ? (
-        <section className="velvet-admin-panel velvet-admin-premium-card" aria-labelledby={`${baseId}-reviews-h`}>
-          <h2 id={`${baseId}-reviews-h`} className="velvet-admin-section-title">
+        <section className="luxury-admin-panel luxury-admin-premium-card" aria-labelledby={`${baseId}-reviews-h`}>
+          <h2 id={`${baseId}-reviews-h`} className="luxury-admin-section-title">
             Recensioni
           </h2>
-          <div className="velvet-admin-subchips" role="tablist" aria-label="Tipo recensioni" style={{ marginBottom: "0.75rem" }}>
+          <div className="luxury-admin-subchips" role="tablist" aria-label="Tipo recensioni" style={{ marginBottom: "0.75rem" }}>
             <button
               type="button"
               role="tab"
               aria-selected={reviewAdminTab === "saloni"}
-              className={`velvet-admin-subchip ${reviewAdminTab === "saloni" ? "is-active" : ""}`}
+              className={`luxury-admin-subchip ${reviewAdminTab === "saloni" ? "is-active" : ""}`}
               onClick={() => setReviewAdminTab("saloni")}
             >
               Sui saloni (post-visita)
@@ -386,22 +419,22 @@ export default function AdminDashboardPage() {
               type="button"
               role="tab"
               aria-selected={reviewAdminTab === "velvet"}
-              className={`velvet-admin-subchip ${reviewAdminTab === "velvet" ? "is-active" : ""}`}
+              className={`luxury-admin-subchip ${reviewAdminTab === "velvet" ? "is-active" : ""}`}
               onClick={() => setReviewAdminTab("velvet")}
             >
               Su Saloni Luxury
             </button>
           </div>
-          <p className="velvet-admin-subchips__intro" style={{ marginTop: "-0.25rem", marginBottom: "0.75rem" }}>
+          <p className="luxury-admin-subchips__intro" style={{ marginTop: "-0.25rem", marginBottom: "0.75rem" }}>
             {reviewAdminTab === "saloni"
               ? "Per ogni salone: media del voto salone su tutte le sedi e tutti i servizi (nessun dettaglio per singolo servizio)."
               : "Feedback clienti e titolari sulla piattaforma (voto 1–5 stelle)."}
           </p>
-          <div className="velvet-admin-subreveal is-open">
+          <div className="luxury-admin-subreveal is-open">
             {reviewAdminTab === "saloni" ? (
               <>
-                <div className="velvet-admin-table-wrap velvet-admin-premium-card__table-wrap">
-                  <table className="velvet-admin-table velvet-admin-table--compact velvet-admin-premium-card__table">
+                <div className="luxury-admin-table-wrap luxury-admin-premium-card__table-wrap">
+                  <table className="luxury-admin-table luxury-admin-table--compact luxury-admin-premium-card__table">
                     <thead>
                       <tr>
                         <th>Salone</th>
@@ -444,7 +477,7 @@ export default function AdminDashboardPage() {
                                     href={`/s/${encodeURIComponent(row.showcaseLocationSlug)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="velvet-admin-muted"
+                                    className="luxury-admin-muted"
                                     style={{ textDecoration: "underline" }}
                                     title="Apre la vetrina di una sede del salone"
                                   >
@@ -463,24 +496,24 @@ export default function AdminDashboardPage() {
                 </div>
                 {reviewsQ.isSuccess && reviewsQ.data && reviewsQ.data.totalElements > 0 ? (
                   <div
-                    className="velvet-admin-subchips velvet-admin-premium-card__pagination"
+                    className="luxury-admin-subchips luxury-admin-premium-card__pagination"
                     aria-label="Paginazione recensioni saloni"
                   >
                     <button
                       type="button"
-                      className="velvet-admin-subchip"
+                      className="luxury-admin-subchip"
                       disabled={reviewsPageSafe === 0}
                       onClick={() => setReviewsPage((p) => Math.max(0, p - 1))}
                     >
                       ← Precedente
                     </button>
-                    <span className="velvet-admin-muted">
+                    <span className="luxury-admin-muted">
                       Pagina {reviewsPageSafe + 1} di {reviewsTotalPages} ·{" "}
                       {reviewsQ.data?.size ?? REVIEWS_PAGE_SIZE} per pagina · {reviewsQ.data?.totalElements ?? 0} saloni
                     </span>
                     <button
                       type="button"
-                      className="velvet-admin-subchip"
+                      className="luxury-admin-subchip"
                       disabled={reviewsPageSafe >= reviewsTotalPages - 1}
                       onClick={() => setReviewsPage((p) => Math.min(reviewsTotalPages - 1, p + 1))}
                     >
@@ -491,8 +524,8 @@ export default function AdminDashboardPage() {
               </>
             ) : (
               <>
-                <div className="velvet-admin-table-wrap velvet-admin-premium-card__table-wrap">
-                  <table className="velvet-admin-table velvet-admin-table--compact velvet-admin-premium-card__table">
+                <div className="luxury-admin-table-wrap luxury-admin-premium-card__table-wrap">
+                  <table className="luxury-admin-table luxury-admin-table--compact luxury-admin-premium-card__table">
                     <thead>
                       <tr>
                         <th>Data</th>
@@ -548,25 +581,25 @@ export default function AdminDashboardPage() {
                 </div>
                 {platformReviewsQ.isSuccess && platformReviewsQ.data && platformReviewsQ.data.totalElements > 0 ? (
                   <div
-                    className="velvet-admin-subchips velvet-admin-premium-card__pagination"
+                    className="luxury-admin-subchips luxury-admin-premium-card__pagination"
                     aria-label="Paginazione recensioni piattaforma"
                   >
                     <button
                       type="button"
-                      className="velvet-admin-subchip"
+                      className="luxury-admin-subchip"
                       disabled={platformReviewsPageSafe === 0}
                       onClick={() => setPlatformReviewsPage((p) => Math.max(0, p - 1))}
                     >
                       ← Precedente
                     </button>
-                    <span className="velvet-admin-muted">
+                    <span className="luxury-admin-muted">
                       Pagina {platformReviewsPageSafe + 1} di {platformReviewsTotalPages} ·{" "}
                       {platformReviewsQ.data?.size ?? REVIEWS_PAGE_SIZE} per pagina ·{" "}
                       {platformReviewsQ.data?.totalElements ?? 0} recensioni
                     </span>
                     <button
                       type="button"
-                      className="velvet-admin-subchip"
+                      className="luxury-admin-subchip"
                       disabled={platformReviewsPageSafe >= platformReviewsTotalPages - 1}
                       onClick={() =>
                         setPlatformReviewsPage((p) => Math.min(platformReviewsTotalPages - 1, p + 1))
@@ -584,7 +617,7 @@ export default function AdminDashboardPage() {
 
       {editingSalon ? (
         <div
-          className="velvet-plans-modal-root"
+          className="luxury-plans-modal-root"
           role="presentation"
           onMouseDown={(ev) => {
             if (ev.target === ev.currentTarget && !updateSalonM.isPending) {
@@ -592,14 +625,14 @@ export default function AdminDashboardPage() {
             }
           }}
         >
-          <div className="velvet-plans-modal" role="dialog" aria-modal="true" aria-labelledby={`${baseId}-salon-edit-title`}>
-            <div className="velvet-plans-modal__head">
-              <h2 id={`${baseId}-salon-edit-title`} className="velvet-plans-modal__title">
+          <div className="luxury-plans-modal" role="dialog" aria-modal="true" aria-labelledby={`${baseId}-salon-edit-title`}>
+            <div className="luxury-plans-modal__head">
+              <h2 id={`${baseId}-salon-edit-title`} className="luxury-plans-modal__title">
                 Modifica salone
               </h2>
               <button
                 type="button"
-                className="velvet-plans-modal__close"
+                className="luxury-plans-modal__close"
                 onClick={() => setEditingSalon(null)}
                 disabled={updateSalonM.isPending}
                 aria-label="Chiudi"
@@ -607,8 +640,8 @@ export default function AdminDashboardPage() {
                 ×
               </button>
             </div>
-            <form className="velvet-plans-modal__form" noValidate onSubmit={submitUpdateSalon}>
-              <label className="velvet-plans-field velvet-plans-field--full">
+            <form className="luxury-plans-modal__form" noValidate onSubmit={submitUpdateSalon}>
+              <label className="luxury-plans-field luxury-plans-field--full">
                 <span>Email titolare</span>
                 <input
                   type="email"
@@ -617,7 +650,7 @@ export default function AdminDashboardPage() {
                   maxLength={320}
                 />
               </label>
-              <label className="velvet-plans-field velvet-plans-field--full">
+              <label className="luxury-plans-field luxury-plans-field--full">
                 <span>Nome del salone</span>
                 <input
                   value={editSalonForm.salonName}
@@ -626,7 +659,7 @@ export default function AdminDashboardPage() {
                   maxLength={200}
                 />
               </label>
-              <label className="velvet-plans-field velvet-plans-field--full">
+              <label className="luxury-plans-field luxury-plans-field--full">
                 <span>Citta</span>
                 <input
                   value={editSalonForm.salonCity}
@@ -635,15 +668,15 @@ export default function AdminDashboardPage() {
                 />
               </label>
               {updateSalonM.isError ? (
-                <p className="velvet-alert velvet-alert--error velvet-plans-modal__alert" role="alert">
+                <p className="luxury-alert luxury-alert--error luxury-plans-modal__alert" role="alert">
                   {updateSalonM.error instanceof Error ? updateSalonM.error.message : "Modifica salone fallita."}
                 </p>
               ) : null}
-              <div className="velvet-plans-modal__actions">
-                <button type="button" className="velvet-plan-cta velvet-plan-cta--secondary" onClick={() => setEditingSalon(null)} disabled={updateSalonM.isPending}>
+              <div className="luxury-plans-modal__actions">
+                <button type="button" className="luxury-plan-cta luxury-plan-cta--secondary" onClick={() => setEditingSalon(null)} disabled={updateSalonM.isPending}>
                   Annulla
                 </button>
-                <button type="submit" className="velvet-plan-cta" disabled={updateSalonM.isPending}>
+                <button type="submit" className="luxury-plan-cta" disabled={updateSalonM.isPending}>
                   {updateSalonM.isPending ? "Salvataggio…" : "Salva modifiche"}
                 </button>
               </div>

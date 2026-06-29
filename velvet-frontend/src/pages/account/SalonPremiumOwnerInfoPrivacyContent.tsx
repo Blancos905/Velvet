@@ -3,10 +3,13 @@ import { Link } from "react-router-dom";
 import {
   LEGAL_AUTOMATED_DECISIONS_PARAGRAPH,
   LEGAL_PLATFORM_ADMIN_ACCESS_PARAGRAPH,
+  LEGAL_PREMIUM_BILLING_DATA_PRIVACY_PARAGRAPH,
   LEGAL_PROCESSING_ROLES_PARAGRAPH,
   LEGAL_RIGHTS_RESPONSE_PARAGRAPH,
+  LEGAL_STRIPE_PAYMENT_PROCESSOR_PARAGRAPH,
 } from "../../content/legalSharedCopy";
-import "../../styles/velvet-info-privacy-premium.css";
+import { isVelvetNativeAppShell } from "../../hooks/useVelvetNativeAppShell";
+import "../../styles/luxury-info-privacy-premium.css";
 
 type SalonPremiumOwnerInfoPrivacyContentProps = {
   supportEmail?: string | null;
@@ -72,6 +75,11 @@ const DATA_TILES: DataTile[] = [
     text: "Misurazione dell’attività, report informativi e documentazione collegata al piano Premium.",
   },
   {
+    id: "billing",
+    title: "Fatturazione Premium",
+    text: "Dati fiscali e di fatturazione (P.IVA/CF, SDI/PEC, indirizzo) solo se attivi l’abbonamento a pagamento post-prova.",
+  },
+  {
     id: "technical",
     title: "Dati tecnici",
     text: "Log, identificativi di sessione e metadati necessari a sicurezza, prevenzione abusi e continuità.",
@@ -87,7 +95,7 @@ function supportMailto(email: string | null | undefined): string | null {
 
 function ChevronIcon() {
   return (
-    <svg className="velvet-info-privacy-premium__chevron" viewBox="0 0 24 24" aria-hidden>
+    <svg className="luxury-info-privacy-premium__chevron" viewBox="0 0 24 24" aria-hidden>
       <path
         fill="none"
         stroke="currentColor"
@@ -200,7 +208,7 @@ function PanelIcon({ kind }: { kind: PrivacyPanelId }) {
   };
 
   return (
-    <span className="velvet-info-privacy-premium__panel-icon" aria-hidden>
+    <span className="luxury-info-privacy-premium__panel-icon" aria-hidden>
       <svg viewBox="0 0 24 24" width={20} height={20}>
         {paths[kind]}
       </svg>
@@ -221,6 +229,7 @@ export function SalonPremiumOwnerInfoPrivacyContent({
   const [openPanels, setOpenPanels] = useState<Set<PrivacyPanelId>>(() => new Set(["controller"]));
   const [activeNav, setActiveNav] = useState<PrivacyPanelId>("controller");
   const [activeDataTile, setActiveDataTile] = useState<string>(DATA_TILES[0]?.id ?? "account");
+  const isNativeApp = isVelvetNativeAppShell();
 
   const panels = useMemo<PrivacyPanel[]>(
     () => [
@@ -230,16 +239,16 @@ export function SalonPremiumOwnerInfoPrivacyContent({
         kicker: "Ruoli salone e piattaforma",
         content: (
           <>
-            <p className="velvet-info-privacy-premium__text">
+            <p className="luxury-info-privacy-premium__text">
               <strong>Saloni Luxury</strong> tratta i dati necessari a registrare e gestire il tuo account titolare,
               l&apos;abbonamento Premium, la piattaforma tecnica (autenticazione, sicurezza, assistenza, notifiche di servizio e
               funzioni Premium come vetrina personalizzata, statistiche e report).
             </p>
-            <p className="velvet-info-privacy-premium__text">{LEGAL_PROCESSING_ROLES_PARAGRAPH}</p>
-            <p className="velvet-info-privacy-premium__text">
+            <p className="luxury-info-privacy-premium__text">{LEGAL_PROCESSING_ROLES_PARAGRAPH}</p>
+            <p className="luxury-info-privacy-premium__text">
               Contatto piattaforma:{" "}
               {mailHref ? (
-                <a className="velvet-info-privacy-premium__link" href={mailHref}>
+                <a className="luxury-info-privacy-premium__link" href={mailHref}>
                   {contactEmail}
                 </a>
               ) : (
@@ -256,7 +265,7 @@ export function SalonPremiumOwnerInfoPrivacyContent({
         kicker: "Categorie operative del piano Premium",
         content: (
           <>
-            <div className="velvet-info-privacy-premium__data-grid" role="list">
+            <div className="luxury-info-privacy-premium__data-grid" role="list">
               {DATA_TILES.map((tile) => {
                 const active = activeDataTile === tile.id;
                 return (
@@ -264,17 +273,17 @@ export function SalonPremiumOwnerInfoPrivacyContent({
                     key={tile.id}
                     type="button"
                     role="listitem"
-                    className={`velvet-info-privacy-premium__data-tile${active ? " is-active" : ""}`}
+                    className={`luxury-info-privacy-premium__data-tile${active ? " is-active" : ""}`}
                     aria-pressed={active}
                     onClick={() => setActiveDataTile(tile.id)}
                   >
-                    <p className="velvet-info-privacy-premium__data-tile-title">{tile.title}</p>
-                    <p className="velvet-info-privacy-premium__data-tile-text">{tile.text}</p>
+                    <p className="luxury-info-privacy-premium__data-tile-title">{tile.title}</p>
+                    <p className="luxury-info-privacy-premium__data-tile-text">{tile.text}</p>
                   </button>
                 );
               })}
             </div>
-            <p className="velvet-info-privacy-premium__text">
+            <p className="luxury-info-privacy-premium__text">
               Seleziona una categoria per evidenziarla. I dati sono trattati solo per le finalità collegate al servizio Premium
               attivo sul salone.
             </p>
@@ -287,26 +296,26 @@ export function SalonPremiumOwnerInfoPrivacyContent({
         kicker: "Sede, mappa e ricerca geografica",
         content: (
           <>
-            <p className="velvet-info-privacy-premium__text">
+            <p className="luxury-info-privacy-premium__text">
               Per il piano Premium trattiamo i dati di <strong>posizione del salone</strong> che inserisci o aggiorni in{" "}
-              <Link to="/account/profilo" className="velvet-info-privacy-premium__link">
+              <Link to="/account/profilo" className="luxury-info-privacy-premium__link">
                 Profilo
               </Link>{" "}
               e in{" "}
-              <Link to="/account/salone/posizione" className="velvet-info-privacy-premium__link">
+              <Link to="/account/salone/posizione" className="luxury-info-privacy-premium__link">
                 Posizione del salone
               </Link>
               : indirizzo, città, CAP e, quando disponibili, <strong>coordinate geografiche</strong> della sede derivate da
               geocodifica. Servono a mostrare il salone su mappa, abilitare la <strong>ricerca geolocalizzata</strong> e
               calcolare la distanza rispetto ai clienti che cercano nella tua zona.
             </p>
-            <p className="velvet-info-privacy-premium__text">
+            <p className="luxury-info-privacy-premium__text">
               Per gestire il salone <strong>non è richiesta la posizione GPS del tuo dispositivo</strong>: usiamo i dati della
               sede che fornisci. Se usi anche l&apos;area cliente, l&apos;eventuale geolocalizzazione del dispositivo per
               suggerimenti «vicino a me» è facoltativa, chiede il permesso del browser e segue le regole dell&apos;informativa
               per i clienti.
             </p>
-            <p className="velvet-info-privacy-premium__text">
+            <p className="luxury-info-privacy-premium__text">
               L&apos;anteprima o l&apos;apertura di mappe può coinvolgere <strong>Google Maps</strong> (terza parte), che riceve
               i dati necessari a mostrare la posizione indicata.
             </p>
@@ -318,7 +327,7 @@ export function SalonPremiumOwnerInfoPrivacyContent({
         title: "Basi giuridiche",
         kicker: "Art. 6 GDPR",
         content: (
-          <p className="velvet-info-privacy-premium__text">
+          <p className="luxury-info-privacy-premium__text">
             Il trattamento per l&apos;account, l&apos;abbonamento Premium, la pubblicazione della sede e le funzioni contrattuali
             (inclusa la visibilità in ricerca geolocalizzata) si fonda sull&apos;esecuzione del contratto o di misure
             precontrattuali (art. 6, par. 1, lett. b, GDPR). Per sicurezza, prevenzione di usi illeciti e tutela del servizio
@@ -333,13 +342,24 @@ export function SalonPremiumOwnerInfoPrivacyContent({
         title: "Destinatari e terze parti",
         kicker: "Staff, fornitori e mappe",
         content: (
-          <p className="velvet-info-privacy-premium__text">
-            I dati possono essere accessibili allo <strong>staff autorizzato</strong> del salone secondo i permessi del piano
-            Premium, ai <strong>fornitori tecnici</strong> che supportano hosting, infrastruttura, email transazionale e sicurezza,
-            ai servizi di <strong>geocodifica</strong> usati per ricavare coordinate da indirizzo e CAP, e — per le funzioni di
-            mappa — a <strong>Google Maps</strong> quando apri o incorpori mappe dal servizio. I fornitori sono vincolati a
-            trattare i dati solo per le finalità del servizio e con misure adeguate. {LEGAL_PLATFORM_ADMIN_ACCESS_PARAGRAPH}
-          </p>
+          <>
+            <p className="luxury-info-privacy-premium__text">
+              I dati possono essere accessibili allo <strong>staff autorizzato</strong> del salone secondo i permessi del piano
+              Premium, ai <strong>fornitori tecnici</strong> che supportano hosting, infrastruttura, email transazionale e sicurezza,
+              ai servizi di <strong>geocodifica</strong> usati per ricavare coordinate da indirizzo e CAP, e — per le funzioni di
+              mappa — a <strong>Google Maps</strong> quando apri o incorpori mappe dal servizio
+              {isNativeApp ? null : (
+                <>
+                  , e a <strong>Stripe</strong> quando attivi o gestisci l&apos;abbonamento Premium a pagamento
+                </>
+              )}
+              . I fornitori sono vincolati a trattare i dati solo per le finalità del servizio e con misure adeguate.{" "}
+              {LEGAL_PLATFORM_ADMIN_ACCESS_PARAGRAPH}
+            </p>
+            {isNativeApp ? null : (
+              <p className="luxury-info-privacy-premium__text">{LEGAL_STRIPE_PAYMENT_PROCESSOR_PARAGRAPH}</p>
+            )}
+          </>
         ),
       },
       {
@@ -347,7 +367,7 @@ export function SalonPremiumOwnerInfoPrivacyContent({
         title: "Trasferimenti extra SEE",
         kicker: "Garanzie contrattuali",
         content: (
-          <p className="velvet-info-privacy-premium__text">
+          <p className="luxury-info-privacy-premium__text">
             Se alcuni fornitori trattano dati al di fuori dello Spazio Economico Europeo, i trasferimenti avvengono solo con
             garanzie previste dal GDPR (ad esempio decisioni di adeguatezza o clausole contrattuali tipo), secondo quanto indicato
             negli accordi applicabili al servizio.
@@ -359,7 +379,7 @@ export function SalonPremiumOwnerInfoPrivacyContent({
         title: "Conservazione",
         kicker: "Durata e cancellazione",
         content: (
-          <p className="velvet-info-privacy-premium__text">
+          <p className="luxury-info-privacy-premium__text">
             I dati sono conservati per il tempo necessario alle finalità indicate, alla durata del rapporto contrattuale e agli
             obblighi di legge applicabili. Dopo la chiusura dell&apos;account o su richiesta, i dati vengono cancellati o
             anonimizzati secondo procedure tecniche e legali, salvo conservazione obbligatoria o legittima per contestazioni o
@@ -373,31 +393,31 @@ export function SalonPremiumOwnerInfoPrivacyContent({
         kicker: "Artt. 15–22 GDPR",
         content: (
           <>
-            <p className="velvet-info-privacy-premium__text">
+            <p className="luxury-info-privacy-premium__text">
               In qualità di titolare account puoi aggiornare molti dati da{" "}
-              <Link to="/account/profilo" className="velvet-info-privacy-premium__link">
+              <Link to="/account/profilo" className="luxury-info-privacy-premium__link">
                 Profilo
               </Link>
               . Puoi inoltre esercitare, ove applicabile, i diritti di accesso, rettifica, cancellazione, limitazione, opposizione
               e portabilità previsti dagli artt. 15–22 GDPR, e revocare un eventuale consenso senza pregiudicare la liceità del
               trattamento precedente.
             </p>
-            <p className="velvet-info-privacy-premium__text">
+            <p className="luxury-info-privacy-premium__text">
               Per richieste sulla piattaforma scrivi a{" "}
               {mailHref ? (
-                <a className="velvet-info-privacy-premium__link" href={mailHref}>
+                <a className="luxury-info-privacy-premium__link" href={mailHref}>
                   {contactEmail}
                 </a>
               ) : (
                 contactEmail
               )}{" "}
               o usa{" "}
-              <Link to="/account/assistenza" className="velvet-info-privacy-premium__link">
+              <Link to="/account/assistenza" className="luxury-info-privacy-premium__link">
                 Assistenza
               </Link>
               . Hai diritto a proporre reclamo all&apos;autorità di controllo competente; in Italia:{" "}
               <a
-                className="velvet-info-privacy-premium__link"
+                className="luxury-info-privacy-premium__link"
                 href="https://www.garanteprivacy.it"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -406,7 +426,7 @@ export function SalonPremiumOwnerInfoPrivacyContent({
               </a>
               .
             </p>
-            <p className="velvet-info-privacy-premium__text">{LEGAL_RIGHTS_RESPONSE_PARAGRAPH}</p>
+            <p className="luxury-info-privacy-premium__text">{LEGAL_RIGHTS_RESPONSE_PARAGRAPH}</p>
           </>
         ),
       },
@@ -415,10 +435,18 @@ export function SalonPremiumOwnerInfoPrivacyContent({
         title: "Obbligo di fornire i dati",
         kicker: "Campi necessari",
         content: (
-          <p className="velvet-info-privacy-premium__text">
+          <p className="luxury-info-privacy-premium__text">
             I dati contrassegnati come necessari in registrazione o in Profilo sono richiesti per creare l&apos;account, pubblicare
-            il salone e usare le funzioni Premium. Il mancato conferimento può impedire l&apos;attivazione o la prosecuzione del
-            servizio per le parti interessate.
+            il salone e usare le funzioni Premium.
+            {isNativeApp
+              ? null
+              : (
+                  <>
+                    {" "}
+                    I dati di fatturazione sono obbligatori solo per attivare l&apos;abbonamento a pagamento dopo la prova
+                    gratuita. {LEGAL_PREMIUM_BILLING_DATA_PRIVACY_PARAGRAPH}
+                  </>
+                )}
           </p>
         ),
       },
@@ -426,21 +454,21 @@ export function SalonPremiumOwnerInfoPrivacyContent({
         id: "automated",
         title: "Decisioni automatizzate",
         kicker: "Nessun profilazione automatica",
-        content: <p className="velvet-info-privacy-premium__text">{LEGAL_AUTOMATED_DECISIONS_PARAGRAPH}</p>,
+        content: <p className="luxury-info-privacy-premium__text">{LEGAL_AUTOMATED_DECISIONS_PARAGRAPH}</p>,
       },
       {
         id: "updates",
         title: "Aggiornamenti",
         kicker: "Documenti ufficiali",
         content: (
-          <p className="velvet-info-privacy-premium__text">
+          <p className="luxury-info-privacy-premium__text">
             Questa pagina riassume le informazioni essenziali in area account. Per il testo legalmente vincolante fanno stato i
             documenti pubblicati in{" "}
-            <Link to="/privacy" className="velvet-info-privacy-premium__link">
+            <Link to="/privacy" className="luxury-info-privacy-premium__link">
               Informativa privacy
             </Link>{" "}
             e{" "}
-            <Link to="/termini" className="velvet-info-privacy-premium__link">
+            <Link to="/termini" className="luxury-info-privacy-premium__link">
               Termini di servizio
             </Link>
             , aggiornabili per adeguamento normativo o evoluzione del prodotto.
@@ -448,7 +476,7 @@ export function SalonPremiumOwnerInfoPrivacyContent({
         ),
       },
     ],
-    [activeDataTile, contactEmail, mailHref],
+    [activeDataTile, contactEmail, isNativeApp, mailHref],
   );
 
   const progress = Math.round((openPanels.size / panels.length) * 100);
@@ -485,32 +513,32 @@ export function SalonPremiumOwnerInfoPrivacyContent({
   };
 
   return (
-    <div className="velvet-info-privacy-premium">
-      <article className="velvet-info-privacy-premium__shell" aria-label="Informativa privacy salone Premium">
-        <div className="velvet-info-privacy-premium__aurora" aria-hidden />
-        <div className="velvet-info-privacy-premium__shine" aria-hidden />
+    <div className="luxury-info-privacy-premium">
+      <article className="luxury-info-privacy-premium__shell" aria-label="Informativa privacy salone Premium">
+        <div className="luxury-info-privacy-premium__aurora" aria-hidden />
+        <div className="luxury-info-privacy-premium__shine" aria-hidden />
 
-        <header className="velvet-info-privacy-premium__header">
-          <div className="velvet-info-privacy-premium__header-top">
-            <div className="velvet-info-privacy-premium__badges">
-              <span className="velvet-info-privacy-premium__badge">Piano Premium</span>
-              <span className="velvet-info-privacy-premium__badge velvet-info-privacy-premium__badge--muted">GDPR art. 13</span>
+        <header className="luxury-info-privacy-premium__header">
+          <div className="luxury-info-privacy-premium__header-top">
+            <div className="luxury-info-privacy-premium__badges">
+              <span className="luxury-info-privacy-premium__badge">Piano Premium</span>
+              <span className="luxury-info-privacy-premium__badge luxury-info-privacy-premium__badge--muted">GDPR art. 13</span>
             </div>
-            <div className="velvet-info-privacy-premium__progress">
-              <p className="velvet-info-privacy-premium__progress-label">
+            <div className="luxury-info-privacy-premium__progress">
+              <p className="luxury-info-privacy-premium__progress-label">
                 Sezioni aperte {openPanels.size}/{panels.length}
               </p>
-              <div className="velvet-info-privacy-premium__progress-track" aria-hidden>
-                <div className="velvet-info-privacy-premium__progress-fill" style={{ width: `${progress}%` }} />
+              <div className="luxury-info-privacy-premium__progress-track" aria-hidden>
+                <div className="luxury-info-privacy-premium__progress-fill" style={{ width: `${progress}%` }} />
               </div>
             </div>
           </div>
 
-          <p className="velvet-info-privacy-premium__lead">
+          <p className="luxury-info-privacy-premium__lead">
             Informativa sintetica per account titolare con piano Premium, redatta in linea con il principio di trasparenza del
             Regolamento (UE) 2016/679 (GDPR) e con le indicazioni del{" "}
             <a
-              className="velvet-info-privacy-premium__link"
+              className="luxury-info-privacy-premium__link"
               href="https://www.edpb.europa.eu/sme-data-protection-guide/faq-frequently-asked-questions/answer/what-information-should-i_en"
               target="_blank"
               rel="noopener noreferrer"
@@ -521,27 +549,27 @@ export function SalonPremiumOwnerInfoPrivacyContent({
           </p>
 
           {namedSalon ? (
-            <p className="velvet-info-privacy-premium__salon">
+            <p className="luxury-info-privacy-premium__salon">
               Salone collegato: <strong>{namedSalon}</strong>
             </p>
           ) : null}
         </header>
 
-        <div className="velvet-info-privacy-premium__toolbar">
-          <button type="button" className="velvet-info-privacy-premium__toolbar-btn" onClick={expandAll}>
+        <div className="luxury-info-privacy-premium__toolbar">
+          <button type="button" className="luxury-info-privacy-premium__toolbar-btn" onClick={expandAll}>
             Espandi tutto
           </button>
-          <button type="button" className="velvet-info-privacy-premium__toolbar-btn" onClick={collapseAll}>
+          <button type="button" className="luxury-info-privacy-premium__toolbar-btn" onClick={collapseAll}>
             Comprimi tutto
           </button>
         </div>
 
-        <nav className="velvet-info-privacy-premium__nav" aria-label="Sezioni informativa privacy">
+        <nav className="luxury-info-privacy-premium__nav" aria-label="Sezioni informativa privacy">
           {panels.map((panel) => (
             <button
               key={panel.id}
               type="button"
-              className={`velvet-info-privacy-premium__nav-chip${activeNav === panel.id ? " is-active" : ""}`}
+              className={`luxury-info-privacy-premium__nav-chip${activeNav === panel.id ? " is-active" : ""}`}
               onClick={() => focusPanel(panel.id)}
             >
               {panel.title}
@@ -549,7 +577,7 @@ export function SalonPremiumOwnerInfoPrivacyContent({
           ))}
         </nav>
 
-        <div className="velvet-info-privacy-premium__body">
+        <div className="luxury-info-privacy-premium__body">
           {panels.map((panel) => {
             const open = openPanels.has(panel.id);
             const regionId = `${baseId}-${panel.id}`;
@@ -560,29 +588,29 @@ export function SalonPremiumOwnerInfoPrivacyContent({
                   panelRefs.current[panel.id] = node;
                 }}
                 id={regionId}
-                className={`velvet-info-privacy-premium__panel${open ? " is-open" : ""}`}
+                className={`luxury-info-privacy-premium__panel${open ? " is-open" : ""}`}
               >
                 <button
                   type="button"
-                  className="velvet-info-privacy-premium__panel-trigger"
+                  className="luxury-info-privacy-premium__panel-trigger"
                   aria-expanded={open}
                   aria-controls={`${regionId}-content`}
                   onClick={() => togglePanel(panel.id)}
                 >
                   <PanelIcon kind={panel.id} />
                   <span>
-                    <h2 className="velvet-info-privacy-premium__panel-title">{panel.title}</h2>
-                    <p className="velvet-info-privacy-premium__panel-kicker">{panel.kicker}</p>
+                    <h2 className="luxury-info-privacy-premium__panel-title">{panel.title}</h2>
+                    <p className="luxury-info-privacy-premium__panel-kicker">{panel.kicker}</p>
                   </span>
                   <ChevronIcon />
                 </button>
                 <div
                   id={`${regionId}-content`}
-                  className="velvet-info-privacy-premium__panel-content"
+                  className="luxury-info-privacy-premium__panel-content"
                   hidden={!open}
                 >
-                  <div className="velvet-info-privacy-premium__panel-inner">
-                    <div className="velvet-info-privacy-premium__panel-copy">{panel.content}</div>
+                  <div className="luxury-info-privacy-premium__panel-inner">
+                    <div className="luxury-info-privacy-premium__panel-copy">{panel.content}</div>
                   </div>
                 </div>
               </section>
@@ -591,19 +619,19 @@ export function SalonPremiumOwnerInfoPrivacyContent({
         </div>
 
         {showAccountActions ? (
-          <footer className="velvet-info-privacy-premium__actions">
-            <Link to="/account/profilo" className="velvet-info-privacy-premium__action">
-              <span className="velvet-info-privacy-premium__action-label">Account</span>
-              <span className="velvet-info-privacy-premium__action-value">Apri Profilo</span>
+          <footer className="luxury-info-privacy-premium__actions">
+            <Link to="/account/profilo" className="luxury-info-privacy-premium__action">
+              <span className="luxury-info-privacy-premium__action-label">Account</span>
+              <span className="luxury-info-privacy-premium__action-value">Apri Profilo</span>
             </Link>
-            <Link to="/account/assistenza" className="velvet-info-privacy-premium__action">
-              <span className="velvet-info-privacy-premium__action-label">Supporto</span>
-              <span className="velvet-info-privacy-premium__action-value">Richiedi assistenza</span>
+            <Link to="/account/assistenza" className="luxury-info-privacy-premium__action">
+              <span className="luxury-info-privacy-premium__action-label">Supporto</span>
+              <span className="luxury-info-privacy-premium__action-value">Richiedi assistenza</span>
             </Link>
             {mailHref ? (
-              <a href={mailHref} className="velvet-info-privacy-premium__action">
-                <span className="velvet-info-privacy-premium__action-label">Email</span>
-                <span className="velvet-info-privacy-premium__action-value">{contactEmail}</span>
+              <a href={mailHref} className="luxury-info-privacy-premium__action">
+                <span className="luxury-info-privacy-premium__action-label">Email</span>
+                <span className="luxury-info-privacy-premium__action-value">{contactEmail}</span>
               </a>
             ) : null}
           </footer>

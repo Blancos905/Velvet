@@ -19,7 +19,7 @@ import {
 import { notifySalonCatalogClientsChanged } from "../lib/salonCatalogClientsSync";
 import { emptySalonShowcase, readSalonShowcaseAsync, type SalonShowcaseStored } from "../lib/salonShowcaseStorage";
 import { SalonPublicReviewsBlock } from "../components/salon/SalonPublicReviewsBlock";
-import "../styles/velvet-salon-explore-page.css";
+import "../styles/luxury-salon-explore-page.css";
 
 type GalleryItem = { src: string; caption: string };
 
@@ -91,12 +91,12 @@ function ServiceRow({
   }, [photoSrc, service.id]);
 
   return (
-    <li className="velvet-salon-explore__service-row">
-      <div className="velvet-salon-explore__service-media">
+    <li className="luxury-salon-explore__service-row">
+      <div className="luxury-salon-explore__service-media">
         {displaySrc && !photoFailed ? (
           <>
             <img
-              className={`velvet-salon-explore__service-photo${photoReady ? " is-ready" : ""}`}
+              className={`luxury-salon-explore__service-photo${photoReady ? " is-ready" : ""}`}
               src={displaySrc}
               alt=""
               style={{ objectPosition: photoObjectPosition }}
@@ -113,12 +113,12 @@ function ServiceRow({
                 setPhotoFailed(true);
               }}
             />
-            {!photoReady ? <span className="velvet-salon-explore__service-photo-skeleton" aria-hidden /> : null}
+            {!photoReady ? <span className="luxury-salon-explore__service-photo-skeleton" aria-hidden /> : null}
           </>
         ) : isPhotoLoading ? (
-          <span className="velvet-salon-explore__service-photo-skeleton" aria-hidden />
+          <span className="luxury-salon-explore__service-photo-skeleton" aria-hidden />
         ) : (
-          <span className="velvet-salon-explore__service-photo-placeholder" aria-hidden />
+          <span className="luxury-salon-explore__service-photo-placeholder" aria-hidden />
         )}
       </div>
       <div>
@@ -408,40 +408,40 @@ export default function SalonExplorePage() {
   }, [detail]);
 
   return (
-    <main className="velvet-page-main velvet-salon-explore velvet-salon-explore--studio velvet-salon-explore--concept">
-      <a href="#il-salone" className="velvet-salon-explore__skip">
+    <main className="luxury-page-main luxury-salon-explore luxury-salon-explore--studio luxury-salon-explore--concept">
+      <a href="#il-salone" className="luxury-salon-explore__skip">
         Vai al contenuto
       </a>
-      <div className="velvet-salon-explore__topbar">
+      <div className="luxury-salon-explore__topbar">
         <Link
           to={s ? `/s/${encodeURIComponent(s)}` : "/search"}
-          className="velvet-link-back velvet-link-back--salon-return"
+          className="luxury-link-back luxury-link-back--salon-return"
         >
-          <span className="velvet-link-back__chevron" aria-hidden="true">
+          <span className="luxury-link-back__chevron" aria-hidden="true">
             ←
           </span>
-          <span className="velvet-link-back__text">Torna alla scheda salone</span>
+          <span className="luxury-link-back__text">Torna alla scheda salone</span>
         </Link>
       </div>
 
-      {detailQ.isLoading && <p className="velvet-text-muted">Caricamento…</p>}
+      {detailQ.isLoading && <p className="luxury-text-muted">Caricamento…</p>}
       {detailQ.error && (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {detailQ.error instanceof Error ? detailQ.error.message : "Sede non trovata"}
         </p>
       )}
 
       {detail && (
         <>
-          <div className="velvet-salon-explore__toolbar">
-            <p className="velvet-salon-explore__menu-label">Menu principale</p>
-            <div className="velvet-salon-explore__nav-wrap velvet-salon-explore__nav-wrap--concept">
-              <nav className="velvet-salon-explore__section-nav" aria-label="Sezioni pagina">
+          <div className="luxury-salon-explore__toolbar">
+            <p className="luxury-salon-explore__menu-label">Menu principale</p>
+            <div className="luxury-salon-explore__nav-wrap luxury-salon-explore__nav-wrap--concept">
+              <nav className="luxury-salon-explore__section-nav" aria-label="Sezioni pagina">
                 {EXPLORE_NAV.map(({ id, label }) => (
                   <a
                     key={id}
                     href={`#${id}`}
-                    className={`velvet-salon-explore__nav-link${id === "prenota" ? " velvet-salon-explore__nav-link--prenota" : ""}${activeSection === id ? " is-active" : ""}`}
+                    className={`luxury-salon-explore__nav-link${id === "prenota" ? " luxury-salon-explore__nav-link--prenota" : ""}${activeSection === id ? " is-active" : ""}`}
                     aria-current={activeSection === id ? "true" : undefined}
                   >
                     {label}
@@ -449,7 +449,7 @@ export default function SalonExplorePage() {
                 ))}
                 <button
                   type="button"
-                  className="velvet-salon-explore__nav-client-cta"
+                  className="luxury-salon-explore__nav-client-cta"
                   onClick={() => {
                     if (!canBookAsClient && !alreadyClient) return;
                     setMembershipFeedback(null);
@@ -493,7 +493,7 @@ export default function SalonExplorePage() {
               </nav>
               {membershipFeedback ? (
                 <p
-                  className={`velvet-salon-explore__membership-feedback${
+                  className={`luxury-salon-explore__membership-feedback${
                     membershipFeedbackIsError ? " is-error" : " is-success"
                   }`}
                   role={membershipFeedbackIsError ? "alert" : "status"}
@@ -504,62 +504,62 @@ export default function SalonExplorePage() {
             </div>
           </div>
 
-          <div className="velvet-salon-explore__layout">
+          <div className="luxury-salon-explore__layout">
             <section
               id="il-salone"
-              className={`velvet-salon-explore__salone-chapter${activeSection === "il-salone" ? " is-active" : ""}`}
+              className={`luxury-salon-explore__salone-chapter${activeSection === "il-salone" ? " is-active" : ""}`}
               aria-labelledby="explore-heading-il-salone"
             >
-              <div className="velvet-salon-explore__screen velvet-salon-explore__screen--hero">
+              <div className="luxury-salon-explore__screen luxury-salon-explore__screen--hero">
                 {heroImageSrc ? (
                   <img
-                    className="velvet-salon-explore__hero-img"
+                    className="luxury-salon-explore__hero-img"
                     src={heroImageSrc}
                     alt=""
                     loading="eager"
                     decoding="async"
                   />
                 ) : (
-                  <div className="velvet-salon-explore__hero-fallback" aria-hidden />
+                  <div className="luxury-salon-explore__hero-fallback" aria-hidden />
                 )}
               </div>
 
-              <div className="velvet-salon-explore__screen velvet-salon-explore__screen--split">
-                <div className="velvet-salon-explore__split-text">
-                  <h2 id="explore-heading-il-salone" className="velvet-salon-explore__split-heading">
+              <div className="luxury-salon-explore__screen luxury-salon-explore__screen--split">
+                <div className="luxury-salon-explore__split-text">
+                  <h2 id="explore-heading-il-salone" className="luxury-salon-explore__split-heading">
                     Benvenuto in {detail.name}
                   </h2>
-                  <span className="velvet-salon-explore__split-rule" aria-hidden />
+                  <span className="luxury-salon-explore__split-rule" aria-hidden />
                   {personal.heroSubtitle?.trim() ? (
-                    <p className="velvet-salon-explore__split-lead">{personal.heroSubtitle.trim()}</p>
+                    <p className="luxury-salon-explore__split-lead">{personal.heroSubtitle.trim()}</p>
                   ) : null}
                   {personal.ownerIntro?.trim() ? (
-                    <p className="velvet-salon-explore__split-body">{parseInlineBold(personal.ownerIntro.trim())}</p>
+                    <p className="luxury-salon-explore__split-body">{parseInlineBold(personal.ownerIntro.trim())}</p>
                   ) : null}
-                  <p className="velvet-salon-explore__split-body">
+                  <p className="luxury-salon-explore__split-body">
                     {parseInlineBold(
                       personal.about?.trim() ||
                         detail.welcomeMessage?.trim() ||
                         "Descrizione del salone in aggiornamento.",
                     )}
                   </p>
-                  <p className="velvet-salon-explore__split-body velvet-salon-explore__split-body--soft">
+                  <p className="luxury-salon-explore__split-body luxury-salon-explore__split-body--soft">
                     {parseInlineBold(
                       personal.strengths?.trim() ||
                         "Tecniche personalizzate, consulenza professionale e attenzione ai dettagli per valorizzare il tuo stile.",
                     )}
                   </p>
                 </div>
-                <div className="velvet-salon-explore__split-visual">
+                <div className="luxury-salon-explore__split-visual">
                   {splitImageSrc ? (
-                    <figure className="velvet-salon-explore__split-figure">
+                    <figure className="luxury-salon-explore__split-figure">
                       {splitImageCaption ? (
-                        <figcaption className="velvet-salon-explore__split-tag">{splitImageCaption}</figcaption>
+                        <figcaption className="luxury-salon-explore__split-tag">{splitImageCaption}</figcaption>
                       ) : null}
                       <img src={splitImageSrc} alt="" loading="lazy" decoding="async" />
                     </figure>
                   ) : (
-                    <div className="velvet-salon-explore__split-placeholder">
+                    <div className="luxury-salon-explore__split-placeholder">
                       <span>Aggiungi immagini dalla vetrina “Crea il tuo sito”</span>
                     </div>
                   )}
@@ -569,14 +569,14 @@ export default function SalonExplorePage() {
 
             <section
               id="gallery"
-              className={`velvet-salon-explore__panel${activeSection === "gallery" ? " is-active" : ""}`}
+              className={`luxury-salon-explore__panel${activeSection === "gallery" ? " is-active" : ""}`}
               aria-labelledby="explore-heading-gallery"
             >
-              <h2 id="explore-heading-gallery" className="velvet-salon-explore__section-title">
+              <h2 id="explore-heading-gallery" className="luxury-salon-explore__section-title">
                 Gallery
               </h2>
               {galleryExtraItems.length === 0 ? (
-                <p className="velvet-salon-explore__empty">
+                <p className="luxury-salon-explore__empty">
                   {galleryItems.length === 0
                     ? "Nessuna immagine in gallery. Carica le foto dalla pagina “Crea il tuo sito”."
                     : galleryItems.length <= 2
@@ -584,7 +584,7 @@ export default function SalonExplorePage() {
                       : "Nessuna immagine aggiuntiva."}
                 </p>
               ) : (
-                <div className="velvet-salon-explore__gallery">
+                <div className="luxury-salon-explore__gallery">
                   {galleryExtraItems.map((item) => (
                     <figure key={item.src}>
                       <img src={item.src} alt="" loading="lazy" decoding="async" />
@@ -597,36 +597,36 @@ export default function SalonExplorePage() {
 
             <section
               id="servizi"
-              className={`velvet-salon-explore__panel${activeSection === "servizi" ? " is-active" : ""}`}
+              className={`luxury-salon-explore__panel${activeSection === "servizi" ? " is-active" : ""}`}
               aria-labelledby="explore-heading-servizi"
             >
-              <h2 id="explore-heading-servizi" className="velvet-salon-explore__section-title">
+              <h2 id="explore-heading-servizi" className="luxury-salon-explore__section-title">
                 Listino servizi
               </h2>
-              <p className="velvet-salon-explore__label">Prezzi a partire da</p>
-              {servicesQ.isLoading && <p className="velvet-text-muted">Carico servizi…</p>}
+              <p className="luxury-salon-explore__label">Prezzi a partire da</p>
+              {servicesQ.isLoading && <p className="luxury-text-muted">Carico servizi…</p>}
               {!servicesQ.isLoading && !servicesQ.error && isServicePhotoLoading ? (
-                <p className="velvet-text-muted" role="status" aria-live="polite">
+                <p className="luxury-text-muted" role="status" aria-live="polite">
                   {servicePhotoSlowLoading ? "Sto ottimizzando le immagini…" : "Foto servizi in caricamento…"}
                 </p>
               ) : null}
               {!servicesQ.isLoading && !servicesQ.error && !isServicePhotoLoading && !hasAnyServicePhoto && services.length > 0 ? (
-                <p className="velvet-text-muted" role="status" aria-live="polite">
+                <p className="luxury-text-muted" role="status" aria-live="polite">
                   Nessuna foto servizio disponibile: puoi comunque vedere listino e prezzi.
                 </p>
               ) : null}
               {servicesQ.error && (
-                <p className="velvet-alert velvet-alert--error" role="alert">
+                <p className="luxury-alert luxury-alert--error" role="alert">
                   {servicesQ.error instanceof Error ? servicesQ.error.message : "Servizi non disponibili"}
                 </p>
               )}
               {!servicesQ.isLoading && !servicesQ.error && services.length === 0 ? (
-                <p className="velvet-salon-explore__empty">Nessun servizio disponibile.</p>
+                <p className="luxury-salon-explore__empty">Nessun servizio disponibile.</p>
               ) : null}
               {services.length > 0 ? (
                 <>
-                  <h3 className="velvet-salon-explore__service-group-title">Servizi</h3>
-                  <ul className="velvet-salon-explore__service-list">
+                  <h3 className="luxury-salon-explore__service-group-title">Servizi</h3>
+                  <ul className="luxury-salon-explore__service-list">
                   {services.map((svc) => (
                     <ServiceRow
                       key={svc.id}
@@ -642,13 +642,13 @@ export default function SalonExplorePage() {
             </section>
           </div>
 
-          <div className="velvet-salon-explore__tail">
+          <div className="luxury-salon-explore__tail">
             <section
               id="recensioni"
-              className={`velvet-salon-explore__panel${activeSection === "recensioni" ? " is-active" : ""}`}
+              className={`luxury-salon-explore__panel${activeSection === "recensioni" ? " is-active" : ""}`}
               aria-label="Recensioni ricevute"
             >
-              <h2 className="velvet-salon-explore__section-title">Recensioni ricevute</h2>
+              <h2 className="luxury-salon-explore__section-title">Recensioni ricevute</h2>
               <SalonPublicReviewsBlock
                 isLoading={reviewsQ.isLoading}
                 isError={Boolean(reviewsQ.error)}
@@ -658,40 +658,40 @@ export default function SalonExplorePage() {
 
             <section
               id="orari"
-              className={`velvet-salon-explore__strip-orari${activeSection === "orari" ? " is-active" : ""}`}
+              className={`luxury-salon-explore__strip-orari${activeSection === "orari" ? " is-active" : ""}`}
               aria-labelledby="explore-heading-orari"
             >
-              <h2 id="explore-heading-orari" className="velvet-salon-explore__strip-orari-text">
+              <h2 id="explore-heading-orari" className="luxury-salon-explore__strip-orari-text">
                 Orari: {personal.openingHours?.trim() || "Martedì - Sabato 08:30 - 19:00"}
               </h2>
             </section>
 
             <section
               id="prenota"
-              className={`velvet-salon-explore__block-prenota${activeSection === "prenota" ? " is-active" : ""}`}
+              className={`luxury-salon-explore__block-prenota${activeSection === "prenota" ? " is-active" : ""}`}
               aria-labelledby="explore-heading-prenota"
             >
-              <div className="velvet-salon-explore__block-prenota-inner">
-                <h2 id="explore-heading-prenota" className="velvet-salon-explore__block-prenota-title">
+              <div className="luxury-salon-explore__block-prenota-inner">
+                <h2 id="explore-heading-prenota" className="luxury-salon-explore__block-prenota-title">
                   Prenota ora
                 </h2>
-                <span className="velvet-salon-explore__title-accent-line" aria-hidden />
-                <p className="velvet-salon-explore__block-prenota-text">
+                <span className="luxury-salon-explore__title-accent-line" aria-hidden />
+                <p className="luxury-salon-explore__block-prenota-text">
                   {personal.bookingNote?.trim() || "Prenota come e quando vuoi con un semplice click."}
                 </p>
-                <div className="velvet-salon-explore__prenota-cta-row">
+                <div className="luxury-salon-explore__prenota-cta-row">
                   {isAuthenticated && !canBookAsClient ? (
                     <>
-                      <p className="velvet-salon-explore__block-prenota-text">
+                      <p className="luxury-salon-explore__block-prenota-text">
                         Con il profilo salone non puoi prenotare online: gestisci gli appuntamenti dall&apos;agenda in area
                         account.
                       </p>
-                      <Link className="velvet-salon-explore__prenota-main-cta" to="/account/prenotazioni">
+                      <Link className="luxury-salon-explore__prenota-main-cta" to="/account/prenotazioni">
                         Vai all&apos;agenda salone
                       </Link>
                     </>
                   ) : (
-                    <Link className="velvet-salon-explore__prenota-main-cta" to={`/s/${encodeURIComponent(s)}`}>
+                    <Link className="luxury-salon-explore__prenota-main-cta" to={`/s/${encodeURIComponent(s)}`}>
                       {personal.bookingCtaLabel?.trim() || "Prenota ora"}
                     </Link>
                   )}
@@ -701,43 +701,43 @@ export default function SalonExplorePage() {
 
             <section
               id="contatti"
-              className={`velvet-salon-explore__block-contatti${activeSection === "contatti" ? " is-active" : ""}`}
+              className={`luxury-salon-explore__block-contatti${activeSection === "contatti" ? " is-active" : ""}`}
               aria-labelledby="explore-heading-contatti"
             >
-              <div className="velvet-salon-explore__block-contatti-inner">
-                <div className="velvet-salon-explore__contatti-col">
-                  <h2 id="explore-heading-contatti" className="velvet-salon-explore__contatti-heading">
+              <div className="luxury-salon-explore__block-contatti-inner">
+                <div className="luxury-salon-explore__contatti-col">
+                  <h2 id="explore-heading-contatti" className="luxury-salon-explore__contatti-heading">
                     Contatti
                   </h2>
-                  <span className="velvet-salon-explore__title-accent-line velvet-salon-explore__title-accent-line--wide" aria-hidden />
-                  <ul className="velvet-salon-explore__contacts-list">
+                  <span className="luxury-salon-explore__title-accent-line luxury-salon-explore__title-accent-line--wide" aria-hidden />
+                  <ul className="luxury-salon-explore__contacts-list">
                     {addressLineFull ? (
                       <li>
-                        <span className="velvet-salon-explore__contact-icon" aria-hidden />
+                        <span className="luxury-salon-explore__contact-icon" aria-hidden />
                         <span>{addressLineFull}</span>
                       </li>
                     ) : null}
                     {detail.contactEmail?.trim() ? (
                       <li>
-                        <span className="velvet-salon-explore__contact-icon" aria-hidden />
+                        <span className="luxury-salon-explore__contact-icon" aria-hidden />
                         <span>Email: {detail.contactEmail.trim()}</span>
                       </li>
                     ) : null}
                     {telForDisplay ? (
                       <li>
-                        <span className="velvet-salon-explore__contact-icon" aria-hidden />
+                        <span className="luxury-salon-explore__contact-icon" aria-hidden />
                         <span>Telefono: {telForDisplay}</span>
                       </li>
                     ) : null}
                     {detail.whatsappE164 ? (
                       <li>
-                        <span className="velvet-salon-explore__contact-icon" aria-hidden />
+                        <span className="luxury-salon-explore__contact-icon" aria-hidden />
                         <span>WhatsApp: {detail.whatsappE164}</span>
                       </li>
                     ) : null}
                     {facebookHref ? (
                       <li>
-                        <span className="velvet-salon-explore__contact-icon" aria-hidden />
+                        <span className="luxury-salon-explore__contact-icon" aria-hidden />
                         <a href={facebookHref} target="_blank" rel="noreferrer">
                           Seguici su Facebook
                         </a>
@@ -745,68 +745,68 @@ export default function SalonExplorePage() {
                     ) : null}
                     {instagramHref ? (
                       <li>
-                        <span className="velvet-salon-explore__contact-icon" aria-hidden />
+                        <span className="luxury-salon-explore__contact-icon" aria-hidden />
                         <a href={instagramHref} target="_blank" rel="noreferrer">
                           Seguici su Instagram
                         </a>
                       </li>
                     ) : null}
                     <li>
-                      <span className="velvet-salon-explore__contact-icon" aria-hidden />
-                      <Link to={`/s/${encodeURIComponent(s)}`} className="velvet-salon-explore__contatti-site-link">
+                      <span className="luxury-salon-explore__contact-icon" aria-hidden />
+                      <Link to={`/s/${encodeURIComponent(s)}`} className="luxury-salon-explore__contatti-site-link">
                         {detail.name}
                       </Link>
                     </li>
                   </ul>
                   {personal.contactsNote?.trim() ? (
-                    <p className="velvet-salon-explore__contatti-note">{personal.contactsNote.trim()}</p>
+                    <p className="luxury-salon-explore__contatti-note">{personal.contactsNote.trim()}</p>
                   ) : null}
-                  <div className="velvet-salon-explore__contatti-quick">
+                  <div className="luxury-salon-explore__contatti-quick">
                     {phoneHref ? (
-                      <a href={phoneHref} className="velvet-salon-explore__contatti-chip">
+                      <a href={phoneHref} className="luxury-salon-explore__contatti-chip">
                         Chiama
                       </a>
                     ) : null}
                     {waHref ? (
-                      <a href={waHref} target="_blank" rel="noreferrer" className="velvet-salon-explore__contatti-chip">
+                      <a href={waHref} target="_blank" rel="noreferrer" className="luxury-salon-explore__contatti-chip">
                         WhatsApp
                       </a>
                     ) : null}
                   </div>
                 </div>
-                <div className="velvet-salon-explore__map-col">
+                <div className="luxury-salon-explore__map-col">
                   {mapEmbedSrc && mapsAllowed ? (
                     <iframe
                       title={`Mappa — ${detail.name}`}
-                      className="velvet-salon-explore__map-iframe"
+                      className="luxury-salon-explore__map-iframe"
                       src={mapEmbedSrc}
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
                     />
                   ) : mapEmbedSrc ? (
-                    <div className="velvet-salon-explore__map-fallback">
+                    <div className="luxury-salon-explore__map-fallback">
                       {addressLineFull ? <p>{addressLineFull}</p> : null}
                       <p>
                         Per visualizzare la mappa interattiva attiva le preferenze «Mappe e geocodifica» in{" "}
-                        <Link to="/privacy/scelte" className="velvet-link-inline">
+                        <Link to="/privacy/scelte" className="luxury-link-inline">
                           Scelte privacy
                         </Link>
                         .
                       </p>
                     </div>
                   ) : (
-                    <div className="velvet-salon-explore__map-fallback">Indirizzo non disponibile per la mappa.</div>
+                    <div className="luxury-salon-explore__map-fallback">Indirizzo non disponibile per la mappa.</div>
                   )}
                 </div>
               </div>
             </section>
 
-            <footer className="velvet-salon-explore__site-footer">
-              <div className="velvet-salon-explore__site-footer-inner">
-                <p className="velvet-salon-explore__footer-copy">
+            <footer className="luxury-salon-explore__site-footer">
+              <div className="luxury-salon-explore__site-footer-inner">
+                <p className="luxury-salon-explore__footer-copy">
                   Copyright © {new Date().getFullYear()} {detail.name}
                 </p>
-                <p className="velvet-salon-explore__footer-powered">Powered by Saloni Luxury</p>
+                <p className="luxury-salon-explore__footer-powered">Powered by Saloni Luxury</p>
               </div>
             </footer>
           </div>

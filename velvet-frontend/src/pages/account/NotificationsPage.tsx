@@ -9,7 +9,7 @@ import { useMeNotificationMessagesQuery } from "../../hooks/useMeNotificationMes
 import { useMeSalonNotificationInboxQuery } from "../../hooks/useMeSalonNotificationInbox";
 import { useMeSalonNotificationMessagesQuery } from "../../hooks/useMeSalonNotificationMessages";
 import { SalonNotificationMessageLine } from "../../components/SalonNotificationMessageLine";
-import "../../styles/velvet-consumer-bookings-page.css";
+import "../../styles/luxury-consumer-bookings-page.css";
 import "../../styles/salon-notifications.css";
 
 type NotificationBucket = {
@@ -64,9 +64,9 @@ function normalizeRows(
 
 function countBadge(value: number, variant: "sent" | "pending", title: string) {
   const cls =
-    "velvet-salon-notif-badge velvet-salon-notif-badge--" +
+    "luxury-salon-notif-badge luxury-salon-notif-badge--" +
     variant +
-    (value === 0 ? " velvet-salon-notif-badge--zero" : "");
+    (value === 0 ? " luxury-salon-notif-badge--zero" : "");
   return <span className={cls} title={title}>{value}</span>;
 }
 
@@ -79,8 +79,8 @@ const STAFF_SALON_NOTIFICATION_BUCKETS: Array<{ key: string; label: string }> = 
 
 function countSalonStaffBadge(value: number, title: string) {
   const cls =
-    "velvet-salon-notif-badge velvet-salon-notif-badge--incoming" +
-    (value === 0 ? " velvet-salon-notif-badge--zero" : "");
+    "luxury-salon-notif-badge luxury-salon-notif-badge--incoming" +
+    (value === 0 ? " luxury-salon-notif-badge--zero" : "");
   return (
     <span className={cls} title={title}>
       {value}
@@ -177,52 +177,52 @@ function StaffSalonNotificationsView() {
   const totalNotifications = rowsForView.reduce((acc, row) => acc + row.sent + row.pending, 0);
 
   return (
-    <main className="velvet-page-main velvet-consumer-bookings-dash velvet-consumer-bookings-dash--base44 velvet-salon-notif-page">
-      <div className="velvet-consumer-bookings-dash__shell">
-        <header className="velvet-consumer-bookings-dash__header--hero">
-          <div className="velvet-consumer-bookings-dash__hero-glow" aria-hidden />
-          <div className="velvet-consumer-bookings-dash__title-row">
-            <h1 className="velvet-consumer-bookings-dash__headline">
-              <span className="velvet-consumer-bookings-dash__headline-pre">Le mie </span>
-              <span className="velvet-consumer-bookings-dash__headline-accent">notifiche</span>
+    <main className="luxury-page-main luxury-consumer-bookings-dash luxury-consumer-bookings-dash--base44 luxury-salon-notif-page">
+      <div className="luxury-consumer-bookings-dash__shell">
+        <header className="luxury-consumer-bookings-dash__header--hero">
+          <div className="luxury-consumer-bookings-dash__hero-glow" aria-hidden />
+          <div className="luxury-consumer-bookings-dash__title-row">
+            <h1 className="luxury-consumer-bookings-dash__headline">
+              <span className="luxury-consumer-bookings-dash__headline-pre">Le mie </span>
+              <span className="luxury-consumer-bookings-dash__headline-accent">notifiche</span>
             </h1>
-            <p className="velvet-consumer-bookings-dash__total-pill" aria-label={`Totale notifiche ${totalNotifications}`}>
-              <span className="velvet-consumer-bookings-dash__total-pill__n" aria-hidden>
+            <p className="luxury-consumer-bookings-dash__total-pill" aria-label={`Totale notifiche ${totalNotifications}`}>
+              <span className="luxury-consumer-bookings-dash__total-pill__n" aria-hidden>
                 {totalNotifications}
               </span>
-              <span className="velvet-consumer-bookings-dash__total-pill__label">notifiche</span>
+              <span className="luxury-consumer-bookings-dash__total-pill__label">notifiche</span>
             </p>
           </div>
         </header>
 
         {inbox.isPending ? (
-          <div className="velvet-surface-card velvet-salon-notif-hub-card">
-            <p className="velvet-text-muted" style={{ margin: 0 }}>
+          <div className="luxury-surface-card luxury-salon-notif-hub-card">
+            <p className="luxury-text-muted" style={{ margin: 0 }}>
               Caricamento…
             </p>
           </div>
         ) : inbox.isError ? (
-          <div className="velvet-surface-card velvet-salon-notif-hub-card">
-            <p className="velvet-text-muted" style={{ margin: 0 }}>
+          <div className="luxury-surface-card luxury-salon-notif-hub-card">
+            <p className="luxury-text-muted" style={{ margin: 0 }}>
               Non riusciamo a leggere i conteggi. Verifica la connessione e l&apos;API{" "}
-              <code className="velvet-text-muted">/api/v1/me/salon/notifications</code>.
+              <code className="luxury-text-muted">/api/v1/me/salon/notifications</code>.
             </p>
           </div>
         ) : (
-          <div className="velvet-surface-card velvet-salon-notif-hub-card">
-            <p className="velvet-salon-notif-hint">
+          <div className="luxury-surface-card luxury-salon-notif-hub-card">
+            <p className="luxury-salon-notif-hint">
               Apri una riga per lo storico (puoi eliminare i singoli messaggi); quando la richiudi il numerino si azzera fino a
               nuove notifiche.
             </p>
-            <ul className="velvet-salon-notif-list" aria-label="Notifiche operatore salone">
+            <ul className="luxury-salon-notif-list" aria-label="Notifiche operatore salone">
               {rowsForView.map((row) => {
                 const expanded = openBucket === row.type;
                 return (
-                  <li key={row.type} className="velvet-salon-notif-item">
+                  <li key={row.type} className="luxury-salon-notif-item">
                     <div
                       className={
-                        "velvet-salon-notif-row velvet-salon-notif-row--interactive" +
-                        (expanded ? " velvet-salon-notif-row--expanded" : "")
+                        "luxury-salon-notif-row luxury-salon-notif-row--interactive" +
+                        (expanded ? " luxury-salon-notif-row--expanded" : "")
                       }
                       role="button"
                       tabIndex={0}
@@ -230,19 +230,19 @@ function StaffSalonNotificationsView() {
                       onClick={() => toggleBucket(row.type)}
                       onKeyDown={(e) => onRowKeyDown(e, row.type)}
                     >
-                      <p className="velvet-salon-notif-row__label">{row.label}</p>
-                      <div className="velvet-salon-notif-row__counts" aria-label={`Conteggi per ${row.label}`}>
+                      <p className="luxury-salon-notif-row__label">{row.label}</p>
+                      <div className="luxury-salon-notif-row__counts" aria-label={`Conteggi per ${row.label}`}>
                         {countSalonStaffBadge(row.sent + row.pending, "In arrivo")}
                       </div>
                     </div>
                     {expanded ? (
-                      <div className="velvet-salon-notif-detail">
+                      <div className="luxury-salon-notif-detail">
                         {messages.isPending ? (
-                          <p className="velvet-salon-notif-detail__status">Caricamento messaggi…</p>
+                          <p className="luxury-salon-notif-detail__status">Caricamento messaggi…</p>
                         ) : messages.data && messages.data.length === 0 ? (
-                          <p className="velvet-salon-notif-detail__status">Nessun messaggio in questa categoria.</p>
+                          <p className="luxury-salon-notif-detail__status">Nessun messaggio in questa categoria.</p>
                         ) : (
-                          <ul className="velvet-salon-notif-detail__list" aria-label={`Messaggi: ${row.label}`}>
+                          <ul className="luxury-salon-notif-detail__list" aria-label={`Messaggi: ${row.label}`}>
                             {messages.data?.map((m) => (
                               <SalonNotificationMessageLine
                                 key={m.id}
@@ -376,70 +376,70 @@ export default function NotificationsPage() {
   }
 
   return (
-    <main className="velvet-page-main velvet-consumer-bookings-dash velvet-consumer-bookings-dash--base44 velvet-salon-notif-page">
-      <div className="velvet-consumer-bookings-dash__shell">
-        <header className="velvet-consumer-bookings-dash__header--hero">
-          <div className="velvet-consumer-bookings-dash__hero-glow" aria-hidden />
-          <div className="velvet-consumer-bookings-dash__title-row">
-            <h1 className="velvet-consumer-bookings-dash__headline">
-              <span className="velvet-consumer-bookings-dash__headline-pre">Le mie </span>
-              <span className="velvet-consumer-bookings-dash__headline-accent">notifiche</span>
+    <main className="luxury-page-main luxury-consumer-bookings-dash luxury-consumer-bookings-dash--base44 luxury-salon-notif-page">
+      <div className="luxury-consumer-bookings-dash__shell">
+        <header className="luxury-consumer-bookings-dash__header--hero">
+          <div className="luxury-consumer-bookings-dash__hero-glow" aria-hidden />
+          <div className="luxury-consumer-bookings-dash__title-row">
+            <h1 className="luxury-consumer-bookings-dash__headline">
+              <span className="luxury-consumer-bookings-dash__headline-pre">Le mie </span>
+              <span className="luxury-consumer-bookings-dash__headline-accent">notifiche</span>
             </h1>
-            <p className="velvet-consumer-bookings-dash__total-pill" aria-label={`Totale notifiche ${totalNotifications}`}>
-              <span className="velvet-consumer-bookings-dash__total-pill__n" aria-hidden>
+            <p className="luxury-consumer-bookings-dash__total-pill" aria-label={`Totale notifiche ${totalNotifications}`}>
+              <span className="luxury-consumer-bookings-dash__total-pill__n" aria-hidden>
                 {totalNotifications}
               </span>
-              <span className="velvet-consumer-bookings-dash__total-pill__label">notifiche</span>
+              <span className="luxury-consumer-bookings-dash__total-pill__label">notifiche</span>
             </p>
           </div>
         </header>
 
-      <div className="velvet-surface-card velvet-salon-notif-hub-card">
+      <div className="luxury-surface-card luxury-salon-notif-hub-card">
           {inbox.isError ? (
-            <p className="velvet-text-muted" style={{ margin: "0 0 0.75rem" }} role="alert">
+            <p className="luxury-text-muted" style={{ margin: "0 0 0.75rem" }} role="alert">
               Non riusciamo a leggere i conteggi. Verifica la connessione e l&apos;API{" "}
-              <code className="velvet-text-muted">/api/v1/me/notifications</code>. Le categorie restano consultabili sotto.
+              <code className="luxury-text-muted">/api/v1/me/notifications</code>. Le categorie restano consultabili sotto.
             </p>
           ) : null}
-          <p className="velvet-salon-notif-hint">
+          <p className="luxury-salon-notif-hint">
             Apri una categoria per leggere i messaggi; quando la richiudi (o passi a un&apos;altra categoria), viene segnata
             come consultata e il numerino si aggiorna.
           </p>
           {notificationsUnauthorized ? (
-            <p className="velvet-salon-notif-hint" style={{ marginTop: "0.55rem" }}>
+            <p className="luxury-salon-notif-hint" style={{ marginTop: "0.55rem" }}>
               Sessione scaduta per le notifiche: fai logout/login per riattivare il centro notifiche.
             </p>
           ) : null}
           <ul
-            className="velvet-salon-notif-list"
+            className="luxury-salon-notif-list"
             aria-label="Conteggi notifiche cliente"
             aria-busy={inbox.isPending}
           >
             {rowsForView.map((row) => {
               const expanded = openBucket === row.type;
               return (
-                <li key={row.type} className="velvet-salon-notif-item">
+                <li key={row.type} className="luxury-salon-notif-item">
                   <div
-                    className={"velvet-salon-notif-row velvet-salon-notif-row--interactive" + (expanded ? " velvet-salon-notif-row--expanded" : "")}
+                    className={"luxury-salon-notif-row luxury-salon-notif-row--interactive" + (expanded ? " luxury-salon-notif-row--expanded" : "")}
                     role="button"
                     tabIndex={0}
                     onClick={() => toggleBucket(row.type)}
                     onKeyDown={(e) => onRowKeyDown(e, row.type)}
                   >
-                    <p className="velvet-salon-notif-row__label">{row.label}</p>
-                    <div className="velvet-salon-notif-row__counts">
+                    <p className="luxury-salon-notif-row__label">{row.label}</p>
+                    <div className="luxury-salon-notif-row__counts">
                       {countBadge(row.sent, "sent", "Inviate")}
                       {countBadge(row.pending, "pending", "In coda")}
                     </div>
                   </div>
                   {expanded ? (
-                    <div className="velvet-salon-notif-detail">
+                    <div className="luxury-salon-notif-detail">
                       {messages.isPending ? (
-                        <p className="velvet-salon-notif-detail__status">Caricamento messaggi…</p>
+                        <p className="luxury-salon-notif-detail__status">Caricamento messaggi…</p>
                       ) : messages.data && messages.data.length === 0 ? (
-                        <p className="velvet-salon-notif-detail__status">Nessun messaggio in questa categoria.</p>
+                        <p className="luxury-salon-notif-detail__status">Nessun messaggio in questa categoria.</p>
                       ) : (
-                        <ul className="velvet-salon-notif-detail__list">
+                        <ul className="luxury-salon-notif-detail__list">
                           {messages.data?.map((m) => (
                             <SalonNotificationMessageLine
                               key={m.id}

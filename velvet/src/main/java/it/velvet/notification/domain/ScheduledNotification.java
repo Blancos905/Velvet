@@ -123,7 +123,7 @@ public class ScheduledNotification {
 		n.status = QueuedNotificationStatus.SENT;
 		n.sentAt = at;
 		String s = subject != null ? subject.trim() : "";
-		n.platformMessageSubject = s.isEmpty() ? "Messaggio da Velvet" : s.substring(0, Math.min(s.length(), 200));
+		n.platformMessageSubject = s.isEmpty() ? "Messaggio da Saloni Luxury" : s.substring(0, Math.min(s.length(), 200));
 		n.platformMessageBody = body != null ? body.trim() : "";
 		return n;
 	}
@@ -140,7 +140,7 @@ public class ScheduledNotification {
 		n.status = QueuedNotificationStatus.SENT;
 		n.sentAt = at;
 		String s = subject != null ? subject.trim() : "";
-		n.platformMessageSubject = s.isEmpty() ? "Messaggio da Velvet" : s.substring(0, Math.min(s.length(), 200));
+		n.platformMessageSubject = s.isEmpty() ? "Messaggio da Saloni Luxury" : s.substring(0, Math.min(s.length(), 200));
 		n.platformMessageBody = body != null ? body.trim() : "";
 		return n;
 	}

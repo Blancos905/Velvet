@@ -73,31 +73,31 @@ export default function ReviewPage() {
 
   if (loading) {
     return (
-      <main className="velvet-page-main">
-        <p className="velvet-text-muted">Caricamento…</p>
+      <main className="luxury-page-main">
+        <p className="luxury-text-muted">Caricamento…</p>
       </main>
     );
   }
 
   return (
-    <main className="velvet-page-main">
-      <h1 className="velvet-page-title">La tua recensione</h1>
-      <p className="velvet-page-subtitle">Dopo la visita — come è andata con il salone e l&apos;operatore?</p>
+    <main className="luxury-page-main">
+      <h1 className="luxury-page-title">La tua recensione</h1>
+      <p className="luxury-page-subtitle">Dopo la visita — come è andata con il salone e l&apos;operatore?</p>
 
       {err && (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {err}
         </p>
       )}
 
       {intent && (
         <>
-          <section className="velvet-surface-card">
+          <section className="luxury-surface-card">
             <p style={{ margin: 0, fontWeight: 600, color: "#fffbeb" }}>{intent.salonName}</p>
-            <p className="velvet-text-muted" style={{ margin: "0.35rem 0 0" }}>
+            <p className="luxury-text-muted" style={{ margin: "0.35rem 0 0" }}>
               {intent.serviceName}
             </p>
-            <p className="velvet-text-muted" style={{ margin: "0.35rem 0 0", fontSize: "0.88rem" }}>
+            <p className="luxury-text-muted" style={{ margin: "0.35rem 0 0", fontSize: "0.88rem" }}>
               {new Date(intent.appointmentStart).toLocaleString(undefined, {
                 dateStyle: "full",
                 timeStyle: "short",
@@ -110,7 +110,7 @@ export default function ReviewPage() {
               Hai già lasciato una recensione per questa visita.
             </p>
           ) : done ? (
-            <p className="velvet-alert velvet-alert--success" style={{ marginTop: "1.25rem" }} role="status">
+            <p className="luxury-alert luxury-alert--success" style={{ marginTop: "1.25rem" }} role="status">
               Grazie, recensione inviata.
             </p>
           ) : (
@@ -133,11 +133,11 @@ export default function ReviewPage() {
                   disabled={busy}
                 />
               </div>
-              <label className="velvet-form-label" style={{ marginTop: "0.85rem" }}>
+              <label className="luxury-form-label" style={{ marginTop: "0.85rem" }}>
                 Commento (opzionale)
-                <textarea className="velvet-soft-field" value={comment} onChange={(e) => setComment(e.target.value)} />
+                <textarea className="luxury-soft-field" value={comment} onChange={(e) => setComment(e.target.value)} />
               </label>
-              <button type="submit" className="velvet-btn velvet-btn--primary" disabled={busy} style={{ marginTop: "1rem" }}>
+              <button type="submit" className="luxury-btn luxury-btn--primary" disabled={busy} style={{ marginTop: "1rem" }}>
                 {busy ? "Invio…" : "Invia recensione"}
               </button>
             </form>
@@ -147,7 +147,7 @@ export default function ReviewPage() {
 
       <LegalSiteFootnote />
       <p style={{ marginTop: "2rem" }}>
-        <Link to="/" className="velvet-link-back" style={{ marginBottom: 0 }}>
+        <Link to="/" className="luxury-link-back" style={{ marginBottom: 0 }}>
           ← Torna alla home
         </Link>
       </p>

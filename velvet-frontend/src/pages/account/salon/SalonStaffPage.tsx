@@ -16,9 +16,9 @@ import {
 import { readImageFileAsStaffPhotoDataUrl } from "../../../lib/readImageDataUrl";
 import { localStaffId, writeLocalStaff, type LocalStaffItem } from "../../../lib/salonStaffLocal";
 import { staffFallbackAvatar } from "../../../lib/salonStaffAvatar";
-import "../../../styles/velvet-account-page-shell.css";
-import "../../../styles/velvet-account-salon-services.css";
-import "../../../styles/velvet-account-salon-staff.css";
+import "../../../styles/luxury-account-page-shell.css";
+import "../../../styles/luxury-account-salon-services.css";
+import "../../../styles/luxury-account-salon-staff.css";
 
 type AvatarAdjustments = {
   zoom: number;
@@ -54,14 +54,14 @@ function StaffPasswordRevealButton(props: {
   return (
     <button
       type="button"
-      className="velvet-salon-staff-password-toggle"
+      className="luxury-salon-staff-password-toggle"
       onClick={onToggle}
       disabled={disabled}
       aria-label={visible ? labelHide : labelShow}
       aria-pressed={visible}
     >
       {visible ? (
-        <svg className="velvet-salon-staff-password-toggle__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+        <svg className="luxury-salon-staff-password-toggle__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
           <path
             d="M3 3l18 18M10.73 10.73a3 3 0 004.24 4.24M9.88 9.88A10.05 10.05 0 0112 5c4.48 0 8.27 2.94 9.54 7a10.02 10.02 0 01-4.13 5.41M6.12 6.12A10.02 10.02 0 003.46 12c.77 3.95 4.26 7 8.54 7 1.05 0 2.05-.18 2.98-.5"
             stroke="currentColor"
@@ -71,7 +71,7 @@ function StaffPasswordRevealButton(props: {
           />
         </svg>
       ) : (
-        <svg className="velvet-salon-staff-password-toggle__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+        <svg className="luxury-salon-staff-password-toggle__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
           <path
             d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
             stroke="currentColor"
@@ -98,26 +98,26 @@ function StaffWorkHoursFields(props: {
 }) {
   const { value, onChange } = props;
   return (
-    <fieldset className="velvet-salon-staff-work-hours">
-      <legend className="velvet-form-label">Orario di lavoro (agenda prenotazioni)</legend>
-      <p className="velvet-text-muted velvet-salon-staff-work-hours__hint">
+    <fieldset className="luxury-salon-staff-work-hours">
+      <legend className="luxury-form-label">Orario di lavoro (agenda prenotazioni)</legend>
+      <p className="luxury-text-muted luxury-salon-staff-work-hours__hint">
         Mattina e pomeriggio separati: nella pausa il cliente non può prenotare con questo operatore.
       </p>
-      <div className="velvet-personal-builder__row-2">
-        <label className="velvet-form-label">
+      <div className="luxury-personal-builder__row-2">
+        <label className="luxury-form-label">
           Apertura mattina
           <input
-            className="velvet-soft-field"
+            className="luxury-soft-field"
             type="time"
             value={value.morningStart}
             onChange={(e) => onChange({ ...value, morningStart: e.target.value })}
             required
           />
         </label>
-        <label className="velvet-form-label">
+        <label className="luxury-form-label">
           Chiusura mattina
           <input
-            className="velvet-soft-field"
+            className="luxury-soft-field"
             type="time"
             value={value.morningEnd}
             onChange={(e) => onChange({ ...value, morningEnd: e.target.value })}
@@ -125,21 +125,21 @@ function StaffWorkHoursFields(props: {
           />
         </label>
       </div>
-      <div className="velvet-personal-builder__row-2">
-        <label className="velvet-form-label">
+      <div className="luxury-personal-builder__row-2">
+        <label className="luxury-form-label">
           Apertura pomeriggio
           <input
-            className="velvet-soft-field"
+            className="luxury-soft-field"
             type="time"
             value={value.afternoonStart}
             onChange={(e) => onChange({ ...value, afternoonStart: e.target.value })}
             required
           />
         </label>
-        <label className="velvet-form-label">
+        <label className="luxury-form-label">
           Chiusura pomeriggio
           <input
-            className="velvet-soft-field"
+            className="luxury-soft-field"
             type="time"
             value={value.afternoonEnd}
             onChange={(e) => onChange({ ...value, afternoonEnd: e.target.value })}
@@ -525,53 +525,53 @@ export default function SalonStaffPage() {
 
   return (
     <>
-      <div className="velvet-account-page-shell velvet-account-page-shell--narrow velvet-account-page-shell--salon-staff">
-        <header className="velvet-account-page-shell__hero">
-          <div className="velvet-account-page-shell__hero-glow" aria-hidden />
-          <div className="velvet-account-page-shell__hero-inner">
-            <Link to="/account/salone" className="velvet-link-back">
+      <div className="luxury-account-page-shell luxury-account-page-shell--narrow luxury-account-page-shell--salon-staff">
+        <header className="luxury-account-page-shell__hero">
+          <div className="luxury-account-page-shell__hero-glow" aria-hidden />
+          <div className="luxury-account-page-shell__hero-inner">
+            <Link to="/account/salone" className="luxury-link-back">
               ← Panoramica salone
             </Link>
-            <h1 className="velvet-salon-staff-hero__headline">
-              <span className="velvet-salon-staff-hero__headline-pre">Il tuo </span>
-              <span className="velvet-salon-staff-hero__headline-accent">staff</span>
+            <h1 className="luxury-salon-staff-hero__headline">
+              <span className="luxury-salon-staff-hero__headline-pre">Il tuo </span>
+              <span className="luxury-salon-staff-hero__headline-accent">staff</span>
             </h1>
-            <p className="velvet-account-page-shell__hero-sub">
+            <p className="luxury-account-page-shell__hero-sub">
               Nome, cognome, ruolo, orario di lavoro e foto; con backend attivo anche email e password per l&apos;accesso all&apos;agenda.
             </p>
           </div>
         </header>
       </div>
 
-      <div className="velvet-salon-services-page velvet-salon-staff-account">
+      <div className="luxury-salon-services-page luxury-salon-staff-account">
         {!backendStaffAvailable ? (
-          <p className="velvet-alert velvet-alert--error velvet-salon-staff-account__alert-spaced" role="status">
+          <p className="luxury-alert luxury-alert--error luxury-salon-staff-account__alert-spaced" role="status">
             Endpoint staff non disponibile sul backend attivo: salvo in locale su questo browser.
           </p>
         ) : null}
 
-        <div className="velvet-salon-staff-account__stack">
-          <div className="velvet-surface-card velvet-salon-services-form-card">
-            <h2 className="velvet-card-title">Aggiungi persona</h2>
-            <form className="velvet-salon-staff-form" onSubmit={onAddMember}>
-          <label className="velvet-form-label">
+        <div className="luxury-salon-staff-account__stack">
+          <div className="luxury-surface-card luxury-salon-services-form-card">
+            <h2 className="luxury-card-title">Aggiungi persona</h2>
+            <form className="luxury-salon-staff-form" onSubmit={onAddMember}>
+          <label className="luxury-form-label">
             Nome
-            <input className="velvet-soft-field" value={firstName} onChange={(e) => setFirstName(e.target.value)} maxLength={80} />
+            <input className="luxury-soft-field" value={firstName} onChange={(e) => setFirstName(e.target.value)} maxLength={80} />
           </label>
-          <label className="velvet-form-label velvet-salon-staff-form__tight">
+          <label className="luxury-form-label luxury-salon-staff-form__tight">
             Cognome
-            <input className="velvet-soft-field" value={lastName} onChange={(e) => setLastName(e.target.value)} maxLength={80} />
+            <input className="luxury-soft-field" value={lastName} onChange={(e) => setLastName(e.target.value)} maxLength={80} />
           </label>
-          <label className="velvet-form-label velvet-salon-staff-form__tight">
+          <label className="luxury-form-label luxury-salon-staff-form__tight">
             Ruolo
-            <input className="velvet-soft-field" value={role} onChange={(e) => setRole(e.target.value)} maxLength={80} placeholder="Es. Colorist, Barber, Stylist" />
+            <input className="luxury-soft-field" value={role} onChange={(e) => setRole(e.target.value)} maxLength={80} placeholder="Es. Colorist, Barber, Stylist" />
           </label>
           {backendStaffAvailable ? (
             <>
-              <label className="velvet-form-label velvet-salon-staff-form__tight">
+              <label className="luxury-form-label luxury-salon-staff-form__tight">
                 Email (accesso staff)
                 <input
-                  className="velvet-soft-field"
+                  className="luxury-soft-field"
                   type="email"
                   autoComplete="off"
                   value={staffEmail}
@@ -580,11 +580,11 @@ export default function SalonStaffPage() {
                   placeholder="nome@esempio.it"
                 />
               </label>
-              <label className="velvet-form-label velvet-salon-staff-form__tight">
+              <label className="luxury-form-label luxury-salon-staff-form__tight">
                 Password
-                <div className="velvet-salon-staff-password-wrap">
+                <div className="luxury-salon-staff-password-wrap">
                   <input
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     type={showStaffPassword ? "text" : "password"}
                     autoComplete="new-password"
                     value={staffPassword}
@@ -603,11 +603,11 @@ export default function SalonStaffPage() {
                   />
                 </div>
               </label>
-              <label className="velvet-form-label velvet-salon-staff-form__tight">
+              <label className="luxury-form-label luxury-salon-staff-form__tight">
                 Conferma password
-                <div className="velvet-salon-staff-password-wrap">
+                <div className="luxury-salon-staff-password-wrap">
                   <input
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     type={showStaffPasswordConfirm ? "text" : "password"}
                     autoComplete="new-password"
                     value={staffPasswordConfirm}
@@ -631,10 +631,10 @@ export default function SalonStaffPage() {
           {backendStaffAvailable ? (
             <StaffWorkHoursFields value={workHours} onChange={setWorkHours} />
           ) : null}
-          <label className="velvet-form-label velvet-salon-staff-form__tight">
+          <label className="luxury-form-label luxury-salon-staff-form__tight">
             Foto (opzionale)
             <input
-              className="velvet-soft-field"
+              className="luxury-soft-field"
               type="file"
               accept="image/*"
               onChange={(e) => {
@@ -643,7 +643,7 @@ export default function SalonStaffPage() {
                 void onPickPhoto(file);
               }}
             />
-            <span className="velvet-salon-staff-photo-preview">
+            <span className="luxury-salon-staff-photo-preview">
               <img
                 src={
                   photoSourceDataUrl && photoSourceDataUrl.trim()
@@ -653,13 +653,13 @@ export default function SalonStaffPage() {
                       : staffFallbackAvatar(firstName || "S", lastName || "F")
                 }
                 alt=""
-                className="velvet-salon-staff-photo-preview__img"
+                className="luxury-salon-staff-photo-preview__img"
                 style={photoSourceDataUrl ? styleFromAdjustments(photoAdjustments) : undefined}
               />
             </span>
             {photoSourceDataUrl ? (
-              <div className="velvet-salon-staff-photo-controls">
-                <label className="velvet-form-label">
+              <div className="luxury-salon-staff-photo-controls">
+                <label className="luxury-form-label">
                   Zoom
                   <input
                     type="range"
@@ -672,7 +672,7 @@ export default function SalonStaffPage() {
                     }
                   />
                 </label>
-                <label className="velvet-form-label">
+                <label className="luxury-form-label">
                   Posizione orizzontale
                   <input
                     type="range"
@@ -685,7 +685,7 @@ export default function SalonStaffPage() {
                     }
                   />
                 </label>
-                <label className="velvet-form-label">
+                <label className="luxury-form-label">
                   Posizione verticale
                   <input
                     type="range"
@@ -702,52 +702,52 @@ export default function SalonStaffPage() {
             ) : null}
           </label>
           {photoMsg ? (
-            <p className="velvet-alert velvet-alert--error" role="alert">
+            <p className="luxury-alert luxury-alert--error" role="alert">
               {photoMsg}
             </p>
           ) : null}
-          <button type="submit" className="velvet-btn velvet-btn--primary" disabled={createMutation.isPending}>
+          <button type="submit" className="luxury-btn luxury-btn--primary" disabled={createMutation.isPending}>
             Aggiungi staff
           </button>
           {saveMsg ? (
-            <p className={`velvet-alert ${saveMsg.includes("aggiunto") ? "velvet-alert--success" : "velvet-alert--error"}`} role="status">
+            <p className={`luxury-alert ${saveMsg.includes("aggiunto") ? "luxury-alert--success" : "luxury-alert--error"}`} role="status">
               {saveMsg}
             </p>
           ) : null}
             </form>
           </div>
 
-          {staffQuery.isPending ? <p className="velvet-text-muted">Caricamento staff…</p> : null}
+          {staffQuery.isPending ? <p className="luxury-text-muted">Caricamento staff…</p> : null}
           {staffQuery.isError ? (
-            <p className="velvet-alert velvet-alert--error" role="alert">
+            <p className="luxury-alert luxury-alert--error" role="alert">
               Non siamo riusciti a leggere lo staff del salone.
             </p>
           ) : null}
           {!staffQuery.isPending && !staffQuery.isError && mergedStaffMembers.length === 0 ? (
-            <p className="velvet-text-muted">Nessun membro staff disponibile per questa sede.</p>
+            <p className="luxury-text-muted">Nessun membro staff disponibile per questa sede.</p>
           ) : null}
 
           {mergedStaffMembers.length > 0 ? (
-            <div className="velvet-salon-staff-list">
+            <div className="luxury-salon-staff-list">
           {mergedStaffMembers.map((member) => (
-            <div key={member.id} className="velvet-surface-card velvet-surface-card--plan-standard velvet-salon-staff-item">
+            <div key={member.id} className="luxury-surface-card luxury-surface-card--plan-standard luxury-salon-staff-item">
               <img
                 src={member.photoDataUrl && member.photoDataUrl.trim() ? member.photoDataUrl : staffFallbackAvatar(member.firstName, member.lastName)}
                 alt=""
-                className="velvet-salon-staff-item__avatar"
+                className="luxury-salon-staff-item__avatar"
               />
-              <div className="velvet-salon-staff-item__body">
-                <strong className="velvet-salon-staff-item__name">
+              <div className="luxury-salon-staff-item__body">
+                <strong className="luxury-salon-staff-item__name">
                   {member.firstName} {member.lastName}
                 </strong>
-                <span className="velvet-text-muted velvet-salon-staff-item__role">Ruolo: {member.role}</span>
+                <span className="luxury-text-muted luxury-salon-staff-item__role">Ruolo: {member.role}</span>
                 {formatStaffWorkHoursLabel(
                   member.workMorningStartMinuteOfDay,
                   member.workMorningEndMinuteOfDay,
                   member.workAfternoonStartMinuteOfDay,
                   member.workAfternoonEndMinuteOfDay,
                 ) ? (
-                  <span className="velvet-text-muted velvet-salon-staff-item__role">
+                  <span className="luxury-text-muted luxury-salon-staff-item__role">
                     Orario:{" "}
                     {formatStaffWorkHoursLabel(
                       member.workMorningStartMinuteOfDay,
@@ -758,20 +758,20 @@ export default function SalonStaffPage() {
                   </span>
                 ) : null}
                 {member.loginEnabled ? (
-                  <span className="velvet-salon-staff-item__chip velvet-salon-staff-item__chip--login">Accesso agenda attivo</span>
+                  <span className="luxury-salon-staff-item__chip luxury-salon-staff-item__chip--login">Accesso agenda attivo</span>
                 ) : (
-                  <span className="velvet-salon-staff-item__chip">Profilo staff</span>
+                  <span className="luxury-salon-staff-item__chip">Profilo staff</span>
                 )}
                 {editingId === member.id ? (
-                  <div className="velvet-salon-staff-item__editor">
-                    <input className="velvet-soft-field" value={editFirstName} onChange={(e) => setEditFirstName(e.target.value)} />
-                    <input className="velvet-soft-field" value={editLastName} onChange={(e) => setEditLastName(e.target.value)} />
-                    <input className="velvet-soft-field" value={editRole} onChange={(e) => setEditRole(e.target.value)} />
+                  <div className="luxury-salon-staff-item__editor">
+                    <input className="luxury-soft-field" value={editFirstName} onChange={(e) => setEditFirstName(e.target.value)} />
+                    <input className="luxury-soft-field" value={editLastName} onChange={(e) => setEditLastName(e.target.value)} />
+                    <input className="luxury-soft-field" value={editRole} onChange={(e) => setEditRole(e.target.value)} />
                     {member.source === "api" ? (
                       <StaffWorkHoursFields value={editWorkHours} onChange={setEditWorkHours} />
                     ) : null}
                     <input
-                      className="velvet-soft-field"
+                      className="luxury-soft-field"
                       type="file"
                       accept="image/*"
                       onChange={(e) => {
@@ -780,7 +780,7 @@ export default function SalonStaffPage() {
                         void onPickEditPhoto(file);
                       }}
                     />
-                    <span className="velvet-salon-staff-photo-preview">
+                    <span className="luxury-salon-staff-photo-preview">
                       <img
                         src={
                           editPhotoSourceDataUrl && editPhotoSourceDataUrl.trim()
@@ -790,13 +790,13 @@ export default function SalonStaffPage() {
                               : staffFallbackAvatar(editFirstName || member.firstName, editLastName || member.lastName)
                         }
                         alt=""
-                        className="velvet-salon-staff-photo-preview__img"
+                        className="luxury-salon-staff-photo-preview__img"
                         style={editPhotoSourceDataUrl ? styleFromAdjustments(editPhotoAdjustments) : undefined}
                       />
                     </span>
                     {editPhotoSourceDataUrl ? (
-                      <div className="velvet-salon-staff-photo-controls">
-                        <label className="velvet-form-label">
+                      <div className="luxury-salon-staff-photo-controls">
+                        <label className="luxury-form-label">
                           Zoom
                           <input
                             type="range"
@@ -812,7 +812,7 @@ export default function SalonStaffPage() {
                             }
                           />
                         </label>
-                        <label className="velvet-form-label">
+                        <label className="luxury-form-label">
                           Posizione orizzontale
                           <input
                             type="range"
@@ -828,7 +828,7 @@ export default function SalonStaffPage() {
                             }
                           />
                         </label>
-                        <label className="velvet-form-label">
+                        <label className="luxury-form-label">
                           Posizione verticale
                           <input
                             type="range"
@@ -846,21 +846,21 @@ export default function SalonStaffPage() {
                         </label>
                       </div>
                     ) : null}
-                    <div className="velvet-salon-staff-item__actions">
-                      <button type="button" className="velvet-btn velvet-btn--primary" onClick={() => void onSaveEdit(member)}>
+                    <div className="luxury-salon-staff-item__actions">
+                      <button type="button" className="luxury-btn luxury-btn--primary" onClick={() => void onSaveEdit(member)}>
                         Salva
                       </button>
-                      <button type="button" className="velvet-btn velvet-btn--secondary" onClick={() => setEditingId(null)}>
+                      <button type="button" className="luxury-btn luxury-btn--secondary" onClick={() => setEditingId(null)}>
                         Annulla
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="velvet-salon-staff-item__actions">
-                    <button type="button" className="velvet-btn velvet-btn--secondary" onClick={() => beginEdit(member)}>
+                  <div className="luxury-salon-staff-item__actions">
+                    <button type="button" className="luxury-btn luxury-btn--secondary" onClick={() => beginEdit(member)}>
                       Modifica
                     </button>
-                    <button type="button" className="velvet-btn velvet-btn--secondary" onClick={() => void onDeleteMember(member)}>
+                    <button type="button" className="luxury-btn luxury-btn--secondary" onClick={() => void onDeleteMember(member)}>
                       Cancella
                     </button>
                   </div>

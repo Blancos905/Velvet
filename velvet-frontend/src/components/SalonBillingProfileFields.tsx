@@ -34,23 +34,25 @@ export function SalonBillingProfileFields({
   legendId,
 }: SalonBillingProfileFieldsProps) {
   const addressDisabled = disabled || disableAddressFields;
-  const fieldClass = variant === "register" ? "velvet-plans-field" : "velvet-form-label";
-  const inputClass = variant === "register" ? undefined : "velvet-soft-field";
-  const selectClass = variant === "register" ? "velvet-eu-contact-select" : "velvet-soft-field";
-  const rowClass = variant === "register" ? "velvet-plans-password-pair" : "velvet-profile-form__row";
-  const fullClass = variant === "register" ? "velvet-plans-field velvet-plans-field--full" : fieldClass;
+  const fieldClass = variant === "register" ? "luxury-plans-field" : "luxury-form-label";
+  const inputClass = variant === "register" ? undefined : "luxury-soft-field";
+  const selectClass = variant === "register" ? "luxury-eu-contact-select" : "luxury-soft-field";
+  const rowClass = variant === "register" ? "luxury-plans-password-pair" : "luxury-profile-form__row";
+  const fullClass = variant === "register" ? "luxury-plans-field luxury-plans-field--full" : fieldClass;
 
   return (
-    <fieldset className="velvet-plans-fieldset velvet-plans-field--full velvet-salon-billing-fields" aria-labelledby={legendId}>
+    <fieldset className="luxury-plans-fieldset luxury-plans-field--full luxury-salon-billing-fields" aria-labelledby={legendId}>
       {legendId ? (
-        <legend id={legendId} className="velvet-plans-salon-types__legend">
+        <legend id={legendId} className="luxury-plans-salon-types__legend">
           Dati di fatturazione
         </legend>
       ) : null}
-      <p className={variant === "register" ? "velvet-salon-billing-fields__hint" : "velvet-text-muted"}>
-        Per le fatture dell&apos;abbonamento Premium: indica almeno Partita IVA o codice fiscale, e codice SDI o PEC
-        (Italia).
-      </p>
+      {variant === "register" ? (
+        <p className="luxury-salon-billing-fields__hint">
+          Per la fattura elettronica dell&apos;abbonamento Premium (FatturaPA verso AdE): indica almeno Partita IVA o
+          codice fiscale, e codice SDI o PEC (Italia).
+        </p>
+      ) : null}
 
       <label className={fullClass}>
         <span>Ragione sociale / intestazione fattura</span>
@@ -79,7 +81,7 @@ export function SalonBillingProfileFields({
         />
       </label>
 
-      <label className={variant === "register" ? "velvet-plans-field velvet-plans-field--full" : fieldClass}>
+      <label className={variant === "register" ? "luxury-plans-field luxury-plans-field--full" : fieldClass}>
         <span>Tipo soggetto (opzionale)</span>
         <select
           className={selectClass}

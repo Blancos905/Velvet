@@ -11,25 +11,25 @@ const FEATURE_LABELS = ["Brand & vetrina", "Notifiche", "Staff & agenda", "Stati
  */
 export function SalonPremiumPlanCardPreview() {
   return (
-    <div className="velvet-plan-premium-preview">
-      <header className="velvet-plan-premium-preview__head">
-        <h3 className="velvet-plan-premium-preview__title">Cosa include</h3>
-        <span className="velvet-plan-premium-preview__chip">4 aree</span>
+    <div className="luxury-plan-premium-preview">
+      <header className="luxury-plan-premium-preview__head">
+        <h3 className="luxury-plan-premium-preview__title">Cosa include</h3>
+        <span className="luxury-plan-premium-preview__chip">4 aree</span>
       </header>
 
-      <ul className="velvet-plan-premium-preview__grid" aria-label="Funzionalità Premium">
+      <ul className="luxury-plan-premium-preview__grid" aria-label="Funzionalità Premium">
         {SALON_PREMIUM_PANORAMA_FEATURES.map((f, i) => {
           const Icon = FEATURE_ICONS[i] ?? Globe;
           const label = FEATURE_LABELS[i] ?? f.text.split(".")[0];
 
           return (
-            <li key={f.text} className="velvet-plan-premium-preview__item">
-              <span className="velvet-plan-premium-preview__icon" aria-hidden>
+            <li key={f.text} className="luxury-plan-premium-preview__item">
+              <span className="luxury-plan-premium-preview__icon" aria-hidden>
                 <Icon strokeWidth={2.1} />
               </span>
-              <div className="velvet-plan-premium-preview__item-body">
-                <span className="velvet-plan-premium-preview__item-label">{label}</span>
-                <span className="velvet-plan-premium-preview__item-text">{f.text}</span>
+              <div className="luxury-plan-premium-preview__item-body">
+                <span className="luxury-plan-premium-preview__item-label">{label}</span>
+                <span className="luxury-plan-premium-preview__item-text">{f.text}</span>
               </div>
             </li>
           );

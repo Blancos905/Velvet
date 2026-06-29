@@ -14,9 +14,9 @@ import {
   writeSalonShowcaseAsync,
   type SalonShowcaseStored,
 } from "../../../lib/salonShowcaseStorage";
-import "../../../styles/velvet-account-page-shell.css";
-import "../../../styles/velvet-account-salon-services.css";
-import "../../../styles/velvet-salon-showcase.css";
+import "../../../styles/luxury-account-page-shell.css";
+import "../../../styles/luxury-account-salon-services.css";
+import "../../../styles/luxury-salon-showcase.css";
 
 function formatItPrice(priceCents: number): string {
   return (priceCents / 100).toLocaleString("it-IT", {
@@ -218,20 +218,20 @@ export default function SalonServicesPage() {
 
   const renderOperatorPicker = (selectedIds: string[], onChange: (next: string[]) => void, idPrefix: string) => {
     if (staffQuery.isLoading) {
-      return <p className="velvet-text-muted">Carico operatori…</p>;
+      return <p className="luxury-text-muted">Carico operatori…</p>;
     }
     if (apiStaff.length === 0) {
       return null;
     }
     return (
-      <ul className="velvet-salon-services-operator-pick" aria-label="Operatori per questo servizio">
+      <ul className="luxury-salon-services-operator-pick" aria-label="Operatori per questo servizio">
         {apiStaff.map((member) => {
           const inputId = `${idPrefix}-op-${member.rawId}`;
           const checked = selectedIds.includes(member.rawId);
           const label = `${member.firstName} ${member.lastName}`.trim();
           return (
             <li key={member.id}>
-              <label htmlFor={inputId} className="velvet-salon-services-operator-pick__label">
+              <label htmlFor={inputId} className="luxury-salon-services-operator-pick__label">
                 <input
                   id={inputId}
                   type="checkbox"
@@ -239,7 +239,7 @@ export default function SalonServicesPage() {
                   onChange={(e) => onChange(toggleOperatorId(selectedIds, member.rawId, e.target.checked))}
                 />
                 <span>{label || "Operatore"}</span>
-                {member.role ? <span className="velvet-text-muted"> · {member.role}</span> : null}
+                {member.role ? <span className="luxury-text-muted"> · {member.role}</span> : null}
               </label>
             </li>
           );
@@ -357,69 +357,69 @@ export default function SalonServicesPage() {
 
   return (
     <>
-      <div className="velvet-account-page-shell velvet-account-page-shell--narrow velvet-account-page-shell--salon-services">
-        <header className="velvet-account-page-shell__hero">
-          <div className="velvet-account-page-shell__hero-glow" aria-hidden />
-          <div className="velvet-account-page-shell__hero-inner">
-            <h1 className="velvet-salon-services-hero__headline">
-              <span className="velvet-salon-services-hero__headline-pre">Aggiungi </span>
-              <span className="velvet-salon-services-hero__headline-accent">servizi</span>
+      <div className="luxury-account-page-shell luxury-account-page-shell--narrow luxury-account-page-shell--salon-services">
+        <header className="luxury-account-page-shell__hero">
+          <div className="luxury-account-page-shell__hero-glow" aria-hidden />
+          <div className="luxury-account-page-shell__hero-inner">
+            <h1 className="luxury-salon-services-hero__headline">
+              <span className="luxury-salon-services-hero__headline-pre">Aggiungi </span>
+              <span className="luxury-salon-services-hero__headline-accent">servizi</span>
             </h1>
           </div>
         </header>
       </div>
-      <div className="velvet-salon-services-page">
+      <div className="luxury-salon-services-page">
       {meSalon.isSuccess && meSalon.data?.provisioned && !meSalon.data.primaryLocationSlug ? (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           Il salone è collegato all&apos;account ma manca la sede in anagrafica. Riprova a salvare: il sistema la
-          ricrea automaticamente. Se l&apos;errore persiste, contatta l&apos;assistenza Velvet.
+          ricrea automaticamente. Se l&apos;errore persiste, contatta l&apos;assistenza Saloni Luxury.
         </p>
       ) : null}
       {meSalon.isSuccess && meSalon.data && !meSalon.data.provisioned ? (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           Nessun salone collegato all&apos;account. Se hai già usato questa email su Piani, invia di nuovo il modulo (crea la
           riga salone anche se il profilo consumatore esisteva già) oppure accedi con la stessa email usata in registrazione.{" "}
-          <Link className="velvet-link-inline" to="/piani">
+          <Link className="luxury-link-inline" to="/piani">
             Piani
           </Link>
         </p>
       ) : null}
       {meSalon.isError ? (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           Impossibile caricare il salone ({meSalon.error instanceof Error ? meSalon.error.message : "errore"}). Verifica backend e
           accesso.
         </p>
       ) : null}
 
       {photoMsg ? (
-        <p className="velvet-alert velvet-alert--error velvet-salon-services-page__alert-spaced" role="alert">
+        <p className="luxury-alert luxury-alert--error luxury-salon-services-page__alert-spaced" role="alert">
           {photoMsg}
         </p>
       ) : null}
       {isPhotoProcessing ? (
-        <p className="velvet-text-muted velvet-salon-services-page__alert-spaced" role="status">
+        <p className="luxury-text-muted luxury-salon-services-page__alert-spaced" role="status">
           Caricamento foto in corso…
         </p>
       ) : null}
 
-      <div className="velvet-surface-card velvet-salon-services-form-card">
-        <h2 className="velvet-card-title">Aggiungi servizio</h2>
+      <div className="luxury-surface-card luxury-salon-services-form-card">
+        <h2 className="luxury-card-title">Aggiungi servizio</h2>
         <form
-          className="velvet-salon-services-form"
+          className="luxury-salon-services-form"
           onSubmit={(e) => {
             e.preventDefault();
             setFormMsg(null);
             createM.mutate();
           }}
         >
-          <label className="velvet-form-label">
+          <label className="luxury-form-label">
             Nome servizio
-            <input className="velvet-soft-field" value={name} onChange={(e) => setName(e.target.value)} maxLength={200} autoComplete="off" />
+            <input className="luxury-soft-field" value={name} onChange={(e) => setName(e.target.value)} maxLength={200} autoComplete="off" />
           </label>
-          <label className="velvet-form-label velvet-salon-services-form__label-tight">
+          <label className="luxury-form-label luxury-salon-services-form__label-tight">
             Costo
             <input
-              className="velvet-soft-field"
+              className="luxury-soft-field"
               value={priceEuro}
               onChange={(e) => setPriceEuro(e.target.value)}
               inputMode="decimal"
@@ -427,10 +427,10 @@ export default function SalonServicesPage() {
               autoComplete="off"
             />
           </label>
-          <label className="velvet-form-label velvet-salon-services-form__label-tight">
+          <label className="luxury-form-label luxury-salon-services-form__label-tight">
             Durata del servizio (minuti)
             <input
-              className="velvet-soft-field"
+              className="luxury-soft-field"
               type="text"
               inputMode="numeric"
               autoComplete="off"
@@ -439,10 +439,10 @@ export default function SalonServicesPage() {
               onChange={(e) => setDurationMinutes(e.target.value)}
             />
           </label>
-          <label className="velvet-form-label velvet-salon-services-form__label-tight">
+          <label className="luxury-form-label luxury-salon-services-form__label-tight">
             Descrizione (massimo 2000 caratteri)
             <textarea
-              className="velvet-soft-field velvet-salon-services-form__textarea"
+              className="luxury-soft-field luxury-salon-services-form__textarea"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               maxLength={2000}
@@ -450,16 +450,16 @@ export default function SalonServicesPage() {
               placeholder=""
             />
           </label>
-          <div className="velvet-form-label velvet-salon-services-form__label-tight">
+          <div className="luxury-form-label luxury-salon-services-form__label-tight">
             Operatori per questo servizio
             {renderOperatorPicker(createOperatorIds, setCreateOperatorIds, "create")}
           </div>
-          <div className="velvet-salon-services-photo-panel" aria-label="Foto opzionale per il nuovo servizio">
-            <span className="velvet-salon-services-photo-panel__legend">
+          <div className="luxury-salon-services-photo-panel" aria-label="Foto opzionale per il nuovo servizio">
+            <span className="luxury-salon-services-photo-panel__legend">
               Aggiungi foto
             </span>
-            <div className="velvet-salon-services-photo-panel__row velvet-brand-service-photo-row">
-              <div className="velvet-brand-service-thumb">
+            <div className="luxury-salon-services-photo-panel__row luxury-brand-service-photo-row">
+              <div className="luxury-brand-service-thumb">
                 {newServicePhotoPreview ? (
                   <img
                     src={newServicePhotoPreview}
@@ -467,18 +467,18 @@ export default function SalonServicesPage() {
                     style={{ objectPosition: buildObjectPosition(newServicePhotoObjectPos.x, newServicePhotoObjectPos.y) }}
                   />
                 ) : (
-                  <div className="velvet-brand-upload-zone velvet-salon-services-photo-panel__thumb-placeholder">
+                  <div className="luxury-brand-upload-zone luxury-salon-services-photo-panel__thumb-placeholder">
                     Anteprima
                   </div>
                 )}
               </div>
-              <div className="velvet-salon-services-photo-panel__actions">
-                <label className="velvet-btn velvet-btn--secondary">
+              <div className="luxury-salon-services-photo-panel__actions">
+                <label className="luxury-btn luxury-btn--secondary">
                   <input
                     ref={newServicePhotoInputRef}
                     type="file"
                     accept="image/*"
-                    className="velvet-salon-services-hidden-file"
+                    className="luxury-salon-services-hidden-file"
                     disabled={!slug || createM.isPending || isPhotoProcessing}
                     onChange={(e) => {
                       const f = e.target.files?.[0] ?? null;
@@ -489,15 +489,15 @@ export default function SalonServicesPage() {
                   Scegli foto…
                 </label>
                 {newServicePhotoPreview ? (
-                  <button type="button" className="velvet-btn velvet-btn--secondary" onClick={clearNewServicePhotoPick}>
+                  <button type="button" className="luxury-btn luxury-btn--secondary" onClick={clearNewServicePhotoPick}>
                     Rimuovi foto
                   </button>
                 ) : null}
               </div>
             </div>
             {newServicePhotoPreview ? (
-              <div className="velvet-salon-services-list__crop-controls" aria-label="Inquadratura foto nuovo servizio">
-                <label className="velvet-form-label velvet-salon-services-list__crop-label">
+              <div className="luxury-salon-services-list__crop-controls" aria-label="Inquadratura foto nuovo servizio">
+                <label className="luxury-form-label luxury-salon-services-list__crop-label">
                   Centra orizzontale ({newServicePhotoObjectPos.x}%)
                   <input
                     type="range"
@@ -512,7 +512,7 @@ export default function SalonServicesPage() {
                     }
                   />
                 </label>
-                <label className="velvet-form-label velvet-salon-services-list__crop-label">
+                <label className="luxury-form-label luxury-salon-services-list__crop-label">
                   Centra verticale ({newServicePhotoObjectPos.y}%)
                   <input
                     type="range"
@@ -532,39 +532,39 @@ export default function SalonServicesPage() {
           </div>
           {formMsg ? (
             <p
-              className={`velvet-alert velvet-salon-services-form__alert ${formMsg.includes("aggiunto") ? "velvet-alert--success" : "velvet-alert--error"}`}
+              className={`luxury-alert luxury-salon-services-form__alert ${formMsg.includes("aggiunto") ? "luxury-alert--success" : "luxury-alert--error"}`}
               role="status"
             >
               {formMsg}
             </p>
           ) : null}
-          <button type="submit" className="velvet-btn velvet-btn--primary" disabled={createM.isPending}>
+          <button type="submit" className="luxury-btn luxury-btn--primary" disabled={createM.isPending}>
             {createM.isPending ? "Salvataggio…" : "Aggiungi servizio"}
           </button>
         </form>
       </div>
 
-      <div className="velvet-surface-card velvet-salon-services-form-card velvet-salon-services-list-card">
-        <h2 className="velvet-card-title">Servizi attuali</h2>
-        {listQ.isLoading ? <p className="velvet-text-muted">Caricamento…</p> : null}
+      <div className="luxury-surface-card luxury-salon-services-form-card luxury-salon-services-list-card">
+        <h2 className="luxury-card-title">Servizi attuali</h2>
+        {listQ.isLoading ? <p className="luxury-text-muted">Caricamento…</p> : null}
         {listQ.error ? (
-          <p className="velvet-alert velvet-alert--error" role="alert">
+          <p className="luxury-alert luxury-alert--error" role="alert">
             {listQ.error instanceof Error ? listQ.error.message : "Errore"}
           </p>
         ) : null}
         {listQ.data && listQ.data.length === 0 ? (
-          <p className="velvet-text-muted velvet-salon-services-empty">
+          <p className="luxury-text-muted luxury-salon-services-empty">
             Ancora nessun servizio: aggiungine uno qui sopra così i clienti possono prenotarlo dalla tua vetrina.
           </p>
         ) : null}
         {listQ.data && listQ.data.length > 0 ? (
-          <ul className="velvet-salon-services-list">
+          <ul className="luxury-salon-services-list">
             {listQ.data.map((s) => {
               const photoObjectPos = parseObjectPosition(showcase.servicePhotoObjectPositions[s.id]);
               return (
-                <li key={s.id} className="velvet-salon-services-list__item">
-                <div className="velvet-brand-service-photo-row">
-                  <div className="velvet-brand-service-thumb">
+                <li key={s.id} className="luxury-salon-services-list__item">
+                <div className="luxury-brand-service-photo-row">
+                  <div className="luxury-brand-service-thumb">
                     {showcase.servicePhotoDataUrls[s.id] ? (
                       <img
                         src={showcase.servicePhotoDataUrls[s.id]}
@@ -572,26 +572,26 @@ export default function SalonServicesPage() {
                         style={{ objectPosition: buildObjectPosition(photoObjectPos.x, photoObjectPos.y) }}
                       />
                     ) : (
-                      <div className="velvet-brand-upload-zone velvet-salon-services-list__thumb-label">Foto</div>
+                      <div className="luxury-brand-upload-zone luxury-salon-services-list__thumb-label">Foto</div>
                     )}
                   </div>
-                  <div className="velvet-salon-services-list__body">
+                  <div className="luxury-salon-services-list__body">
                     {editingServiceId === s.id ? (
-                      <div className="velvet-salon-services-list__editor">
-                        <label className="velvet-form-label">
+                      <div className="luxury-salon-services-list__editor">
+                        <label className="luxury-form-label">
                           Nome servizio
                           <input
-                            className="velvet-soft-field"
+                            className="luxury-soft-field"
                             value={editName}
                             onChange={(e) => setEditName(e.target.value)}
                             maxLength={200}
                             autoComplete="off"
                           />
                         </label>
-                        <label className="velvet-form-label velvet-salon-services-form__label-tight">
+                        <label className="luxury-form-label luxury-salon-services-form__label-tight">
                           Costo
                           <input
-                            className="velvet-soft-field"
+                            className="luxury-soft-field"
                             value={editPriceEuro}
                             onChange={(e) => setEditPriceEuro(e.target.value)}
                             inputMode="decimal"
@@ -599,10 +599,10 @@ export default function SalonServicesPage() {
                             autoComplete="off"
                           />
                         </label>
-                        <label className="velvet-form-label velvet-salon-services-form__label-tight">
+                        <label className="luxury-form-label luxury-salon-services-form__label-tight">
                           Durata del servizio (minuti)
                           <input
-                            className="velvet-soft-field"
+                            className="luxury-soft-field"
                             type="text"
                             inputMode="numeric"
                             autoComplete="off"
@@ -611,32 +611,32 @@ export default function SalonServicesPage() {
                             onChange={(e) => setEditDurationMinutes(e.target.value)}
                           />
                         </label>
-                        <label className="velvet-form-label velvet-salon-services-form__label-tight">
+                        <label className="luxury-form-label luxury-salon-services-form__label-tight">
                           Descrizione (massimo 2000 caratteri)
                           <textarea
-                            className="velvet-soft-field velvet-salon-services-form__textarea"
+                            className="luxury-soft-field luxury-salon-services-form__textarea"
                             value={editDescription}
                             onChange={(e) => setEditDescription(e.target.value)}
                             maxLength={2000}
                             rows={4}
                           />
                         </label>
-                        <div className="velvet-form-label velvet-salon-services-form__label-tight">
+                        <div className="luxury-form-label luxury-salon-services-form__label-tight">
                           Operatori per questo servizio
                           {renderOperatorPicker(editOperatorIds, setEditOperatorIds, "edit")}
                         </div>
                         {editMsg ? (
                           <p
-                            className={`velvet-alert velvet-salon-services-form__alert ${editMsg.includes("aggiornato") ? "velvet-alert--success" : "velvet-alert--error"}`}
+                            className={`luxury-alert luxury-salon-services-form__alert ${editMsg.includes("aggiornato") ? "luxury-alert--success" : "luxury-alert--error"}`}
                             role="status"
                           >
                             {editMsg}
                           </p>
                         ) : null}
-                        <div className="velvet-salon-services-list__toolbar">
+                        <div className="luxury-salon-services-list__toolbar">
                           <button
                             type="button"
-                            className="velvet-btn velvet-btn--primary"
+                            className="luxury-btn luxury-btn--primary"
                             disabled={updateM.isPending}
                             onClick={() => updateM.mutate(s.id)}
                           >
@@ -644,7 +644,7 @@ export default function SalonServicesPage() {
                           </button>
                           <button
                             type="button"
-                            className="velvet-btn velvet-btn--secondary"
+                            className="luxury-btn luxury-btn--secondary"
                             disabled={updateM.isPending}
                             onClick={cancelServiceEdit}
                           >
@@ -654,16 +654,16 @@ export default function SalonServicesPage() {
                       </div>
                     ) : (
                       <>
-                        <div className="velvet-salon-services-list__head">
-                          <span className="velvet-salon-services-list__name">{s.name}</span>
-                          <span className="velvet-salon-services-list__meta">
+                        <div className="luxury-salon-services-list__head">
+                          <span className="luxury-salon-services-list__name">{s.name}</span>
+                          <span className="luxury-salon-services-list__meta">
                             <span>Costo {formatItPrice(s.priceCents)} €</span>
                             <span>Durata {s.durationMinutes} min</span>
                           </span>
                         </div>
-                        {s.description ? <p className="velvet-salon-services-list__desc">{s.description}</p> : null}
+                        {s.description ? <p className="luxury-salon-services-list__desc">{s.description}</p> : null}
                         {s.operatorIds?.length ? (
-                          <p className="velvet-salon-services-list__operators velvet-text-muted">
+                          <p className="luxury-salon-services-list__operators luxury-text-muted">
                             Operatori:{" "}
                             {s.operatorIds
                               .map((id) => {
@@ -673,25 +673,25 @@ export default function SalonServicesPage() {
                               .join(", ")}
                           </p>
                         ) : (
-                          <p className="velvet-salon-services-list__operators velvet-text-muted">Operatori: tutti</p>
+                          <p className="luxury-salon-services-list__operators luxury-text-muted">Operatori: tutti</p>
                         )}
                       </>
                     )}
-                    <div className="velvet-salon-services-list__toolbar">
+                    <div className="luxury-salon-services-list__toolbar">
                       {editingServiceId !== s.id ? (
                         <button
                           type="button"
-                          className="velvet-btn velvet-btn--secondary"
+                          className="luxury-btn luxury-btn--secondary"
                           onClick={() => beginServiceEdit(s)}
                         >
                           Modifica
                         </button>
                       ) : null}
-                      <label className="velvet-btn velvet-btn--secondary">
+                      <label className="luxury-btn luxury-btn--secondary">
                         <input
                           type="file"
                           accept="image/*"
-                          className="velvet-salon-services-hidden-file"
+                          className="luxury-salon-services-hidden-file"
                           disabled={!slug || isPhotoProcessing}
                           onChange={(e) => {
                             const f = e.target.files?.[0] ?? null;
@@ -702,7 +702,7 @@ export default function SalonServicesPage() {
                         Carica foto
                       </label>
                       {showcase.servicePhotoDataUrls[s.id] ? (
-                        <button type="button" className="velvet-btn velvet-btn--secondary" onClick={() => clearListServicePhoto(s.id)}>
+                        <button type="button" className="luxury-btn luxury-btn--secondary" onClick={() => clearListServicePhoto(s.id)}>
                           Rimuovi foto
                         </button>
                       ) : null}

@@ -27,23 +27,23 @@ export default function SalonLayoutCatalogPage() {
   return (
     <SalonStandardSectionGuard>
       <div>
-        <Link to="/account/salone" className="velvet-link-back">
+        <Link to="/account/salone" className="luxury-link-back">
           ← Panoramica salone
         </Link>
-        <h1 className="velvet-page-title">Catalogo layout</h1>
-        <p className="velvet-page-subtitle">
+        <h1 className="luxury-page-title">Catalogo layout</h1>
+        <p className="luxury-page-subtitle">
           Scegli uno dei 100 template Luxury (piano Premium), poi affina i token — colori, tipografia, densità, ordine blocchi — dal
           pannello impostazioni quando sarà collegato al motore tema (doc § template).
         </p>
 
         {activeId ? (
-          <p className="velvet-surface-card velvet-surface-card--plan-standard" style={{ marginTop: 0, marginBottom: "1rem", fontSize: "0.92rem", lineHeight: 1.55 }}>
+          <p className="luxury-surface-card luxury-surface-card--plan-standard" style={{ marginTop: 0, marginBottom: "1rem", fontSize: "0.92rem", lineHeight: 1.55 }}>
             <strong style={{ color: "#fffbeb" }}>Layout selezionato in questa sessione:</strong>{" "}
             {STANDARD_LAYOUT_CATALOG.find((t) => t.id === activeId)?.name ?? activeId}. L’applicazione effettiva all’interfaccia staff
-            avverrà al publish di <code className="velvet-text-muted">theme_config</code> lato backend.
+            avverrà al publish di <code className="luxury-text-muted">theme_config</code> lato backend.
           </p>
         ) : (
-          <p className="velvet-text-muted" style={{ margin: "0 0 1rem", fontSize: "0.9rem" }}>
+          <p className="luxury-text-muted" style={{ margin: "0 0 1rem", fontSize: "0.9rem" }}>
             Nessun template ancora scelto: seleziona una card per impostare la preferenza (memorizzata in sessione sul browser).
           </p>
         )}
@@ -63,7 +63,7 @@ export default function SalonLayoutCatalogPage() {
             return (
               <li
                 key={t.id}
-                className={`velvet-surface-card velvet-standard-layout-catalog-card${selected ? " velvet-standard-layout-catalog-card--active" : ""}`}
+                className={`luxury-surface-card luxury-standard-layout-catalog-card${selected ? " luxury-standard-layout-catalog-card--active" : ""}`}
                 style={{ marginTop: 0 }}
               >
                 <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
@@ -83,10 +83,10 @@ export default function SalonLayoutCatalogPage() {
                     <h2 style={{ margin: "0 0 0.35rem", fontSize: "1.08rem", color: "#fffbeb" }}>{t.name}</h2>
                   </div>
                 </div>
-                <p className="velvet-text-muted" style={{ margin: "0.65rem 0 0", fontSize: "0.88rem", lineHeight: 1.5 }}>
+                <p className="luxury-text-muted" style={{ margin: "0.65rem 0 0", fontSize: "0.88rem", lineHeight: 1.5 }}>
                   {t.description}
                 </p>
-                <ul className="velvet-text-muted" style={{ margin: "0.5rem 0 0", paddingLeft: "1.1rem", fontSize: "0.8rem", lineHeight: 1.45 }}>
+                <ul className="luxury-text-muted" style={{ margin: "0.5rem 0 0", paddingLeft: "1.1rem", fontSize: "0.8rem", lineHeight: 1.45 }}>
                   {t.tokenHighlights.map((line) => (
                     <li key={line}>{line}</li>
                   ))}
@@ -109,11 +109,11 @@ export default function SalonLayoutCatalogPage() {
                       Layout attivo (sessione)
                     </span>
                   ) : (
-                    <button type="button" className="velvet-btn velvet-btn--primary" style={{ width: "100%" }} onClick={() => selectTemplate(t.id)}>
+                    <button type="button" className="luxury-btn luxury-btn--primary" style={{ width: "100%" }} onClick={() => selectTemplate(t.id)}>
                       Usa questo layout
                     </button>
                   )}
-                  <button type="button" className="velvet-btn velvet-btn--secondary" style={{ width: "100%" }} disabled>
+                  <button type="button" className="luxury-btn luxury-btn--secondary" style={{ width: "100%" }} disabled>
                     Anteprima live (in arrivo)
                   </button>
                 </div>
@@ -122,7 +122,7 @@ export default function SalonLayoutCatalogPage() {
           })}
         </ul>
 
-        <p className="velvet-text-muted" style={{ marginTop: "1.25rem", fontSize: "0.9rem", lineHeight: 1.55 }}>
+        <p className="luxury-text-muted" style={{ marginTop: "1.25rem", fontSize: "0.9rem", lineHeight: 1.55 }}>
           In bozza potrai vedere le modifiche senza pubblicarle; al publish il backend versiona il tema e invalida la cache della configurazione
           (doc §88).
         </p>

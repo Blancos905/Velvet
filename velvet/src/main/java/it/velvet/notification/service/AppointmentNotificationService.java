@@ -68,7 +68,7 @@ public class AppointmentNotificationService {
 	/**
 	 * Prenotazione inserita dal titolare in agenda.
 	 * <ul>
-	 *   <li>Cliente senza account Velvet (walk-in / nuovo in anagrafica): solo inbox salone
+	 *   <li>Cliente senza account Saloni Luxury (walk-in / nuovo in anagrafica): solo inbox salone
 	 *       ({@link NotificationType#BOOKING_CREATED_FOR_SALON}).</li>
 	 *   <li>Cliente con account collegato: conferma e promemoria al cliente, senza duplicare l&apos;avviso salone.</li>
 	 * </ul>

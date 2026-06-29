@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +70,7 @@ class ConsumerRegistrationConflictRepairIntegrationTest {
 		ConsumerProfile pre = new ConsumerProfile(FIXED_SUB.toString(), email, "Pre");
 		pre.setPasswordHash(passwordEncoder.encode("Password1!"));
 		pre.setSecurityRoles("CLIENT");
+		pre.setEmailVerifiedAt(Instant.now());
 		consumerProfileRepository.save(pre);
 
 		Map<String, Object> payload = new LinkedHashMap<>();

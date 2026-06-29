@@ -92,54 +92,54 @@ export function AdminSuperAdminProfileSection({
 
   return (
     <section
-      className="velvet-admin-panel velvet-admin-premium-card"
+      className="luxury-admin-panel luxury-admin-premium-card"
       aria-labelledby={showSectionTitle ? headingId : undefined}
       aria-label={showSectionTitle ? undefined : "Profilo super admin"}
     >
       {showSectionTitle ? (
-        <h2 id={headingId} className="velvet-admin-section-title">
+        <h2 id={headingId} className="luxury-admin-section-title">
           Profilo super admin
         </h2>
       ) : null}
 
-      <dl className="velvet-admin-super-profile__dl" aria-label="Riepilogo account">
-        <div className="velvet-admin-super-profile__row">
+      <dl className="luxury-admin-super-profile__dl" aria-label="Riepilogo account">
+        <div className="luxury-admin-super-profile__row">
           <dt>Email</dt>
           <dd>{profile.email?.trim() ? profile.email : "—"}</dd>
         </div>
-        <div className="velvet-admin-super-profile__row">
+        <div className="luxury-admin-super-profile__row">
           <dt>Nome in evidenza</dt>
           <dd>{profile.displayName?.trim() ? profile.displayName : "—"}</dd>
         </div>
-        <div className="velvet-admin-super-profile__row">
+        <div className="luxury-admin-super-profile__row">
           <dt>Telefono</dt>
           <dd>{profile.phone?.trim() ? profile.phone : "—"}</dd>
         </div>
-        <div className="velvet-admin-super-profile__row">
+        <div className="luxury-admin-super-profile__row">
           <dt>Lingua preferita</dt>
           <dd>{profile.preferredLocale?.trim() ? profile.preferredLocale : "—"}</dd>
         </div>
-        <div className="velvet-admin-super-profile__row">
+        <div className="luxury-admin-super-profile__row">
           <dt>Ruoli</dt>
           <dd>{profile.securityRoles?.trim() ? profile.securityRoles : "—"}</dd>
         </div>
-        <div className="velvet-admin-super-profile__row">
+        <div className="luxury-admin-super-profile__row">
           <dt>Profilo su database</dt>
           <dd>{profile.persistedProfile ? "Sì" : "No (solo dati sessione / JWT)"}</dd>
         </div>
       </dl>
 
-      <div className="velvet-admin-super-profile__blocks">
-        <div className="velvet-admin-super-profile__block">
-          <h3 className="velvet-admin-super-profile__block-title">Modifica anagrafica</h3>
+      <div className="luxury-admin-super-profile__blocks">
+        <div className="luxury-admin-super-profile__block">
+          <h3 className="luxury-admin-super-profile__block-title">Modifica anagrafica</h3>
           {!profile.persistedProfile ? (
-            <p className="velvet-admin-muted" role="status">
+            <p className="luxury-admin-muted" role="status">
               Non è ancora presente il record consumer collegato: impossibile salvare da qui. Verifica il bootstrap super
               admin (credenziali DB o proprietà).
             </p>
           ) : (
-            <form className="velvet-plans-modal__form" noValidate onSubmit={submitProfile}>
-              <label className="velvet-plans-field velvet-plans-field--full" htmlFor={`${idPrefix}-dn`}>
+            <form className="luxury-plans-modal__form" noValidate onSubmit={submitProfile}>
+              <label className="luxury-plans-field luxury-plans-field--full" htmlFor={`${idPrefix}-dn`}>
                 <span>Nome in evidenza</span>
                 <input
                   id={`${idPrefix}-dn`}
@@ -149,7 +149,7 @@ export function AdminSuperAdminProfileSection({
                   autoComplete="name"
                 />
               </label>
-              <label className="velvet-plans-field velvet-plans-field--full" htmlFor={`${idPrefix}-ph`}>
+              <label className="luxury-plans-field luxury-plans-field--full" htmlFor={`${idPrefix}-ph`}>
                 <span>Telefono</span>
                 <input
                   id={`${idPrefix}-ph`}
@@ -159,7 +159,7 @@ export function AdminSuperAdminProfileSection({
                   autoComplete="tel"
                 />
               </label>
-              <label className="velvet-plans-field velvet-plans-field--full" htmlFor={`${idPrefix}-loc`}>
+              <label className="luxury-plans-field luxury-plans-field--full" htmlFor={`${idPrefix}-loc`}>
                 <span>Lingua preferita (es. it)</span>
                 <input
                   id={`${idPrefix}-loc`}
@@ -171,14 +171,14 @@ export function AdminSuperAdminProfileSection({
               </label>
               {profMsg ? (
                 <p
-                  className={`velvet-alert velvet-plans-modal__alert ${profMsg.includes("aggiornato") ? "velvet-alert--success" : "velvet-alert--error"}`}
+                  className={`luxury-alert luxury-plans-modal__alert ${profMsg.includes("aggiornato") ? "luxury-alert--success" : "luxury-alert--error"}`}
                   role={profMsg.includes("aggiornato") ? "status" : "alert"}
                 >
                   {profMsg}
                 </p>
               ) : null}
-              <div className="velvet-plans-modal__actions">
-                <button type="submit" className="velvet-plan-cta" disabled={patchM.isPending}>
+              <div className="luxury-plans-modal__actions">
+                <button type="submit" className="luxury-plan-cta" disabled={patchM.isPending}>
                   {patchM.isPending ? "Salvataggio…" : "Salva anagrafica"}
                 </button>
               </div>
@@ -186,10 +186,10 @@ export function AdminSuperAdminProfileSection({
           )}
         </div>
 
-        <div className="velvet-admin-super-profile__block">
-          <h3 className="velvet-admin-super-profile__block-title">Cambio password</h3>
-          <form className="velvet-plans-modal__form" noValidate onSubmit={submitPassword}>
-            <label className="velvet-plans-field velvet-plans-field--full" htmlFor={`${idPrefix}-cur`}>
+        <div className="luxury-admin-super-profile__block">
+          <h3 className="luxury-admin-super-profile__block-title">Cambio password</h3>
+          <form className="luxury-plans-modal__form" noValidate onSubmit={submitPassword}>
+            <label className="luxury-plans-field luxury-plans-field--full" htmlFor={`${idPrefix}-cur`}>
               <span>Password attuale</span>
               <input
                 id={`${idPrefix}-cur`}
@@ -199,7 +199,7 @@ export function AdminSuperAdminProfileSection({
                 autoComplete="current-password"
               />
             </label>
-            <label className="velvet-plans-field velvet-plans-field--full" htmlFor={`${idPrefix}-np`}>
+            <label className="luxury-plans-field luxury-plans-field--full" htmlFor={`${idPrefix}-np`}>
               <span>Nuova password (min. 8 caratteri)</span>
               <input
                 id={`${idPrefix}-np`}
@@ -210,7 +210,7 @@ export function AdminSuperAdminProfileSection({
                 minLength={8}
               />
             </label>
-            <label className="velvet-plans-field velvet-plans-field--full" htmlFor={`${idPrefix}-cf`}>
+            <label className="luxury-plans-field luxury-plans-field--full" htmlFor={`${idPrefix}-cf`}>
               <span>Conferma nuova password</span>
               <input
                 id={`${idPrefix}-cf`}
@@ -223,14 +223,14 @@ export function AdminSuperAdminProfileSection({
             </label>
             {pwdMsg ? (
               <p
-                className={`velvet-alert velvet-plans-modal__alert ${pwdMsg.includes("aggiornata") ? "velvet-alert--success" : "velvet-alert--error"}`}
+                className={`luxury-alert luxury-plans-modal__alert ${pwdMsg.includes("aggiornata") ? "luxury-alert--success" : "luxury-alert--error"}`}
                 role={pwdMsg.includes("aggiornata") ? "status" : "alert"}
               >
                 {pwdMsg}
               </p>
             ) : null}
-            <div className="velvet-plans-modal__actions">
-              <button type="submit" className="velvet-plan-cta" disabled={pwdM.isPending}>
+            <div className="luxury-plans-modal__actions">
+              <button type="submit" className="luxury-plan-cta" disabled={pwdM.isPending}>
                 {pwdM.isPending ? "Aggiornamento…" : "Aggiorna password"}
               </button>
             </div>

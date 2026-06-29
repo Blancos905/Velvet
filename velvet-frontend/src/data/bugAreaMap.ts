@@ -96,7 +96,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
     surfaces: ["/"],
     aliases: ["home", "landing", "homepage"],
     example: "@home c'è un bug, controlla",
-    frontend: ["velvet-frontend/src/pages/HomePage.tsx", "velvet-frontend/src/styles/velvet-home.css"],
+    frontend: ["velvet-frontend/src/pages/HomePage.tsx", "velvet-frontend/src/styles/luxury-home.css"],
     backend: [],
     tests: ["cd velvet-frontend && npm run build"],
   },
@@ -133,7 +133,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
     example: "@ricerca c'è un bug, controlla",
     frontend: [
       "velvet-frontend/src/pages/SearchPage.tsx",
-      "velvet-frontend/src/styles/velvet-search-page.css",
+      "velvet-frontend/src/styles/luxury-search-page.css",
       "velvet-frontend/src/components/SearchHitLogoAvatar.tsx",
     ],
     backend: [
@@ -401,11 +401,11 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
     aliases: ["chat", "messaggi salone", "inbox chat"],
     example: "@chat c'è un bug, controlla",
     frontend: [
-      "velvet-frontend/src/pages/account/SalonVelvetChatPage.tsx",
+      "velvet-frontend/src/pages/account/SalonLuxuryChatPage.tsx",
       "velvet-frontend/src/hooks/useMeSalonChatUnread.ts",
       "velvet-frontend/src/lib/salonChatInbox404.ts",
     ],
-    backend: ["velvet/src/main/java/it/velvet/consumer/service/SalonVelvetChatService.java"],
+    backend: ["velvet/src/main/java/it/velvet/consumer/service/SalonLuxuryChatService.java"],
     tests: ["cd velvet && ./mvnw -q test -Dtest=MeSalonClientsControllerTest"],
   },
   {

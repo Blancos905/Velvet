@@ -17,8 +17,10 @@ velvet/src/main/resources/application-local.properties
 
 # IDE / OS
 .DS_Store
+._*
 .idea/
 *.iml
 .cursor/
 scripts/.seed-tmp/
+.npm-cache-codegraph/
 

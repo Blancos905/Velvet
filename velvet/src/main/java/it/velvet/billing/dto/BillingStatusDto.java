@@ -9,5 +9,10 @@ public record BillingStatusDto(
 		Instant currentPeriodEnd,
 		boolean cancelAtPeriodEnd,
 		boolean premiumAccess,
-		boolean billingProfileComplete) {
+		boolean billingProfileComplete,
+		Instant subscriptionCancelRequestedAt,
+		Instant accountDeletionScheduledAt,
+		Instant promotionalTrialEndsAt,
+		boolean promotionalTrialActive,
+		boolean subscriptionActivationRequired) {
 }

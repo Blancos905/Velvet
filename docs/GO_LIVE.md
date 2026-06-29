@@ -30,6 +30,20 @@ Combinare con l’audit tecnico:
 
 **URL per store:** vedi `src/content/velvetLegalPanelPaths.ts` e hub `/legale`.
 
+### Checklist legale penale-first (post-audit giugno 2026)
+
+| Priorità | Voce | Stato | Azione |
+|----------|------|-------|--------|
+| 🔴 Bloccante | Dati societari reali (`VITE_COMPANY_*`, P.IVA, sede) | Placeholder | Valorizzare `.env.production` prima di raccogliere dati |
+| 🔴 Bloccante | DPA Art. 28 firmati con saloni partner | Fuori repo | Template + accettazione click-wrap o contratto |
+| 🔴 Alta | RoPA + DPIA | Organizzativo | Redazione con consulente (non sostituibile da LegalBlink generico) |
+| 🟠 Media | Registro consensi cookie server-side | **Implementato** | Tabella `cookie_consent_events` + `POST /api/v1/public/cookie-consent`; applicare SQL in `velvet/deploy/sql/add_cookie_consent_events_*.sql` su DB prod |
+| 🟠 Media | Piano incident response (art. 167-bis) | Da documentare | Procedura breach + notifica Garante/interessati |
+| 🟠 Media | Play / App Store Data Safety ↔ privacy | Manuale | Allineare dopo build finale |
+| 🟢 OK | Export/cancellazione account, gate cookie, informative layered | In codice | Verificare con `./velvet-audit.sh` |
+
+**LegalBlink:** non adottare come sostituto delle informative custom; eventuale audit esterno una tantum sì.
+
 ### Aruba — tre credenziali diverse (non confondere la Gmail)
 
 | Contesto | Username | Password |
@@ -94,3 +108,4 @@ Certificati TLS in `nginx/certs/`. Non committare `.env` né certificati.
 - [ ] `./velvet-audit.sh` exit 0
 - [ ] `./go-live-check.sh` exit 0 (o solo WARN accettati)
 - [ ] Play Console / App Store Connect allineati alle informative pubblicate
+- [ ] Note reviewer: `docs/APP_STORE_REVIEW_NOTES.md`

@@ -56,6 +56,7 @@ void main() {
       expect(VelvetFreePlanPolicy.isPathAllowed('/account/salone/brand'), isFalse);
       expect(VelvetFreePlanPolicy.isPathAllowed('/account/chat'), isFalse);
       expect(VelvetFreePlanPolicy.isPathAllowed('/admin/dashboard'), isFalse);
+      expect(VelvetFreePlanPolicy.isPathAllowed('/account/billing/checkout'), isFalse);
     });
   });
 }

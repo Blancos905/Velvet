@@ -1,7 +1,7 @@
-/** Classi NavLink coerenti con `velvet-account-hub`. */
+/** Classi NavLink coerenti con `luxury-account-hub`. */
 export function accountHubNavBtn(extraClass = "") {
   return ({ isActive }: { isActive: boolean }) =>
-    "velvet-account-hub__btn" +
-    (isActive ? " velvet-account-hub__btn--active" : "") +
+    "luxury-account-hub__btn" +
+    (isActive ? " luxury-account-hub__btn--active" : "") +
     (extraClass ? ` ${extraClass}` : "");
 }

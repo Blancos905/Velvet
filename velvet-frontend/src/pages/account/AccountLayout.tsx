@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { apiJson } from "../../api/client";
 import type { OrganizationDetail, SalonCatalogClientRow, SalonClientMembershipDto } from "../../api/types";
 import { useOptionalAdminAuth } from "../../auth/AdminAuthProvider";
@@ -33,7 +33,6 @@ import { nativeAccountOverlayTitle } from "../../lib/nativeAccountOverlayTitle";
 import {
   isNativeAccountHubPath,
   nativeAccountHubFallbackPath,
-  normalizeAccountPath,
 } from "../../lib/nativeAccountHubPaths";
 import { readSalonClientsNavDebugEnabled } from "../../lib/salonClientsNavDebug";
 import { subscribeSalonCatalogClientsInvalidate } from "../../lib/salonCatalogClientsSync";
@@ -372,7 +371,7 @@ export function AccountLayout() {
     const body = `${qty} nel centro notifiche del salone.`;
     const browserNotification = new Notification(title, {
       body,
-      tag: "velvet-salon-notifications",
+      tag: "luxury-salon-notifications",
     });
     browserNotification.onclick = (event) => {
       event?.preventDefault?.();
@@ -397,7 +396,7 @@ export function AccountLayout() {
     const body = `${qty} nel tuo centro notifiche.`;
     const browserNotification = new Notification(title, {
       body,
-      tag: "velvet-consumer-notifications",
+      tag: "luxury-consumer-notifications",
     });
     browserNotification.onclick = (event) => {
       event?.preventDefault?.();
@@ -470,8 +469,8 @@ export function AccountLayout() {
   const isNativeHubScreen =
     isNativeApp && isNativeAccountHubPath(location.pathname, { isSalonTitolare, isSalonStaff });
   const accountHubClassName = [
-    accountHubUsesVelvetPlansTheme ? "velvet-account-hub velvet-account-hub--velvet-plans" : "velvet-account-hub",
-    isNativeHubScreen ? "velvet-account-hub--native-hub" : null,
+    accountHubUsesVelvetPlansTheme ? "luxury-account-hub luxury-account-hub--luxury-plans" : "luxury-account-hub",
+    isNativeHubScreen ? "luxury-account-hub--native-hub" : null,
   ]
     .filter(Boolean)
     .join(" ");
@@ -492,7 +491,7 @@ export function AccountLayout() {
 
   if (embedded) {
     return (
-      <div className="velvet-account-hub velvet-account-hub--embedded" aria-label="Pannello account incorporato">
+      <div className="luxury-account-hub luxury-account-hub--embedded" aria-label="Pannello account incorporato">
         <AccountOutletSuspense>
           <Outlet />
         </AccountOutletSuspense>
@@ -505,14 +504,18 @@ export function AccountLayout() {
     (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
   );
 
+  if (isNativeApp && isBillingCheckoutRoute) {
+    return <Navigate to="/account/salone" replace />;
+  }
+
   const blockFreeOwnerWebPanel =
     isSalonTitolare && !isNativeApp && !isSuperAdminViewingAsSalonOwner && !isBillingCheckoutRoute;
   if (blockFreeOwnerWebPanel) {
     if (meSalon.isPending) {
       return (
-        <main className="velvet-auth-page">
-          <div className="velvet-auth-card">
-            <p className="velvet-auth-loading">Caricamento account salone…</p>
+        <main className="luxury-auth-page">
+          <div className="luxury-auth-card">
+            <p className="luxury-auth-loading">Caricamento account salone…</p>
           </div>
         </main>
       );
@@ -541,7 +544,7 @@ export function AccountLayout() {
   if (isBillingCheckoutRoute && !isNativeApp) {
     return (
       <AccountNavigationTransitionProvider>
-        <main className="velvet-auth-page velvet-billing-flow-standalone" aria-label="Checkout Premium">
+        <main className="luxury-auth-page luxury-billing-flow-standalone" aria-label="Checkout Premium">
           <AccountOutletRegion variant="embedded">
             <Outlet />
           </AccountOutletRegion>
@@ -553,31 +556,31 @@ export function AccountLayout() {
   return (
     <AccountNavigationTransitionProvider>
     <div className={accountHubClassName} aria-label="Area account Luxury">
-      <div className="velvet-account-hub__masthead">
-        <div className="velvet-account-hub__masthead-inner">
-          <div className="velvet-account-hub__top">
+      <div className="luxury-account-hub__masthead">
+        <div className="luxury-account-hub__masthead-inner">
+          <div className="luxury-account-hub__top">
             {isSalonStaff ? (
-              <span className="velvet-account-hub__plan velvet-account-hub__plan--staff">Staff salone</span>
+              <span className="luxury-account-hub__plan luxury-account-hub__plan--staff">Staff salone</span>
             ) : isSalonTitolare ? (
-              <span className="velvet-account-hub__plan">{salonPlanBadgeLabel}</span>
+              <span className="luxury-account-hub__plan">{salonPlanBadgeLabel}</span>
             ) : isVelvetSuperAdmin ? (
-              <span className="velvet-account-hub__plan velvet-account-hub__plan--admin">Amministratore</span>
+              <span className="luxury-account-hub__plan luxury-account-hub__plan--admin">Amministratore</span>
             ) : (
-              <span className="velvet-account-hub__plan velvet-account-hub__plan--client">Account cliente</span>
+              <span className="luxury-account-hub__plan luxury-account-hub__plan--client">Account cliente</span>
             )}
           </div>
 
-          <header className="velvet-account-hub__welcome">
-            <div className="velvet-account-hub__mark-wrap">
+          <header className="luxury-account-hub__welcome">
+            <div className="luxury-account-hub__mark-wrap">
               <SaloniLuxuryLogoMark variant="default" />
             </div>
-            <div className="velvet-account-hub__welcome-copy">
-              <p className="velvet-account-hub__welcome-line">Benvenuto in Saloni Luxury</p>
+            <div className="luxury-account-hub__welcome-copy">
+              <p className="luxury-account-hub__welcome-line">Benvenuto in Saloni Luxury</p>
               {isSalonStaff ? (
                 <>
-                  <p className="velvet-account-hub__reg">Accesso operatore</p>
+                  <p className="luxury-account-hub__reg">Accesso operatore</p>
                   <p
-                    className="velvet-account-hub__welcome-line"
+                    className="luxury-account-hub__welcome-line"
                     style={{ fontSize: "1.05rem", fontWeight: 600, marginTop: "0.2rem", letterSpacing: "0.01em" }}
                   >
                     {staffSalon.isPending ? (
@@ -592,7 +595,7 @@ export function AccountLayout() {
                       <span style={{ fontWeight: 500, opacity: 0.88 }}>Salone non collegato al profilo</span>
                     )}
                   </p>
-                  <p className="velvet-account-hub__greeting">
+                  <p className="luxury-account-hub__greeting">
                     {consumerGreeting ? (
                       <>
                         Ciao <strong>{consumerGreeting}</strong>
@@ -604,22 +607,22 @@ export function AccountLayout() {
                 </>
               ) : isSalonTitolare ? (
                 <>
-                  <p className="velvet-account-hub__reg">Il tuo salone</p>
+                  <p className="luxury-account-hub__reg">Il tuo salone</p>
                   {titolareSalonGreeting.hasNamedSalon ? (
-                    <p className="velvet-account-hub__greeting">
+                    <p className="luxury-account-hub__greeting">
                       <strong>{titolareSalonGreeting.salonName}</strong>
                     </p>
                   ) : "salonHint" in titolareSalonGreeting && titolareSalonGreeting.salonHint === "pending" ? (
-                    <p className="velvet-text-muted" style={{ marginTop: "0.2rem", fontSize: "0.88rem" }}>
+                    <p className="luxury-text-muted" style={{ marginTop: "0.2rem", fontSize: "0.88rem" }}>
                       Caricamento nome commerciale…
                     </p>
                   ) : (
-                    <p className="velvet-text-muted" style={{ marginTop: "0.2rem", fontSize: "0.88rem" }}>
+                    <p className="luxury-text-muted" style={{ marginTop: "0.2rem", fontSize: "0.88rem" }}>
                       Completa i dati pubblicati da «Il mio salone» quando sei pronto.
                     </p>
                   )}
                   {"salonHint" in titolareSalonGreeting && titolareSalonGreeting.salonHint === "error" ? (
-                    <p className="velvet-account-hub__welcome-line" style={{ fontSize: "0.88rem", opacity: 0.85, marginTop: "0.35rem" }}>
+                    <p className="luxury-account-hub__welcome-line" style={{ fontSize: "0.88rem", opacity: 0.85, marginTop: "0.35rem" }}>
                       {meSalonForbidden ? (
                         <>
                           Accesso negato su <code>/api/v1/me/salon</code> (403): il token attuale non ha ruolo titolare
@@ -636,7 +639,7 @@ export function AccountLayout() {
                     </p>
                   ) : null}
                   {"salonHint" in titolareSalonGreeting && titolareSalonGreeting.salonHint === "not_provisioned" ? (
-                    <p className="velvet-account-hub__welcome-line" style={{ fontSize: "0.88rem", opacity: 0.85, marginTop: "0.35rem" }}>
+                    <p className="luxury-account-hub__welcome-line" style={{ fontSize: "0.88rem", opacity: 0.85, marginTop: "0.35rem" }}>
                       Il database non ha un salone collegato a questo account (email di login ≠ <code>owner_email</code> oppure
                       registrazione <code>/piani</code> non ha creato la riga). Verifica email di login e che la registrazione sia
                       completata; con dati di test vecchi può servire riallineare il profilo titolare o creare un nuovo utente.
@@ -645,9 +648,9 @@ export function AccountLayout() {
                 </>
               ) : isVelvetSuperAdmin ? (
                 <>
-                  <p className="velvet-account-hub__welcome-line">Area account</p>
-                  <p className="velvet-account-hub__reg">Super admin Saloni Luxury</p>
-                  <p className="velvet-account-hub__greeting">
+                  <p className="luxury-account-hub__welcome-line">Area account</p>
+                  <p className="luxury-account-hub__reg">Super admin Saloni Luxury</p>
+                  <p className="luxury-account-hub__greeting">
                     {consumerGreeting ? (
                       <>
                         Ciao <strong>{consumerGreeting}</strong>
@@ -656,14 +659,14 @@ export function AccountLayout() {
                       "Ciao"
                     )}
                   </p>
-                  <p className="velvet-account-hub__super-admin-lead">
+                  <p className="luxury-account-hub__super-admin-lead">
                     Il lavoro quotidiano avviene nel <strong>pannello di gestione</strong> (metriche, utenti, stato
                     piattaforma). Qui sotto trovi l&apos;accesso rapido e, se serve, email e password in «Profilo e
                     sicurezza».
                   </p>
                 </>
               ) : (
-                <p className="velvet-account-hub__greeting">
+                <p className="luxury-account-hub__greeting">
                   {consumerGreeting ? (
                     <>
                       Ciao <strong>{consumerGreeting}</strong>
@@ -678,16 +681,16 @@ export function AccountLayout() {
         </div>
       </div>
 
-      <nav className="velvet-account-hub__nav velvet-account-hub__nav--deck" aria-label="Navigazione area account">
+      <nav className="luxury-account-hub__nav luxury-account-hub__nav--deck" aria-label="Navigazione area account">
         {isSuperAdminViewingAsSalonOwner ? (
           <>
-            <span className="velvet-account-hub__nav-label">Super admin</span>
-            <div className="velvet-account-hub__nav-scroll">
+            <span className="luxury-account-hub__nav-label">Super admin</span>
+            <div className="luxury-account-hub__nav-scroll">
               <AccountHubNavLink
                 to="/admin/dashboard"
                 className={({ isActive }) =>
-                  "velvet-account-hub__btn velvet-account-hub__btn--admin" +
-                  (isActive ? " velvet-account-hub__btn--active" : "")
+                  "luxury-account-hub__btn luxury-account-hub__btn--admin" +
+                  (isActive ? " luxury-account-hub__btn--active" : "")
                 }
               >
                 Torna al pannello super admin
@@ -697,13 +700,13 @@ export function AccountLayout() {
         ) : null}
         {isVelvetSuperAdmin ? (
           <>
-            <span className="velvet-account-hub__nav-label">Super admin</span>
-            <div className="velvet-account-hub__nav-scroll">
+            <span className="luxury-account-hub__nav-label">Super admin</span>
+            <div className="luxury-account-hub__nav-scroll">
               <AccountHubNavLink
                 to="/admin/dashboard"
                 className={({ isActive }) =>
-                  "velvet-account-hub__btn velvet-account-hub__btn--admin" +
-                  (isActive ? " velvet-account-hub__btn--active" : "")
+                  "luxury-account-hub__btn luxury-account-hub__btn--admin" +
+                  (isActive ? " luxury-account-hub__btn--active" : "")
                 }
               >
                 Pannello di gestione
@@ -714,7 +717,7 @@ export function AccountLayout() {
               <AccountHubNavLink to="/account/notifiche" className={navBtn()}>
                 Notifiche
               </AccountHubNavLink>
-              <AccountHubNavLink to="/" className={navBtn("velvet-account-hub__btn--ghost")}>
+              <AccountHubNavLink to="/" className={navBtn("luxury-account-hub__btn--ghost")}>
                 Sito pubblico
               </AccountHubNavLink>
               <AccountHubNavLink to="/account/info-privacy" className={navBtn()} title="Informazioni sul trattamento dati e privacy.">
@@ -728,21 +731,21 @@ export function AccountLayout() {
         ) : null}
         {!isVelvetSuperAdmin && isSalonStaff ? (
           <>
-            <span className="velvet-account-hub__nav-label" title="Salone per cui lavori come operatore">
+            <span className="luxury-account-hub__nav-label" title="Salone per cui lavori come operatore">
               {staffSalonMenuLabel}
             </span>
-            <div className="velvet-account-hub__nav-scroll velvet-account-hub__nav-scroll--consumer-grid">
-              <AccountHubNavLink to="/account/staff" end className={navBtn("velvet-account-hub__btn--sky")}>
+            <div className="luxury-account-hub__nav-scroll luxury-account-hub__nav-scroll--consumer-grid">
+              <AccountHubNavLink to="/account/staff" end className={navBtn("luxury-account-hub__btn--sky")}>
                 La mia agenda
               </AccountHubNavLink>
               <AccountHubNavLink to="/account/profilo" className={navBtn()}>
                 Profilo
               </AccountHubNavLink>
               <AccountHubNavLink to="/account/feedback-velvet" className={navBtn()}>
-                <span className="velvet-account-hub__btn-notif">
+                <span className="luxury-account-hub__btn-notif">
                   Recensioni
                   {showSalonReviewsNavPill ? (
-                    <span className="velvet-account-hub__notif-pill" title="Nuove recensioni da consultare">
+                    <span className="luxury-account-hub__notif-pill" title="Nuove recensioni da consultare">
                       {salonReviewUnreadCount > 99 ? "99+" : salonReviewUnreadCount}
                     </span>
                   ) : null}
@@ -752,11 +755,11 @@ export function AccountLayout() {
                 Info e privacy
               </AccountHubNavLink>
               <AccountHubNavLink to="/account/notifiche" className={navBtn()}>
-                <span className="velvet-account-hub__btn-notif">
+                <span className="luxury-account-hub__btn-notif">
                   Notifiche
                   {showSalonNotificheNavPill ? (
                     <span
-                      className="velvet-account-hub__notif-pill"
+                      className="luxury-account-hub__notif-pill"
                       title={`Da gestire in notifiche: ${notifInboxAttentionTotal} (in coda + inviate in evidenza)`}
                     >
                       {notifInboxAttentionTotal > 99 ? "99+" : notifInboxAttentionTotal}
@@ -770,11 +773,11 @@ export function AccountLayout() {
                   className={navBtn()}
                   title="Elenco clienti della tua sede; da ogni scheda apri la chat Luxury."
                 >
-                  <span className="velvet-account-hub__btn-notif">
+                  <span className="luxury-account-hub__btn-notif">
                     Clienti
                     {showStaffSalonClientsNavPill ? (
                       <span
-                        className="velvet-account-hub__notif-pill"
+                        className="luxury-account-hub__notif-pill"
                         title={`Nuovi clienti da vedere: ${staffSalonClientsNavBadge}`}
                       >
                         {staffSalonClientsNavBadge > 99 ? "99+" : staffSalonClientsNavBadge}
@@ -788,10 +791,10 @@ export function AccountLayout() {
                 className={navBtn()}
                 title="Messaggi con i clienti della sede (con piano Premium dello studio vedi le conversazioni; altrimenti una breve spiegazione in pagina)."
               >
-                <span className="velvet-account-hub__btn-notif">
+                <span className="luxury-account-hub__btn-notif">
                   Chat
                   {showStaffChatNavPill ? (
-                    <span className="velvet-account-hub__notif-pill" title={`Messaggi dai clienti: ${ownerChatUnread}`}>
+                    <span className="luxury-account-hub__notif-pill" title={`Messaggi dai clienti: ${ownerChatUnread}`}>
                       {ownerChatUnread > 99 ? "99+" : ownerChatUnread}
                     </span>
                   ) : null}
@@ -804,7 +807,7 @@ export function AccountLayout() {
           </>
         ) : null}
         {!isVelvetSuperAdmin && !isSalonStaff && isSalonTitolare && showPremiumSalonNav ? (
-          <span className="velvet-account-hub__nav-label">
+          <span className="luxury-account-hub__nav-label">
             {titolareSalonGreeting.hasNamedSalon ? titolareSalonGreeting.salonName : "Il tuo salone"}
           </span>
         ) : null}
@@ -835,7 +838,7 @@ export function AccountLayout() {
         ) : null}
       </nav>
 
-      <div id="velvet-account-hub-body" ref={hubBodyRef} className="velvet-account-hub__body">
+      <div id="luxury-account-hub-body" ref={hubBodyRef} className="luxury-account-hub__body">
         <AccountOutletRegion>
           <Outlet />
         </AccountOutletRegion>
@@ -845,7 +848,7 @@ export function AccountLayout() {
         <div
           role="status"
           aria-label="Debug badge clienti"
-          className="velvet-debug-salon-clienti-nav"
+          className="luxury-debug-salon-clienti-nav"
           style={{
             position: "fixed",
             bottom: "0.75rem",

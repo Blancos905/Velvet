@@ -42,6 +42,7 @@ public class StripeWebhookProcessor {
 	private final StripeWebhookEventRepository webhookEventRepository;
 	private final StripeSubscriptionSyncService subscriptionSyncService;
 	private final SalonBillingNotificationService billingNotificationService;
+	private final FatturaPaInvoiceService fatturaPaInvoiceService;
 	private final SecurityAuditService securityAuditService;
 	private final com.stripe.StripeClient stripeClient;
 
@@ -49,11 +50,13 @@ public class StripeWebhookProcessor {
 			StripeWebhookEventRepository webhookEventRepository,
 			StripeSubscriptionSyncService subscriptionSyncService,
 			SalonBillingNotificationService billingNotificationService,
+			FatturaPaInvoiceService fatturaPaInvoiceService,
 			SecurityAuditService securityAuditService,
 			com.stripe.StripeClient stripeClient) {
 		this.webhookEventRepository = webhookEventRepository;
 		this.subscriptionSyncService = subscriptionSyncService;
 		this.billingNotificationService = billingNotificationService;
+		this.fatturaPaInvoiceService = fatturaPaInvoiceService;
 		this.securityAuditService = securityAuditService;
 		this.stripeClient = stripeClient;
 	}
@@ -143,6 +146,8 @@ public class StripeWebhookProcessor {
 		subscriptionSyncService.syncFromSubscriptionId(subscriptionId, null);
 		if ("invoice.paid".equals(event.getType())) {
 			billingNotificationService.onInvoicePaid(invoice, subscriptionId);
+			billingNotificationService.findStudioGroupIdForSubscription(subscriptionId)
+					.ifPresent(studioGroupId -> fatturaPaInvoiceService.issueFromStripeInvoice(invoice, studioGroupId));
 		}
 		return billingNotificationService.findStudioGroupIdForSubscription(subscriptionId).orElse(null);
 	}

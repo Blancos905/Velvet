@@ -3,8 +3,8 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { useVelvetAuth } from "../../../auth/VelvetAuthProvider";
 import { useSalonStaffList } from "../../../hooks/useSalonStaffList";
 import { SalonAgendaBoard } from "../SalonAgendaBoard";
-import "../../../styles/velvet-account-salon-staff.css";
-import "../../../styles/velvet-salon-staff-agenda-page.css";
+import "../../../styles/luxury-account-salon-staff.css";
+import "../../../styles/luxury-salon-staff-agenda-page.css";
 
 export default function SalonStaffAgendaPage() {
   const { staffId } = useParams<{ staffId: string }>();
@@ -26,19 +26,19 @@ export default function SalonStaffAgendaPage() {
 
   if (staffQuery.isPending) {
     return (
-      <div className="velvet-salon-staff-page velvet-salon-staff-page--agenda-wide velvet-salon-staff-agenda-page">
-        <p className="velvet-text-muted">Caricamento…</p>
+      <div className="luxury-salon-staff-page luxury-salon-staff-page--agenda-wide luxury-salon-staff-agenda-page">
+        <p className="luxury-text-muted">Caricamento…</p>
       </div>
     );
   }
 
   if (staffQuery.isError) {
     return (
-      <div className="velvet-salon-staff-page velvet-salon-staff-page--agenda-wide velvet-salon-staff-agenda-page">
-        <Link to="/account/prenotazioni" className="velvet-link-back">
+      <div className="luxury-salon-staff-page luxury-salon-staff-page--agenda-wide luxury-salon-staff-agenda-page">
+        <Link to="/account/prenotazioni" className="luxury-link-back">
           ← Agenda
         </Link>
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           Non siamo riusciti a verificare lo staff del salone.
         </p>
       </div>
@@ -52,25 +52,25 @@ export default function SalonStaffAgendaPage() {
   const displayName = member ? `${member.firstName} ${member.lastName}`.trim() : "Staff";
 
   return (
-    <div className="velvet-salon-staff-page velvet-salon-staff-page--agenda-wide velvet-salon-staff-agenda-page">
-      <Link to="/account/prenotazioni" className="velvet-link-back">
+    <div className="luxury-salon-staff-page luxury-salon-staff-page--agenda-wide luxury-salon-staff-agenda-page">
+      <Link to="/account/prenotazioni" className="luxury-link-back">
         ← Agenda
       </Link>
-      <header className="velvet-salon-staff-agenda-page__hero">
-        <div className="velvet-salon-staff-agenda-page__hero-glow" aria-hidden />
-        <div className="velvet-salon-staff-agenda-page__hero-inner">
-          <h1 className="velvet-page-title">
-            <span className="velvet-salon-staff-agenda-page__title-label">Agenda</span>
-            <span className="velvet-salon-staff-agenda-page__title-dot" aria-hidden="true">
+      <header className="luxury-salon-staff-agenda-page__hero">
+        <div className="luxury-salon-staff-agenda-page__hero-glow" aria-hidden />
+        <div className="luxury-salon-staff-agenda-page__hero-inner">
+          <h1 className="luxury-page-title">
+            <span className="luxury-salon-staff-agenda-page__title-label">Agenda</span>
+            <span className="luxury-salon-staff-agenda-page__title-dot" aria-hidden="true">
               ·
             </span>
-            <span className="velvet-salon-staff-agenda-page__title-accent">{displayName}</span>
+            <span className="luxury-salon-staff-agenda-page__title-accent">{displayName}</span>
           </h1>
-          <p className="velvet-page-subtitle">Appuntamenti della settimana per questo operatore.</p>
+          <p className="luxury-page-subtitle">Appuntamenti della settimana per questo operatore.</p>
         </div>
       </header>
-      <p className="velvet-salon-staff-agenda-page__manage-row">
-        <Link to="/account/salone/staff" className="velvet-salon-staff-agenda-page__manage-link">
+      <p className="luxury-salon-staff-agenda-page__manage-row">
+        <Link to="/account/salone/staff" className="luxury-salon-staff-agenda-page__manage-link">
           Gestione staff
         </Link>
       </p>

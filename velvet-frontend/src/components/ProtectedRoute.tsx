@@ -11,9 +11,13 @@ import {
 } from "../lib/postLoginReturnPath";
 import {
   isPremiumSalonRegistrationPending,
+  loginReturnPathForSalonRegistration,
   PREMIUM_SALON_POST_LOGIN_PATH,
   readIntendedSalonPlanFromSession,
 } from "../lib/salonRegistrationPostLogin";
+import { isSalonPremiumCheckoutRequired, shouldOfferSalonPremiumCheckout } from "../lib/salonPremiumCheckoutPolicy";
+import { useSalonPremiumCheckoutPolicyQuery } from "../hooks/useSalonPremiumCheckoutPolicy";
+import { useBillingStatusQuery } from "../hooks/useSalonFeaturePlanTier";
 import { humanizePostRegistrationAuthError } from "../utils/oidcErrors";
 import { velvetJwtHintsFromAccessToken } from "../lib/velvetJwtHintsFromAccessToken";
 import { hasPendingBooking } from "./PendingBookingResume";
@@ -24,11 +28,11 @@ import {
   VELVET_SESSION_ENDED_EVENT,
 } from "../lib/velvetLoginFormReset";
 
-function shouldSwitchAwayFromSuperAdminSession(): boolean {
+function shouldSwitchAwayFromSuperAdminSession(premiumCheckoutRequired: boolean): boolean {
   if (typeof sessionStorage === "undefined") return false;
   const pendingReturn = sessionStorage.getItem(VELVET_POST_LOGIN_RETURN_KEY);
-  if (pendingReturn === PREMIUM_SALON_POST_LOGIN_PATH) return true;
-  return isPremiumSalonRegistrationPending();
+  if (pendingReturn === PREMIUM_SALON_POST_LOGIN_PATH && premiumCheckoutRequired) return true;
+  return isPremiumSalonRegistrationPending() && premiumCheckoutRequired;
 }
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -45,6 +49,13 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [loginFormKey, setLoginFormKey] = useState(0);
+  const checkoutPolicy = useSalonPremiumCheckoutPolicyQuery();
+  const premiumCheckoutRequired = isSalonPremiumCheckoutRequired(checkoutPolicy.data);
+  const billingStatus = useBillingStatusQuery();
+  const checkoutAvailable = shouldOfferSalonPremiumCheckout(
+    premiumCheckoutRequired,
+    billingStatus.data,
+  );
   const switchingSessionRef = useRef(false);
   const wasAuthenticatedRef = useRef(false);
 
@@ -86,7 +97,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (isLoading || !isAuthenticated || !isVelvetSuperAdmin) return;
-    if (!shouldSwitchAwayFromSuperAdminSession()) {
+    if (!shouldSwitchAwayFromSuperAdminSession(premiumCheckoutRequired)) {
       navigate("/admin/dashboard", { replace: true });
       return;
     }
@@ -95,33 +106,42 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     void signOutForAccountSwitch().finally(() => {
       switchingSessionRef.current = false;
     });
-  }, [isAuthenticated, isLoading, isVelvetSuperAdmin, navigate, signOutForAccountSwitch]);
+  }, [isAuthenticated, isLoading, isVelvetSuperAdmin, navigate, signOutForAccountSwitch, premiumCheckoutRequired]);
 
   useEffect(() => {
     if (isLoading || !isAuthenticated || isVelvetSuperAdmin || !isSalonTitolare) return;
     const path = location.pathname.replace(/\/+$/, "") || "/";
     if (path === PREMIUM_SALON_POST_LOGIN_PATH || path === "/account/billing/success") return;
+    if (!checkoutAvailable) return;
     const ret = sessionStorage.getItem(VELVET_POST_LOGIN_RETURN_KEY);
     if (ret === PREMIUM_SALON_POST_LOGIN_PATH) {
       navigate(PREMIUM_SALON_POST_LOGIN_PATH, { replace: true });
     }
-  }, [isAuthenticated, isLoading, isSalonTitolare, isVelvetSuperAdmin, location.pathname, navigate]);
+  }, [
+    checkoutAvailable,
+    isAuthenticated,
+    isLoading,
+    isSalonTitolare,
+    isVelvetSuperAdmin,
+    location.pathname,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (isLoading || isAuthenticated) return;
     const intendedPlan = readIntendedSalonPlanFromSession();
     if (intendedPlan === "PREMIUM") {
-      setPostLoginReturnPath(PREMIUM_SALON_POST_LOGIN_PATH);
+      setPostLoginReturnPath(loginReturnPathForSalonRegistration(intendedPlan, premiumCheckoutRequired));
       return;
     }
     setPostLoginReturnPath(`${location.pathname}${location.search}`);
-  }, [isAuthenticated, isLoading, location.pathname, location.search]);
+  }, [isAuthenticated, isLoading, location.pathname, location.search, premiumCheckoutRequired]);
 
   if (isLoading) {
     return (
-      <main className="velvet-auth-page">
-        <div className="velvet-auth-card">
-          <p className="velvet-auth-loading">Accesso in corso…</p>
+      <main className="luxury-auth-page">
+        <div className="luxury-auth-card">
+          <p className="luxury-auth-loading">Accesso in corso…</p>
         </div>
       </main>
     );
@@ -130,17 +150,17 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   if (!isAuthenticated) {
     return (
       <VelvetEntrySplashGate>
-        <main className="velvet-auth-page">
-        <div className="velvet-auth-card">
-          <div className="velvet-auth-card-toolbar">
+        <main className="luxury-auth-page">
+        <div className="luxury-auth-card">
+          <div className="luxury-auth-card-toolbar">
             <button
               type="button"
-              className="velvet-auth-back"
+              className="luxury-auth-back"
               aria-label="Torna indietro"
               onClick={() => navigate(-1)}
             >
               <svg
-                className="velvet-auth-back-icon"
+                className="luxury-auth-back-icon"
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -157,15 +177,15 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
               <span>Indietro</span>
             </button>
           </div>
-          <h1 className="velvet-auth-title">Accedi</h1>
+          <h1 className="luxury-auth-title">Accedi</h1>
           {error ? (
-            <p className="velvet-alert velvet-alert--error velvet-auth-alert" role="alert">
+            <p className="luxury-alert luxury-alert--error luxury-auth-alert" role="alert">
               {error}
             </p>
           ) : null}
           <form
             key={loginFormKey}
-            className="velvet-auth-form"
+            className="luxury-auth-form"
             noValidate
             onSubmit={(e) => {
               e.preventDefault();
@@ -217,8 +237,8 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
               })();
             }}
           >
-            <div className="velvet-auth-field">
-              <label htmlFor={emailFieldId} className="velvet-auth-label">
+            <div className="luxury-auth-field">
+              <label htmlFor={emailFieldId} className="luxury-auth-label">
                 Email
               </label>
               <input
@@ -230,14 +250,14 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
                 value={email}
                 onChange={(ev) => setEmail(ev.target.value)}
                 disabled={submitting}
-                className="velvet-auth-input"
+                className="luxury-auth-input"
               />
             </div>
-            <div className="velvet-auth-field">
-              <label htmlFor={passFieldId} className="velvet-auth-label">
+            <div className="luxury-auth-field">
+              <label htmlFor={passFieldId} className="luxury-auth-label">
                 Password
               </label>
-              <div className="velvet-auth-password-wrap">
+              <div className="luxury-auth-password-wrap">
                 <input
                   id={passFieldId}
                   name="password"
@@ -246,18 +266,18 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
                   value={password}
                   onChange={(ev) => setPassword(ev.target.value)}
                   disabled={submitting}
-                  className="velvet-auth-input velvet-auth-input--with-toggle"
+                  className="luxury-auth-input luxury-auth-input--with-toggle"
                 />
                 <button
                   type="button"
-                  className="velvet-auth-password-toggle"
+                  className="luxury-auth-password-toggle"
                   onClick={() => setShowPassword((v) => !v)}
                   disabled={submitting}
                   aria-label={showPassword ? "Nascondi password" : "Mostra password"}
                   aria-pressed={showPassword}
                 >
                   {showPassword ? (
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden className="velvet-auth-password-toggle__icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden className="luxury-auth-password-toggle__icon">
                       <path
                         d="M3 3l18 18M10.73 10.73a3 3 0 004.24 4.24M9.88 9.88A10.05 10.05 0 0112 5c4.48 0 8.27 2.94 9.54 7a10.02 10.02 0 01-4.13 5.41M6.12 6.12A10.02 10.02 0 003.46 12c.77 3.95 4.26 7 8.54 7 1.05 0 2.05-.18 2.98-.5"
                         stroke="currentColor"
@@ -267,7 +287,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
                       />
                     </svg>
                   ) : (
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden className="velvet-auth-password-toggle__icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden className="luxury-auth-password-toggle__icon">
                       <path
                         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                         stroke="currentColor"
@@ -287,12 +307,12 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
                 </button>
               </div>
             </div>
-            <p className="velvet-auth-recover">
-              <Link className="velvet-auth-recover-link" to="/reimposta-password">
+            <p className="luxury-auth-recover">
+              <Link className="luxury-auth-recover-link" to="/reimposta-password">
                 Password dimenticata?
               </Link>
             </p>
-            <button type="submit" className="velvet-auth-submit" disabled={submitting}>
+            <button type="submit" className="luxury-auth-submit" disabled={submitting}>
               {submitting ? "Accesso…" : "Accedi"}
             </button>
           </form>
@@ -303,11 +323,11 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   }
 
   if (isAuthenticated && isVelvetSuperAdmin) {
-    if (shouldSwitchAwayFromSuperAdminSession()) {
+    if (shouldSwitchAwayFromSuperAdminSession(premiumCheckoutRequired)) {
       return (
-        <main className="velvet-auth-page">
-          <div className="velvet-auth-card">
-            <p className="velvet-auth-loading">Accedi con l&apos;account del salone per continuare…</p>
+        <main className="luxury-auth-page">
+          <div className="luxury-auth-card">
+            <p className="luxury-auth-loading">Accedi con l&apos;account del salone per continuare…</p>
           </div>
         </main>
       );

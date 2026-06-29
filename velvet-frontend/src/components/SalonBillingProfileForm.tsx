@@ -41,14 +41,14 @@ export function SalonBillingProfileForm({
   };
 
   return (
-    <form className="velvet-profile-form velvet-profile-form--account" noValidate onSubmit={handleSubmit}>
+    <form className="luxury-profile-form luxury-profile-form--account" noValidate onSubmit={handleSubmit}>
       {errorHint ? (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {errorHint}
         </p>
       ) : null}
       <SalonBillingProfileFields values={values} onChange={onChange} disabled={submitting} variant="account" />
-      <button type="submit" className="velvet-btn velvet-btn--primary velvet-profile-form__submit" disabled={submitting}>
+      <button type="submit" className="luxury-btn luxury-btn--primary luxury-profile-form__submit" disabled={submitting}>
         {submitting ? "Salvataggio…" : submitLabel}
       </button>
     </form>

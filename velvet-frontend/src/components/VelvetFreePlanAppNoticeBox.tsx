@@ -1,5 +1,5 @@
 import { appStoreUrl, playStoreUrl } from "../config/env";
-import "../styles/velvet-email-confirm-box.css";
+import "../styles/luxury-email-confirm-box.css";
 
 type VelvetFreePlanAppNoticeBoxProps = {
   onClose: () => void;
@@ -8,10 +8,10 @@ type VelvetFreePlanAppNoticeBoxProps = {
 
 export function VelvetFreePlanAppNoticeBox({ onClose, titleId }: VelvetFreePlanAppNoticeBoxProps) {
   return (
-    <section className="velvet-email-confirm-box velvet-free-plan-app-notice" aria-live="polite">
-      <div className="velvet-email-confirm-box__glow" aria-hidden />
-      <div className="velvet-email-confirm-box__icon-wrap" aria-hidden>
-        <svg className="velvet-email-confirm-box__icon" viewBox="0 0 24 24" fill="none">
+    <section className="luxury-email-confirm-box luxury-free-plan-app-notice" aria-live="polite">
+      <div className="luxury-email-confirm-box__glow" aria-hidden />
+      <div className="luxury-email-confirm-box__icon-wrap" aria-hidden>
+        <svg className="luxury-email-confirm-box__icon" viewBox="0 0 24 24" fill="none">
           <rect
             x="7"
             y="3.5"
@@ -26,20 +26,20 @@ export function VelvetFreePlanAppNoticeBox({ onClose, titleId }: VelvetFreePlanA
         </svg>
       </div>
 
-      <p className="velvet-email-confirm-box__kicker">Piano Free</p>
-      <h2 id={titleId} className="velvet-email-confirm-box__title">
+      <p className="luxury-email-confirm-box__kicker">Piano Free</p>
+      <h2 id={titleId} className="luxury-email-confirm-box__title">
         Registrati dall&apos;app
       </h2>
-      <p className="velvet-email-confirm-box__lead">
+      <p className="luxury-email-confirm-box__lead">
         Per registrarti con il piano Free devi accedere dall&apos;app Saloni Luxury su smartphone.
       </p>
 
-      <div className="velvet-email-confirm-box__email-row">
-        <span className="velvet-email-confirm-box__email-label">Disponibile su</span>
-        <strong className="velvet-email-confirm-box__email">App Store · Google Play</strong>
+      <div className="luxury-email-confirm-box__email-row">
+        <span className="luxury-email-confirm-box__email-label">Disponibile su</span>
+        <strong className="luxury-email-confirm-box__email">App Store · Google Play</strong>
       </div>
 
-      <ol className="velvet-email-confirm-box__steps">
+      <ol className="luxury-email-confirm-box__steps">
         <li>
           Scarica <strong>Saloni Luxury</strong> sul telefono
         </li>
@@ -51,28 +51,30 @@ export function VelvetFreePlanAppNoticeBox({ onClose, titleId }: VelvetFreePlanA
         </li>
       </ol>
 
-      <div className="velvet-email-confirm-box__actions">
-        <div className="velvet-free-plan-app-notice__store-row">
+      <div className="luxury-email-confirm-box__actions">
+        <div className="luxury-free-plan-app-notice__store-row">
           <a
             href={playStoreUrl}
-            className="velvet-email-confirm-box__cta velvet-email-confirm-box__cta--primary"
+            className="luxury-email-confirm-box__cta luxury-email-confirm-box__cta--primary"
             target="_blank"
             rel="noopener noreferrer"
           >
             Google Play
           </a>
-          <a
-            href={appStoreUrl}
-            className="velvet-email-confirm-box__cta velvet-email-confirm-box__cta--secondary"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            App Store
-          </a>
+          {appStoreUrl ? (
+            <a
+              href={appStoreUrl}
+              className="luxury-email-confirm-box__cta luxury-email-confirm-box__cta--secondary"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              App Store
+            </a>
+          ) : null}
         </div>
         <button
           type="button"
-          className="velvet-email-confirm-box__cta velvet-email-confirm-box__cta--secondary"
+          className="luxury-email-confirm-box__cta luxury-email-confirm-box__cta--secondary"
           onClick={onClose}
         >
           Chiudi

@@ -47,6 +47,13 @@ describe("subscription-guards", () => {
     expect(isFeatureEnabled("owner.web.freeRegistration", "BASE", { surface: "web" })).toBe(
       false,
     );
+    expect(
+      isFeatureEnabled("owner.web.freeRegistration", "PREMIUM", { surface: "nativeApp" }),
+    ).toBe(false);
+  });
+
+  it("blocca checkout billing in app nativa Free owner", () => {
+    expect(isNativeFreeOwnerPathAllowed("/account/billing/checkout")).toBe(false);
   });
 
   it("applica allowlist path Free owner in app", () => {

@@ -50,7 +50,7 @@ public class MeSupportService {
 		return new SupportInfo(
 				"https://velvet.example/help",
 				"https://velvet.example/contact",
-				"Il modulo qui sotto invia la richiesta al centro notifiche del team Saloni Velvet. Per un contatto diretto usa email o WhatsApp.",
+				"Il modulo qui sotto invia la richiesta al centro notifiche del team Saloni Luxury. Per un contatto diretto usa email o WhatsApp.",
 				supportEmail,
 				supportPhone);
 	}

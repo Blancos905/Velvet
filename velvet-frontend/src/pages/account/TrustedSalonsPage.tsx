@@ -6,8 +6,8 @@ import type { SalonClientMembershipDto } from "../../api/types";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
 import { formatSalonCityForDisplay } from "../../lib/formatSalonCityForDisplay";
 import { notifySalonCatalogClientsChanged } from "../../lib/salonCatalogClientsSync";
-import "../../styles/velvet-consumer-bookings-page.css";
-import "../../styles/velvet-trusted-salons-page.css";
+import "../../styles/luxury-consumer-bookings-page.css";
+import "../../styles/luxury-trusted-salons-page.css";
 
 function formatTrustedSince(iso: string): { day: string; month: string; full: string } {
   const d = new Date(iso);
@@ -70,28 +70,28 @@ export default function TrustedSalonsPage() {
   const listCount = q.isLoading ? null : rows.length;
 
   return (
-    <main className="velvet-page-main velvet-consumer-agenda velvet-consumer-bookings-dash velvet-consumer-bookings-dash--base44 velvet-trusted-salons-page">
-      <div className="velvet-consumer-bookings-dash__shell">
-        <header className="velvet-consumer-bookings-dash__header--hero">
-          <div className="velvet-consumer-bookings-dash__hero-glow" aria-hidden />
-          <div className="velvet-consumer-bookings-dash__title-row">
-            <h1 className="velvet-consumer-bookings-dash__headline">
-              <span className="velvet-consumer-bookings-dash__headline-pre">Saloni di </span>
-              <span className="velvet-consumer-bookings-dash__headline-accent">fiducia</span>
+    <main className="luxury-page-main luxury-consumer-agenda luxury-consumer-bookings-dash luxury-consumer-bookings-dash--base44 luxury-trusted-salons-page">
+      <div className="luxury-consumer-bookings-dash__shell">
+        <header className="luxury-consumer-bookings-dash__header--hero">
+          <div className="luxury-consumer-bookings-dash__hero-glow" aria-hidden />
+          <div className="luxury-consumer-bookings-dash__title-row">
+            <h1 className="luxury-consumer-bookings-dash__headline">
+              <span className="luxury-consumer-bookings-dash__headline-pre">Saloni di </span>
+              <span className="luxury-consumer-bookings-dash__headline-accent">fiducia</span>
             </h1>
             {q.isLoading ? (
-              <p className="velvet-consumer-bookings-dash__total-pill velvet-consumer-bookings-dash__total-pill--loading" aria-hidden>
+              <p className="luxury-consumer-bookings-dash__total-pill luxury-consumer-bookings-dash__total-pill--loading" aria-hidden>
                 …
               </p>
             ) : (
               <p
-                className="velvet-consumer-bookings-dash__total-pill"
+                className="luxury-consumer-bookings-dash__total-pill"
                 aria-label={`Totale ${listCount ?? 0} ${listCount === 1 ? "salone" : "saloni"} di fiducia`}
               >
-                <span className="velvet-consumer-bookings-dash__total-pill__n" aria-hidden>
+                <span className="luxury-consumer-bookings-dash__total-pill__n" aria-hidden>
                   {listCount ?? 0}
                 </span>
-                <span className="velvet-consumer-bookings-dash__total-pill__label">
+                <span className="luxury-consumer-bookings-dash__total-pill__label">
                   {listCount === 1 ? "salone" : "saloni"}
                 </span>
               </p>
@@ -100,20 +100,20 @@ export default function TrustedSalonsPage() {
         </header>
 
         {q.isLoading ? (
-          <p className="velvet-trusted-salons-state velvet-trusted-salons-state--loading" aria-live="polite">
+          <p className="luxury-trusted-salons-state luxury-trusted-salons-state--loading" aria-live="polite">
             Caricamento…
           </p>
         ) : null}
 
         {q.error ? (
-          <p className="velvet-alert velvet-alert--error" role="alert">
+          <p className="luxury-alert luxury-alert--error" role="alert">
             {q.error instanceof Error ? q.error.message : "Errore"}
           </p>
         ) : null}
 
         {feedback ? (
           <p
-            className={`velvet-trusted-salons-feedback${feedbackIsError ? " velvet-trusted-salons-feedback--error" : ""}`}
+            className={`luxury-trusted-salons-feedback${feedbackIsError ? " luxury-trusted-salons-feedback--error" : ""}`}
             role={feedbackIsError ? "alert" : "status"}
           >
             {feedback}
@@ -121,52 +121,52 @@ export default function TrustedSalonsPage() {
         ) : null}
 
         {!q.isLoading && !q.error && rows.length === 0 ? (
-          <div className="velvet-trusted-salons-empty velvet-consumer-bookings-dash__empty" role="status">
-            <p className="velvet-trusted-salons-empty__title">Ancora nessun salone di fiducia</p>
-            <p className="velvet-trusted-salons-empty__body">
-              Entra nella scheda di un salone e scegli <span className="velvet-trusted-salons-empty__hl">Diventa cliente</span>:
+          <div className="luxury-trusted-salons-empty luxury-consumer-bookings-dash__empty" role="status">
+            <p className="luxury-trusted-salons-empty__title">Ancora nessun salone di fiducia</p>
+            <p className="luxury-trusted-salons-empty__body">
+              Entra nella scheda di un salone e scegli <span className="luxury-trusted-salons-empty__hl">Diventa cliente</span>:
               così il salone ti riconosce tra i suoi clienti e puoi usare la chat dedicata.
             </p>
-            <Link to="/" className="velvet-trusted-salons-empty__cta">
+            <Link to="/" className="luxury-trusted-salons-empty__cta">
               Vai all&apos;area di ricerca
             </Link>
           </div>
         ) : null}
 
         {rows.length > 0 ? (
-          <ul className="velvet-consumer-agenda__list">
+          <ul className="luxury-consumer-agenda__list">
             {rows.map((m) => {
               const since = formatTrustedSince(m.createdAt);
               return (
-                <li key={m.id} className="velvet-consumer-agenda__item">
-                  <div className="velvet-consumer-agenda__date" aria-hidden>
-                    <span className="velvet-consumer-agenda__day">{since.day}</span>
-                    <span className="velvet-consumer-agenda__month">{since.month}</span>
+                <li key={m.id} className="luxury-consumer-agenda__item">
+                  <div className="luxury-consumer-agenda__date" aria-hidden>
+                    <span className="luxury-consumer-agenda__day">{since.day}</span>
+                    <span className="luxury-consumer-agenda__month">{since.month}</span>
                   </div>
-                  <div className="velvet-consumer-agenda__content">
-                    <p className="velvet-consumer-agenda__meta">
+                  <div className="luxury-consumer-agenda__content">
+                    <p className="luxury-consumer-agenda__meta">
                       <span>Cliente dal {since.full}</span>
-                      <span className="velvet-consumer-agenda__status velvet-consumer-agenda__status--confirmed">
+                      <span className="luxury-consumer-agenda__status luxury-consumer-agenda__status--confirmed">
                         Cliente attivo
                       </span>
                     </p>
-                    <Link to={`/s/${encodeURIComponent(m.slug)}`} className="velvet-consumer-agenda__title">
+                    <Link to={`/s/${encodeURIComponent(m.slug)}`} className="luxury-consumer-agenda__title">
                       {m.name}
                     </Link>
-                    <p className="velvet-consumer-agenda__desc">
+                    <p className="luxury-consumer-agenda__desc">
                       {m.city ? `${formatSalonCityForDisplay(m.city) ?? m.city} · ` : ""}
                       Salone collegato al tuo profilo.
                     </p>
-                    <div className="velvet-consumer-agenda__actions velvet-trusted-salons-page__actions">
+                    <div className="luxury-consumer-agenda__actions luxury-trusted-salons-page__actions">
                       <Link
                         to={`/account/chat?salonClientId=${encodeURIComponent(m.id)}`}
-                        className="velvet-consumer-agenda__manage-link"
+                        className="luxury-consumer-agenda__manage-link"
                       >
                         Apri chat
                       </Link>
                       <button
                         type="button"
-                        className="velvet-trusted-salons-page__leave-btn"
+                        className="luxury-trusted-salons-page__leave-btn"
                         disabled={leaveSalonClientM.isPending && leavingOrganizationId === m.organizationId}
                         onClick={() => {
                           setFeedback(null);

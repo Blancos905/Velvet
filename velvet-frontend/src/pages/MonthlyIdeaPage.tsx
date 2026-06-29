@@ -11,7 +11,7 @@ import { formatSalonCityForDisplay } from "../lib/formatSalonCityForDisplay";
 import { formatSalonClientAudienceLabel } from "../lib/formatSalonClientAudience";
 import { prefetchSalonPublicPage } from "../lib/prefetchSalonPublicPage";
 import type { SalonOrgNavState } from "../lib/publicOrganizationDetail";
-import "../styles/velvet-search-page.css";
+import "../styles/luxury-search-page.css";
 import "../styles/monthly-idea-page.css";
 
 function monthlySalonCaption(o: OrganizationSummary): string | null {
@@ -33,7 +33,7 @@ function goBackOrHome(navigate: ReturnType<typeof useNavigate>) {
 
 function ChevronIcon() {
   return (
-    <svg className="velvet-search-card-chevron" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg className="luxury-search-card-chevron" viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
         d="M9 6l6 6-6 6"
         stroke="currentColor"
@@ -93,15 +93,15 @@ export default function MonthlyIdeaPage() {
   const showSkeleton = salonsQ.isLoading && hits.length === 0;
 
   return (
-    <main className="velvet-page-main velvet-search-page velvet-monthly-idea-page">
-      <div className="velvet-search-back-row">
+    <main className="luxury-page-main luxury-search-page luxury-monthly-idea-page">
+      <div className="luxury-search-back-row">
         <button
           type="button"
-          className="velvet-search-back"
+          className="luxury-search-back"
           aria-label="Torna indietro"
           onClick={() => goBackOrHome(navigate)}
         >
-          <svg className="velvet-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <svg className="luxury-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path
               d="M15 18l-6-6 6-6"
               stroke="currentColor"
@@ -114,70 +114,70 @@ export default function MonthlyIdeaPage() {
         </button>
       </div>
 
-      <header className="velvet-search-hero">
-        <div className="velvet-search-hero__glow" aria-hidden />
-        <h1 className="velvet-page-title">
-          <span className="velvet-search-hero__title-text">I migliori saloni del mese</span>
+      <header className="luxury-search-hero">
+        <div className="luxury-search-hero__glow" aria-hidden />
+        <h1 className="luxury-page-title">
+          <span className="luxury-search-hero__title-text">I migliori saloni del mese</span>
         </h1>
       </header>
 
       {salonsQ.isError ? (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           Non siamo riusciti a caricare l&apos;elenco. Riprova tra poco.
         </p>
       ) : null}
 
       {showSkeleton ? (
-        <div className="velvet-search-skeleton-grid" aria-hidden>
+        <div className="luxury-search-skeleton-grid" aria-hidden>
           {[0, 1, 2, 3, 4].map((k) => (
-            <div key={k} className="velvet-search-skeleton-card" />
+            <div key={k} className="luxury-search-skeleton-card" />
           ))}
         </div>
       ) : null}
 
       {!showSkeleton && hits.length > 0 ? (
         <>
-          <p className="velvet-search-a11y-live" aria-live="polite" aria-atomic="true">
+          <p className="luxury-search-a11y-live" aria-live="polite" aria-atomic="true">
             {hits.length} saloni in classifica per questa idea.
           </p>
-          <ul className="velvet-search-grid">
+          <ul className="luxury-search-grid">
             {hits.map((o, idx) => {
               const caption = monthlySalonCaption(o);
               const avg = o.averageRating;
               const showStars = typeof avg === "number" && Number.isFinite(avg) && caption != null;
               const audienceLabel = formatSalonClientAudienceLabel(o.salonClientGenders);
               const pageToneClass =
-                idx === 0 ? " velvet-search-card--page-lead" : " velvet-search-card--page-following";
+                idx === 0 ? " luxury-search-card--page-lead" : " luxury-search-card--page-following";
               return (
-                <li key={o.id} className={"velvet-search-card" + pageToneClass}>
+                <li key={o.id} className={"luxury-search-card" + pageToneClass}>
                   <Link
                     to={`/s/${encodeURIComponent(o.slug)}`}
                     state={{ orgPreview: o } satisfies SalonOrgNavState}
                     onMouseEnter={() => prefetchSalonPublicPage(queryClient, o.slug)}
                     onFocus={() => prefetchSalonPublicPage(queryClient, o.slug)}
-                    className="velvet-search-card__link"
+                    className="luxury-search-card__link"
                   >
                     <SearchHitLogoAvatar
                       slug={o.slug}
                       name={o.name}
-                      avatarClass="velvet-search-card-avatar"
-                      logoExtraClass="velvet-search-card-avatar--logo"
+                      avatarClass="luxury-search-card-avatar"
+                      logoExtraClass="luxury-search-card-avatar--logo"
                     />
-                    <div className="velvet-search-card-body">
-                      <h3 className="velvet-search-card-name">{o.name}</h3>
+                    <div className="luxury-search-card-body">
+                      <h3 className="luxury-search-card-name">{o.name}</h3>
                       {showStars ? (
-                        <div className="velvet-search-card-rating">
+                        <div className="luxury-search-card-rating">
                           <StarRatingDisplay rating={avg} caption={caption} />
                         </div>
                       ) : (
-                        <p className="velvet-search-card-rating velvet-monthly-idea-no-reviews">Recensioni in arrivo</p>
+                        <p className="luxury-search-card-rating luxury-monthly-idea-no-reviews">Recensioni in arrivo</p>
                       )}
-                      <div className="velvet-search-card-footer">
+                      <div className="luxury-search-card-footer">
                         {audienceLabel ? (
-                          <span className="velvet-search-card-audience">{audienceLabel}</span>
+                          <span className="luxury-search-card-audience">{audienceLabel}</span>
                         ) : null}
                         {o.city ? (
-                          <span className="velvet-search-card-city">
+                          <span className="luxury-search-card-city">
                             <PinIcon />
                             {formatSalonCityForDisplay(o.city) ?? o.city}
                           </span>
@@ -194,14 +194,14 @@ export default function MonthlyIdeaPage() {
       ) : null}
 
       {!showSkeleton && hits.length === 0 && !salonsQ.isError ? (
-        <section className="velvet-search-empty-state" aria-labelledby="velvet-monthly-idea-empty-title">
-          <h2 id="velvet-monthly-idea-empty-title" className="velvet-search-empty-title">
+        <section className="luxury-search-empty-state" aria-labelledby="luxury-monthly-idea-empty-title">
+          <h2 id="luxury-monthly-idea-empty-title" className="luxury-search-empty-title">
             Nessun salone in evidenza per questa idea
           </h2>
-          <div className="velvet-search-empty-actions">
+          <div className="luxury-search-empty-actions">
             <button
               type="button"
-              className="velvet-search-empty-btn velvet-search-empty-btn--primary"
+              className="luxury-search-empty-btn luxury-search-empty-btn--primary"
               onClick={() => navigate("/")}
             >
               Torna alla home

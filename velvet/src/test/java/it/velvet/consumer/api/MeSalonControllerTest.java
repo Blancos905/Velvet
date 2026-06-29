@@ -192,7 +192,7 @@ class MeSalonControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].notificationType").value("BOOKING_CREATED_FOR_SALON"))
 				.andExpect(jsonPath("$[0].appointmentId").value(appointment.getId().toString()))
-				.andExpect(jsonPath("$[0].previewLine").value(org.hamcrest.Matchers.containsString(" con Op.")));
+				.andExpect(jsonPath("$[0].previewLine").value(org.hamcrest.Matchers.containsString("in attesa di conferma")));
 
 		mockMvc.perform(post("/api/v1/me/salon/notifications/inbox/ack-bucket")
 						.param("bucket", "BOOKING_CONFIRMATION")
@@ -779,7 +779,7 @@ class MeSalonControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].notificationType").value("BOOKING_CREATED_FOR_SALON"))
 				.andExpect(jsonPath("$[0].clientName").value("Mario Rossi"))
-				.andExpect(jsonPath("$[0].previewLine", org.hamcrest.Matchers.containsString("Mario Rossi ha prenotato")));
+				.andExpect(jsonPath("$[0].previewLine", org.hamcrest.Matchers.containsString("Mario Rossi ha richiesto")));
 	}
 
 	@Test

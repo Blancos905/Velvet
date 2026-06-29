@@ -1,5 +1,6 @@
 package it.velvet.consumer.service;
 
+import it.velvet.billing.service.BillingRegistrationPlanPolicy;
 import it.velvet.config.VelvetRegistrationProperties;
 import it.velvet.config.VelvetSecurityProperties;
 import it.velvet.consumer.domain.ConsumerProfile;
@@ -25,6 +26,7 @@ public class VelvetEmailVerificationService {
 	private final SalonOwnerRoleAlignmentService salonOwnerRoleAlignmentService;
 	private final VelvetRefreshTokenService velvetRefreshTokenService;
 	private final VelvetSecurityProperties securityProperties;
+	private final BillingRegistrationPlanPolicy billingRegistrationPlanPolicy;
 
 	public VelvetEmailVerificationService(
 			VelvetPendingRegistrationService pendingRegistrationService,
@@ -32,13 +34,15 @@ public class VelvetEmailVerificationService {
 			ConsumerProfileRepository consumerProfileRepository,
 			SalonOwnerRoleAlignmentService salonOwnerRoleAlignmentService,
 			VelvetRefreshTokenService velvetRefreshTokenService,
-			VelvetSecurityProperties securityProperties) {
+			VelvetSecurityProperties securityProperties,
+			BillingRegistrationPlanPolicy billingRegistrationPlanPolicy) {
 		this.pendingRegistrationService = pendingRegistrationService;
 		this.registrationProperties = registrationProperties;
 		this.consumerProfileRepository = consumerProfileRepository;
 		this.salonOwnerRoleAlignmentService = salonOwnerRoleAlignmentService;
 		this.velvetRefreshTokenService = velvetRefreshTokenService;
 		this.securityProperties = securityProperties;
+		this.billingRegistrationPlanPolicy = billingRegistrationPlanPolicy;
 	}
 
 	@Transactional
@@ -85,10 +89,16 @@ public class VelvetEmailVerificationService {
 		ConsumerProfile forToken = consumerProfileRepository.findById(profile.getId()).orElse(profile);
 		VelvetRefreshTokenService.RefreshTokenPair tokens =
 				velvetRefreshTokenService.issueForProfile(forToken, request);
-		boolean premium = "PREMIUM".equalsIgnoreCase(StudioGroup.canonicalPlanTier(outcome.salonProvisionPlanTier()));
-		String nextPath = premium ? "/account/billing/checkout" : "/account/salone";
+		String planTier = StudioGroup.canonicalPlanTier(outcome.salonProvisionPlanTier());
+		boolean premium = "PREMIUM".equalsIgnoreCase(planTier);
+		boolean checkoutRequired = billingRegistrationPlanPolicy.billingCheckoutRequiredForPremiumRegistration(planTier);
+		String nextPath = premium
+				? billingRegistrationPlanPolicy.salonOwnerPostConfirmPath(planTier)
+				: "/account/salone";
 		String message = premium
-				? "Email confermata. Prosegui con il pagamento Premium per attivare il salone."
+				? checkoutRequired
+						? "Email confermata. Prosegui con il pagamento Premium per attivare il salone."
+						: "Email confermata. Il tuo salone Premium è attivo: inizia dalla panoramica salone."
 				: "Email confermata. Il tuo salone è attivo.";
 		return new EmailVerificationConfirmResult(
 				message,

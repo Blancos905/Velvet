@@ -92,6 +92,9 @@ export default function SuperAdminStatisticsSection({ overviewQ }: Props) {
       { name: "Saloni a pagamento", count: counts.studioGroupsPaying, revenue: 0 },
       { name: "— Premium (a pagamento)", count: counts.studioGroupsPayingPremium, revenue: 0 },
       { name: "— Free/BASE (a pagamento)", count: counts.studioGroupsPayingBase, revenue: 0 },
+      { name: "Abbonati paganti (Stripe)", count: counts.studioGroupsSubscribedPaying ?? 0, revenue: 0 },
+      { name: "In prova (Stripe)", count: counts.studioGroupsSubscribedTrial ?? 0, revenue: 0 },
+      { name: "Disdetta abbonamento", count: counts.studioGroupsSubscribedCancelled ?? 0, revenue: 0 },
       { name: "Saloni provider (senza pagamento)", count: counts.studioGroupsProvider, revenue: 0 },
       { name: "Sedi attive", count: counts.locations, revenue: 0 },
       { name: "Servizi in catalogo", count: counts.salonServices, revenue: 0 },
@@ -125,20 +128,20 @@ export default function SuperAdminStatisticsSection({ overviewQ }: Props) {
       <>
         <span
           className={
-            "velvet-stats-delta " +
-            (trendUp ? "velvet-stats-delta--up" : trendDown ? "velvet-stats-delta--down" : "velvet-stats-delta--flat")
+            "luxury-stats-delta " +
+            (trendUp ? "luxury-stats-delta--up" : trendDown ? "luxury-stats-delta--down" : "luxury-stats-delta--flat")
           }
         >
           {trendUp ? "↑" : trendDown ? "↓" : "→"} {monthDelta > 0 ? `+${monthDelta}` : monthDelta} vs mese precedente
           {pctVsPrevious != null ? (
-            <span className="velvet-stats-delta__pct">
+            <span className="luxury-stats-delta__pct">
               {" "}
               ({pctVsPrevious > 0 ? "+" : ""}
               {pctVsPrevious}%)
             </span>
           ) : null}
         </span>
-        <span className="velvet-stats-chart-card__compare-note">
+        <span className="luxury-stats-chart-card__compare-note">
           Campione utenti: ultimo mese {currentMonthCount} · precedente {previousMonthCount}
         </span>
       </>
@@ -158,57 +161,58 @@ export default function SuperAdminStatisticsSection({ overviewQ }: Props) {
   } else {
     bannerBody = (
       <>
-        Conteggi globali: {counts?.appointmentsTotal ?? "—"} appuntamenti, {counts?.studioGroupsPaying ?? "—"} saloni a
-        pagamento ({counts?.studioGroupsPayingPremium ?? "—"} Premium, {counts?.studioGroupsPayingBase ?? "—"} Free) e{" "}
-        {counts?.studioGroupsProvider ?? "—"} provider senza pagamento abbonamento.
+        Conteggi globali: {counts?.appointmentsTotal ?? "—"} appuntamenti, {counts?.studioGroupsSubscribedPaying ?? "—"}{" "}
+        abbonati paganti, {counts?.studioGroupsSubscribedTrial ?? "—"} in prova,{" "}
+        {counts?.studioGroupsSubscribedCancelled ?? "—"} con disdetta e {counts?.studioGroupsProvider ?? "—"} provider
+        senza pagamento abbonamento.
       </>
     );
   }
 
   return (
-    <section className="velvet-admin-panel velvet-admin-premium-card" aria-labelledby="super-admin-stats-h">
-      <h2 id="super-admin-stats-h" className="velvet-admin-section-title" style={{ marginBottom: "0.75rem" }}>
+    <section className="luxury-admin-panel luxury-admin-premium-card" aria-labelledby="super-admin-stats-h">
+      <h2 id="super-admin-stats-h" className="luxury-admin-section-title" style={{ marginBottom: "0.75rem" }}>
         Statistiche piattaforma
       </h2>
-      <div className="velvet-stats-page velvet-stats-dash velvet-stats-dash--metrics-pro velvet-stats-dash--base44">
-        <div className="velvet-stats-dash__shell">
-          <header className="velvet-stats-dash__header velvet-stats-dash__header--bordered">
-            <div className="velvet-stats-dash__header-inner">
+      <div className="luxury-stats-page luxury-stats-dash luxury-stats-dash--metrics-pro luxury-stats-dash--base44">
+        <div className="luxury-stats-dash__shell">
+          <header className="luxury-stats-dash__header luxury-stats-dash__header--bordered">
+            <div className="luxury-stats-dash__header-inner">
               <div>
-                <p className="velvet-stats-dash__eyebrow">Super admin</p>
-                <h1 className="velvet-stats-dash__title-h1 velvet-stats-dash__title-h1--playfair">Statistiche</h1>
-                <p className="velvet-stats-dash__subtitle">
+                <p className="luxury-stats-dash__eyebrow">Super admin</p>
+                <h1 className="luxury-stats-dash__title-h1 luxury-stats-dash__title-h1--playfair">Statistiche</h1>
+                <p className="luxury-stats-dash__subtitle">
                   Panoramica globale Luxury — i saloni provider non generano ricavi da abbonamento
                 </p>
               </div>
-              <div className="velvet-stats-dash__period">
-                <ClockIcon className="velvet-stats-dash__period-icon" strokeWidth={2} aria-hidden />
-                <span className="velvet-stats-dash__period-label">{generatedLabel}</span>
+              <div className="luxury-stats-dash__period">
+                <ClockIcon className="luxury-stats-dash__period-icon" strokeWidth={2} aria-hidden />
+                <span className="luxury-stats-dash__period-label">{generatedLabel}</span>
               </div>
             </div>
           </header>
 
           {overviewQ.isPending ? (
-            <div className="velvet-stats-metric-card velvet-stats-dash__loading">
-              <p className="velvet-stats-metric-muted" style={{ margin: 0 }}>
+            <div className="luxury-stats-metric-card luxury-stats-dash__loading">
+              <p className="luxury-stats-metric-muted" style={{ margin: 0 }}>
                 Caricamento statistiche…
               </p>
             </div>
           ) : overviewQ.isError ? (
-            <div className="velvet-stats-metric-card velvet-stats-dash__loading">
-              <p className="velvet-alert velvet-alert--error" role="alert" style={{ margin: 0 }}>
+            <div className="luxury-stats-metric-card luxury-stats-dash__loading">
+              <p className="luxury-alert luxury-alert--error" role="alert" style={{ margin: 0 }}>
                 {overviewQ.error instanceof Error ? overviewQ.error.message : "Errore caricamento statistiche"}
               </p>
             </div>
           ) : !counts ? (
-            <div className="velvet-stats-metric-card velvet-stats-dash__loading">
-              <p className="velvet-stats-metric-muted" style={{ margin: 0 }}>
+            <div className="luxury-stats-metric-card luxury-stats-dash__loading">
+              <p className="luxury-stats-metric-muted" style={{ margin: 0 }}>
                 Dati di riepilogo non disponibili.
               </p>
             </div>
           ) : (
-            <main className="velvet-stats-dash__main velvet-stats-dash__main--spaced">
-              <section className="velvet-stats-dash__kpi" aria-label="Indicatori principali">
+            <main className="luxury-stats-dash__main luxury-stats-dash__main--spaced">
+              <section className="luxury-stats-dash__kpi" aria-label="Indicatori principali">
                 <StatCard
                   icon={Users}
                   label="Clienti in anagrafica"
@@ -225,16 +229,16 @@ export default function SuperAdminStatisticsSection({ overviewQ }: Props) {
                 />
                 <StatCard
                   icon={Euro}
-                  label="Saloni a pagamento"
-                  value={String(counts.studioGroupsPaying)}
-                  subValue={`${counts.studioGroupsPayingPremium} Premium · ${counts.studioGroupsPayingBase} Free — esclusi ${counts.studioGroupsProvider} provider`}
+                  label="Abbonati paganti"
+                  value={String(counts.studioGroupsSubscribedPaying ?? 0)}
+                  subValue={`${counts.studioGroupsSubscribedTrial ?? 0} in prova · ${counts.studioGroupsSubscribedCancelled ?? 0} disdetta`}
                   trend={null}
                 />
                 <StatCard
                   icon={TrendingUp}
-                  label="Saloni provider"
-                  value={String(counts.studioGroupsProvider)}
-                  subValue="Nessun pagamento abbonamento a Luxury (anche se piano Premium)"
+                  label="Saloni a pagamento"
+                  value={String(counts.studioGroupsPaying)}
+                  subValue={`${counts.studioGroupsPayingPremium} Premium · ${counts.studioGroupsPayingBase} Free — esclusi ${counts.studioGroupsProvider} provider`}
                   trend={null}
                 />
                 <StatCard
@@ -246,7 +250,7 @@ export default function SuperAdminStatisticsSection({ overviewQ }: Props) {
                 />
               </section>
 
-              <div className="velvet-stats-dash__charts">
+              <div className="luxury-stats-dash__charts">
                 <BookingsChart
                   title="Nuovi utenti (campione)"
                   subtitle="Ultimi 5 mesi — fino a 28 profili più recenti per data di creazione"
@@ -272,14 +276,14 @@ export default function SuperAdminStatisticsSection({ overviewQ }: Props) {
                   barGradientId={`${barGradientId}-provider`}
                   loading={overviewQ.isPending}
                   compareLine={
-                    <span className="velvet-stats-chart-card__compare-note">
+                    <span className="luxury-stats-chart-card__compare-note">
                       Piattaforma: {counts.studioGroupsProvider} provider — nessun ricavo abbonamento
                     </span>
                   }
                 />
               </div>
 
-              <div className="velvet-stats-dash__triple velvet-stats-dash__triple--single">
+              <div className="luxury-stats-dash__triple luxury-stats-dash__triple--single">
                 <TopServices rows={serviceRows} totalBookings={serviceBookingsTotal} />
               </div>
 
@@ -292,17 +296,17 @@ export default function SuperAdminStatisticsSection({ overviewQ }: Props) {
                 />
               ) : null}
 
-              <section className="velvet-stats-dash__banner">
-                <div className="velvet-stats-dash__banner-deco" aria-hidden />
-                <div className="velvet-stats-dash__banner-inner">
-                  <div className="velvet-stats-dash__banner-icon-wrap">
-                    <TrendingIcon className="velvet-stats-dash__banner-icon" strokeWidth={2} aria-hidden />
+              <section className="luxury-stats-dash__banner">
+                <div className="luxury-stats-dash__banner-deco" aria-hidden />
+                <div className="luxury-stats-dash__banner-inner">
+                  <div className="luxury-stats-dash__banner-icon-wrap">
+                    <TrendingIcon className="luxury-stats-dash__banner-icon" strokeWidth={2} aria-hidden />
                   </div>
                   <div>
-                    <h3 className="velvet-stats-dash__banner-title">
+                    <h3 className="luxury-stats-dash__banner-title">
                       {bannerPositive ? "Segnali positivi nel campione" : "Panoramica aggiornata"}
                     </h3>
-                    <p className="velvet-stats-dash__banner-text">{bannerBody}</p>
+                    <p className="luxury-stats-dash__banner-text">{bannerBody}</p>
                   </div>
                 </div>
               </section>

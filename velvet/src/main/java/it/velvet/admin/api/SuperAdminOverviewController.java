@@ -120,8 +120,9 @@ public class SuperAdminOverviewController {
 	@SecurityRequirement(name = "bearer-jwt")
 	public Page<SuperAdminRecentSalonRow> listSalons(
 			@PageableDefault(size = 20, sort = "createdAt") Pageable pageable,
-			@RequestParam(required = false) String planTier) {
-		return overviewActionsService.listSalons(pageable, planTier);
+			@RequestParam(required = false) String planTier,
+			@RequestParam(required = false) String subscriptionBilling) {
+		return overviewActionsService.listSalons(pageable, planTier, subscriptionBilling);
 	}
 
 	@GetMapping("/salons/{studioGroupId}/staff")
@@ -160,7 +161,7 @@ public class SuperAdminOverviewController {
 
 	@GetMapping("/platform-reviews")
 	@Operation(
-			summary = "Recensioni sulla piattaforma Saloni Velvet (paginate)",
+			summary = "Recensioni sulla piattaforma Saloni Luxury (paginate)",
 			description = "Ordine: voto (stelle) decrescente, poi data creazione decrescente.")
 	@SecurityRequirement(name = "bearer-jwt")
 	public Page<SuperAdminPlatformReviewRow> listPlatformReviews(

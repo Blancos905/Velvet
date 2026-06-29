@@ -15,7 +15,7 @@ import {
 } from "../../lib/salonShowcaseStorage";
 import { formatSalonCityForDisplay } from "../../lib/formatSalonCityForDisplay";
 import type { SalonShowcaseServiceChip } from "./SalonPublicShowcase";
-import "../../styles/velvet-salon-custom-layout.css";
+import "../../styles/luxury-salon-custom-layout.css";
 
 type Props = {
   salonName: string;
@@ -77,8 +77,8 @@ export function SalonCustomLayoutShowcase({
   const [carouselIdx, setCarouselIdx] = useState(0);
   const slides = useMemo(() => showcase.siteImageDataUrls.filter((u): u is string => Boolean(u)), [showcase.siteImageDataUrls]);
   const effectiveLayout = layout ?? defaultShowcaseCustomLayout();
-  const ambientClass = cardAmbientClass?.trim() ? ` velvet-salon-showcase--ambient-scene ${cardAmbientClass.trim()}` : "";
-  const rootClass = `velvet-salon-showcase velvet-salon-showcase--custom-layout${themeClass ? ` ${themeClass}` : ""}${ambientClass}`;
+  const ambientClass = cardAmbientClass?.trim() ? ` luxury-salon-showcase--ambient-scene ${cardAmbientClass.trim()}` : "";
+  const rootClass = `luxury-salon-showcase luxury-salon-showcase--custom-layout${themeClass ? ` ${themeClass}` : ""}${ambientClass}`;
 
   const onMutateBlock = (
     id: ShowcaseCustomLayoutBlockId,
@@ -177,14 +177,14 @@ export function SalonCustomLayoutShowcase({
 
     if (id === "logo") {
       return (
-        <div className="velvet-custom-layout-block__inner velvet-custom-layout-block__inner--logo">
+        <div className="luxury-custom-layout-block__inner luxury-custom-layout-block__inner--logo">
           {showcase.logoDataUrl ? <img src={showcase.logoDataUrl} alt="" /> : <span>Logo</span>}
         </div>
       );
     }
     if (id === "title") {
       return (
-        <div className="velvet-custom-layout-block__inner velvet-custom-layout-block__inner--title" style={titleStyle}>
+        <div className="luxury-custom-layout-block__inner luxury-custom-layout-block__inner--title" style={titleStyle}>
           <h2>{salonName}</h2>
           {cityFmt ? <p>{cityFmt}</p> : null}
         </div>
@@ -192,19 +192,19 @@ export function SalonCustomLayoutShowcase({
     }
     if (id === "description") {
       return (
-        <div className="velvet-custom-layout-block__inner velvet-custom-layout-block__inner--description" style={bodyStyle}>
+        <div className="luxury-custom-layout-block__inner luxury-custom-layout-block__inner--description" style={bodyStyle}>
           {siteDesc || "Aggiungi una descrizione dal pannello Brand"}
         </div>
       );
     }
     if (id === "carousel") {
       return (
-        <div className="velvet-custom-layout-block__inner velvet-custom-layout-block__inner--carousel">
+        <div className="luxury-custom-layout-block__inner luxury-custom-layout-block__inner--carousel">
           {slides.length > 0 ? (
             <>
               <img src={slides[Math.min(carouselIdx, slides.length - 1)]} alt="" />
               {slides.length > 1 ? (
-                <div className="velvet-custom-layout-carousel-nav">
+                <div className="luxury-custom-layout-carousel-nav">
                   <button
                     type="button"
                     onMouseDown={(e) => {
@@ -237,7 +237,7 @@ export function SalonCustomLayoutShowcase({
               ) : null}
             </>
           ) : (
-            <div className="velvet-custom-layout-carousel-empty" style={bodyStyle}>
+            <div className="luxury-custom-layout-carousel-empty" style={bodyStyle}>
               Carica immagini sito
             </div>
           )}
@@ -246,7 +246,7 @@ export function SalonCustomLayoutShowcase({
     }
     if (id === "position") {
       return (
-        <div className="velvet-custom-layout-block__inner velvet-custom-layout-block__inner--position" style={bodyStyle}>
+        <div className="luxury-custom-layout-block__inner luxury-custom-layout-block__inner--position" style={bodyStyle}>
           <strong style={titleStyle}>Posizione</strong>
           <p>{positionText}</p>
         </div>
@@ -262,13 +262,13 @@ export function SalonCustomLayoutShowcase({
       color: bodyColor ?? undefined,
     };
     return (
-      <div className="velvet-custom-layout-block__inner velvet-custom-layout-block__inner--services" style={serviceVars}>
-        <div className="velvet-custom-layout-services-list">
+      <div className="luxury-custom-layout-block__inner luxury-custom-layout-block__inner--services" style={serviceVars}>
+        <div className="luxury-custom-layout-services-list">
           {(services.length > 0 ? services : []).slice(0, 8).map((s) => (
             <button
               key={s.id}
               type="button"
-              className={`velvet-custom-layout-service-pill${selectedServiceId === s.id ? " velvet-custom-layout-service-pill--active" : ""}`}
+              className={`luxury-custom-layout-service-pill${selectedServiceId === s.id ? " luxury-custom-layout-service-pill--active" : ""}`}
               onClick={() => {
                 onSelectService?.(s.id);
               }}
@@ -279,11 +279,11 @@ export function SalonCustomLayoutShowcase({
           ))}
         </div>
         {selected ? (
-          <div className="velvet-custom-layout-service-detail" style={bodyStyle}>
+          <div className="luxury-custom-layout-service-detail" style={bodyStyle}>
             <strong style={titleStyle}>{selected.name}</strong>
             {selected.description?.trim() ? <p>{selected.description.trim()}</p> : null}
             {onBookService ? (
-              <button type="button" className="velvet-btn velvet-btn--primary" style={buttonStyle} onClick={() => onBookService(selected.id)}>
+              <button type="button" className="luxury-btn luxury-btn--primary" style={buttonStyle} onClick={() => onBookService(selected.id)}>
                 Prenota
               </button>
             ) : null}
@@ -295,7 +295,7 @@ export function SalonCustomLayoutShowcase({
 
   return (
     <section className={rootClass} data-ambient-ui={cardAmbientUiTone}>
-      <div className="velvet-custom-layout-canvas" ref={canvasRef}>
+      <div className="luxury-custom-layout-canvas" ref={canvasRef}>
         {BLOCK_ORDER.map((id) => {
           const b = effectiveLayout.blocks[id];
           const innerScaleStyle: CSSProperties = {
@@ -305,11 +305,11 @@ export function SalonCustomLayoutShowcase({
             height: `${100 / (b.scale ?? 1)}%`,
           };
           const nodeInner = (
-            <div className="velvet-custom-layout-block__content">
+            <div className="luxury-custom-layout-block__content">
               {editable ? (
-                <div className="velvet-custom-layout-block__badge-wrap">
-                  <span className="velvet-custom-layout-block__badge">{BLOCK_LABELS[id]}</span>
-                  <div className="velvet-custom-layout-block__zoom">
+                <div className="luxury-custom-layout-block__badge-wrap">
+                  <span className="luxury-custom-layout-block__badge">{BLOCK_LABELS[id]}</span>
+                  <div className="luxury-custom-layout-block__zoom">
                     <button
                       type="button"
                       onClick={(e) => {
@@ -340,7 +340,7 @@ export function SalonCustomLayoutShowcase({
           if (!editable) {
             return (
               <div key={id}>
-                <div className="velvet-custom-layout-block" style={blockStyle(b)} data-block-id={id}>
+                <div className="luxury-custom-layout-block" style={blockStyle(b)} data-block-id={id}>
                   {nodeInner}
                 </div>
               </div>
@@ -358,16 +358,16 @@ export function SalonCustomLayoutShowcase({
               size={{ width: pxW, height: pxH }}
               dragGrid={[1, 1]}
               resizeGrid={[1, 1]}
-              className="velvet-custom-layout-rnd"
+              className="luxury-custom-layout-rnd"
               resizeHandleClasses={{
-                top: "velvet-custom-layout-handle velvet-custom-layout-handle--top",
-                right: "velvet-custom-layout-handle velvet-custom-layout-handle--right",
-                bottom: "velvet-custom-layout-handle velvet-custom-layout-handle--bottom",
-                left: "velvet-custom-layout-handle velvet-custom-layout-handle--left",
-                topRight: "velvet-custom-layout-handle velvet-custom-layout-handle--top-right",
-                bottomRight: "velvet-custom-layout-handle velvet-custom-layout-handle--bottom-right",
-                bottomLeft: "velvet-custom-layout-handle velvet-custom-layout-handle--bottom-left",
-                topLeft: "velvet-custom-layout-handle velvet-custom-layout-handle--top-left",
+                top: "luxury-custom-layout-handle luxury-custom-layout-handle--top",
+                right: "luxury-custom-layout-handle luxury-custom-layout-handle--right",
+                bottom: "luxury-custom-layout-handle luxury-custom-layout-handle--bottom",
+                left: "luxury-custom-layout-handle luxury-custom-layout-handle--left",
+                topRight: "luxury-custom-layout-handle luxury-custom-layout-handle--top-right",
+                bottomRight: "luxury-custom-layout-handle luxury-custom-layout-handle--bottom-right",
+                bottomLeft: "luxury-custom-layout-handle luxury-custom-layout-handle--bottom-left",
+                topLeft: "luxury-custom-layout-handle luxury-custom-layout-handle--top-left",
               }}
               onDragStop={(_, d) =>
                 onMutateBlock(id, {
@@ -387,7 +387,7 @@ export function SalonCustomLayoutShowcase({
               style={{ position: "absolute" }}
               enableResizing={editable}
             >
-              <div className="velvet-custom-layout-block velvet-custom-layout-block--editable">{nodeInner}</div>
+              <div className="luxury-custom-layout-block luxury-custom-layout-block--editable">{nodeInner}</div>
             </Rnd>
           );
         })}

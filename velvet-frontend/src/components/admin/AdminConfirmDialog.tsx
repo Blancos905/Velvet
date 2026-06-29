@@ -20,7 +20,7 @@ export type AdminConfirmDialogProps = {
 function DangerIcon() {
   return (
     <svg
-      className="velvet-admin-confirm-dialog__icon-svg"
+      className="luxury-admin-confirm-dialog__icon-svg"
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden
@@ -57,41 +57,41 @@ export function AdminConfirmDialog({
 
   return (
     <div
-      className={`velvet-plans-modal-root velvet-admin-confirm-dialog-root${isDanger ? " velvet-admin-confirm-dialog-root--danger" : ""}`}
+      className={`luxury-plans-modal-root luxury-admin-confirm-dialog-root${isDanger ? " luxury-admin-confirm-dialog-root--danger" : ""}`}
       role="presentation"
       onMouseDown={(ev) => {
         if (ev.target === ev.currentTarget && !busy) onCancel();
       }}
     >
       <div
-        className={`velvet-plans-modal velvet-admin-confirm-dialog${isDanger ? " velvet-admin-confirm-dialog--danger" : ""}`}
+        className={`luxury-plans-modal luxury-admin-confirm-dialog${isDanger ? " luxury-admin-confirm-dialog--danger" : ""}`}
         role="alertdialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={`${titleId}-desc`}
       >
         {isDanger ? (
-          <div className="velvet-admin-confirm-dialog__hero" aria-hidden>
-            <span className="velvet-admin-confirm-dialog__icon-ring">
-              <span className="velvet-admin-confirm-dialog__icon">
+          <div className="luxury-admin-confirm-dialog__hero" aria-hidden>
+            <span className="luxury-admin-confirm-dialog__icon-ring">
+              <span className="luxury-admin-confirm-dialog__icon">
                 <DangerIcon />
               </span>
             </span>
           </div>
         ) : null}
 
-        <div className="velvet-plans-modal__head velvet-admin-confirm-dialog__head">
-          <div className="velvet-admin-confirm-dialog__title-block">
+        <div className="luxury-plans-modal__head luxury-admin-confirm-dialog__head">
+          <div className="luxury-admin-confirm-dialog__title-block">
             {isDanger ? (
-              <p className="velvet-admin-confirm-dialog__kicker">Azione irreversibile</p>
+              <p className="luxury-admin-confirm-dialog__kicker">Azione irreversibile</p>
             ) : null}
-            <h2 id={titleId} className="velvet-plans-modal__title velvet-admin-confirm-dialog__title">
+            <h2 id={titleId} className="luxury-plans-modal__title luxury-admin-confirm-dialog__title">
               {title}
             </h2>
           </div>
           <button
             type="button"
-            className="velvet-plans-modal__close velvet-admin-confirm-dialog__close"
+            className="luxury-plans-modal__close luxury-admin-confirm-dialog__close"
             onClick={onCancel}
             disabled={busy}
             aria-label="Chiudi"
@@ -101,21 +101,21 @@ export function AdminConfirmDialog({
         </div>
 
         {subject ? (
-          <p className="velvet-admin-confirm-dialog__subject" aria-label="Elemento interessato">
+          <p className="luxury-admin-confirm-dialog__subject" aria-label="Elemento interessato">
             {subjectLabel ? (
-              <span className="velvet-admin-confirm-dialog__subject-label">{subjectLabel}</span>
+              <span className="luxury-admin-confirm-dialog__subject-label">{subjectLabel}</span>
             ) : null}
-            <span className="velvet-admin-confirm-dialog__subject-name">{subject}</span>
+            <span className="luxury-admin-confirm-dialog__subject-name">{subject}</span>
           </p>
         ) : null}
 
         <div
           id={`${titleId}-desc`}
-          className={`velvet-admin-confirm-dialog__body${isDanger ? " velvet-admin-confirm-dialog__body--danger" : ""}`}
+          className={`luxury-admin-confirm-dialog__body${isDanger ? " luxury-admin-confirm-dialog__body--danger" : ""}`}
         >
-          <p className="velvet-plans-modal__intro velvet-admin-confirm-dialog__message">{message}</p>
+          <p className="luxury-plans-modal__intro luxury-admin-confirm-dialog__message">{message}</p>
           {warningNotes && warningNotes.length > 0 ? (
-            <ul className="velvet-admin-confirm-dialog__warnings">
+            <ul className="luxury-admin-confirm-dialog__warnings">
               {warningNotes.map((note) => (
                 <li key={note}>{note}</li>
               ))}
@@ -123,10 +123,10 @@ export function AdminConfirmDialog({
           ) : null}
         </div>
 
-        <div className="velvet-plans-modal__actions velvet-admin-confirm-dialog__actions">
+        <div className="luxury-plans-modal__actions luxury-admin-confirm-dialog__actions">
           <button
             type="button"
-            className={`velvet-plan-cta velvet-plan-cta--secondary velvet-admin-confirm-dialog__cancel${isDanger ? " velvet-admin-confirm-dialog__cancel--danger" : ""}`}
+            className={`luxury-plan-cta luxury-plan-cta--secondary luxury-admin-confirm-dialog__cancel${isDanger ? " luxury-admin-confirm-dialog__cancel--danger" : ""}`}
             onClick={onCancel}
             disabled={busy}
           >
@@ -134,7 +134,7 @@ export function AdminConfirmDialog({
           </button>
           <button
             type="button"
-            className={`velvet-plan-cta velvet-admin-confirm-dialog__confirm${isDanger ? " velvet-admin-confirm-dialog__confirm--danger" : " velvet-admin-btn--danger"}`}
+            className={`luxury-plan-cta luxury-admin-confirm-dialog__confirm${isDanger ? " luxury-admin-confirm-dialog__confirm--danger" : " luxury-admin-btn--danger"}`}
             onClick={onConfirm}
             disabled={busy}
           >

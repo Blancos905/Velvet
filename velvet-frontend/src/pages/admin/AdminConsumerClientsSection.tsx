@@ -186,14 +186,14 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
     <>
       {confirmDialog}
       {actionBanner}
-      <section className="velvet-admin-panel velvet-admin-premium-card" aria-labelledby={headingId}>
-        <h2 id={headingId} className="velvet-admin-section-title">
+      <section className="luxury-admin-panel luxury-admin-premium-card" aria-labelledby={headingId}>
+        <h2 id={headingId} className="luxury-admin-section-title">
           Clienti Saloni Luxury
         </h2>
-        <div className="velvet-admin-subchips velvet-admin-premium-card__toolbar" role="toolbar" aria-label="Azioni clienti">
+        <div className="luxury-admin-subchips luxury-admin-premium-card__toolbar" role="toolbar" aria-label="Azioni clienti">
           <button
             type="button"
-            className="velvet-admin-btn"
+            className="luxury-admin-btn"
             onClick={() => {
               setShowCreateModal((v) => {
                 const next = !v;
@@ -209,7 +209,7 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
           </button>
           <button
             type="button"
-            className={`velvet-admin-subchip ${listScope === "booking" ? "is-active" : ""}`}
+            className={`luxury-admin-subchip ${listScope === "booking" ? "is-active" : ""}`}
             aria-pressed={listScope === "booking"}
             onClick={() => setListScope("booking")}
           >
@@ -217,23 +217,23 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
           </button>
           <button
             type="button"
-            className={`velvet-admin-subchip ${listScope === "all" ? "is-active" : ""}`}
+            className={`luxury-admin-subchip ${listScope === "all" ? "is-active" : ""}`}
             aria-pressed={listScope === "all"}
             onClick={() => setListScope("all")}
           >
             Tutti i profili
           </button>
         </div>
-        <div className="velvet-admin-subreveal is-open">
-          <div className="velvet-admin-premium-card__search-panel">
-            <label className="velvet-admin-premium-card__search-label" htmlFor={`${idPrefix}-search`}>
+        <div className="luxury-admin-subreveal is-open">
+          <div className="luxury-admin-premium-card__search-panel">
+            <label className="luxury-admin-premium-card__search-label" htmlFor={`${idPrefix}-search`}>
               Cerca per email o nome
             </label>
-            <div className="velvet-admin-premium-card__search-row">
+            <div className="luxury-admin-premium-card__search-row">
               <input
                 id={`${idPrefix}-search`}
                 type="search"
-                className="velvet-admin-input velvet-admin-premium-card__search-input"
+                className="luxury-admin-input luxury-admin-premium-card__search-input"
                 placeholder="Es. mario.rossi…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -241,14 +241,14 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
                 spellCheck={false}
               />
               {search.trim() ? (
-                <button type="button" className="velvet-admin-premium-card__search-clear" onClick={() => setSearch("")}>
+                <button type="button" className="luxury-admin-premium-card__search-clear" onClick={() => setSearch("")}>
                   Azzera
                 </button>
               ) : null}
             </div>
           </div>
-          <div className="velvet-admin-table-wrap velvet-admin-premium-card__table-wrap">
-            <table className="velvet-admin-table velvet-admin-table--compact velvet-admin-premium-card__table">
+          <div className="luxury-admin-table-wrap luxury-admin-premium-card__table-wrap">
+            <table className="luxury-admin-table luxury-admin-table--compact luxury-admin-premium-card__table">
               <thead>
                 <tr>
                   <th scope="col">Email</th>
@@ -283,13 +283,13 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
                     <tr key={row.id}>
                       <td>{row.email ?? "—"}</td>
                       <td>{row.displayName ?? "—"}</td>
-                      <td className="velvet-admin-mono">{row.securityRoles ?? "—"}</td>
+                      <td className="luxury-admin-mono">{row.securityRoles ?? "—"}</td>
                       <td>{row.planTier ?? "—"}</td>
                       <td>{row.deletedAt ? "eliminato" : "attivo"}</td>
-                      <td className="velvet-admin-premium-card__actions-cell">
+                      <td className="luxury-admin-premium-card__actions-cell">
                         <button
                           type="button"
-                          className="velvet-admin-btn velvet-admin-premium-card__action-btn"
+                          className="luxury-admin-btn luxury-admin-premium-card__action-btn"
                           title={
                             canOpenConsumerVelvetSession(row)
                               ? "Apri l’account nell’area Saloni Luxury (stessa idea del Login sui saloni)"
@@ -308,7 +308,7 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
                         </button>
                         <button
                           type="button"
-                          className="velvet-admin-btn velvet-admin-btn--danger velvet-admin-premium-card__action-btn"
+                          className="luxury-admin-btn luxury-admin-btn--danger luxury-admin-premium-card__action-btn"
                           disabled={Boolean(row.deletedAt) || deleteM.isPending}
                           onClick={() => {
                             const label = consumerRowLabel(row);
@@ -333,22 +333,22 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
             </table>
           </div>
           {totalPages > 1 ? (
-            <div className="velvet-admin-subchips velvet-admin-premium-card__pagination" aria-label="Paginazione profili">
+            <div className="luxury-admin-subchips luxury-admin-premium-card__pagination" aria-label="Paginazione profili">
               <button
                 type="button"
-                className="velvet-admin-subchip"
+                className="luxury-admin-subchip"
                 disabled={pageSafe === 0}
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
               >
                 ← Precedente
               </button>
-              <span className="velvet-admin-muted">
+              <span className="luxury-admin-muted">
                 Pagina {pageSafe + 1} di {totalPages} · {listQ.data?.size ?? CLIENTS_PAGE_SIZE} per pagina ·{" "}
                 {listQ.data?.totalElements ?? 0} profili
               </span>
               <button
                 type="button"
-                className="velvet-admin-subchip"
+                className="luxury-admin-subchip"
                 disabled={pageSafe >= totalPages - 1}
                 onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               >
@@ -357,12 +357,12 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
             </div>
           ) : null}
           {deleteM.isError ? (
-            <p className="velvet-alert velvet-alert--error" role="alert">
+            <p className="luxury-alert luxury-alert--error" role="alert">
               {deleteM.error instanceof Error ? deleteM.error.message : "Operazione fallita."}
             </p>
           ) : null}
           {consumerLoginM.isError ? (
-            <p className="velvet-alert velvet-alert--error" role="alert">
+            <p className="luxury-alert luxury-alert--error" role="alert">
               {consumerLoginM.error instanceof Error ? consumerLoginM.error.message : "Login account non riuscito."}
             </p>
           ) : null}
@@ -371,7 +371,7 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
 
       {showCreateModal ? (
         <div
-          className="velvet-plans-modal-root"
+          className="luxury-plans-modal-root"
           role="presentation"
           onMouseDown={(ev) => {
             if (ev.target === ev.currentTarget && !createClientM.isPending) {
@@ -379,14 +379,14 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
             }
           }}
         >
-          <div className="velvet-plans-modal velvet-plans-modal--wide" role="dialog" aria-modal="true" aria-labelledby={`${idPrefix}-create-title`}>
-            <div className="velvet-plans-modal__head">
-              <h2 id={`${idPrefix}-create-title`} className="velvet-plans-modal__title">
+          <div className="luxury-plans-modal luxury-plans-modal--wide" role="dialog" aria-modal="true" aria-labelledby={`${idPrefix}-create-title`}>
+            <div className="luxury-plans-modal__head">
+              <h2 id={`${idPrefix}-create-title`} className="luxury-plans-modal__title">
                 Nuovo cliente — Saloni Luxury
               </h2>
               <button
                 type="button"
-                className="velvet-plans-modal__close"
+                className="luxury-plans-modal__close"
                 onClick={() => setShowCreateModal(false)}
                 disabled={createClientM.isPending}
                 aria-label="Chiudi"
@@ -394,30 +394,30 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
                 ×
               </button>
             </div>
-            <p className="velvet-plans-modal__intro">
+            <p className="luxury-plans-modal__intro">
               Crea un account con ruolo applicativo{" "}
               <code style={{ fontSize: "0.85em", color: "rgba(253, 186, 116, 0.9)" }}>CLIENT</code> (prenotazioni,
               preferiti, recensioni). Non usare questo modulo per titolari di salone o super admin.
             </p>
-            <p className="velvet-plans-modal__note" role="note">
+            <p className="luxury-plans-modal__note" role="note">
               <strong>Backend:</strong> stesso flusso della registrazione pubblica cliente; credenziali gestite da Luxury.
             </p>
             {createErrorHint ? (
-              <p className="velvet-alert velvet-alert--error velvet-plans-modal__alert" role="alert">
+              <p className="luxury-alert luxury-alert--error luxury-plans-modal__alert" role="alert">
                 {createErrorHint}
               </p>
             ) : createClientM.isError ? (
-              <p className="velvet-alert velvet-alert--error velvet-plans-modal__alert" role="alert">
+              <p className="luxury-alert luxury-alert--error luxury-plans-modal__alert" role="alert">
                 {createClientM.error instanceof Error ? createClientM.error.message : "Creazione cliente fallita."}
               </p>
             ) : null}
             {createClientM.isSuccess ? (
-              <p className="velvet-alert velvet-alert--success velvet-plans-modal__alert" role="status">
+              <p className="luxury-alert luxury-alert--success luxury-plans-modal__alert" role="status">
                 Cliente creato con successo.
               </p>
             ) : null}
-            <form className="velvet-plans-modal__form" noValidate onSubmit={submitCreateClient}>
-              <label className="velvet-plans-field">
+            <form className="luxury-plans-modal__form" noValidate onSubmit={submitCreateClient}>
+              <label className="luxury-plans-field">
                 <span>Nome</span>
                 <input
                   value={createForm.firstName}
@@ -427,7 +427,7 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
                   maxLength={100}
                 />
               </label>
-              <label className="velvet-plans-field">
+              <label className="luxury-plans-field">
                 <span>Cognome</span>
                 <input
                   value={createForm.lastName}
@@ -437,7 +437,7 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
                   maxLength={100}
                 />
               </label>
-              <label className="velvet-plans-field velvet-plans-field--full">
+              <label className="luxury-plans-field luxury-plans-field--full">
                 <span>Email</span>
                 <input
                   type="email"
@@ -448,7 +448,7 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
                   maxLength={320}
                 />
               </label>
-              <label className="velvet-plans-field velvet-plans-field--full">
+              <label className="luxury-plans-field luxury-plans-field--full">
                 <span>Telefono</span>
                 <input
                   value={createForm.phone}
@@ -457,7 +457,7 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
                   maxLength={40}
                 />
               </label>
-              <label className="velvet-plans-field velvet-plans-field--full">
+              <label className="luxury-plans-field luxury-plans-field--full">
                 <span>Password</span>
                 <input
                   type="password"
@@ -469,16 +469,16 @@ export function AdminConsumerClientsSection({ accessToken, idPrefix, headingId }
                   maxLength={200}
                 />
               </label>
-              <div className="velvet-plans-modal__actions">
+              <div className="luxury-plans-modal__actions">
                 <button
                   type="button"
-                  className="velvet-plan-cta velvet-plan-cta--secondary"
+                  className="luxury-plan-cta luxury-plan-cta--secondary"
                   onClick={() => setShowCreateModal(false)}
                   disabled={createClientM.isPending}
                 >
                   Annulla
                 </button>
-                <button type="submit" className="velvet-plan-cta" disabled={createClientM.isPending}>
+                <button type="submit" className="luxury-plan-cta" disabled={createClientM.isPending}>
                   {createClientM.isPending ? "Creazione…" : "Crea cliente"}
                 </button>
               </div>

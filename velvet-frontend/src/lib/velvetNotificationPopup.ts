@@ -50,7 +50,7 @@ export function salonAlertBannerForType(type: string | undefined): string {
   }
 }
 
-export const VELVET_NOTIFICATION_OPEN_EVENT = "velvet-notification-open";
+export const VELVET_NOTIFICATION_OPEN_EVENT = "luxury-notification-open";
 const PENDING_POPUP_STORAGE_KEY = "velvet.pendingNotificationPopup";
 
 type PopupListener = (payload: VelvetNotificationPopupPayload) => void;

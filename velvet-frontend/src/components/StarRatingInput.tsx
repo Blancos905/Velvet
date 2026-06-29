@@ -16,13 +16,13 @@ export function StarRatingInput({ value, onChange, max = 5, disabled, id, label 
   const labelId = id ? `${id}-label` : undefined;
 
   return (
-    <div className="velvet-star-rating" role="group" aria-labelledby={labelId}>
+    <div className="luxury-star-rating" role="group" aria-labelledby={labelId}>
       {label ? (
-        <span id={labelId} className="velvet-star-rating__label">
+        <span id={labelId} className="luxury-star-rating__label">
           {label}
         </span>
       ) : null}
-      <div className="velvet-star-rating__row" aria-hidden={!!label}>
+      <div className="luxury-star-rating__row" aria-hidden={!!label}>
         {Array.from({ length: safeMax }, (_, i) => {
           const n = i + 1;
           const filled = n <= v;
@@ -31,7 +31,7 @@ export function StarRatingInput({ value, onChange, max = 5, disabled, id, label 
               key={n}
               type="button"
               disabled={disabled}
-              className={`velvet-star-rating__star ${filled ? "is-filled" : ""}`}
+              className={`luxury-star-rating__star ${filled ? "is-filled" : ""}`}
               aria-label={`${n} su ${safeMax}`}
               onClick={() => onChange(n)}
               onMouseDown={(e: MouseEvent) => e.preventDefault()}
@@ -41,7 +41,7 @@ export function StarRatingInput({ value, onChange, max = 5, disabled, id, label 
           );
         })}
       </div>
-      <span className="velvet-star-rating__value" aria-live="polite">
+      <span className="luxury-star-rating__value" aria-live="polite">
         {v}/{safeMax}
       </span>
     </div>

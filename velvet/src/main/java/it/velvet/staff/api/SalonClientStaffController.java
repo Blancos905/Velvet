@@ -119,7 +119,7 @@ public class SalonClientStaffController {
 		return t.isEmpty() ? null : t;
 	}
 
-	public record ClientDto(UUID id, String displayName, String email, String phone, boolean velvetConsumerLinked) {
+	public record ClientDto(UUID id, String displayName, String email, String phone, boolean luxuryConsumerLinked) {
 		public static ClientDto from(SalonClient c) {
 			return new ClientDto(
 					c.getId(),

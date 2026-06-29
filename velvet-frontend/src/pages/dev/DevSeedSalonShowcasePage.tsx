@@ -87,7 +87,7 @@ export default function DevSeedSalonShowcasePage() {
 
   if (!import.meta.env.DEV) {
     return (
-      <main className="velvet-page-main" style={{ padding: "2rem", color: "#fffbeb" }}>
+      <main className="luxury-page-main" style={{ padding: "2rem", color: "#fffbeb" }}>
         <p>Questa pagina è disponibile solo in build di sviluppo.</p>
         <Link to="/">Home</Link>
       </main>
@@ -95,8 +95,8 @@ export default function DevSeedSalonShowcasePage() {
   }
 
   return (
-    <main className="velvet-page-main" style={{ padding: "clamp(1.25rem, 4vw, 2.5rem)", maxWidth: "36rem", color: "#fffbeb" }}>
-      <h1 className="velvet-page-title" style={{ marginTop: 0 }}>
+    <main className="luxury-page-main" style={{ padding: "clamp(1.25rem, 4vw, 2.5rem)", maxWidth: "36rem", color: "#fffbeb" }}>
+      <h1 className="luxury-page-title" style={{ marginTop: 0 }}>
         Seed dev — Crea il tuo sito / Esplora
       </h1>
       <p style={{ lineHeight: 1.55, opacity: 0.88 }}>
@@ -112,22 +112,22 @@ export default function DevSeedSalonShowcasePage() {
         </li>
       </ul>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "0.65rem", marginTop: "1.25rem" }}>
-        <button type="button" className="velvet-btn velvet-btn--primary" disabled={status === "working"} onClick={() => void runSeed()}>
+        <button type="button" className="luxury-btn luxury-btn--primary" disabled={status === "working"} onClick={() => void runSeed()}>
           {status === "working" ? "Salvataggio…" : "Carica dati di prova"}
         </button>
-        <Link className="velvet-btn velvet-btn--secondary" to={`/s/${encodeURIComponent(slug)}/esplora#gallery`}>
+        <Link className="luxury-btn luxury-btn--secondary" to={`/s/${encodeURIComponent(slug)}/esplora#gallery`}>
           Apri Esplora (gallery)
         </Link>
-        <Link className="velvet-btn velvet-btn--secondary" to={`/s/${encodeURIComponent(slug)}/il-tuo-salone`}>
+        <Link className="luxury-btn luxury-btn--secondary" to={`/s/${encodeURIComponent(slug)}/il-tuo-salone`}>
           Apri Il tuo sito
         </Link>
-        <Link className="velvet-btn velvet-btn--secondary" to="/account/salone/tuo-salone">
+        <Link className="luxury-btn luxury-btn--secondary" to="/account/salone/tuo-salone">
           Editor account
         </Link>
       </div>
       {message ? (
         <p
-          className={status === "error" ? "velvet-alert velvet-alert--error" : "velvet-alert velvet-alert--success"}
+          className={status === "error" ? "luxury-alert luxury-alert--error" : "luxury-alert luxury-alert--success"}
           style={{ marginTop: "1rem" }}
           role={status === "error" ? "alert" : "status"}
         >

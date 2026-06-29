@@ -1,0 +1,343 @@
+/**
+ * Modale registrazione titolare (/piani) — stesso linguaggio visivo di .luxury-email-confirm-box.
+ */
+
+.luxury-plans-modal-root--salon-register {
+  background: rgba(12, 6, 4, 0.78);
+  backdrop-filter: blur(10px);
+}
+
+.luxury-plans-modal-root--salon-register .luxury-salon-register-box.luxury-email-confirm-box {
+  width: min(480px, calc(100vw - 1.5rem));
+  max-height: min(92vh, 920px);
+  margin: 0;
+  padding: 1.55rem 1.45rem 1.45rem;
+  text-align: left;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.luxury-salon-register-box--wide.luxury-email-confirm-box {
+  width: min(720px, calc(100vw - 1.5rem));
+}
+
+.luxury-salon-register-box__close {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 2px solid rgba(251, 146, 60, 0.38);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fdba74;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.luxury-salon-register-box__close:hover:not(:disabled) {
+  transform: scale(1.05);
+  border-color: rgba(253, 186, 116, 0.72);
+  background: rgba(251, 146, 60, 0.12);
+  color: #ffedd5;
+}
+
+.luxury-salon-register-box__close:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.luxury-salon-register-box__close:focus-visible {
+  outline: 2px solid #fb923c;
+  outline-offset: 2px;
+}
+
+.luxury-salon-register-box .luxury-email-confirm-box__kicker,
+.luxury-salon-register-box .luxury-email-confirm-box__title,
+.luxury-salon-register-box .luxury-email-confirm-box__lead {
+  text-align: center;
+}
+
+.luxury-salon-register-box .luxury-email-confirm-box__lead {
+  margin-bottom: 1rem;
+}
+
+.luxury-salon-register-box__alert {
+  margin: 0 0 0.85rem;
+  text-align: left;
+}
+
+.luxury-salon-register-box__form.luxury-plans-modal__form {
+  display: grid;
+  gap: 0.85rem 0.9rem;
+  margin-top: 0.15rem;
+}
+
+.luxury-salon-register-box--wide .luxury-salon-register-box__form.luxury-plans-modal__form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.luxury-salon-register-box .luxury-plans-field--full,
+.luxury-salon-register-box .luxury-eu-phone-field,
+.luxury-salon-register-box .luxury-plans-fieldset,
+.luxury-salon-register-box .luxury-plans-privacy-terms,
+.luxury-salon-register-box .luxury-plans-password-pair,
+.luxury-salon-register-box .luxury-salon-register-box__actions {
+  grid-column: 1 / -1;
+}
+
+.luxury-salon-register-box .luxury-plans-password-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 0.9rem;
+}
+
+.luxury-salon-register-box .luxury-plans-field {
+  padding: 0.35rem 0.4rem 0.5rem;
+  border-radius: 12px;
+  transition:
+    background 0.32s ease,
+    box-shadow 0.32s ease,
+    transform 0.32s cubic-bezier(0.34, 1.46, 0.64, 1);
+}
+
+.luxury-salon-register-box .luxury-plans-field:focus-within {
+  background: rgba(251, 146, 60, 0.07);
+  box-shadow:
+    0 0 0 1px rgba(251, 146, 60, 0.22),
+    0 10px 26px rgba(0, 0, 0, 0.28);
+  transform: translateY(-1px);
+}
+
+.luxury-salon-register-box .luxury-plans-field > span:first-child,
+.luxury-salon-register-box .luxury-eu-phone-field > span:first-child {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #fb923c;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.luxury-salon-register-box .luxury-eu-phone-field {
+  padding: 0.35rem 0.4rem 0.5rem;
+  border-radius: 12px;
+  transition:
+    background 0.32s ease,
+    box-shadow 0.32s ease,
+    transform 0.32s cubic-bezier(0.34, 1.46, 0.64, 1);
+}
+
+.luxury-salon-register-box .luxury-eu-phone-field:focus-within {
+  background: rgba(251, 146, 60, 0.07);
+  box-shadow:
+    0 0 0 1px rgba(251, 146, 60, 0.22),
+    0 10px 26px rgba(0, 0, 0, 0.28);
+  transform: translateY(-1px);
+}
+
+.luxury-salon-register-box .luxury-eu-phone-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.55rem;
+  width: 100%;
+}
+
+.luxury-salon-register-box .luxury-eu-phone-row__prefix {
+  flex: 0 0 auto;
+  min-width: 6.75rem;
+  max-width: 9rem;
+  width: auto;
+  padding-right: 1.75rem;
+}
+
+.luxury-salon-register-box .luxury-eu-phone-row__number {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+}
+
+.luxury-salon-register-box .luxury-eu-contact-select,
+.luxury-salon-register-box .luxury-eu-phone-row__number {
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  color: #0a0a0a;
+  caret-color: #0a0a0a;
+  color-scheme: light;
+  background-color: #ffedd5;
+  border: 1px solid #fb923c;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  outline: none;
+  transition:
+    border-color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.32s ease,
+    background 0.25s ease;
+}
+
+.luxury-salon-register-box .luxury-eu-phone-row__prefix.luxury-eu-contact-select {
+  width: auto;
+}
+
+.luxury-salon-register-box .luxury-plans-field input[type="text"],
+.luxury-salon-register-box .luxury-plans-field input[type="email"],
+.luxury-salon-register-box .luxury-plans-field input[type="tel"],
+.luxury-salon-register-box .luxury-plans-field input[type="password"],
+.luxury-salon-register-box .luxury-plans-field .luxury-plans-password-wrap input {
+  box-sizing: border-box;
+  width: 100%;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  color: #0a0a0a;
+  caret-color: #0a0a0a;
+  color-scheme: light;
+  background-color: #ffedd5;
+  border: 1px solid #fb923c;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  outline: none;
+  transition:
+    border-color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.32s ease,
+    background 0.25s ease;
+}
+
+.luxury-salon-register-box .luxury-plans-field input:hover:not(:disabled),
+.luxury-salon-register-box .luxury-eu-contact-select:hover:not(:disabled),
+.luxury-salon-register-box .luxury-eu-phone-row__number:hover:not(:disabled) {
+  border-color: #f97316;
+  background-color: #fed7aa;
+}
+
+.luxury-salon-register-box .luxury-plans-field input:focus,
+.luxury-salon-register-box .luxury-plans-field input:focus-visible,
+.luxury-salon-register-box .luxury-eu-contact-select:focus,
+.luxury-salon-register-box .luxury-eu-phone-row__number:focus {
+  outline: none;
+  border-color: #ea580c;
+  background-color: #fdba74;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 0 3px rgba(249, 115, 22, 0.35),
+    0 6px 20px rgba(243, 112, 33, 0.2);
+}
+
+.luxury-salon-register-box .luxury-plans-field input::placeholder,
+.luxury-salon-register-box .luxury-eu-phone-row__number::placeholder {
+  color: rgba(10, 10, 10, 0.42);
+}
+
+.luxury-salon-register-box .luxury-eu-contact-select:disabled,
+.luxury-salon-register-box .luxury-eu-phone-row__number:disabled,
+.luxury-salon-register-box .luxury-plans-field input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.luxury-salon-register-box .luxury-plans-salon-types__legend,
+.luxury-salon-register-box .luxury-plans-modal__section-title {
+  color: #fb923c;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.luxury-salon-register-box .luxury-plans-salon-type-chip {
+  border-color: rgba(251, 146, 60, 0.42);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(253, 186, 116, 0.92);
+}
+
+.luxury-salon-register-box .luxury-plans-salon-type-chip--selected {
+  border-color: rgba(253, 186, 116, 0.75);
+  background: rgba(251, 146, 60, 0.16);
+  color: #ffedd5;
+  box-shadow: 0 0 20px rgba(243, 112, 33, 0.18);
+}
+
+.luxury-salon-register-box .luxury-plans-field--check {
+  color: rgba(253, 186, 116, 0.88);
+}
+
+.luxury-salon-register-box .luxury-plans-field--check input[type="checkbox"] {
+  accent-color: #f97316;
+}
+
+.luxury-salon-register-box .luxury-salon-billing-fields {
+  margin: 0.15rem 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.luxury-salon-register-box .luxury-salon-billing-fields__hint {
+  margin: 0 0 0.85rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(253, 186, 116, 0.82);
+  text-align: left;
+}
+
+.luxury-salon-register-box .luxury-salon-billing-fields .luxury-plans-password-pair {
+  grid-column: 1 / -1;
+}
+
+.luxury-salon-register-box--wide .luxury-salon-billing-fields .luxury-plans-password-pair {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.luxury-salon-register-box .luxury-link-inline {
+  color: #fdba74;
+}
+
+.luxury-salon-register-box__actions.luxury-email-confirm-box__actions {
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+}
+
+.luxury-salon-register-box__actions .luxury-email-confirm-box__cta {
+  width: 100%;
+}
+
+@media (min-width: 520px) {
+  .luxury-salon-register-box__actions.luxury-email-confirm-box__actions {
+    flex-direction: row;
+  }
+
+  .luxury-salon-register-box__actions .luxury-email-confirm-box__cta {
+    flex: 1 1 0;
+    max-width: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .luxury-salon-register-box--wide .luxury-salon-register-box__form.luxury-plans-modal__form,
+  .luxury-salon-register-box .luxury-plans-password-pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-register-box .luxury-plans-field:focus-within,
+  .luxury-salon-register-box .luxury-eu-phone-field:focus-within,
+  .luxury-salon-register-box__close:hover:not(:disabled) {
+    transform: none;
+  }
+}

@@ -1,0 +1,208 @@
+.luxury-salon-staff-page {
+  max-width: 760px;
+}
+
+/** Agenda sotto Prenotazioni: usa tutta la larghezza utile dell’area account. */
+.luxury-salon-staff-page--agenda-wide {
+  max-width: min(1180px, 100%);
+  width: 100%;
+}
+
+.luxury-salon-staff-work-hours {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.luxury-salon-staff-work-hours__hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+}
+
+.luxury-salon-staff-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.luxury-salon-staff-form__tight {
+  margin-top: 0.15rem;
+}
+
+.luxury-salon-staff-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.luxury-salon-staff-item {
+  margin-top: 0;
+  padding: 0.75rem 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 2px solid #000000;
+}
+
+button.luxury-salon-staff-pick-item {
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  border-radius: inherit;
+}
+
+button.luxury-salon-staff-pick-item:hover {
+  border-color: #000000;
+}
+
+.luxury-salon-staff-item__avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  box-shadow: 0 6px 16px rgba(2, 6, 23, 0.35);
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.luxury-salon-staff-item__body {
+  min-width: 0;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.luxury-salon-staff-item__name {
+  display: block;
+}
+
+.luxury-salon-staff-item__role {
+  font-size: 0.9rem;
+}
+
+.luxury-salon-staff-item__chip {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.16rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: rgba(255, 251, 235, 0.92);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  background: rgba(14, 116, 144, 0.3);
+}
+
+.luxury-salon-staff-item__chip--login {
+  border-color: rgba(52, 211, 153, 0.55);
+  background: rgba(6, 78, 59, 0.45);
+}
+
+.luxury-salon-staff-item__actions {
+  margin-top: 0.35rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.luxury-salon-staff-item__actions .luxury-btn {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.luxury-salon-staff-item__editor {
+  margin-top: 0.45rem;
+  display: grid;
+  gap: 0.4rem;
+  max-width: 460px;
+}
+
+.luxury-salon-staff-photo-preview {
+  display: inline-flex;
+  margin-top: 0.5rem;
+  width: 68px;
+  height: 68px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: rgba(15, 23, 42, 0.45);
+  box-shadow: 0 6px 16px rgba(2, 6, 23, 0.28);
+}
+
+.luxury-salon-staff-photo-preview__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.luxury-salon-staff-photo-controls {
+  margin-top: 0.45rem;
+  display: grid;
+  gap: 0.35rem;
+  max-width: 340px;
+}
+
+.luxury-salon-staff-photo-controls .luxury-form-label {
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.78rem;
+}
+
+.luxury-salon-staff-password-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.luxury-salon-staff-password-wrap .luxury-soft-field {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 2.75rem;
+}
+
+.luxury-salon-staff-password-toggle {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  color: #fb923c;
+  background: rgba(251, 146, 60, 0.1);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.luxury-salon-staff-password-toggle:hover:not(:disabled) {
+  color: #fdba74;
+  background: rgba(251, 146, 60, 0.22);
+  transform: translateY(-50%);
+}
+
+.luxury-salon-staff-password-toggle:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.luxury-salon-staff-password-toggle:focus-visible {
+  outline: 2px solid #fb923c;
+  outline-offset: 2px;
+}
+
+.luxury-salon-staff-password-toggle:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.luxury-salon-staff-password-toggle__icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}

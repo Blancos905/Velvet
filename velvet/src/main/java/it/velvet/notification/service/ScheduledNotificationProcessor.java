@@ -200,8 +200,8 @@ public class ScheduledNotificationProcessor {
 			case REMINDER_24H -> "Promemoria: tra 24 ore — " + salon;
 			case REMINDER_1H -> "Promemoria: tra 2 ore — " + salon;
 			case REVIEW_INVITE -> "Com'è andata? Lascia una recensione — " + salon;
-			case ADMIN_PLATFORM_MESSAGE -> "Messaggio Velvet";
-			case SUPPORT_REQUEST_TO_VELVET -> "Assistenza Velvet";
+			case ADMIN_PLATFORM_MESSAGE -> "Messaggio Saloni Luxury";
+			case SUPPORT_REQUEST_TO_VELVET -> "Assistenza Saloni Luxury";
 		};
 	}
 
@@ -252,7 +252,7 @@ public class ScheduledNotificationProcessor {
 					default -> "";
 				};
 				String appointmentUrl = buildConsumerAppointmentUrl(a.getId());
-				yield "Grazie per aver prenotato con SaloniLuxury.\n\n"
+				yield "Grazie per aver prenotato con Saloni Luxury.\n\n"
 						+ "Un ringraziamento anche da parte di "
 						+ salon
 						+ ".\n\n"
@@ -300,7 +300,7 @@ public class ScheduledNotificationProcessor {
 					+ "Sede: "
 					+ salon
 					+ "\n"
-					+ "\nPer un nuovo appuntamento visita il sito del salone o l'app SaloniLuxury.\n";
+					+ "\nPer un nuovo appuntamento visita il sito del salone o l'app Saloni Luxury.\n";
 			case REVIEW_INVITE -> {
 				String reviewToken = appointmentTokenService.mintReviewToken(a.getId());
 				String reviewUrl = buildReviewUrl(reviewToken);

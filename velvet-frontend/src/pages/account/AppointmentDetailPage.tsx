@@ -7,7 +7,7 @@ import { BookingConfirmedModal } from "../../components/BookingConfirmedModal";
 import { StarRatingInput } from "../../components/StarRatingInput";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
 import { formatPriceEUR } from "../../lib/format";
-import "../../styles/velvet-appointment-detail-page.css";
+import "../../styles/luxury-appointment-detail-page.css";
 
 function localDayBounds(): { from: string; to: string } {
   const d = new Date();
@@ -308,18 +308,18 @@ export default function AppointmentDetailPage() {
 
   if (q.isLoading) {
     return (
-      <div className="velvet-appointment-detail-page">
-        <p className="velvet-text-muted">Caricamento…</p>
+      <div className="luxury-appointment-detail-page">
+        <p className="luxury-text-muted">Caricamento…</p>
       </div>
     );
   }
   if (q.error || !a) {
     return (
-      <div className="velvet-appointment-detail-page">
-        <p className="velvet-alert velvet-alert--error" role="alert">
+      <div className="luxury-appointment-detail-page">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {q.error instanceof Error ? q.error.message : "Appuntamento non trovato"}
         </p>
-        <Link to={agendaListPath} className="velvet-link-back">
+        <Link to={agendaListPath} className="luxury-link-back">
           ← Torna all&apos;elenco
         </Link>
       </div>
@@ -332,23 +332,23 @@ export default function AppointmentDetailPage() {
   const deadlineFmt = new Intl.DateTimeFormat("it-IT", { dateStyle: "short", timeStyle: "short" });
 
   return (
-    <div className="velvet-appointment-detail-page">
-      <Link to={agendaListPath} className="velvet-link-back velvet-link-back--overlay-nav">
-        <span className="velvet-link-back__chevron" aria-hidden="true">
+    <div className="luxury-appointment-detail-page">
+      <Link to={agendaListPath} className="luxury-link-back luxury-link-back--overlay-nav">
+        <span className="luxury-link-back__chevron" aria-hidden="true">
           ←
         </span>
-        <span className="velvet-link-back__text">{salonSide ? "Agenda" : "Prenotazioni"}</span>
+        <span className="luxury-link-back__text">{salonSide ? "Agenda" : "Prenotazioni"}</span>
       </Link>
-      <header className="velvet-appointment-detail-page__hero">
-        <div className="velvet-appointment-detail-page__hero-glow" aria-hidden />
-        <div className="velvet-appointment-detail-page__hero-inner">
-          <h1 className="velvet-appointment-detail-page__headline">
-            <span className="velvet-appointment-detail-page__headline-pre">
+      <header className="luxury-appointment-detail-page__hero">
+        <div className="luxury-appointment-detail-page__hero-glow" aria-hidden />
+        <div className="luxury-appointment-detail-page__hero-inner">
+          <h1 className="luxury-appointment-detail-page__headline">
+            <span className="luxury-appointment-detail-page__headline-pre">
               {salonSide ? "Appuntamento · " : "Prenotazione · "}
             </span>
-            <span className="velvet-appointment-detail-page__headline-accent">{a.serviceName}</span>
+            <span className="luxury-appointment-detail-page__headline-accent">{a.serviceName}</span>
           </h1>
-          <p className="velvet-appointment-detail-page__hero-sub">
+          <p className="luxury-appointment-detail-page__hero-sub">
             {salonSide
               ? pendingSalonDecision
                 ? "Richiesta cliente in attesa: accetta o rifiuta la prenotazione."
@@ -360,40 +360,40 @@ export default function AppointmentDetailPage() {
         </div>
       </header>
 
-      <section className="velvet-surface-card velvet-appointment-detail-page__summary">
-        <p className="velvet-appointment-detail-page__location">{a.locationName}</p>
-        <p className="velvet-appointment-detail-page__meta">
+      <section className="luxury-surface-card luxury-appointment-detail-page__summary">
+        <p className="luxury-appointment-detail-page__location">{a.locationName}</p>
+        <p className="luxury-appointment-detail-page__meta">
           {formatPriceEUR(a.priceCents)} · {a.operatorName}
         </p>
-        <p className="velvet-appointment-detail-page__when">
+        <p className="luxury-appointment-detail-page__when">
           {new Date(a.start).toLocaleString(undefined, {
             dateStyle: "full",
             timeStyle: "short",
           })}
         </p>
-        <div className="velvet-appointment-detail-page__status-row">
-          <span className="velvet-appointment-detail-page__status-label">Stato</span>
-          <span className="velvet-appointment-detail-page__status" data-appt-status={a.status}>
+        <div className="luxury-appointment-detail-page__status-row">
+          <span className="luxury-appointment-detail-page__status-label">Stato</span>
+          <span className="luxury-appointment-detail-page__status" data-appt-status={a.status}>
             {appointmentStatusLabel(a.status)}
           </span>
         </div>
       </section>
 
       {err && (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {err}
         </p>
       )}
       {okMsg && (
-        <p className="velvet-alert velvet-alert--success" role="status">
+        <p className="luxury-alert luxury-alert--success" role="status">
           {okMsg}
         </p>
       )}
 
       {showConsumerBookingActions && hasSelfService && (
-        <div className="velvet-btn-row velvet-appointment-detail-page__actions">
+        <div className="luxury-btn-row luxury-appointment-detail-page__actions">
           {a.canConsumerCancel ? (
-            <button type="button" className="velvet-btn velvet-btn--secondary" onClick={() => void onCancel()} disabled={busy}>
+            <button type="button" className="luxury-btn luxury-btn--secondary" onClick={() => void onCancel()} disabled={busy}>
               Disdici prenotazione
             </button>
           ) : null}
@@ -401,7 +401,7 @@ export default function AppointmentDetailPage() {
           {!slots.length && a.canConsumerReschedule && (
             <button
               type="button"
-              className="velvet-btn velvet-btn--primary"
+              className="luxury-btn luxury-btn--primary"
               onClick={() => void loadSlots()}
               disabled={busy || slotsLoading}
             >
@@ -410,13 +410,13 @@ export default function AppointmentDetailPage() {
           )}
 
           {!!slots.length && a.canConsumerReschedule && (
-            <div className="velvet-appointment-detail-page__reschedule-block">
-              <label htmlFor="slot-me" className="velvet-form-label">
+            <div className="luxury-appointment-detail-page__reschedule-block">
+              <label htmlFor="slot-me" className="luxury-form-label">
                 Scegli un nuovo orario
               </label>
               <select
                 id="slot-me"
-                className="velvet-soft-field"
+                className="luxury-soft-field"
                 value={selectedSlot ?? ""}
                 onChange={(e) => setSelectedSlot(e.target.value || null)}
               >
@@ -435,7 +435,7 @@ export default function AppointmentDetailPage() {
               </select>
               <button
                 type="button"
-                className="velvet-btn velvet-btn--primary"
+                className="luxury-btn luxury-btn--primary"
                 onClick={() => void onReschedule()}
                 disabled={!selectedSlot || busy}
               >
@@ -447,7 +447,7 @@ export default function AppointmentDetailPage() {
       )}
 
       {showConsumerBookingActions && !hasSelfService && (
-        <p className="velvet-text-muted" style={{ marginTop: "1.25rem" }}>
+        <p className="luxury-text-muted" style={{ marginTop: "1.25rem" }}>
           La modifica e la disdetta autonoma non sono più disponibili: termine per la disdetta era il{" "}
           {deadlineFmt.format(new Date(a.consumerCancelDeadline))}, termine per cambiare orario il{" "}
           {deadlineFmt.format(new Date(a.consumerRescheduleDeadline))}. Per eccezioni contatta {a.locationName}.
@@ -455,28 +455,28 @@ export default function AppointmentDetailPage() {
       )}
 
       {!showConsumerBookingActions && a.status !== "CANCELLED" && a.status !== "COMPLETED" && !salonSide && a.status !== "BOOKED" && (
-        <p className="velvet-text-muted" style={{ marginTop: "1.25rem" }}>
+        <p className="luxury-text-muted" style={{ marginTop: "1.25rem" }}>
           Per modifiche in questo stato contatta il salone.
         </p>
       )}
 
       {salonSide && pendingSalonDecision ? (
-        <div className="velvet-btn-row velvet-appointment-detail-page__actions">
-          <button type="button" className="velvet-btn velvet-btn--primary" onClick={() => void onConfirmSalon()} disabled={busy}>
+        <div className="luxury-btn-row luxury-appointment-detail-page__actions">
+          <button type="button" className="luxury-btn luxury-btn--primary" onClick={() => void onConfirmSalon()} disabled={busy}>
             Accetta prenotazione
           </button>
-          <button type="button" className="velvet-btn velvet-btn--secondary" onClick={() => void onRejectSalon()} disabled={busy}>
+          <button type="button" className="luxury-btn luxury-btn--secondary" onClick={() => void onRejectSalon()} disabled={busy}>
             Rifiuta
           </button>
         </div>
       ) : null}
 
       {salonSide && !pendingSalonDecision ? (
-        <div className="velvet-btn-row velvet-appointment-detail-page__actions">
+        <div className="luxury-btn-row luxury-appointment-detail-page__actions">
           {!slots.length && canSalonCancel(a.status) && isSalonTitolare ? (
             <button
               type="button"
-              className="velvet-btn velvet-btn--primary"
+              className="luxury-btn luxury-btn--primary"
               onClick={() => void loadSlotsSalon()}
               disabled={busy || slotsLoading}
             >
@@ -484,18 +484,18 @@ export default function AppointmentDetailPage() {
             </button>
           ) : null}
           {canSalonCancel(a.status) ? (
-            <button type="button" className="velvet-btn velvet-btn--secondary" onClick={() => void onCancelSalon()} disabled={busy}>
+            <button type="button" className="luxury-btn luxury-btn--secondary" onClick={() => void onCancelSalon()} disabled={busy}>
               Annulla appuntamento
             </button>
           ) : null}
           {!!slots.length && canSalonCancel(a.status) ? (
-            <div className="velvet-appointment-detail-page__reschedule-block">
-              <label htmlFor="slot-salon" className="velvet-form-label">
+            <div className="luxury-appointment-detail-page__reschedule-block">
+              <label htmlFor="slot-salon" className="luxury-form-label">
                 Scegli un nuovo orario
               </label>
               <select
                 id="slot-salon"
-                className="velvet-soft-field"
+                className="luxury-soft-field"
                 value={selectedSlot ?? ""}
                 onChange={(e) => setSelectedSlot(e.target.value || null)}
               >
@@ -514,7 +514,7 @@ export default function AppointmentDetailPage() {
               </select>
               <button
                 type="button"
-                className="velvet-btn velvet-btn--primary"
+                className="luxury-btn luxury-btn--primary"
                 onClick={() => void onRescheduleSalon()}
                 disabled={!selectedSlot || busy}
               >
@@ -526,21 +526,21 @@ export default function AppointmentDetailPage() {
       ) : null}
 
       {a.status === "COMPLETED" && !salonSide && accessToken && (
-        <section ref={reviewSectionRef} className="velvet-surface-card velvet-appointment-detail-page__review">
-          <h2 className="velvet-section-title" style={{ marginTop: 0 }}>
+        <section ref={reviewSectionRef} className="luxury-surface-card luxury-appointment-detail-page__review">
+          <h2 className="luxury-section-title" style={{ marginTop: 0 }}>
             La tua recensione
           </h2>
-          <p className="velvet-text-muted" style={{ margin: "0 0 1rem", fontSize: "0.92rem" }}>
+          <p className="luxury-text-muted" style={{ margin: "0 0 1rem", fontSize: "0.92rem" }}>
             Puoi usare anche il link che ricevi via email dopo la visita: qui è lo stesso flusso, con il tuo
             account.
           </p>
           {reviewErr && (
-            <p className="velvet-alert velvet-alert--error" role="alert">
+            <p className="luxury-alert luxury-alert--error" role="alert">
               {reviewErr}
             </p>
           )}
           {reviewDone ? (
-            <p className="velvet-alert velvet-alert--success" role="status">
+            <p className="luxury-alert luxury-alert--success" role="status">
               {reviewReturning ? "Grazie, recensione registrata. Ritorno alle recensioni..." : "Grazie, recensione registrata."}
             </p>
           ) : (
@@ -592,16 +592,16 @@ export default function AppointmentDetailPage() {
                 onChange={setReviewStaffRating}
                 disabled={reviewBusy}
               />
-              <label className="velvet-form-label" style={{ marginTop: "0.85rem" }}>
+              <label className="luxury-form-label" style={{ marginTop: "0.85rem" }}>
                 Commento (opzionale)
                 <textarea
-                  className="velvet-soft-field"
+                  className="luxury-soft-field"
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
                   rows={4}
                 />
               </label>
-              <button type="submit" className="velvet-btn velvet-btn--primary" disabled={reviewBusy} style={{ marginTop: "1rem" }}>
+              <button type="submit" className="luxury-btn luxury-btn--primary" disabled={reviewBusy} style={{ marginTop: "1rem" }}>
                 {reviewBusy ? "Invio…" : "Invia recensione"}
               </button>
             </form>

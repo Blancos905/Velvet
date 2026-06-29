@@ -424,6 +424,9 @@ export async function readSalonShowcaseAsync(
   }
 
   if (serverForUse && serverRaw) {
+    if (localForUse && salonShowcaseLocalRicherThanServer(serverForUse, localForUse)) {
+      return localForUse;
+    }
     const cleaned = JSON.stringify(serverForUse);
     void writeLocalShowcaseRaw(key, cleaned);
     return serverForUse;

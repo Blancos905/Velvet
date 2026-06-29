@@ -4,8 +4,8 @@ import {
   SALON_PREMIUM_PANORAMA_PARTNER_CHECKLIST_KEY,
 } from "../components/salon/SalonPremiumPanorama";
 import { SALON_PLANS, planDisplayName } from "../data/salonPlans";
-import "../styles/velvet-search-page.css";
-import "../styles/velvet-legal-public.css";
+import "../styles/luxury-search-page.css";
+import "../styles/luxury-legal-public.css";
 
 /** `/partner`: anteprima panoramica Premium. */
 export default function PartnerPage() {
@@ -13,10 +13,10 @@ export default function PartnerPage() {
   const planTagline = premiumPlan?.tagline ?? "";
 
   return (
-    <main className="velvet-page-main velvet-search-page velvet-partner-panorama-public">
-      <div className="velvet-search-back-row">
-        <Link to="/" className="velvet-search-back">
-          <svg className="velvet-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <main className="luxury-page-main luxury-search-page luxury-partner-panorama-public">
+      <div className="luxury-search-back-row">
+        <Link to="/" className="luxury-search-back">
+          <svg className="luxury-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path
               d="M15 18l-6-6 6-6"
               stroke="currentColor"
@@ -39,26 +39,26 @@ export default function PartnerPage() {
         showProvisionWarning={false}
       />
 
-      <nav className="velvet-legal-public__nav velvet-partner-panorama-public__legal" aria-label="Documenti legali partner">
-        <Link to="/privacy" className="velvet-legal-public__nav-link">
+      <nav className="luxury-legal-public__nav luxury-partner-panorama-public__legal" aria-label="Documenti legali partner">
+        <Link to="/privacy" className="luxury-legal-public__nav-link">
           Privacy saloni (B2B)
         </Link>
-        <Link to="/privacy/staff" className="velvet-legal-public__nav-link">
+        <Link to="/privacy/staff" className="luxury-legal-public__nav-link">
           Privacy staff
         </Link>
-        <Link to="/termini" className="velvet-legal-public__nav-link">
+        <Link to="/termini" className="luxury-legal-public__nav-link">
           Termini di servizio
         </Link>
-        <Link to="/privacy/scelte" className="velvet-legal-public__nav-link">
+        <Link to="/privacy/scelte" className="luxury-legal-public__nav-link">
           Scelte privacy
         </Link>
-        <Link to="/privacy/cookie" className="velvet-legal-public__nav-link">
+        <Link to="/privacy/cookie" className="luxury-legal-public__nav-link">
           Informativa cookie
         </Link>
-        <Link to="/privacy/elimina-account" className="velvet-legal-public__nav-link">
+        <Link to="/privacy/elimina-account" className="luxury-legal-public__nav-link">
           Elimina account
         </Link>
-        <Link to="/legale" className="velvet-legal-public__nav-link">
+        <Link to="/legale" className="luxury-legal-public__nav-link">
           Requisiti store
         </Link>
       </nav>

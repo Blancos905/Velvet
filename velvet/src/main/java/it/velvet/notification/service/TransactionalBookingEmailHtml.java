@@ -33,7 +33,7 @@ public final class TransactionalBookingEmailHtml {
 				        <tr><td style="padding:0 24px 8px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#c4b5a0;">Saloni Luxury</td></tr>
 				        <tr><td style="padding:0 24px 16px;font-size:22px;line-height:1.35;color:#f5ead8;">%s</td></tr>
 				        <tr><td style="padding:0 24px 8px;font-size:15px;line-height:1.6;color:#e8dfd0;">
-				          Grazie per aver prenotato con SaloniLuxury.<br>
+				          Grazie per aver prenotato con Saloni Luxury.<br>
 				          Un ringraziamento anche da parte di <strong>%s</strong>.
 				        </td></tr>
 				        <tr><td style="padding:16px 24px;">

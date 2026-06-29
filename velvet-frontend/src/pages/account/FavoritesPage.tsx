@@ -4,7 +4,7 @@ import { apiJson } from "../../api/client";
 import type { FavoriteDto } from "../../api/types";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
 import { formatSalonCityForDisplay } from "../../lib/formatSalonCityForDisplay";
-import "../../styles/velvet-favorites-page.css";
+import "../../styles/luxury-favorites-page.css";
 
 function HeartIcon() {
   return (
@@ -33,26 +33,26 @@ export default function FavoritesPage() {
   const rows = q.data ?? [];
 
   return (
-    <div className="velvet-favorites-page">
-      <header className="velvet-favorites-page__header">
-        <h1 className="velvet-page-title velvet-favorites-page__title">Saloni preferiti</h1>
+    <div className="luxury-favorites-page">
+      <header className="luxury-favorites-page__header">
+        <h1 className="luxury-page-title luxury-favorites-page__title">Saloni preferiti</h1>
       </header>
 
       {q.isLoading ? (
-        <p className="velvet-favorites-state velvet-favorites-state--loading" aria-live="polite">
+        <p className="luxury-favorites-state luxury-favorites-state--loading" aria-live="polite">
           Caricamento…
         </p>
       ) : null}
 
       {q.error ? (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {q.error instanceof Error ? q.error.message : "Errore"}
         </p>
       ) : null}
 
       {!q.isLoading && !q.error && rows.length === 0 ? (
-        <div className="velvet-favorites-empty" role="status">
-          <svg className="velvet-favorites-empty__icon" viewBox="0 0 24 24" width={22} height={22} aria-hidden fill="none">
+        <div className="luxury-favorites-empty" role="status">
+          <svg className="luxury-favorites-empty__icon" viewBox="0 0 24 24" width={22} height={22} aria-hidden fill="none">
             <path
               d="M12 21s-6.7-4.5-9-8.5C.5 8.5 2.5 5 6.5 5c2.2 0 3.9 1.3 5.5 3.4C13.6 6.3 15.3 5 17.5 5c4 0 6 3.5 3.5 7.5-2.3 4-9 8.5-9 8.5z"
               stroke="currentColor"
@@ -60,37 +60,37 @@ export default function FavoritesPage() {
               strokeLinejoin="round"
             />
           </svg>
-          <p className="velvet-favorites-empty__title">Nessun preferito ancora</p>
-          <p className="velvet-favorites-empty__body">
-            Esplora i saloni e usa <span className="velvet-favorites-empty__hl">Aggiungi ai preferiti</span> sulla scheda del
+          <p className="luxury-favorites-empty__title">Nessun preferito ancora</p>
+          <p className="luxury-favorites-empty__body">
+            Esplora i saloni e usa <span className="luxury-favorites-empty__hl">Aggiungi ai preferiti</span> sulla scheda del
             salone che ti interessa.
           </p>
         </div>
       ) : null}
 
       {rows.length > 0 ? (
-        <ul className="velvet-favorites-list">
+        <ul className="luxury-favorites-list">
           {rows.map((f) => (
-            <li key={f.id} className="velvet-favorites-row">
-              <div className="velvet-favorites-row__main">
-                <span className="velvet-favorites-row__heart" aria-hidden>
+            <li key={f.id} className="luxury-favorites-row">
+              <div className="luxury-favorites-row__main">
+                <span className="luxury-favorites-row__heart" aria-hidden>
                   <HeartIcon />
                 </span>
-                <div className="velvet-favorites-row__text">
-                  <Link to={`/s/${encodeURIComponent(f.slug)}`} className="velvet-favorites-row__link">
+                <div className="luxury-favorites-row__text">
+                  <Link to={`/s/${encodeURIComponent(f.slug)}`} className="luxury-favorites-row__link">
                     {f.name}
-                    <span className="velvet-favorites-row__chevron" aria-hidden>
+                    <span className="luxury-favorites-row__chevron" aria-hidden>
                       →
                     </span>
                   </Link>
                   {f.city ? (
-                    <p className="velvet-favorites-row__city">{formatSalonCityForDisplay(f.city) ?? f.city}</p>
+                    <p className="luxury-favorites-row__city">{formatSalonCityForDisplay(f.city) ?? f.city}</p>
                   ) : null}
                 </div>
               </div>
               <button
                 type="button"
-                className="velvet-favorites-remove"
+                className="luxury-favorites-remove"
                 onClick={() => removeM.mutate(f.organizationId)}
                 disabled={removeM.isPending}
               >

@@ -4,9 +4,9 @@ import { apiJson } from "../../api/client";
 import type { SupportInfo } from "../../api/types";
 import { useVelvetAuth } from "../../auth/VelvetAuthProvider";
 import { SaloniLuxuryLogoMark } from "../../components/SaloniLuxuryLogoMark";
-import "../../styles/velvet-consumer-bookings-page.css";
-import "../../styles/velvet-account-page-shell.css";
-import "../../styles/velvet-support-page.css";
+import "../../styles/luxury-consumer-bookings-page.css";
+import "../../styles/luxury-account-page-shell.css";
+import "../../styles/luxury-support-page.css";
 
 function sanitizeMailtoHref(raw: string | null | undefined): string | null {
   const value = raw?.trim();
@@ -55,14 +55,14 @@ export default function SupportPage() {
   });
 
   const supportHero = (sub: string) => (
-    <header className="velvet-consumer-bookings-dash__header--hero">
-      <div className="velvet-consumer-bookings-dash__hero-glow" aria-hidden />
-      <div className="velvet-consumer-bookings-dash__title-row">
-        <h1 className="velvet-consumer-bookings-dash__headline">
-          <span className="velvet-consumer-bookings-dash__headline-pre">Area </span>
-          <span className="velvet-consumer-bookings-dash__headline-accent">assistenza</span>
+    <header className="luxury-consumer-bookings-dash__header--hero">
+      <div className="luxury-consumer-bookings-dash__hero-glow" aria-hidden />
+      <div className="luxury-consumer-bookings-dash__title-row">
+        <h1 className="luxury-consumer-bookings-dash__headline">
+          <span className="luxury-consumer-bookings-dash__headline-pre">Area </span>
+          <span className="luxury-consumer-bookings-dash__headline-accent">assistenza</span>
         </h1>
-        <p className="velvet-page-subtitle" style={{ margin: 0 }}>
+        <p className="luxury-page-subtitle" style={{ margin: 0 }}>
           {sub}
         </p>
       </div>
@@ -71,8 +71,8 @@ export default function SupportPage() {
 
   if (q.isLoading) {
     return (
-      <div className="velvet-support-page velvet-consumer-bookings-dash velvet-consumer-bookings-dash--base44 velvet-account-page-shell velvet-account-page-shell--support">
-        <div className="velvet-consumer-bookings-dash__shell">
+      <div className="luxury-support-page luxury-consumer-bookings-dash luxury-consumer-bookings-dash--base44 luxury-account-page-shell luxury-account-page-shell--support">
+        <div className="luxury-consumer-bookings-dash__shell">
         {supportHero("Caricamento informazioni di contatto…")}
         </div>
       </div>
@@ -80,10 +80,10 @@ export default function SupportPage() {
   }
   if (q.error) {
     return (
-      <div className="velvet-support-page velvet-consumer-bookings-dash velvet-consumer-bookings-dash--base44 velvet-account-page-shell velvet-account-page-shell--support">
-        <div className="velvet-consumer-bookings-dash__shell">
+      <div className="luxury-support-page luxury-consumer-bookings-dash luxury-consumer-bookings-dash--base44 luxury-account-page-shell luxury-account-page-shell--support">
+        <div className="luxury-consumer-bookings-dash__shell">
         {supportHero("Non siamo riusciti a leggere i contatti dal server.")}
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {q.error instanceof Error ? q.error.message : "Errore"}
         </p>
         </div>
@@ -100,39 +100,39 @@ export default function SupportPage() {
   const mailHref = sanitizeMailtoHref(s.supportEmail);
 
   return (
-    <div className="velvet-support-page velvet-consumer-bookings-dash velvet-consumer-bookings-dash--base44 velvet-account-page-shell velvet-account-page-shell--support">
-      <div className="velvet-consumer-bookings-dash__shell">
+    <div className="luxury-support-page luxury-consumer-bookings-dash luxury-consumer-bookings-dash--base44 luxury-account-page-shell luxury-account-page-shell--support">
+      <div className="luxury-consumer-bookings-dash__shell">
       {supportHero(s.message)}
 
-      <section className="velvet-support-page__grid" aria-label="Contatti assistenza Saloni Luxury">
-        <article className="velvet-support-card">
-          <div className="velvet-support-card__logo">
+      <section className="luxury-support-page__grid" aria-label="Contatti assistenza Saloni Luxury">
+        <article className="luxury-support-card">
+          <div className="luxury-support-card__logo">
             <SaloniLuxuryLogoMark />
           </div>
-          <p className="velvet-support-card__badge">Supporto diretto</p>
-          <h2 className="velvet-section-title velvet-support-card__title">Team Saloni Luxury</h2>
-          <p className="velvet-text-muted velvet-support-card__text">
+          <p className="luxury-support-card__badge">Supporto diretto</p>
+          <h2 className="luxury-section-title luxury-support-card__title">Team Saloni Luxury</h2>
+          <p className="luxury-text-muted luxury-support-card__text">
             Per qualsiasi problema tecnico, operativo o commerciale puoi contattare direttamente il team Saloni Luxury.
           </p>
-          <div className="velvet-support-card__contacts">
+          <div className="luxury-support-card__contacts">
             {mailHref ? (
-              <a className="velvet-support-contact" href={mailHref}>
-                <span className="velvet-support-contact__label">Email</span>
+              <a className="luxury-support-contact" href={mailHref}>
+                <span className="luxury-support-contact__label">Email</span>
                 <strong>{s.supportEmail}</strong>
               </a>
             ) : (
-              <div className="velvet-support-contact velvet-support-contact--muted">
-                <span className="velvet-support-contact__label">Email</span>
+              <div className="luxury-support-contact luxury-support-contact--muted">
+                <span className="luxury-support-contact__label">Email</span>
                 <strong>Non disponibile</strong>
               </div>
             )}
             {telHref && phoneLabel ? (
-              <div className="velvet-support-contact">
-                <span className="velvet-support-contact__label">Telefono</span>
-                <div className="velvet-support-contact__value-row">
+              <div className="luxury-support-contact">
+                <span className="luxury-support-contact__label">Telefono</span>
+                <div className="luxury-support-contact__value-row">
                   {waHref ? (
                     <a
-                      className="velvet-support-contact__whatsapp"
+                      className="luxury-support-contact__whatsapp"
                       href={waHref}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -144,23 +144,23 @@ export default function SupportPage() {
                       </svg>
                     </a>
                   ) : null}
-                  <a className="velvet-support-contact__tel" href={telHref}>
+                  <a className="luxury-support-contact__tel" href={telHref}>
                     <strong>{phoneLabel}</strong>
                   </a>
                 </div>
               </div>
             ) : (
-              <div className="velvet-support-contact velvet-support-contact--muted">
-                <span className="velvet-support-contact__label">Telefono</span>
+              <div className="luxury-support-contact luxury-support-contact--muted">
+                <span className="luxury-support-contact__label">Telefono</span>
                 <strong>Non disponibile</strong>
               </div>
             )}
           </div>
-          <p className="velvet-support-card__footnote">
+          <p className="luxury-support-card__footnote">
             Ti risponderemo il prima possibile.
           </p>
           <form
-            className="velvet-support-request-form"
+            className="luxury-support-request-form"
             onSubmit={(e) => {
               e.preventDefault();
               setSendMsg(null);
@@ -171,20 +171,20 @@ export default function SupportPage() {
               sendSupportM.mutate();
             }}
           >
-            <label className="velvet-form-label">
+            <label className="luxury-form-label">
               Oggetto (facoltativo)
               <input
-                className="velvet-soft-field"
+                className="luxury-soft-field"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 maxLength={120}
                 placeholder="Es. Problema prenotazione"
               />
             </label>
-            <label className="velvet-form-label">
+            <label className="luxury-form-label">
               Messaggio
               <textarea
-                className="velvet-soft-field velvet-support-request-form__textarea"
+                className="luxury-soft-field luxury-support-request-form__textarea"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 minLength={10}
@@ -193,13 +193,13 @@ export default function SupportPage() {
                 placeholder="Descrivi il problema (almeno 10 caratteri)…"
               />
             </label>
-            <button type="submit" className="velvet-btn velvet-btn--primary" disabled={sendSupportM.isPending}>
+            <button type="submit" className="luxury-btn luxury-btn--primary" disabled={sendSupportM.isPending}>
               {sendSupportM.isPending ? "Invio…" : "Invia richiesta assistenza"}
             </button>
             {sendMsg ? (
               <p
-                className={`velvet-alert ${
-                  /\b(inviata|registrata|riceve)\b/i.test(sendMsg) ? "velvet-alert--success" : "velvet-alert--error"
+                className={`luxury-alert ${
+                  /\b(inviata|registrata|riceve)\b/i.test(sendMsg) ? "luxury-alert--success" : "luxury-alert--error"
                 }`}
                 role="status"
               >

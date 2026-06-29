@@ -89,24 +89,24 @@ export default function AdminConsumersPage() {
   });
 
   return (
-    <div className="velvet-admin-panel">
+    <div className="luxury-admin-panel">
       {confirmDialog}
       {actionBanner}
-      <h1 className="velvet-admin-page-title">Profili consumatore</h1>
-      <p className="velvet-admin-muted">
+      <h1 className="luxury-admin-page-title">Profili consumatore</h1>
+      <p className="luxury-admin-muted">
         Elenco da database: soft-delete se necessario. Il piano è solo informativo qui: non si applica upgrade a Premium
         per i profili consumatore da questo pannello.
       </p>
-      {listQ.isLoading ? <p className="velvet-admin-muted">Caricamento…</p> : null}
+      {listQ.isLoading ? <p className="luxury-admin-muted">Caricamento…</p> : null}
       {listQ.isError ? (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {listQ.error instanceof Error ? listQ.error.message : "Errore elenco."}
         </p>
       ) : null}
       {listQ.data && listQ.data.content.length === 0 ? <p>Nessun profilo.</p> : null}
       {listQ.data && listQ.data.content.length > 0 ? (
-        <div className="velvet-admin-table-wrap">
-          <table className="velvet-admin-table">
+        <div className="luxury-admin-table-wrap">
+          <table className="luxury-admin-table">
             <thead>
               <tr>
                 <th>Email</th>
@@ -122,13 +122,13 @@ export default function AdminConsumersPage() {
                 <tr key={row.id}>
                   <td>{row.email ?? "—"}</td>
                   <td>{row.displayName ?? "—"}</td>
-                  <td className="velvet-admin-mono">{row.securityRoles ?? "—"}</td>
+                  <td className="luxury-admin-mono">{row.securityRoles ?? "—"}</td>
                   <td>{row.planTier ?? "—"}</td>
                   <td>{row.deletedAt ? "eliminato" : "attivo"}</td>
-                  <td className="velvet-admin-actions">
+                  <td className="luxury-admin-actions">
                     <button
                       type="button"
-                      className="velvet-admin-btn"
+                      className="luxury-admin-btn"
                       title={
                         canOpenConsumerVelvetSession(row)
                           ? "Apri l’account nell’area Saloni Luxury"
@@ -145,7 +145,7 @@ export default function AdminConsumersPage() {
                     </button>
                     <button
                       type="button"
-                      className="velvet-admin-btn velvet-admin-btn--danger"
+                      className="luxury-admin-btn luxury-admin-btn--danger"
                       disabled={Boolean(row.deletedAt) || deleteM.isPending || consumerLoginM.isPending}
                       onClick={() => {
                         const label = row.email?.trim() || row.displayName?.trim() || "profilo";
@@ -170,17 +170,17 @@ export default function AdminConsumersPage() {
         </div>
       ) : null}
       {listQ.data && listQ.data.totalElements > CONSUMERS_PAGE_SIZE ? (
-        <div className="velvet-admin-pagination">
-          <button type="button" className="velvet-admin-btn" disabled={page <= 0} onClick={() => setPage((p) => p - 1)}>
+        <div className="luxury-admin-pagination">
+          <button type="button" className="luxury-admin-btn" disabled={page <= 0} onClick={() => setPage((p) => p - 1)}>
             Precedente
           </button>
-          <span className="velvet-admin-muted">
+          <span className="luxury-admin-muted">
             Pagina {page + 1} di {Math.max(1, listQ.data.totalPages)} · {CONSUMERS_PAGE_SIZE} per pagina ·{" "}
             {listQ.data.totalElements} profili
           </span>
           <button
             type="button"
-            className="velvet-admin-btn"
+            className="luxury-admin-btn"
             disabled={page >= Math.max(0, listQ.data.totalPages - 1)}
             onClick={() => setPage((p) => p + 1)}
           >
@@ -189,12 +189,12 @@ export default function AdminConsumersPage() {
         </div>
       ) : null}
       {deleteM.isError ? (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {deleteM.error instanceof Error ? deleteM.error.message : "Operazione fallita."}
         </p>
       ) : null}
       {consumerLoginM.isError ? (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {consumerLoginM.error instanceof Error ? consumerLoginM.error.message : "Login account non riuscito."}
         </p>
       ) : null}

@@ -13,15 +13,11 @@ export function useBillingStatusQuery() {
   });
 }
 
-/** Piano usato per sbloccare funzionalità: Premium registrato ma non pagato resta BASE finché Stripe non conferma. */
+/** Piano usato per sbloccare funzionalità: Premium senza accesso attivo resta BASE. */
 export function useSalonFeaturePlanTier(): SalonPlanTier {
   const registeredPlan = useEffectiveSalonPlanTier();
   const billingStatus = useBillingStatusQuery();
-  if (
-    registeredPlan === "PREMIUM" &&
-    billingStatus.data?.configured === true &&
-    billingStatus.data.premiumAccess !== true
-  ) {
+  if (registeredPlan === "PREMIUM" && billingStatus.data?.premiumAccess !== true) {
     return "BASE";
   }
   return registeredPlan;
@@ -31,6 +27,6 @@ export function useSalonPremiumActive(): boolean {
   const registeredPlan = useEffectiveSalonPlanTier();
   const billingStatus = useBillingStatusQuery();
   if (registeredPlan !== "PREMIUM") return false;
-  if (billingStatus.data?.configured !== true) return true;
+  if (billingStatus.isPending || !billingStatus.data) return true;
   return billingStatus.data.premiumAccess === true;
 }

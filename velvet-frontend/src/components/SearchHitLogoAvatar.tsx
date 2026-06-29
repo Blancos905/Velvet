@@ -17,9 +17,9 @@ type HitVisual = {
 type Props = {
   slug: string;
   name: string;
-  /** Classi base avatar (es. `velvet-search-card-avatar`). */
+  /** Classi base avatar (es. `luxury-search-card-avatar`). */
   avatarClass: string;
-  /** Aggiunta quando c’è il logo (es. `velvet-search-card-avatar--logo`). */
+  /** Aggiunta quando c’è il logo (es. `luxury-search-card-avatar--logo`). */
   logoExtraClass?: string;
 };
 
@@ -60,7 +60,7 @@ export function SearchHitLogoAvatar({ slug, name, avatarClass, logoExtraClass }:
   }
 
   if (cover) {
-    const withCover = [base, "velvet-hit-avatar--cover"].filter(Boolean).join(" ");
+    const withCover = [base, "luxury-hit-avatar--cover"].filter(Boolean).join(" ");
     return (
       <div
         className={withCover}

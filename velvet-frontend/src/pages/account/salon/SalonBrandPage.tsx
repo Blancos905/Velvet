@@ -11,9 +11,9 @@ import {
   writeSalonShowcaseAsync,
   type SalonShowcaseStored,
 } from "../../../lib/salonShowcaseStorage";
-import "../../../styles/velvet-account-page-shell.css";
-import "../../../styles/velvet-account-salon-services.css";
-import "../../../styles/velvet-salon-showcase.css";
+import "../../../styles/luxury-account-page-shell.css";
+import "../../../styles/luxury-account-salon-services.css";
+import "../../../styles/luxury-salon-showcase.css";
 import { SalonStandardSectionGuard } from "./SalonStandardSectionGuard";
 
 export default function SalonBrandPage() {
@@ -119,67 +119,67 @@ export default function SalonBrandPage() {
   return (
     <SalonStandardSectionGuard>
       <>
-        <div className="velvet-account-page-shell velvet-account-page-shell--narrow velvet-account-page-shell--salon-brand">
-          <header className="velvet-account-page-shell__hero">
-            <div className="velvet-account-page-shell__hero-glow" aria-hidden />
-            <div className="velvet-account-page-shell__hero-inner">
-              <Link to="/account/salone" className="velvet-link-back">
+        <div className="luxury-account-page-shell luxury-account-page-shell--narrow luxury-account-page-shell--salon-brand">
+          <header className="luxury-account-page-shell__hero">
+            <div className="luxury-account-page-shell__hero-glow" aria-hidden />
+            <div className="luxury-account-page-shell__hero-inner">
+              <Link to="/account/salone" className="luxury-link-back">
                 ← Panoramica salone
               </Link>
-              <h1 className="velvet-salon-brand-hero__headline">
-                <span className="velvet-salon-brand-hero__headline-pre">Brand e </span>
-                <span className="velvet-salon-brand-hero__headline-accent">vetrina</span>
+              <h1 className="luxury-salon-brand-hero__headline">
+                <span className="luxury-salon-brand-hero__headline-pre">Brand e </span>
+                <span className="luxury-salon-brand-hero__headline-accent">vetrina</span>
               </h1>
-              <p className="velvet-account-page-shell__hero-sub">
+              <p className="luxury-account-page-shell__hero-sub">
                 Logo e immagini per la scheda pubblica del salone e per la pagina <strong>Esplora il nostro salone</strong>.
               </p>
             </div>
           </header>
         </div>
 
-        <div className="velvet-salon-services-page velvet-brand-account">
+        <div className="luxury-salon-services-page luxury-brand-account">
           {!slug ? (
-            <p className="velvet-alert velvet-alert--error" role="alert">
+            <p className="luxury-alert luxury-alert--error" role="alert">
               Slug sede non disponibile: completa la registrazione salone o attendi il provisioning.
             </p>
           ) : null}
 
           {slotMsg ? (
-            <p className="velvet-alert velvet-alert--error velvet-brand-account__alert-spaced" role="alert">
+            <p className="luxury-alert luxury-alert--error luxury-brand-account__alert-spaced" role="alert">
               {slotMsg}
             </p>
           ) : null}
           {persistMsg ? (
             <p
-              className={`velvet-alert velvet-brand-account__alert-spaced ${persistMsg.includes("non") ? "velvet-alert--error" : "velvet-alert--success"}`}
+              className={`luxury-alert luxury-brand-account__alert-spaced ${persistMsg.includes("non") ? "luxury-alert--error" : "luxury-alert--success"}`}
               role="status"
             >
               {persistMsg}
             </p>
           ) : null}
 
-          <div className="velvet-brand-account__stack">
-            <section className="velvet-surface-card velvet-salon-services-form-card">
-              <h2 className="velvet-card-title">Carica il tuo logo</h2>
-              <p className="velvet-text-muted velvet-brand-account__lede">
+          <div className="luxury-brand-account__stack">
+            <section className="luxury-surface-card luxury-salon-services-form-card">
+              <h2 className="luxury-card-title">Carica il tuo logo</h2>
+              <p className="luxury-text-muted luxury-brand-account__lede">
                 Il logo viene mostrato in un <strong>cerchio</strong> con riempimento tipo zoom (ritaglio al centro). Preferisci
                 immagini quadrate o leggermente più alte che larghe.
               </p>
               {state.logoDataUrl ? (
-                <div className="velvet-brand-preview-logo velvet-brand-account__logo-block">
+                <div className="luxury-brand-preview-logo luxury-brand-account__logo-block">
                   <img src={state.logoDataUrl} alt="Logo caricato" />
                 </div>
               ) : (
-                <div className="velvet-brand-upload-zone velvet-brand-upload-zone--logo velvet-brand-account__logo-block">
-                  <span className="velvet-text-muted velvet-brand-account__placeholder-label">Nessun logo ancora</span>
+                <div className="luxury-brand-upload-zone luxury-brand-upload-zone--logo luxury-brand-account__logo-block">
+                  <span className="luxury-text-muted luxury-brand-account__placeholder-label">Nessun logo ancora</span>
                 </div>
               )}
-              <div className="velvet-brand-account__btn-row">
-                <label className="velvet-btn velvet-btn--primary velvet-brand-account__file-trigger">
+              <div className="luxury-brand-account__btn-row">
+                <label className="luxury-btn luxury-btn--primary luxury-brand-account__file-trigger">
                   <input
                     type="file"
                     accept="image/*"
-                    className="velvet-salon-services-hidden-file"
+                    className="luxury-salon-services-hidden-file"
                     disabled={!slug}
                     onChange={(e) => {
                       const f = e.target.files?.[0] ?? null;
@@ -190,43 +190,43 @@ export default function SalonBrandPage() {
                   Scegli file…
                 </label>
                 {state.logoDataUrl ? (
-                  <button type="button" className="velvet-btn velvet-btn--secondary" onClick={() => commitShowcase((p) => ({ ...p, logoDataUrl: null }))}>
+                  <button type="button" className="luxury-btn luxury-btn--secondary" onClick={() => commitShowcase((p) => ({ ...p, logoDataUrl: null }))}>
                     Rimuovi logo
                   </button>
                 ) : null}
               </div>
             </section>
 
-            <section className="velvet-surface-card velvet-salon-services-form-card">
-              <h2 className="velvet-card-title">Aggiungi immagini sito</h2>
-              <div className="velvet-salon-services-form">
-                <p className="velvet-text-muted velvet-brand-account__lede">
+            <section className="luxury-surface-card luxury-salon-services-form-card">
+              <h2 className="luxury-card-title">Aggiungi immagini sito</h2>
+              <div className="luxury-salon-services-form">
+                <p className="luxury-text-muted luxury-brand-account__lede">
                   Fino a <strong>5 immagini</strong> per il carousel in vetrina (formato orizzontale consigliato).
                 </p>
-                <div className="velvet-brand-site-grid">
+                <div className="luxury-brand-site-grid">
                   {([0, 1, 2, 3, 4] as const).map((i) => {
                     const filled = Boolean(state.siteImageDataUrls[i]);
                     return (
                       <div
                         key={i}
-                        className={`velvet-brand-site-slot${filled ? " velvet-brand-site-slot--filled" : " velvet-brand-site-slot--empty"}`}
+                        className={`luxury-brand-site-slot${filled ? " luxury-brand-site-slot--filled" : " luxury-brand-site-slot--empty"}`}
                       >
                         {filled ? (
                           <img src={state.siteImageDataUrls[i]!} alt="" />
                         ) : (
-                          <div className="velvet-brand-upload-zone velvet-brand-site-slot__placeholder">
-                            <span className="velvet-brand-site-slot__glyph" aria-hidden="true">
+                          <div className="luxury-brand-upload-zone luxury-brand-site-slot__placeholder">
+                            <span className="luxury-brand-site-slot__glyph" aria-hidden="true">
                               +
                             </span>
-                            <span className="velvet-brand-site-slot__label">{siteLabels[i]}</span>
+                            <span className="luxury-brand-site-slot__label">{siteLabels[i]}</span>
                           </div>
                         )}
-                        <div className="velvet-brand-site-slot__toolbar">
-                          <label className="velvet-btn velvet-btn--secondary velvet-brand-site-slot__btn">
+                        <div className="luxury-brand-site-slot__toolbar">
+                          <label className="luxury-btn luxury-btn--secondary luxury-brand-site-slot__btn">
                             <input
                               type="file"
                               accept="image/*"
-                              className="velvet-salon-services-hidden-file"
+                              className="luxury-salon-services-hidden-file"
                               disabled={!slug}
                               onChange={(e) => {
                                 const f = e.target.files?.[0] ?? null;
@@ -239,7 +239,7 @@ export default function SalonBrandPage() {
                           {filled ? (
                             <button
                               type="button"
-                              className="velvet-btn velvet-btn--secondary velvet-brand-site-slot__btn"
+                              className="luxury-btn luxury-btn--secondary luxury-brand-site-slot__btn"
                               onClick={() => clearSiteSlot(i)}
                             >
                               Rimuovi
@@ -254,14 +254,14 @@ export default function SalonBrandPage() {
             </section>
 
             {slug ? (
-              <section className="velvet-surface-card velvet-salon-services-form-card">
-                <h2 className="velvet-card-title">Salva vetrina</h2>
-                <p className="velvet-text-muted velvet-brand-account__lede" style={{ marginBottom: "0.85rem" }}>
+              <section className="luxury-surface-card luxury-salon-services-form-card">
+                <h2 className="luxury-card-title">Salva vetrina</h2>
+                <p className="luxury-text-muted luxury-brand-account__lede" style={{ marginBottom: "0.85rem" }}>
                   Logo e immagini si salvano anche subito dopo il caricamento; puoi premere qui per riscrivere tutto su
                   questo browser e aggiornare anteprima in home/ricerca.
                 </p>
-                <div className="velvet-brand-account__btn-row">
-                  <button type="button" className="velvet-btn velvet-btn--primary" onClick={() => void onSaveVetrinaExplicit()}>
+                <div className="luxury-brand-account__btn-row">
+                  <button type="button" className="luxury-btn luxury-btn--primary" onClick={() => void onSaveVetrinaExplicit()}>
                     Salva vetrina
                   </button>
                 </div>

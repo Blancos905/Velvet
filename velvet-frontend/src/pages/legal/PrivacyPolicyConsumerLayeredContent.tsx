@@ -25,7 +25,7 @@ export function PrivacyPolicyConsumerLayeredContent() {
       <LegalPrivacyAudienceNotice audience="b2c" />
 
       <LegalPrivacyAccordion title="Chi tratta i dati (Titolari del Trattamento)" defaultOpen>
-        <p className="velvet-legal-public__text">
+        <p className="luxury-legal-public__text">
           <strong>{companyName}</strong> (<em>{companyLegalName}</em>, con sede in{" "}
           <em>{companyAddress}</em>
           {companyVat ? (
@@ -38,16 +38,16 @@ export function PrivacyPolicyConsumerLayeredContent() {
           piattaforma Luxury (sito web, area account, app mobile <code>velvet-app</code>): credenziali, profilo, preferiti,
           notifiche di piattaforma e pubblicazione delle recensioni che rilasci.
         </p>
-        <p className="velvet-legal-public__text">
+        <p className="luxury-legal-public__text">
           <strong>Il salone che prenoti</strong> diventa <strong>Titolare autonomo del trattamento</strong> nel momento in cui
           confermi un appuntamento: lo staff del negozio deve visualizzare in agenda nome, cognome e telefono per erogare il
           servizio e gestire imprevisti. In quel flusso {companyName} agisce esclusivamente come{" "}
           <strong>Responsabile del Trattamento (Art. 28 GDPR)</strong>, fornendo il software di prenotazione secondo le istruzioni
           del salone.
         </p>
-        <p className="velvet-legal-public__text">
+        <p className="luxury-legal-public__text">
           Contatto privacy (diritti GDPR): <LegalPrivacyMailLink /> — assistenza generale:{" "}
-          <a href={`mailto:${LEGAL_CONTACT_EMAIL}`} className="velvet-legal-public__inline-link">
+          <a href={`mailto:${LEGAL_CONTACT_EMAIL}`} className="luxury-legal-public__inline-link">
             {LEGAL_CONTACT_EMAIL}
           </a>
           .
@@ -56,12 +56,12 @@ export function PrivacyPolicyConsumerLayeredContent() {
       </LegalPrivacyAccordion>
 
       <LegalPrivacyAccordion title="Che dati raccogliamo e perché (Finalità)">
-        <ul className="velvet-legal-public__list">
+        <ul className="luxury-legal-public__list">
           <li>
             <strong>Dati di registrazione:</strong> Nome, cognome, email e numero di telefono (necessari per evitare false
             prenotazioni e permettere al salone di avvisarti in caso di imprevisti), oltre alle credenziali criptate per l&apos;accesso
             (anche da{" "}
-            <Link to="/registrati" className="velvet-legal-public__inline-link">
+            <Link to="/registrati" className="luxury-legal-public__inline-link">
               registrazione cliente
             </Link>
             ).
@@ -73,7 +73,7 @@ export function PrivacyPolicyConsumerLayeredContent() {
           <li>
             <strong>Dati di geolocalizzazione:</strong> Posizione GPS del dispositivo <strong>solo se autorizzi</strong> esplicitamente
             (browser o modulo GPS dell&apos;app Flutter) per la funzione «Saloni vicino a me» sulla{" "}
-            <Link to="/search" className="velvet-legal-public__inline-link">
+            <Link to="/search" className="luxury-legal-public__inline-link">
               pagina di ricerca
             </Link>
             . Se neghi il consenso, puoi cercare manualmente inserendo città o CAP.
@@ -95,7 +95,7 @@ export function PrivacyPolicyConsumerLayeredContent() {
       </LegalPrivacyAccordion>
 
       <LegalPrivacyAccordion title="Base giuridica del trattamento">
-        <ul className="velvet-legal-public__list">
+        <ul className="luxury-legal-public__list">
           <li>
             <strong>Esecuzione contrattuale (Art. 6, par. 1, lett. b, GDPR):</strong> Per creare il profilo, prenotare tagli e
             servizi presso i saloni e ricevere comunicazioni strettamente necessarie alla prenotazione.
@@ -103,7 +103,7 @@ export function PrivacyPolicyConsumerLayeredContent() {
           <li>
             <strong>Consenso (Art. 6, par. 1, lett. a, GDPR):</strong> Per l&apos;accesso al GPS dello smartphone o del browser e
             per eventuali comunicazioni di marketing facoltative (ove attivate e revocabili dalle{" "}
-            <Link to="/privacy/scelte" className="velvet-legal-public__inline-link">
+            <Link to="/privacy/scelte" className="luxury-legal-public__inline-link">
               Scelte privacy
             </Link>
             ), nonché per le notifiche push se le attivi dall&apos;app.
@@ -117,10 +117,10 @@ export function PrivacyPolicyConsumerLayeredContent() {
       </LegalPrivacyAccordion>
 
       <LegalPrivacyAccordion title="Con chi condividiamo i tuoi dati (Destinatari)">
-        <p className="velvet-legal-public__text">
+        <p className="luxury-legal-public__text">
           I dati non vengono venduti. Possono essere comunicati esclusivamente a:
         </p>
-        <ol className="velvet-legal-public__list velvet-legal-public__list--ordered">
+        <ol className="luxury-legal-public__list luxury-legal-public__list--ordered">
           <li>
             <strong>Il salone scelto:</strong> Riceve i dati anagrafici e il telefono necessari a confermare e gestire la
             prenotazione nel proprio gestionale/agenda Luxury.
@@ -141,15 +141,15 @@ export function PrivacyPolicyConsumerLayeredContent() {
             notifiche operative), ove l&apos;utente abiliti le notifiche.
           </li>
         </ol>
-        <p className="velvet-legal-public__text">
+        <p className="luxury-legal-public__text">
           I fornitori tecnici agiscono come Responsabili del Trattamento vincolati da accordi Art. 28 GDPR.
         </p>
-        <p className="velvet-legal-public__text">{LEGAL_ART28_SUBPROCESSORS_PARAGRAPH}</p>
+        <p className="luxury-legal-public__text">{LEGAL_ART28_SUBPROCESSORS_PARAGRAPH}</p>
         <LegalCitationList citations={[GDPR_CITATIONS.art13, GDPR_CITATIONS.art14]} />
       </LegalPrivacyAccordion>
 
       <LegalPrivacyAccordion title="Conservazione dei dati">
-        <ul className="velvet-legal-public__list">
+        <ul className="luxury-legal-public__list">
           <li>
             <strong>Account cliente:</strong> Resta attivo fino a richiesta di cancellazione da parte tua o chiusura del servizio.
           </li>
@@ -172,34 +172,34 @@ export function PrivacyPolicyConsumerLayeredContent() {
       </LegalPrivacyAccordion>
 
       <LegalPrivacyAccordion title="Recensioni e moderazione contenuti">
-        <p className="velvet-legal-public__text">{LEGAL_REVIEW_MODERATION_PARAGRAPH}</p>
+        <p className="luxury-legal-public__text">{LEGAL_REVIEW_MODERATION_PARAGRAPH}</p>
         <LegalCitationList citations={[GDPR_CITATIONS.regulation]} />
       </LegalPrivacyAccordion>
 
       <LegalPrivacyAccordion title="Notifiche push">
-        <p className="velvet-legal-public__text">{LEGAL_PUSH_NOTIFICATIONS_PARAGRAPH}</p>
+        <p className="luxury-legal-public__text">{LEGAL_PUSH_NOTIFICATIONS_PARAGRAPH}</p>
         <LegalCitationList citations={[GDPR_CITATIONS.art13]} />
       </LegalPrivacyAccordion>
 
       <LegalPrivacyAccordion title="Diritti dell'utente e rimozione account (App Store / Google Play)">
-        <p className="velvet-legal-public__text">
+        <p className="luxury-legal-public__text">
           Puoi esercitare i diritti di accesso, rettifica, cancellazione, limitazione, portabilità e opposizione scrivendo a{" "}
           <LegalPrivacyMailLink />. Rispondiamo nei termini dell&apos;art. 12 GDPR.
         </p>
-        <p className="velvet-legal-public__text">
+        <p className="luxury-legal-public__text">
           <strong>Funzione Elimina account (diritto all&apos;oblio):</strong> Da{" "}
-          <Link to="/account/profilo" className="velvet-legal-public__inline-link">
+          <Link to="/account/profilo" className="luxury-legal-public__inline-link">
             Profilo account
           </Link>
           ,{" "}
-          <Link to="/privacy/elimina-account" className="velvet-legal-public__inline-link">
+          <Link to="/privacy/elimina-account" className="luxury-legal-public__inline-link">
             Elimina account
           </Link>{" "}
           o dall&apos;app mobile (stessa area Profilo in WebView) puoi chiudere l&apos;account in autonomia. L&apos;azione invoca{" "}
           <code>DELETE /api/v1/me/account</code>: revoca sessioni, rimuove token dispositivo e anonimizza il profilo; le recensioni
           pubbliche restano senza identificazione personale come descritto sopra.
         </p>
-        <p className="velvet-legal-public__text">
+        <p className="luxury-legal-public__text">
           Puoi proporre reclamo al <em>Garante per la protezione dei dati personali</em> (Italia).
         </p>
         <LegalCitationList

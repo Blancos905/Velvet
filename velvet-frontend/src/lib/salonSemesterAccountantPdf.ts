@@ -225,7 +225,7 @@ function renderSalonAccountantPdf(input: SalonSemesterPdfInput, downloadFileBase
   y += 4;
   paragraph(`Totale periodo: ${formatPriceEUR(revenueCents)}`, 10);
 
-  const safeBase = downloadFileBase.replace(/[^a-zA-Z0-9-_]/g, "_").slice(0, 120) || "velvet-report-ricavi";
+  const safeBase = downloadFileBase.replace(/[^a-zA-Z0-9-_]/g, "_").slice(0, 120) || "luxury-report-ricavi";
   doc.save(`${safeBase}.pdf`);
 }
 
@@ -234,12 +234,12 @@ export function downloadSalonSemesterAccountantPdf(input: SalonSemesterPdfInput)
   const safe = input.fileSlug.replace(/[^a-zA-Z0-9-_]/g, "_").slice(0, 64) || "salone";
   const yPart = input.fromYmd.slice(0, 4);
   const semTag = Number(input.fromYmd.slice(5, 7)) <= 6 ? "S1" : "S2";
-  renderSalonAccountantPdf(input, `velvet-report-ricavi_${safe}_${yPart}-${semTag}`);
+  renderSalonAccountantPdf(input, `luxury-report-ricavi_${safe}_${yPart}-${semTag}`);
 }
 
 /** PDF sul mese solare (stessi contenuti del report semestrale, ristretto al mese). */
 export function downloadSalonMonthlyAccountantPdf(input: SalonSemesterPdfInput): void {
   const safe = input.fileSlug.replace(/[^a-zA-Z0-9-_]/g, "_").slice(0, 64) || "salone";
   const ym = input.fromYmd.slice(0, 7);
-  renderSalonAccountantPdf(input, `velvet-report-ricavi_${safe}_mese-${ym}`);
+  renderSalonAccountantPdf(input, `luxury-report-ricavi_${safe}_mese-${ym}`);
 }

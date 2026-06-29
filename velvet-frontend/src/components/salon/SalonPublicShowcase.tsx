@@ -16,7 +16,7 @@ import { formatSalonCityForDisplay } from "../../lib/formatSalonCityForDisplay";
 import { normalizeShowcaseHexColor, type SalonShowcaseStored } from "../../lib/salonShowcaseStorage";
 import { salonShowcaseHasContent } from "../../lib/salonShowcaseStorage";
 import "../../styles/app-header.css";
-import "../../styles/velvet-salon-showcase.css";
+import "../../styles/luxury-salon-showcase.css";
 
 export type SalonShowcaseServiceChip = {
   id: string;
@@ -55,7 +55,7 @@ type Props = {
   embedHeading?: boolean;
   themeClass?: string;
   allowEmptyPreview?: boolean;
-  /** Solo anteprima layout: classe scene (es. `velvet-brand-preview-bg--0`) sul `<section>` = sfondo di tutta la card vetrina. */
+  /** Solo anteprima layout: classe scene (es. `luxury-brand-preview-bg--0`) sul `<section>` = sfondo di tutta la card vetrina. */
   cardAmbientClass?: string;
   /** Abbinato allo sfondo: testi/controlli chiari o scuri per leggibilità. */
   cardAmbientUiTone?: PreviewAmbientUiTone;
@@ -63,14 +63,14 @@ type Props = {
 
 function sectionClass(themeClass?: string): string {
   const t = themeClass?.trim();
-  return t ? `velvet-salon-showcase ${t}` : "velvet-salon-showcase";
+  return t ? `luxury-salon-showcase ${t}` : "luxury-salon-showcase";
 }
 
 function sectionRootClass(themeClass: string | undefined, cardAmbient: string | undefined): string {
   const base = sectionClass(themeClass);
   const amb = cardAmbient?.trim();
   if (!amb) return base;
-  return `${base} velvet-salon-showcase--ambient-scene ${amb}`.trim();
+  return `${base} luxury-salon-showcase--ambient-scene ${amb}`.trim();
 }
 
 function trimServiceLabel(name: string, max = 22): string {
@@ -93,33 +93,33 @@ function SalonSiteDescription({
   isPlaceholder?: boolean;
 }) {
   const wrapClass = [
-    "velvet-salon-showcase__site-desc-wrap",
-    detached ? "velvet-salon-showcase__site-desc-wrap--detached" : "",
-    isPlaceholder ? "velvet-salon-showcase__site-desc-wrap--placeholder" : "",
+    "luxury-salon-showcase__site-desc-wrap",
+    detached ? "luxury-salon-showcase__site-desc-wrap--detached" : "",
+    isPlaceholder ? "luxury-salon-showcase__site-desc-wrap--placeholder" : "",
   ]
     .filter(Boolean)
     .join(" ");
   const descClass = [
-    "velvet-salon-showcase__site-desc",
-    detached ? "velvet-salon-showcase__site-desc--detached" : "",
-    isPlaceholder ? "velvet-salon-showcase__site-desc--placeholder" : "",
+    "luxury-salon-showcase__site-desc",
+    detached ? "luxury-salon-showcase__site-desc--detached" : "",
+    isPlaceholder ? "luxury-salon-showcase__site-desc--placeholder" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
     <div className={wrapClass}>
-      <span className="velvet-salon-showcase__site-desc-flourish velvet-salon-showcase__site-desc-flourish--top" aria-hidden="true" />
-      <div className="velvet-salon-showcase__site-desc-panel">
-        <span className="velvet-salon-showcase__site-desc-quote velvet-salon-showcase__site-desc-quote--open" aria-hidden="true">
+      <span className="luxury-salon-showcase__site-desc-flourish luxury-salon-showcase__site-desc-flourish--top" aria-hidden="true" />
+      <div className="luxury-salon-showcase__site-desc-panel">
+        <span className="luxury-salon-showcase__site-desc-quote luxury-salon-showcase__site-desc-quote--open" aria-hidden="true">
           “
         </span>
         <p className={descClass}>{text}</p>
-        <span className="velvet-salon-showcase__site-desc-quote velvet-salon-showcase__site-desc-quote--close" aria-hidden="true">
+        <span className="luxury-salon-showcase__site-desc-quote luxury-salon-showcase__site-desc-quote--close" aria-hidden="true">
           ”
         </span>
       </div>
-      <span className="velvet-salon-showcase__site-desc-flourish velvet-salon-showcase__site-desc-flourish--bottom" aria-hidden="true" />
+      <span className="luxury-salon-showcase__site-desc-flourish luxury-salon-showcase__site-desc-flourish--bottom" aria-hidden="true" />
     </div>
   );
 }
@@ -149,8 +149,8 @@ export function SalonPublicShowcase({
   const [publicServicesStripOpen, setPublicServicesStripOpen] = useState(false);
   const effectiveSelectedId = selectedServiceId ?? internalSelectedId;
   const sectionExtraClass = [
-    detachedPublicLayout ? "velvet-salon-showcase--detached-public" : "",
-    detachedPublicLayout && siteFullscreenBleed ? "velvet-salon-showcase--site-fullscreen" : "",
+    detachedPublicLayout ? "luxury-salon-showcase--detached-public" : "",
+    detachedPublicLayout && siteFullscreenBleed ? "luxury-salon-showcase--site-fullscreen" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -294,10 +294,10 @@ export function SalonPublicShowcase({
     if (stripServices.length === 0) return null;
     return (
       <>
-        <nav className="velvet-salon-showcase__service-strip" aria-label="Servizi in evidenza">
+        <nav className="luxury-salon-showcase__service-strip" aria-label="Servizi in evidenza">
           {stripServices.map((svc) => {
             const active = effectiveSelectedId === svc.id;
-            const label = <span className="velvet-salon-showcase__pill-label">{trimServiceLabel(svc.name)}</span>;
+            const label = <span className="luxury-salon-showcase__pill-label">{trimServiceLabel(svc.name)}</span>;
             const demo = svc.id.startsWith("_demo");
             const pillSelectable = onSelectService ? !demo : true;
             if (pillSelectable) {
@@ -305,8 +305,8 @@ export function SalonPublicShowcase({
                 <button
                   key={svc.id}
                   type="button"
-                  className={`velvet-header-cta-pill velvet-header-btn-primary velvet-salon-showcase__pill${
-                    active ? " active velvet-salon-showcase__pill--active" : ""
+                  className={`luxury-header-cta-pill luxury-header-btn-primary luxury-salon-showcase__pill${
+                    active ? " active luxury-salon-showcase__pill--active" : ""
                   }`}
                   aria-pressed={active}
                   onClick={() => {
@@ -326,7 +326,7 @@ export function SalonPublicShowcase({
             return (
               <span
                 key={svc.id}
-                className={`velvet-salon-showcase__pill velvet-salon-showcase__pill--static${active ? " velvet-salon-showcase__pill--active" : ""}`}
+                className={`luxury-salon-showcase__pill luxury-salon-showcase__pill--static${active ? " luxury-salon-showcase__pill--active" : ""}`}
               >
                 {label}
               </span>
@@ -335,13 +335,13 @@ export function SalonPublicShowcase({
         </nav>
         {selectedService ? (
           <div
-            className="velvet-salon-showcase__service-detail"
+            className="luxury-salon-showcase__service-detail"
             role="region"
             aria-label={`Dettagli: ${selectedService.name}`}
           >
-            <p className="velvet-salon-showcase__service-detail-title">{selectedService.name}</p>
+            <p className="luxury-salon-showcase__service-detail-title">{selectedService.name}</p>
             {selectedService.description?.trim() ? (
-              <p className="velvet-salon-showcase__service-detail-body">{selectedService.description.trim()}</p>
+              <p className="luxury-salon-showcase__service-detail-body">{selectedService.description.trim()}</p>
             ) : null}
           </div>
         ) : null}
@@ -356,12 +356,12 @@ export function SalonPublicShowcase({
       detailService &&
       createPortal(
         <div
-          className="velvet-salon-showcase__service-detail-backdrop"
+          className="luxury-salon-showcase__service-detail-backdrop"
           role="presentation"
           onClick={closeServiceDetail}
         >
           <div
-            className="velvet-salon-showcase__service-detail-dialog"
+            className="luxury-salon-showcase__service-detail-dialog"
             role="dialog"
             aria-modal="true"
             aria-labelledby={detailTitleId}
@@ -369,14 +369,14 @@ export function SalonPublicShowcase({
           >
             <button
               type="button"
-              className="velvet-salon-showcase__service-detail-close"
+              className="luxury-salon-showcase__service-detail-close"
               onClick={closeServiceDetail}
               aria-label="Chiudi"
             >
               ×
             </button>
             {detailService.photoDataUrl?.trim() ? (
-              <div className="velvet-salon-showcase__service-detail-photo" aria-hidden="true">
+              <div className="luxury-salon-showcase__service-detail-photo" aria-hidden="true">
                 <img
                   src={detailService.photoDataUrl.trim()}
                   alt=""
@@ -384,21 +384,21 @@ export function SalonPublicShowcase({
                 />
               </div>
             ) : null}
-            <h2 id={detailTitleId} className="velvet-salon-showcase__service-detail-dialog-title">
+            <h2 id={detailTitleId} className="luxury-salon-showcase__service-detail-dialog-title">
               {detailService.name}
             </h2>
-            <p className="velvet-salon-showcase__service-detail-dialog-meta">
+            <p className="luxury-salon-showcase__service-detail-dialog-meta">
               {typeof detailService.priceCents === "number" ? formatPriceEUR(detailService.priceCents) : "—"}
               {typeof detailService.durationMinutes === "number" ? ` · ${detailService.durationMinutes} min` : ""}
             </p>
             {detailService.description?.trim() ? (
-              <p className="velvet-salon-showcase__service-detail-dialog-desc">{detailService.description.trim()}</p>
+              <p className="luxury-salon-showcase__service-detail-dialog-desc">{detailService.description.trim()}</p>
             ) : null}
-            <div className="velvet-salon-showcase__service-detail-dialog-actions">
+            <div className="luxury-salon-showcase__service-detail-dialog-actions">
               {!detailService.id.startsWith("_demo") ? (
                 <button
                   type="button"
-                  className="velvet-btn velvet-btn--primary velvet-salon-showcase__services-toggle velvet-salon-showcase__service-detail-dialog-book"
+                  className="luxury-btn luxury-btn--primary luxury-salon-showcase__services-toggle luxury-salon-showcase__service-detail-dialog-book"
                   onClick={() => {
                     const id = detailService.id;
                     if (onBookService) {
@@ -412,7 +412,7 @@ export function SalonPublicShowcase({
                   Continua
                 </button>
               ) : (
-                <span className="velvet-text-muted velvet-salon-showcase__service-detail-dialog-demo">
+                <span className="luxury-text-muted luxury-salon-showcase__service-detail-dialog-demo">
                   Anteprima demo
                 </span>
               )}
@@ -427,20 +427,20 @@ export function SalonPublicShowcase({
     const servicePickStrip = (
       <div
         className={
-          "velvet-salon-showcase__service-pick-wrap" +
-          (useServicesToggle && !publicServicesStripOpen ? " velvet-salon-showcase__service-pick-wrap--toggle-closed" : "")
+          "luxury-salon-showcase__service-pick-wrap" +
+          (useServicesToggle && !publicServicesStripOpen ? " luxury-salon-showcase__service-pick-wrap--toggle-closed" : "")
         }
         id={useServicesToggle ? servicesStripRegionId : undefined}
         aria-label="Servizi e prenotazione"
         aria-hidden={useServicesToggle && !publicServicesStripOpen ? true : undefined}
       >
-        <div className="velvet-salon-showcase__service-pick-strip">
+        <div className="luxury-salon-showcase__service-pick-strip">
           {stripServices.map((svc) => (
             <button
               key={svc.id}
               type="button"
-              className={`velvet-header-cta-pill velvet-header-btn-primary velvet-salon-showcase__service-pick-btn${
-                effectiveSelectedId === svc.id ? " active velvet-salon-showcase__service-pick-btn--active" : ""
+              className={`luxury-header-cta-pill luxury-header-btn-primary luxury-salon-showcase__service-pick-btn${
+                effectiveSelectedId === svc.id ? " active luxury-salon-showcase__service-pick-btn--active" : ""
               }`}
               tabIndex={useServicesToggle && !publicServicesStripOpen ? -1 : undefined}
               onClick={() => {
@@ -462,10 +462,10 @@ export function SalonPublicShowcase({
     return (
       <>
         {useServicesToggle ? (
-          <div className="velvet-salon-showcase__services-toggle-wrap">
+          <div className="luxury-salon-showcase__services-toggle-wrap">
             <button
               type="button"
-              className="velvet-btn velvet-btn--primary velvet-salon-showcase__services-toggle"
+              className="luxury-btn luxury-btn--primary luxury-salon-showcase__services-toggle"
               aria-expanded={publicServicesStripOpen}
               aria-controls={servicesStripRegionId}
               onClick={() => setPublicServicesStripOpen((v) => !v)}
@@ -491,23 +491,23 @@ export function SalonPublicShowcase({
         Boolean(emptyCarouselCopy && !hasCarousel) ||
         (!hasCarousel && (hasLogo || Boolean(embedHeading)));
       return (
-        <div className="velvet-salon-showcase__page velvet-salon-showcase__page--detached">
-          <div className="velvet-salon-showcase__brand-top velvet-salon-showcase__brand-top--detached-centered">
-            <div className="velvet-salon-showcase__brand-logo-side">
-              <div className="velvet-salon-showcase__logo-frame velvet-salon-showcase__logo-frame--hero velvet-salon-showcase__logo-frame--detached velvet-salon-showcase__logo-frame--public-hero">
+        <div className="luxury-salon-showcase__page luxury-salon-showcase__page--detached">
+          <div className="luxury-salon-showcase__brand-top luxury-salon-showcase__brand-top--detached-centered">
+            <div className="luxury-salon-showcase__brand-logo-side">
+              <div className="luxury-salon-showcase__logo-frame luxury-salon-showcase__logo-frame--hero luxury-salon-showcase__logo-frame--detached luxury-salon-showcase__logo-frame--public-hero">
                 {hasLogo ? (
                   <img src={showcase.logoDataUrl!} alt={`Logo ${salonName}`} />
                 ) : (
-                  <span className="velvet-salon-showcase__logo-placeholder-letter" aria-hidden="true">
+                  <span className="luxury-salon-showcase__logo-placeholder-letter" aria-hidden="true">
                     {brandInitial}
                   </span>
                 )}
               </div>
             </div>
-            <div className="velvet-salon-showcase__brand-text">
-              <h1 className="velvet-salon-showcase__page-title velvet-salon-showcase__page-title--detached">{salonName}</h1>
+            <div className="luxury-salon-showcase__brand-text">
+              <h1 className="luxury-salon-showcase__page-title luxury-salon-showcase__page-title--detached">{salonName}</h1>
               {cityDisplay ? (
-                <p className="velvet-salon-showcase__page-sub velvet-salon-showcase__page-sub--detached">{cityDisplay}</p>
+                <p className="luxury-salon-showcase__page-sub luxury-salon-showcase__page-sub--detached">{cityDisplay}</p>
               ) : null}
               <SalonSiteDescription
                 text={hasSiteDesc ? siteDesc : SALON_SITE_DESC_PLACEHOLDER}
@@ -518,10 +518,10 @@ export function SalonPublicShowcase({
           </div>
 
           {showCarouselSection ? (
-            <div className="velvet-salon-showcase__carousel-block velvet-salon-showcase__carousel-block--detached-wide">
+            <div className="luxury-salon-showcase__carousel-block luxury-salon-showcase__carousel-block--detached-wide">
               {carouselInner}
               {!hasCarousel && emptyCarouselCopy ? (
-                <div className="velvet-salon-showcase__carousel velvet-salon-showcase__carousel--empty velvet-salon-showcase__carousel--in-page velvet-salon-showcase__carousel--wide">
+                <div className="luxury-salon-showcase__carousel luxury-salon-showcase__carousel--empty luxury-salon-showcase__carousel--in-page luxury-salon-showcase__carousel--wide">
                   {emptyCarouselCopy}
                 </div>
               ) : null}
@@ -534,25 +534,25 @@ export function SalonPublicShowcase({
     }
 
     return (
-    <div className="velvet-salon-showcase__page">
-      <header className="velvet-salon-showcase__page-head velvet-salon-showcase__hero-head">
-        <h1 className="velvet-salon-showcase__page-title">{salonName}</h1>
-        {cityDisplay ? <p className="velvet-salon-showcase__page-sub">{cityDisplay}</p> : null}
+    <div className="luxury-salon-showcase__page">
+      <header className="luxury-salon-showcase__page-head luxury-salon-showcase__hero-head">
+        <h1 className="luxury-salon-showcase__page-title">{salonName}</h1>
+        {cityDisplay ? <p className="luxury-salon-showcase__page-sub">{cityDisplay}</p> : null}
         {hasSiteDesc ? <SalonSiteDescription text={siteDesc} /> : null}
       </header>
 
       {showCarouselBlock ? (
-      <div className={`velvet-salon-showcase__carousel-block${hasLogo ? " velvet-salon-showcase__carousel-block--with-logo" : ""}`}>
+      <div className={`luxury-salon-showcase__carousel-block${hasLogo ? " luxury-salon-showcase__carousel-block--with-logo" : ""}`}>
         {hasLogo ? (
-          <div className="velvet-salon-showcase__logo-float" aria-hidden={!embedHeading ? true : undefined}>
-            <div className="velvet-salon-showcase__logo-frame velvet-salon-showcase__logo-frame--hero">
+          <div className="luxury-salon-showcase__logo-float" aria-hidden={!embedHeading ? true : undefined}>
+            <div className="luxury-salon-showcase__logo-frame luxury-salon-showcase__logo-frame--hero">
               <img src={showcase.logoDataUrl!} alt="" />
             </div>
           </div>
         ) : null}
         {carouselInner}
         {!hasCarousel && emptyCarouselCopy ? (
-          <div className="velvet-salon-showcase__carousel velvet-salon-showcase__carousel--empty velvet-salon-showcase__carousel--in-page">
+          <div className="luxury-salon-showcase__carousel luxury-salon-showcase__carousel--empty luxury-salon-showcase__carousel--in-page">
             {emptyCarouselCopy}
           </div>
         ) : null}
@@ -585,11 +585,11 @@ export function SalonPublicShowcase({
   if (!hasAnyContent) return null;
   if (!hasVisualMini) return null;
 
-  const carouselWideClass = detachedPublicLayout ? " velvet-salon-showcase__carousel--wide" : "";
+  const carouselWideClass = detachedPublicLayout ? " luxury-salon-showcase__carousel--wide" : "";
 
   const carouselNode = hasCarousel ? (
-    <div className={`velvet-salon-showcase__carousel velvet-salon-showcase__carousel--in-page${carouselWideClass}`}>
-      <div className={`velvet-salon-showcase__carousel-viewport${detachedPublicLayout ? " velvet-salon-showcase__carousel-viewport--wide" : ""}`}>
+    <div className={`luxury-salon-showcase__carousel luxury-salon-showcase__carousel--in-page${carouselWideClass}`}>
+      <div className={`luxury-salon-showcase__carousel-viewport${detachedPublicLayout ? " luxury-salon-showcase__carousel-viewport--wide" : ""}`}>
         {slide ? (
           <img
             src={slide}
@@ -599,7 +599,7 @@ export function SalonPublicShowcase({
           />
         ) : null}
         {slides.length > 1 ? (
-          <div className="velvet-salon-showcase__carousel-nav" aria-hidden="true">
+          <div className="luxury-salon-showcase__carousel-nav" aria-hidden="true">
             <button
               type="button"
               onClick={() => setIdx((i) => (i - 1 + slides.length) % slides.length)}
@@ -614,7 +614,7 @@ export function SalonPublicShowcase({
         ) : null}
       </div>
       {slides.length > 1 ? (
-        <div className="velvet-salon-showcase__carousel-dots" role="tablist" aria-label="Scorri immagini vetrina">
+        <div className="luxury-salon-showcase__carousel-dots" role="tablist" aria-label="Scorri immagini vetrina">
           {slides.map((_, i) => (
             <button
               key={i}
@@ -629,11 +629,11 @@ export function SalonPublicShowcase({
     </div>
   ) : hasLogo || embedHeading ? (
     <div
-      className={`velvet-salon-showcase__carousel velvet-salon-showcase__carousel--in-page velvet-salon-showcase__carousel--placeholder${carouselWideClass}`}
+      className={`luxury-salon-showcase__carousel luxury-salon-showcase__carousel--in-page luxury-salon-showcase__carousel--placeholder${carouselWideClass}`}
     />
   ) : null;
 
-  const paletteHueClass = paletteTheme !== null ? " velvet-salon-showcase--palette-hue" : "";
+  const paletteHueClass = paletteTheme !== null ? " luxury-salon-showcase--palette-hue" : "";
   const ambientUi: PreviewAmbientUiTone | undefined =
     cardAmbientClass?.trim() && cardAmbientUiTone ? cardAmbientUiTone : undefined;
 

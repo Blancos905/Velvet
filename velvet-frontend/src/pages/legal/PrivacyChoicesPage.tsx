@@ -60,34 +60,34 @@ export default function PrivacyChoicesPage() {
         },
       ]}
     >
-      <section className="velvet-legal-public__section">
-        <h2 className="velvet-legal-public__section-title">Cookie e tecnologie simili</h2>
-        <p className="velvet-legal-public__text">
+      <section className="luxury-legal-public__section">
+        <h2 className="luxury-legal-public__section-title">Cookie e tecnologie simili</h2>
+        <p className="luxury-legal-public__text">
           Gestisci le preferenze su mappe (Google Maps) e contenuti editoriali da terze parti. I cookie necessari al servizio
           non possono essere disattivati.
         </p>
         <CookiePreferencesEditor />
       </section>
-      <section className="velvet-legal-public__section">
-        <h2 className="velvet-legal-public__section-title">Collegamenti rapidi (con account)</h2>
-        <ul className="velvet-legal-public__actions">
+      <section className="luxury-legal-public__section">
+        <h2 className="luxury-legal-public__section-title">Collegamenti rapidi (con account)</h2>
+        <ul className="luxury-legal-public__actions">
           <li>
-            <Link to="/account/profilo" className="velvet-legal-public__action-link">
+            <Link to="/account/profilo" className="luxury-legal-public__action-link">
               Profilo e chiusura account
             </Link>
           </li>
           <li>
-            <Link to="/privacy/elimina-account" className="velvet-legal-public__action-link">
+            <Link to="/privacy/elimina-account" className="luxury-legal-public__action-link">
               Elimina account (pagina pubblica)
             </Link>
           </li>
           <li>
-            <Link to="/account/assistenza" className="velvet-legal-public__action-link">
+            <Link to="/account/assistenza" className="luxury-legal-public__action-link">
               Assistenza
             </Link>
           </li>
           <li>
-            <Link to="/account/info-privacy" className="velvet-legal-public__action-link">
+            <Link to="/account/info-privacy" className="luxury-legal-public__action-link">
               Info e privacy in area account
             </Link>
           </li>

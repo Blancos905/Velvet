@@ -25,7 +25,7 @@ class SendPremiumSubscriptionActivationEmailManualTest {
 
 	@Test
 	void sendActivationEmail() {
-		String to = System.getenv().getOrDefault("VELVET_TEST_EMAIL_TO", "costantinomichele358@gmail.com");
+		String to = System.getenv().getOrDefault("VELVET_TEST_EMAIL_TO", "reviewer@example.org");
 		StudioGroup group = new StudioGroup("Salone Demo Premium");
 		group.setOwnerEmail(to);
 		emailDispatchService.dispatchPaymentThankYou(group, 0L, "eur", Instant.parse("2026-07-23T22:00:00Z"));

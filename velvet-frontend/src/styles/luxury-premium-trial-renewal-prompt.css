@@ -1,0 +1,118 @@
+.luxury-premium-trial-renewal {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 1.35rem;
+  border: 1px solid rgba(196, 181, 160, 0.32);
+  background:
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(196, 181, 160, 0.16), transparent 58%),
+    linear-gradient(168deg, rgba(28, 24, 20, 0.98) 0%, rgba(12, 10, 8, 0.99) 100%);
+  color: #f5ead8;
+}
+
+.luxury-premium-trial-renewal__glow {
+  position: absolute;
+  inset: -35% -15% auto;
+  height: 65%;
+  background: radial-gradient(circle, rgba(196, 181, 160, 0.14), transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.luxury-premium-trial-renewal__rim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.luxury-premium-trial-renewal__inner {
+  position: relative;
+  z-index: 1;
+  padding: 1.75rem 1.5rem 1.5rem;
+}
+
+.luxury-premium-trial-renewal__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid rgba(196, 181, 160, 0.35);
+  background: rgba(42, 36, 32, 0.85);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e8dfd0;
+}
+
+.luxury-premium-trial-renewal__title {
+  margin: 0.85rem 0 0.65rem;
+  font-size: clamp(1.45rem, 3.2vw, 1.95rem);
+  line-height: 1.2;
+  font-weight: 650;
+  color: #fff8ef;
+}
+
+.luxury-premium-trial-renewal__lead {
+  margin: 0 0 1rem;
+  line-height: 1.6;
+  color: rgba(245, 234, 216, 0.88);
+}
+
+.luxury-premium-trial-renewal__perks {
+  margin: 0 0 1rem;
+  padding-left: 1.15rem;
+  line-height: 1.55;
+  color: rgba(245, 234, 216, 0.82);
+}
+
+.luxury-premium-trial-renewal__price {
+  margin: 0 0 1.15rem;
+  line-height: 1.5;
+  color: rgba(245, 234, 216, 0.9);
+}
+
+.luxury-premium-trial-renewal__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.luxury-premium-trial-renewal__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.85rem;
+  padding: 0.65rem 1.35rem;
+  border-radius: 999px;
+  border: 1px solid rgba(196, 181, 160, 0.45);
+  background: linear-gradient(180deg, rgba(196, 181, 160, 0.95) 0%, rgba(168, 149, 128, 0.95) 100%);
+  color: #1a1510;
+  font-weight: 650;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.luxury-premium-trial-renewal__cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.luxury-premium-trial-renewal__hint {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(245, 234, 216, 0.68);
+}
+
+.luxury-premium-trial-renewal__legal-link {
+  color: rgba(232, 223, 208, 0.95);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.luxury-premium-trial-renewal__legal-link:hover {
+  color: #fff8ef;
+}

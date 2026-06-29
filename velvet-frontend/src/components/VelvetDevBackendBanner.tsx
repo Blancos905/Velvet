@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { apiUrl } from "../config/env";
 import { fetchWithTimeout } from "../api/fetchWithTimeout";
 import { isVelvetNativeAppShell } from "../hooks/useVelvetNativeAppShell";
-import "../styles/velvet-dev-backend-banner.css";
+import "../styles/luxury-dev-backend-banner.css";
 
 type BackendReachability = "checking" | "ok" | "down";
 
@@ -101,21 +101,21 @@ export function VelvetDevBackendBanner() {
 
   if (status === "checking") {
     return (
-      <div className="velvet-dev-backend-banner velvet-dev-backend-banner--checking" role="status">
+      <div className="luxury-dev-backend-banner luxury-dev-backend-banner--checking" role="status">
         Connessione al backend in corso…
       </div>
     );
   }
 
   return (
-    <div className="velvet-dev-backend-banner" role="alert">
+    <div className="luxury-dev-backend-banner" role="alert">
       <strong>Backend non raggiungibile.</strong> Le API via proxy Vite (
       <code>/api</code> → <code>http://127.0.0.1:8080</code>) non rispondono: l&apos;app resta lenta
       finché Spring Boot non è avviato. In un altro terminale:{" "}
       <code>cd velvet &amp;&amp; ./mvnw spring-boot:run</code>
-      <span className="velvet-dev-backend-banner__hint"> — oppure usa </span>
+      <span className="luxury-dev-backend-banner__hint"> — oppure usa </span>
       <code>./scripts/dev-app-ios.sh</code>
-      <span className="velvet-dev-backend-banner__hint"> (avvio automatico).</span>
+      <span className="luxury-dev-backend-banner__hint"> (avvio automatico).</span>
     </div>
   );
 }

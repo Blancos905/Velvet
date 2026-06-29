@@ -117,8 +117,8 @@ class VelvetFreeWebBridge {
   static String get applyFreeVisualThemeScript => '''
 (function() {
   var root = document.documentElement;
-  root.classList.add('velvet-native-app-free');
-  var id = 'velvet-app-free-theme';
+  root.classList.add('luxury-native-app-free');
+  var id = 'luxury-app-free-theme';
   var existing = document.getElementById(id);
   if (existing) existing.remove();
   var style = document.createElement('style');
@@ -132,13 +132,13 @@ class VelvetFreeWebBridge {
 
   function velvetAppSyncFreeOwnerUi() {
     if (typeof velvetAppSetNativePath === 'function') velvetAppSetNativePath();
-    var path = document.documentElement.getAttribute('data-velvet-path') || '';
+    var path = document.documentElement.getAttribute('data-luxury-path') || '';
     if (!path) {
       path = (window.location.pathname || '').replace(/\\/+\$/, '') || '/';
     }
-    var onAccount = document.documentElement.classList.contains('velvet-native-app-free') &&
+    var onAccount = document.documentElement.classList.contains('luxury-native-app-free') &&
       velvetAppIsAccountProfilePath(path);
-    document.documentElement.classList.toggle('velvet-native-app-free-profile', onAccount);
+    document.documentElement.classList.toggle('luxury-native-app-free-profile', onAccount);
     if (typeof window.velvetAppFilterFreeNav === 'function') window.velvetAppFilterFreeNav();
     if (typeof window.velvetAppApplyFreeServizi === 'function') window.velvetAppApplyFreeServizi();
     if (typeof window.velvetAppSyncFreeOwnerNavActive === 'function') {
@@ -176,30 +176,30 @@ class VelvetFreeWebBridge {
 
   static const removeFreeVisualThemeScript = '''
 (function() {
-  document.documentElement.classList.remove('velvet-native-app-free');
-  document.documentElement.classList.remove('velvet-native-app-free-profile');
-  document.documentElement.classList.remove('velvet-native-app-free-servizi');
-  var style = document.getElementById('velvet-app-free-theme');
+  document.documentElement.classList.remove('luxury-native-app-free');
+  document.documentElement.classList.remove('luxury-native-app-free-profile');
+  document.documentElement.classList.remove('luxury-native-app-free-servizi');
+  var style = document.getElementById('luxury-app-free-theme');
   if (style) style.remove();
-  var premiumLabel = document.getElementById('velvet-app-free-premium-nav-label');
+  var premiumLabel = document.getElementById('luxury-app-free-premium-nav-label');
   if (premiumLabel) premiumLabel.remove();
-  var premiumNav = document.getElementById('velvet-app-free-premium-nav');
+  var premiumNav = document.getElementById('luxury-app-free-premium-nav');
   if (premiumNav) premiumNav.remove();
-  var rebuiltNav = document.getElementById('velvet-app-free-owner-nav-scroll');
+  var rebuiltNav = document.getElementById('luxury-app-free-owner-nav-scroll');
   if (rebuiltNav) rebuiltNav.remove();
-  var legacyHost = document.getElementById('velvet-app-free-owner-nav');
+  var legacyHost = document.getElementById('luxury-app-free-owner-nav');
   if (legacyHost) legacyHost.remove();
-  document.querySelectorAll('.velvet-account-hub__nav-scroll.velvet-app-free-nav-source-hidden').forEach(function(el) {
-    el.classList.remove('velvet-app-free-nav-source-hidden');
+  document.querySelectorAll('.luxury-account-hub__nav-scroll.luxury-app-free-nav-source-hidden').forEach(function(el) {
+    el.classList.remove('luxury-app-free-nav-source-hidden');
   });
-  document.querySelectorAll('[data-velvet-app-free-paywall-bound]').forEach(function(el) {
-    el.removeAttribute('data-velvet-app-free-paywall-bound');
-    el.classList.remove('velvet-app-free-premium-locked');
-    el.classList.remove('velvet-app-free-nav-dupe-hidden');
-    el.removeAttribute('data-velvet-app-free-feature');
+  document.querySelectorAll('[data-luxury-app-free-paywall-bound]').forEach(function(el) {
+    el.removeAttribute('data-luxury-app-free-paywall-bound');
+    el.classList.remove('luxury-app-free-premium-locked');
+    el.classList.remove('luxury-app-free-nav-dupe-hidden');
+    el.removeAttribute('data-luxury-app-free-feature');
   });
-  document.querySelectorAll('a.velvet-app-free-hidden-nav').forEach(function(a) {
-    a.classList.remove('velvet-app-free-hidden-nav');
+  document.querySelectorAll('a.luxury-app-free-hidden-nav').forEach(function(a) {
+    a.classList.remove('luxury-app-free-hidden-nav');
     a.removeAttribute('aria-hidden');
   });
 })();
@@ -231,33 +231,33 @@ window.velvetAppFreeNavButtonTitle = function velvetAppFreeNavButtonTitle(link) 
 
 window.velvetAppBindFreePremiumPaywall = function velvetAppBindFreePremiumPaywall(el, featureTitle) {
   if (!el) return;
-  el.classList.add('velvet-app-free-premium-locked');
+  el.classList.add('luxury-app-free-premium-locked');
   if (featureTitle) {
-    el.setAttribute('data-velvet-app-free-feature', featureTitle);
+    el.setAttribute('data-luxury-app-free-feature', featureTitle);
   } else {
-    el.removeAttribute('data-velvet-app-free-feature');
+    el.removeAttribute('data-luxury-app-free-feature');
   }
 };
 
 if (!window.__velvetAppFreeNavPaywallDelegate) {
   window.__velvetAppFreeNavPaywallDelegate = true;
   document.addEventListener('click', function(e) {
-    if (!document.documentElement.classList.contains('velvet-native-app-free')) return;
+    if (!document.documentElement.classList.contains('luxury-native-app-free')) return;
     var target = e.target;
-    var link = target && target.closest ? target.closest('a.velvet-app-free-premium-locked[href]') : null;
+    var link = target && target.closest ? target.closest('a.luxury-app-free-premium-locked[href]') : null;
     if (!link) return;
     e.preventDefault();
     e.stopPropagation();
     if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
-    var customTitle = link.getAttribute('data-velvet-app-free-feature') || '';
+    var customTitle = link.getAttribute('data-luxury-app-free-feature') || '';
     velvetAppShowFreePremiumPaywallMessage(customTitle || velvetAppFreeNavButtonTitle(link));
     return false;
   }, true);
 }
 
 window.velvetAppRebuildFreeOwnerNav = function velvetAppRebuildFreeOwnerNav() {
-  if (!document.documentElement.classList.contains('velvet-native-app-free')) return;
-  var nav = document.querySelector('.velvet-account-hub__nav');
+  if (!document.documentElement.classList.contains('luxury-native-app-free')) return;
+  var nav = document.querySelector('.luxury-account-hub__nav');
   if (!nav) return;
 
   var items = [
@@ -271,30 +271,30 @@ window.velvetAppRebuildFreeOwnerNav = function velvetAppRebuildFreeOwnerNav() {
     { href: '/account/salone/brand', label: 'Brand e vetrina', allowed: false },
     { href: '/account/salone/posizione', label: 'Posizione del salone', allowed: false },
     { href: '/account/salone/staff', label: 'Staff', allowed: false },
-    { href: '/account/salone/statistiche', label: 'Statistiche', allowed: false, extra: 'velvet-account-hub__btn--salon-statistiche' },
+    { href: '/account/salone/statistiche', label: 'Statistiche', allowed: false, extra: 'luxury-account-hub__btn--salon-statistiche' },
     { href: '/account/salone', label: 'Panoramica', allowed: true }
   ];
 
   Array.from(nav.children).forEach(function(el) {
-    if (el.id === 'velvet-app-free-owner-nav-scroll') return;
+    if (el.id === 'luxury-app-free-owner-nav-scroll') return;
     if (
-      el.classList.contains('velvet-account-hub__nav-label') ||
-      el.classList.contains('velvet-account-hub__nav-scroll') ||
-      el.id === 'velvet-app-free-owner-nav'
+      el.classList.contains('luxury-account-hub__nav-label') ||
+      el.classList.contains('luxury-account-hub__nav-scroll') ||
+      el.id === 'luxury-app-free-owner-nav'
     ) {
-      el.classList.add('velvet-app-free-nav-source-hidden');
+      el.classList.add('luxury-app-free-nav-source-hidden');
     }
   });
 
-  var scroll = document.getElementById('velvet-app-free-owner-nav-scroll');
+  var scroll = document.getElementById('luxury-app-free-owner-nav-scroll');
   if (!scroll) {
     scroll = document.createElement('div');
-    scroll.id = 'velvet-app-free-owner-nav-scroll';
-    scroll.className = 'velvet-account-hub__nav-scroll velvet-account-hub__nav-scroll--consumer-grid';
+    scroll.id = 'luxury-app-free-owner-nav-scroll';
+    scroll.className = 'luxury-account-hub__nav-scroll luxury-account-hub__nav-scroll--consumer-grid';
     scroll.setAttribute('aria-label', 'Menu account salone');
     nav.appendChild(scroll);
   }
-  scroll.classList.remove('velvet-app-free-nav-source-hidden');
+  scroll.classList.remove('luxury-app-free-nav-source-hidden');
   scroll.style.display = 'grid';
   scroll.style.visibility = 'visible';
 
@@ -317,10 +317,10 @@ window.velvetAppRebuildFreeOwnerNav = function velvetAppRebuildFreeOwnerNav() {
   scroll.innerHTML = '';
   items.forEach(function(item) {
     var a = document.createElement('a');
-    a.className = 'velvet-account-hub__btn' + (item.extra ? ' ' + item.extra : '');
+    a.className = 'luxury-account-hub__btn' + (item.extra ? ' ' + item.extra : '');
     a.href = item.href;
     a.setAttribute('data-router-link', 'true');
-    a.setAttribute('data-velvet-app-free-nav-item', item.allowed ? 'free' : 'premium');
+    a.setAttribute('data-luxury-app-free-nav-item', item.allowed ? 'free' : 'premium');
     a.textContent = item.label;
     a.style.color = '#0a1628';
     a.style.webkitTextFillColor = '#0a1628';
@@ -337,12 +337,12 @@ window.velvetAppRebuildFreeOwnerNav = function velvetAppRebuildFreeOwnerNav() {
 window.velvetAppSyncFreeOwnerNavActive = function velvetAppSyncFreeOwnerNavActive() {
   var helper = window.__velvetSubscriptionGuards;
   if (!helper) return;
-  var path = document.documentElement.getAttribute('data-velvet-path') || '';
+  var path = document.documentElement.getAttribute('data-luxury-path') || '';
   if (!path) {
     path = (window.location.pathname || '').replace(/\\/+\$/, '') || '/';
   }
   path = helper.normalizePath(path);
-  document.querySelectorAll('#velvet-app-free-owner-nav-scroll a[href]').forEach(function(a) {
+  document.querySelectorAll('#luxury-app-free-owner-nav-scroll a[href]').forEach(function(a) {
     var href = a.getAttribute('href') || '';
     var linkPath = helper.normalizePath(href);
     var active = false;
@@ -353,7 +353,7 @@ window.velvetAppSyncFreeOwnerNavActive = function velvetAppSyncFreeOwnerNavActiv
     } else {
       active = path === linkPath || path.indexOf(linkPath + '/') === 0;
     }
-    a.classList.toggle('velvet-account-hub__btn--active', active);
+    a.classList.toggle('luxury-account-hub__btn--active', active);
   });
 };
 
@@ -376,7 +376,7 @@ window.velvetAppInstallFreeNavObserver = function velvetAppInstallFreeNavObserve
     }, 120);
   }
   function attach() {
-    var nav = document.querySelector('.velvet-account-hub__nav');
+    var nav = document.querySelector('.luxury-account-hub__nav');
     if (!nav || nav.__velvetAppFreeNavObserving) return;
     nav.__velvetAppFreeNavObserving = true;
     new MutationObserver(scheduleRebuild).observe(nav, { childList: true, subtree: true });
@@ -391,7 +391,7 @@ window.velvetAppInjectFreeOwnerPremiumNav = velvetAppRebuildFreeOwnerNav;
 window.velvetAppAlignFreeNavWithPremium = function velvetAppAlignFreeNavWithPremium() {};
 
 window.velvetAppFilterFreeNav = function velvetAppFilterFreeNav() {
-  if (!document.documentElement.classList.contains('velvet-native-app-free')) return;
+  if (!document.documentElement.classList.contains('luxury-native-app-free')) return;
   var guards = window.__VELVET_SUBSCRIPTION_GUARDS__;
   var helper = window.__velvetSubscriptionGuards;
   if (!guards || !helper) {
@@ -403,9 +403,9 @@ window.velvetAppFilterFreeNav = function velvetAppFilterFreeNav() {
   velvetAppInjectFreeOwnerPremiumNav();
   velvetAppAlignFreeNavWithPremium();
 
-  document.querySelectorAll('#velvet-app-free-owner-nav-scroll a[data-velvet-app-free-nav-item="free"]').forEach(function(a) {
-    a.classList.remove('velvet-app-free-premium-locked');
-    a.removeAttribute('data-velvet-app-free-feature');
+  document.querySelectorAll('#luxury-app-free-owner-nav-scroll a[data-luxury-app-free-nav-item="free"]').forEach(function(a) {
+    a.classList.remove('luxury-app-free-premium-locked');
+    a.removeAttribute('data-luxury-app-free-feature');
   });
 };
 window.velvetAppFilterFreeNav();
@@ -414,7 +414,7 @@ window.velvetAppFilterFreeNav();
   /// Agenda Free: blocca link «Gestione staff» dentro la pagina prenotazioni.
   static const applyFreeAgendaRestrictionsScript = '''
 window.velvetAppApplyFreeAgendaRestrictions = function velvetAppApplyFreeAgendaRestrictions() {
-  if (!document.documentElement.classList.contains('velvet-native-app-free')) return;
+  if (!document.documentElement.classList.contains('luxury-native-app-free')) return;
   var path = window.location.pathname || '';
   if (path.indexOf('/account/prenotazioni') !== 0) return;
   document.querySelectorAll('a[href*="/account/salone/staff"]').forEach(function(a) {
@@ -427,12 +427,12 @@ window.velvetAppApplyFreeAgendaRestrictions();
   /// Pagina servizi: niente upload foto (solo piano Free in app).
   static const applyFreeServiziNoPhotoScript = '''
 window.velvetAppApplyFreeServizi = function velvetAppApplyFreeServizi() {
-  if (!document.documentElement.classList.contains('velvet-native-app-free')) return;
+  if (!document.documentElement.classList.contains('luxury-native-app-free')) return;
   var path = window.location.pathname || '';
   var onServizi = path.indexOf('/account/salone/servizi') === 0;
-  document.documentElement.classList.toggle('velvet-native-app-free-servizi', onServizi);
+  document.documentElement.classList.toggle('luxury-native-app-free-servizi', onServizi);
   if (!onServizi) return;
-  document.querySelectorAll('input.velvet-salon-services-hidden-file').forEach(function(input) {
+  document.querySelectorAll('input.luxury-salon-services-hidden-file').forEach(function(input) {
     input.disabled = true;
     input.setAttribute('aria-hidden', 'true');
   });

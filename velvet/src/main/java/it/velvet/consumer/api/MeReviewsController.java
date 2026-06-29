@@ -75,7 +75,7 @@ public class MeReviewsController {
 	}
 
 	@PostMapping("/platform")
-	@Operation(summary = "Valuta Saloni Velvet (solo clienti)")
+	@Operation(summary = "Valuta Saloni Luxury (solo clienti)")
 	@PreAuthorize("hasAuthority('ROLE_CLIENT')")
 	public PlatformReviewResponse submitPlatformReview(
 			@AuthenticationPrincipal VelvetUserPrincipal principal,

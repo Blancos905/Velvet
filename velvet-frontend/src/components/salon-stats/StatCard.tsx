@@ -16,20 +16,20 @@ export default function StatCard({ icon: Icon, label, value, subValue, trend, tr
   const IconRender = Icon as unknown as IconComp;
   const showTrend = trend != null && Number.isFinite(trend);
   return (
-    <article className="velvet-stats-pro-card">
-      <div className="velvet-stats-pro-card__head">
-        <span className="velvet-stats-pro-card__label">{label}</span>
-        <span className="velvet-stats-pro-card__icon-wrap" aria-hidden>
-          <IconRender className="velvet-stats-pro-card__icon" strokeWidth={2} />
+    <article className="luxury-stats-pro-card">
+      <div className="luxury-stats-pro-card__head">
+        <span className="luxury-stats-pro-card__label">{label}</span>
+        <span className="luxury-stats-pro-card__icon-wrap" aria-hidden>
+          <IconRender className="luxury-stats-pro-card__icon" strokeWidth={2} />
         </span>
       </div>
-      <strong className="velvet-stats-pro-card__value">{value}</strong>
-      <p className="velvet-stats-pro-card__sub">{subValue}</p>
+      <strong className="luxury-stats-pro-card__value">{value}</strong>
+      <p className="luxury-stats-pro-card__sub">{subValue}</p>
       {showTrend ? (
         <span
           className={
-            "velvet-stats-pro-card__trend " +
-            (trendUp === false ? "velvet-stats-pro-card__trend--down" : "velvet-stats-pro-card__trend--up")
+            "luxury-stats-pro-card__trend " +
+            (trendUp === false ? "luxury-stats-pro-card__trend--down" : "luxury-stats-pro-card__trend--up")
           }
         >
           {trendUp === false ? "↓" : "↑"} {trend > 0 ? `+${trend}` : trend}% vs mese scorso

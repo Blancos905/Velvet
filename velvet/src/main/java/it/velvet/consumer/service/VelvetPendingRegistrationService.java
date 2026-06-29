@@ -13,6 +13,7 @@ import it.velvet.consumer.domain.PendingRegistrationRepository;
 import it.velvet.notification.service.RegistrationEmailDispatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -194,10 +195,21 @@ public class VelvetPendingRegistrationService {
 			String displayName) {
 		String norm = normalizeEmail(email);
 		String payloadJson = serialize(payload);
-		pendingRegistrationRepository.findByEmailIgnoreCase(norm).ifPresent(pendingRegistrationRepository::delete);
+		pendingRegistrationRepository.findByEmailIgnoreCase(norm).ifPresent(existing -> {
+			pendingRegistrationRepository.delete(existing);
+			pendingRegistrationRepository.flush();
+		});
 		PendingRegistration pending =
 				new PendingRegistration(norm, passwordEncoder.encode(password), kind, payloadJson, displayName);
-		pendingRegistrationRepository.save(pending);
+		try {
+			pendingRegistrationRepository.save(pending);
+		}
+		catch (DataIntegrityViolationException ex) {
+			throw new BusinessException(
+					HttpStatus.CONFLICT,
+					"EMAIL_ALREADY_IN_USE",
+					"Esiste già una registrazione in corso o un account con questa email.");
+		}
 		issueVerification(pending);
 	}
 

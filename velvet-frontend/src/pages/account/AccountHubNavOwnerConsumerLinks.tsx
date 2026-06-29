@@ -52,7 +52,7 @@ export function AccountHubNavOwnerConsumerLinks({
 
   return (
     <div
-      className="velvet-account-hub__nav-scroll velvet-account-hub__nav-scroll--consumer-grid"
+      className="luxury-account-hub__nav-scroll luxury-account-hub__nav-scroll--consumer-grid"
       aria-label="Menu principale account"
     >
       {showFreeSalonShortcuts ? (
@@ -77,7 +77,7 @@ export function AccountHubNavOwnerConsumerLinks({
       ) : null}
       {isSalonTitolare ? (
         <AccountHubNavLink to="/account/salone/servizi" className={navBtn()}>
-          <span className="velvet-account-hub__btn-notif">Aggiungi servizi</span>
+          <span className="luxury-account-hub__btn-notif">Aggiungi servizi</span>
         </AccountHubNavLink>
       ) : null}
       {isSalonTitolare ? (
@@ -86,11 +86,11 @@ export function AccountHubNavOwnerConsumerLinks({
           className={navBtn()}
           title="Centro notifiche salone: prenotazioni e messaggi in evidenza."
         >
-          <span className="velvet-account-hub__btn-notif">
+          <span className="luxury-account-hub__btn-notif">
             Notifiche
             {showSalonNotificheNavPill ? (
               <span
-                className="velvet-account-hub__notif-pill"
+                className="luxury-account-hub__notif-pill"
                 title={`Da gestire in notifiche: ${notifInboxAttentionTotal} (in coda + inviate in evidenza)`}
               >
                 {notifInboxAttentionTotal > 99 ? "99+" : notifInboxAttentionTotal}
@@ -101,17 +101,17 @@ export function AccountHubNavOwnerConsumerLinks({
       ) : null}
       <AccountHubNavLink to="/account/prenotazioni" className={navBtn()}>
         {isSalonTitolare ? (
-          <span className="velvet-account-hub__btn-notif">Agenda</span>
+          <span className="luxury-account-hub__btn-notif">Agenda</span>
         ) : (
           "Prenotazioni"
         )}
       </AccountHubNavLink>
       {!isSalonTitolare ? (
         <AccountHubNavLink to="/account/chat" className={navBtn()} title="Messaggi con i saloni di cui sei cliente.">
-          <span className="velvet-account-hub__btn-notif">
+          <span className="luxury-account-hub__btn-notif">
             Chat
             {showClientChatNavPill ? (
-              <span className="velvet-account-hub__notif-pill" title={`Messaggi non letti: ${clientChatUnread}`}>
+              <span className="luxury-account-hub__notif-pill" title={`Messaggi non letti: ${clientChatUnread}`}>
                 {clientChatUnread > 99 ? "99+" : clientChatUnread}
               </span>
             ) : null}
@@ -120,10 +120,10 @@ export function AccountHubNavOwnerConsumerLinks({
       ) : null}
       {!isSalonTitolare ? (
         <AccountHubNavLink to="/account/notifiche" className={navBtn()}>
-          <span className="velvet-account-hub__btn-notif">
+          <span className="luxury-account-hub__btn-notif">
             Notifiche
             {showConsumerNotificheNavPill ? (
-              <span className="velvet-account-hub__notif-pill">
+              <span className="luxury-account-hub__notif-pill">
                 {consumerNotifAttentionTotal > 99 ? "99+" : consumerNotifAttentionTotal}
               </span>
             ) : null}
@@ -144,11 +144,11 @@ export function AccountHubNavOwnerConsumerLinks({
           className={navBtn()}
           title="Saloni presso cui sei registrato come cliente; il numerino segnala nuovi legami dall’ultima volta che hai aperto l’elenco."
         >
-          <span className="velvet-account-hub__btn-notif">
+          <span className="luxury-account-hub__btn-notif">
             Saloni di fiducia
             {showTrustedSalonsNavPill ? (
               <span
-                className="velvet-account-hub__notif-pill"
+                className="luxury-account-hub__notif-pill"
                 title={`Nuovi saloni di fiducia: ${trustedSalonsNavBadge}`}
               >
                 {trustedSalonsNavBadge > 99 ? "99+" : trustedSalonsNavBadge}
@@ -158,10 +158,10 @@ export function AccountHubNavOwnerConsumerLinks({
         </AccountHubNavLink>
       ) : null}
       <AccountHubNavLink to="/account/feedback-velvet" className={navBtn()}>
-        <span className="velvet-account-hub__btn-notif">
+        <span className="luxury-account-hub__btn-notif">
           Recensioni
           {showSalonReviewsNavPill || showClientReviewsNavPill ? (
-            <span className="velvet-account-hub__notif-pill">
+            <span className="luxury-account-hub__notif-pill">
               {isSalonTitolare
                 ? salonReviewUnreadCount > 99
                   ? "99+"
@@ -179,11 +179,11 @@ export function AccountHubNavOwnerConsumerLinks({
           className={navBtn()}
           title="Elenco clienti della sede; il numerino indica quanti clienti sono stati aggiunti dall’ultima volta che hai aperto questa pagina."
         >
-          <span className="velvet-account-hub__btn-notif">
+          <span className="luxury-account-hub__btn-notif">
             Clienti
             {showSalonClientsNavPill ? (
               <span
-                className="velvet-account-hub__notif-pill"
+                className="luxury-account-hub__notif-pill"
                 title={`Nuovi clienti da vedere: ${salonClientsNavBadge}`}
               >
                 {salonClientsNavBadge > 99 ? "99+" : salonClientsNavBadge}
@@ -194,10 +194,10 @@ export function AccountHubNavOwnerConsumerLinks({
       ) : null}
       {showPremiumSalonNav ? (
         <AccountHubNavLink to="/account/chat" className={navBtn()} title="Chat con i clienti collegati al salone.">
-          <span className="velvet-account-hub__btn-notif">
+          <span className="luxury-account-hub__btn-notif">
             Chat
             {showOwnerChatNavPill ? (
-              <span className="velvet-account-hub__notif-pill" title={`Messaggi dai clienti: ${ownerChatUnread}`}>
+              <span className="luxury-account-hub__notif-pill" title={`Messaggi dai clienti: ${ownerChatUnread}`}>
                 {ownerChatUnread > 99 ? "99+" : ownerChatUnread}
               </span>
             ) : null}

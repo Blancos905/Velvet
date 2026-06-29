@@ -6,6 +6,7 @@ import { useVelvetAuth } from "../auth/VelvetAuthProvider";
 import { registerConsumerApi } from "../api/registerConsumer";
 import { SaloniLuxuryLogoMark } from "../components/SaloniLuxuryLogoMark";
 import { SalonPremiumPlanCardPreview } from "../components/salon/SalonPremiumPlanCardPreview";
+import { SalonPlanCardTagline } from "../components/salon/SalonPlanCardTagline";
 import { SalonPlanPremiumTrialPanel } from "../components/salon/SalonPlanPremiumTrialPanel";
 import { SalonPremiumOwnerInfoPrivacyModal } from "../components/salon/SalonPremiumOwnerInfoPrivacyModal";
 import { VelvetEuropeanContactFields } from "../components/VelvetEuropeanContactFields";
@@ -19,7 +20,7 @@ import {
 import { partnerContactEmail } from "../config/env";
 import { SALON_BUSINESS_TYPE_OPTIONS } from "../data/salonBusinessTypes";
 import { SALON_CLIENT_GENDER_OPTIONS } from "../data/salonClientGenders";
-import { SALON_PLANS, SALON_PREMIUM_TRIAL_DAYS, planDisplayName, type SalonPlanTier } from "../data/salonPlans";
+import { SALON_PLANS, premiumTrialFreeLabel, premiumTrialLeadFootnote, SALON_PREMIUM_TRIAL_MONTHS, planDisplayName, type SalonPlanTier } from "../data/salonPlans";
 import {
   DEFAULT_EUROPEAN_COUNTRY_CODE,
   EUROPEAN_PHONE_COUNTRIES,
@@ -30,13 +31,16 @@ import {
   loginReturnPathForSalonRegistration,
   setPostLoginPathForSalonRegistration,
 } from "../lib/salonRegistrationPostLogin";
+import { isSalonPremiumCheckoutRequired } from "../lib/salonPremiumCheckoutPolicy";
+import { NATIVE_PREMIUM_BILLING_BLOCKED_MESSAGE } from "../lib/nativePremiumUpgradePolicy";
+import { useSalonPremiumCheckoutPolicyQuery } from "../hooks/useSalonPremiumCheckoutPolicy";
 import { toBillingProfilePayload, validateSalonBillingProfileForm } from "../lib/salonBillingProfileValidation";
 import { isFeatureEnabled, resolveSubscriptionSurface } from "../lib/subscription-guards";
 import { useVelvetNativeAppShell } from "../hooks/useVelvetNativeAppShell";
 import { humanizeOidcNetworkError } from "../utils/oidcErrors";
-import "../styles/velvet-email-confirm-box.css";
-import "../styles/velvet-salon-plans-register.css";
-import "../styles/velvet-search-page.css";
+import "../styles/luxury-email-confirm-box.css";
+import "../styles/luxury-salon-plans-register.css";
+import "../styles/luxury-search-page.css";
 
 function validateRequiredSalonLocation(s: {
   salonAddressLine1: string;
@@ -56,6 +60,8 @@ export default function SalonPlansPage() {
   const queryClient = useQueryClient();
   const { signUpForSalon, signInWithPassword } = useVelvetAuth();
   const isNativeApp = useVelvetNativeAppShell();
+  const checkoutPolicy = useSalonPremiumCheckoutPolicyQuery();
+  const premiumCheckoutRequired = isSalonPremiumCheckoutRequired(checkoutPolicy.data);
   const [modalPlan, setModalPlan] = useState<SalonPlanTier | null>(null);
   const [freePlanNoticeOpen, setFreePlanNoticeOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -243,7 +249,7 @@ export default function SalonPlansPage() {
       }
     }
 
-    if (modalPlan === "PREMIUM") {
+    if (modalPlan === "PREMIUM" && premiumCheckoutRequired) {
       const billingValues = resolveBillingForSubmit();
       const billingErr = validateSalonBillingProfileForm(billingValues);
       if (billingErr) {
@@ -256,7 +262,10 @@ export default function SalonPlansPage() {
     void (async () => {
       try {
         const emailNorm = email.trim().toLowerCase();
-        const billingPayload = modalPlan === "PREMIUM" ? toBillingProfilePayload(resolveBillingForSubmit()) : undefined;
+        const billingPayload =
+          modalPlan === "PREMIUM" && premiumCheckoutRequired
+            ? toBillingProfilePayload(resolveBillingForSubmit())
+            : undefined;
         const result = await registerConsumerApi({
           email: emailNorm,
           password,
@@ -280,15 +289,15 @@ export default function SalonPlansPage() {
         });
         await queryClient.invalidateQueries({ queryKey: ["orgs"] });
         await queryClient.invalidateQueries({ queryKey: ["me"] });
-        setPostLoginPathForSalonRegistration(modalPlan);
+        setPostLoginPathForSalonRegistration(modalPlan, premiumCheckoutRequired);
         if (result.emailVerificationRequired === false) {
           await signInWithPassword(emailNorm, password);
-          navigate(loginReturnPathForSalonRegistration(modalPlan), { replace: true });
+          navigate(loginReturnPathForSalonRegistration(modalPlan, premiumCheckoutRequired), { replace: true });
           setSubmitting(false);
           return;
         }
         setRegisteredPlanTier(modalPlan);
-        setRegistrationNeedsEmailConfirm(result.emailVerificationRequired !== false);
+        setRegistrationNeedsEmailConfirm(true);
         setRegistrationSuccessMessage(result.message);
         setModalPlan(null);
         setRegistrationComplete(true);
@@ -312,7 +321,7 @@ export default function SalonPlansPage() {
           <>
             {freePlanNoticeOpen ? (
               <div
-                className="velvet-plans-modal-root velvet-plans-modal-root--free-notice"
+                className="luxury-plans-modal-root luxury-plans-modal-root--free-notice"
                 role="presentation"
                 onMouseDown={(ev) => ev.target === ev.currentTarget && closeFreePlanNotice()}
               >
@@ -331,29 +340,29 @@ export default function SalonPlansPage() {
             ) : null}
             {modalPlan != null ? (
               <div
-                className="velvet-plans-modal-root velvet-plans-modal-root--salon-register"
+                className="luxury-plans-modal-root luxury-plans-modal-root--salon-register"
                 role="presentation"
                 onMouseDown={(ev) => ev.target === ev.currentTarget && closeModal()}
               >
                 <section
-                  className={`velvet-email-confirm-box velvet-salon-register-box${modalPlan === "PREMIUM" ? " velvet-salon-register-box--premium" : ""}${wideModal ? " velvet-salon-register-box--wide" : ""}`}
+                  className={`luxury-email-confirm-box luxury-salon-register-box${modalPlan === "PREMIUM" ? " luxury-salon-register-box--premium" : ""}${wideModal ? " luxury-salon-register-box--wide" : ""}`}
                   role="dialog"
                   aria-modal="true"
                   aria-labelledby={titleId}
                   onMouseDown={(ev) => ev.stopPropagation()}
                 >
-                  <div className="velvet-email-confirm-box__glow" aria-hidden />
+                  <div className="luxury-email-confirm-box__glow" aria-hidden />
                   <button
                     type="button"
-                    className="velvet-salon-register-box__close"
+                    className="luxury-salon-register-box__close"
                     onClick={closeModal}
                     disabled={submitting}
                     aria-label="Chiudi"
                   >
                     ×
                   </button>
-                  <div className="velvet-email-confirm-box__icon-wrap" aria-hidden>
-                    <svg className="velvet-email-confirm-box__icon" viewBox="0 0 24 24" fill="none">
+                  <div className="luxury-email-confirm-box__icon-wrap" aria-hidden>
+                    <svg className="luxury-email-confirm-box__icon" viewBox="0 0 24 24" fill="none">
                       <path
                         d="M4 8.5V18a2 2 0 002 2h12a2 2 0 002-2V8.5M4 8.5L12 13l8-4.5M4 8.5l8-4.5 8 4.5"
                         stroke="currentColor"
@@ -369,17 +378,17 @@ export default function SalonPlansPage() {
                       />
                     </svg>
                   </div>
-                  <p className="velvet-email-confirm-box__kicker">Registrazione titolare</p>
-                  <h2 id={titleId} className="velvet-email-confirm-box__title">
+                  <p className="luxury-email-confirm-box__kicker">Registrazione titolare</p>
+                  <h2 id={titleId} className="luxury-email-confirm-box__title">
                     Piano {modalPlanName}
                   </h2>
                   {errorHint ? (
-                    <p className="velvet-alert velvet-alert--error velvet-salon-register-box__alert" role="alert">
+                    <p className="luxury-alert luxury-alert--error luxury-salon-register-box__alert" role="alert">
                       {errorHint}
                     </p>
                   ) : null}
-                  <form className="velvet-salon-register-box__form velvet-plans-modal__form" noValidate onSubmit={onSubmitRegistration}>
-                    <label className="velvet-plans-field">
+                  <form className="luxury-salon-register-box__form luxury-plans-modal__form" noValidate onSubmit={onSubmitRegistration}>
+                    <label className="luxury-plans-field">
                       <span>Nome</span>
                       <input
                         name="firstName"
@@ -391,7 +400,7 @@ export default function SalonPlansPage() {
                         disabled={submitting}
                       />
                     </label>
-                    <label className="velvet-plans-field">
+                    <label className="luxury-plans-field">
                       <span>Cognome</span>
                       <input
                         name="lastName"
@@ -403,7 +412,7 @@ export default function SalonPlansPage() {
                         disabled={submitting}
                       />
                     </label>
-                    <label className="velvet-plans-field velvet-plans-field--full">
+                    <label className="luxury-plans-field luxury-plans-field--full">
                       <span>Email</span>
                       <input
                         name="email"
@@ -428,7 +437,7 @@ export default function SalonPlansPage() {
                       prefixSelectId={`${formId}-phone-prefix`}
                       phoneInputId={`${formId}-phone-local`}
                     />
-                    <label className="velvet-plans-field velvet-plans-field--full">
+                    <label className="luxury-plans-field luxury-plans-field--full">
                       <span>Nome del salone</span>
                       <input
                         name="salonName"
@@ -445,20 +454,20 @@ export default function SalonPlansPage() {
                     {showLocationSection ? (
                       <>
                         <fieldset
-                          className="velvet-plans-fieldset velvet-plans-salon-types velvet-plans-field--full"
+                          className="luxury-plans-fieldset luxury-plans-salon-types luxury-plans-field--full"
                           aria-labelledby={salonTypesLegendId}
                         >
-                          <legend id={salonTypesLegendId} className="velvet-plans-salon-types__legend">
+                          <legend id={salonTypesLegendId} className="luxury-plans-salon-types__legend">
                             Di che salone si tratta?
                           </legend>
-                          <div className="velvet-plans-salon-types__chips">
+                          <div className="luxury-plans-salon-types__chips">
                             {SALON_BUSINESS_TYPE_OPTIONS.map((opt) => {
                               const selected = salonBusinessTypes.has(opt.id);
                               return (
                                 <button
                                   key={opt.id}
                                   type="button"
-                                  className={`velvet-plans-salon-type-chip${selected ? " velvet-plans-salon-type-chip--selected" : ""}`}
+                                  className={`luxury-plans-salon-type-chip${selected ? " luxury-plans-salon-type-chip--selected" : ""}`}
                                   aria-pressed={selected}
                                   disabled={submitting}
                                   onClick={() => {
@@ -477,20 +486,20 @@ export default function SalonPlansPage() {
                           </div>
                         </fieldset>
                         <fieldset
-                          className="velvet-plans-fieldset velvet-plans-salon-types velvet-plans-field--full"
+                          className="luxury-plans-fieldset luxury-plans-salon-types luxury-plans-field--full"
                           aria-labelledby={salonClientGendersLegendId}
                         >
-                          <legend id={salonClientGendersLegendId} className="velvet-plans-salon-types__legend">
+                          <legend id={salonClientGendersLegendId} className="luxury-plans-salon-types__legend">
                             Per chi è il salone?
                           </legend>
-                          <div className="velvet-plans-salon-types__chips">
+                          <div className="luxury-plans-salon-types__chips">
                             {SALON_CLIENT_GENDER_OPTIONS.map((opt) => {
                               const selected = salonClientGenders.has(opt.id);
                               return (
                                 <button
                                   key={opt.id}
                                   type="button"
-                                  className={`velvet-plans-salon-type-chip${selected ? " velvet-plans-salon-type-chip--selected" : ""}`}
+                                  className={`luxury-plans-salon-type-chip${selected ? " luxury-plans-salon-type-chip--selected" : ""}`}
                                   aria-pressed={selected}
                                   disabled={submitting}
                                   onClick={() => {
@@ -508,7 +517,7 @@ export default function SalonPlansPage() {
                             })}
                           </div>
                         </fieldset>
-                        <label className="velvet-plans-field velvet-plans-field--full">
+                        <label className="luxury-plans-field luxury-plans-field--full">
                           <span>Indirizzo sede (via e civico)</span>
                           <input
                             name="salonAddressLine1"
@@ -520,7 +529,7 @@ export default function SalonPlansPage() {
                             disabled={submitting}
                           />
                         </label>
-                        <label className="velvet-plans-field">
+                        <label className="luxury-plans-field">
                           <span>CAP</span>
                           <input
                             name="salonPostalCode"
@@ -532,7 +541,7 @@ export default function SalonPlansPage() {
                             disabled={submitting}
                           />
                         </label>
-                        <label className="velvet-plans-field">
+                        <label className="luxury-plans-field">
                           <span>Città</span>
                           <input
                             name="salonCity"
@@ -544,7 +553,7 @@ export default function SalonPlansPage() {
                             disabled={submitting}
                           />
                         </label>
-                        <label className="velvet-plans-field">
+                        <label className="luxury-plans-field">
                           <span>Provincia (sigla)</span>
                           <input
                             name="salonProvince"
@@ -557,11 +566,11 @@ export default function SalonPlansPage() {
                             placeholder="es. MI"
                           />
                         </label>
-                        <label className="velvet-plans-field">
+                        <label className="luxury-plans-field">
                           <span>Paese</span>
                           <select
                             name="salonCountry"
-                            className="velvet-eu-contact-select"
+                            className="luxury-eu-contact-select"
                             value={salonCountry || DEFAULT_EUROPEAN_COUNTRY_CODE}
                             onChange={(ev) => {
                               const nextCode = ev.target.value;
@@ -582,9 +591,9 @@ export default function SalonPlansPage() {
                       </>
                     ) : null}
 
-                    {modalPlan === "PREMIUM" ? (
+                    {modalPlan === "PREMIUM" && premiumCheckoutRequired ? (
                       <>
-                        <label className="velvet-plans-field velvet-plans-field--full velvet-plans-field--check">
+                        <label className="luxury-plans-field luxury-plans-field--full luxury-plans-field--check">
                           <input
                             type="checkbox"
                             checked={billingSameAsSalon}
@@ -617,10 +626,10 @@ export default function SalonPlansPage() {
                       </>
                     ) : null}
 
-                    <div className="velvet-plans-password-pair">
-                      <label className="velvet-plans-field">
+                    <div className="luxury-plans-password-pair">
+                      <label className="luxury-plans-field">
                         <span>Password</span>
-                        <div className="velvet-plans-password-wrap">
+                        <div className="luxury-plans-password-wrap">
                           <input
                             name="password"
                             type={showPassword ? "text" : "password"}
@@ -634,7 +643,7 @@ export default function SalonPlansPage() {
                           />
                           <button
                             type="button"
-                            className="velvet-plans-password-toggle"
+                            className="luxury-plans-password-toggle"
                             onClick={() => setShowPassword((v) => !v)}
                             disabled={submitting}
                             aria-label={showPassword ? "Nascondi password" : "Mostra password"}
@@ -642,7 +651,7 @@ export default function SalonPlansPage() {
                           >
                             {showPassword ? (
                               <svg
-                                className="velvet-plans-password-toggle__icon"
+                                className="luxury-plans-password-toggle__icon"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -658,7 +667,7 @@ export default function SalonPlansPage() {
                               </svg>
                             ) : (
                               <svg
-                                className="velvet-plans-password-toggle__icon"
+                                className="luxury-plans-password-toggle__icon"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -683,9 +692,9 @@ export default function SalonPlansPage() {
                           </button>
                         </div>
                       </label>
-                      <label className="velvet-plans-field">
+                      <label className="luxury-plans-field">
                         <span>Ripeti password</span>
-                        <div className="velvet-plans-password-wrap">
+                        <div className="luxury-plans-password-wrap">
                           <input
                             name="confirmPassword"
                             type={showConfirmPassword ? "text" : "password"}
@@ -699,7 +708,7 @@ export default function SalonPlansPage() {
                           />
                           <button
                             type="button"
-                            className="velvet-plans-password-toggle"
+                            className="luxury-plans-password-toggle"
                             onClick={() => setShowConfirmPassword((v) => !v)}
                             disabled={submitting}
                             aria-label={showConfirmPassword ? "Nascondi ripeti password" : "Mostra ripeti password"}
@@ -707,7 +716,7 @@ export default function SalonPlansPage() {
                           >
                             {showConfirmPassword ? (
                               <svg
-                                className="velvet-plans-password-toggle__icon"
+                                className="luxury-plans-password-toggle__icon"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -723,7 +732,7 @@ export default function SalonPlansPage() {
                               </svg>
                             ) : (
                               <svg
-                                className="velvet-plans-password-toggle__icon"
+                                className="luxury-plans-password-toggle__icon"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -749,8 +758,8 @@ export default function SalonPlansPage() {
                         </div>
                       </label>
                     </div>
-                    <div className="velvet-plans-privacy-terms velvet-plans-field--full">
-                      <label className="velvet-plans-field velvet-plans-field--check">
+                    <div className="luxury-plans-privacy-terms luxury-plans-field--full">
+                      <label className="luxury-plans-field luxury-plans-field--check">
                         <input
                           type="checkbox"
                           checked={acceptTerms}
@@ -759,17 +768,17 @@ export default function SalonPlansPage() {
                         />
                         <span>
                           Dichiaro di aver letto e accetto i{" "}
-                          <Link to="/termini" className="velvet-link-inline" target="_blank" rel="noopener noreferrer">
+                          <Link to="/termini" className="luxury-link-inline" target="_blank" rel="noopener noreferrer">
                             termini di servizio
                           </Link>{" "}
                           e l&apos;
-                          <Link to="/privacy" className="velvet-link-inline" target="_blank" rel="noopener noreferrer">
+                          <Link to="/privacy" className="luxury-link-inline" target="_blank" rel="noopener noreferrer">
                             informativa privacy
                           </Link>
                           .
                         </span>
                       </label>
-                      <label className="velvet-plans-field velvet-plans-field--check">
+                      <label className="luxury-plans-field luxury-plans-field--check">
                         <input
                           type="checkbox"
                           checked={confirmAdult16}
@@ -780,17 +789,17 @@ export default function SalonPlansPage() {
                       </label>
                       <button
                         type="button"
-                        className="velvet-plans-privacy-open"
+                        className="luxury-plans-privacy-open"
                         onClick={() => setPrivacyNoticeOpen(true)}
                         disabled={submitting}
                       >
                         Leggi info e privacy
                       </button>
                     </div>
-                    <div className="velvet-salon-register-box__actions velvet-email-confirm-box__actions">
+                    <div className="luxury-salon-register-box__actions luxury-email-confirm-box__actions">
                       <button
                         type="button"
-                        className="velvet-email-confirm-box__cta velvet-email-confirm-box__cta--secondary"
+                        className="luxury-email-confirm-box__cta luxury-email-confirm-box__cta--secondary"
                         onClick={closeModal}
                         disabled={submitting}
                       >
@@ -798,7 +807,7 @@ export default function SalonPlansPage() {
                       </button>
                       <button
                         type="submit"
-                        className="velvet-email-confirm-box__cta velvet-email-confirm-box__cta--primary"
+                        className="luxury-email-confirm-box__cta luxury-email-confirm-box__cta--primary"
                         disabled={submitting}
                       >
                         {submitting ? "Creazione account…" : "Crea account e continua"}
@@ -815,12 +824,12 @@ export default function SalonPlansPage() {
 
   return (
     <>
-    <main className="velvet-page-main velvet-search-page velvet-plans-page">
+    <main className="luxury-page-main luxury-search-page luxury-plans-page">
       {isNativeApp ? (
-        <div className="velvet-app-plans-top-row" aria-label="Navigazione e brand">
-          <div className="velvet-search-back-row">
-            <Link to="/partner" className="velvet-search-back" aria-label="Indietro a Perché Saloni Luxury">
-              <svg className="velvet-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <div className="luxury-app-plans-top-row" aria-label="Navigazione e brand">
+          <div className="luxury-search-back-row">
+            <Link to="/partner" className="luxury-search-back" aria-label="Indietro a Perché Saloni Luxury">
+              <svg className="luxury-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
                 <path
                   d="M15 18l-6-6 6-6"
                   stroke="currentColor"
@@ -835,9 +844,9 @@ export default function SalonPlansPage() {
           <SaloniLuxuryLogoMark variant="hero" />
         </div>
       ) : (
-        <div className="velvet-search-back-row">
-          <Link to="/partner" className="velvet-search-back" aria-label="Indietro a Perché Saloni Luxury">
-            <svg className="velvet-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <div className="luxury-search-back-row">
+          <Link to="/partner" className="luxury-search-back" aria-label="Indietro a Perché Saloni Luxury">
+            <svg className="luxury-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path
                 d="M15 18l-6-6 6-6"
                 stroke="currentColor"
@@ -851,117 +860,129 @@ export default function SalonPlansPage() {
         </div>
       )}
 
-      <header className="velvet-search-hero">
-        <div className="velvet-search-hero__glow" aria-hidden />
+      <header className="luxury-search-hero">
+        <div className="luxury-search-hero__glow" aria-hidden />
         {!isNativeApp ? <SaloniLuxuryLogoMark variant="hero" /> : null}
-        {!isNativeApp ? <p className="velvet-plans-page__kicker">Per titolari e saloni</p> : null}
-        <h1 className="velvet-page-title">
-          <span className="velvet-search-hero__title-text">Scegli il piano e registrati</span>
+        {!isNativeApp ? <p className="luxury-plans-page__kicker">Per titolari e saloni</p> : null}
+        <h1 className="luxury-page-title">
+          <span className="luxury-search-hero__title-text">Scegli il piano e registrati</span>
         </h1>
         {!isNativeApp && !registrationComplete ? (
-          <div className="velvet-plans-page__lead-box">
-            <div className="velvet-plans-page__lead-glow" aria-hidden />
-            <p className="velvet-plans-page__lead-eyebrow">
-              <span className="velvet-plans-page__lead-badge">{SALON_PREMIUM_TRIAL_DAYS} giorni gratis</span>
-              <span className="velvet-plans-page__lead-eyebrow-text">Prova Premium senza rischio</span>
+          <div className="luxury-plans-page__lead-box">
+            <div className="luxury-plans-page__lead-glow" aria-hidden />
+            <p className="luxury-plans-page__lead-eyebrow">
+              <span className="luxury-plans-page__lead-badge">{premiumTrialFreeLabel()}</span>
+              <span className="luxury-plans-page__lead-eyebrow-text">Prova Premium senza rischio</span>
             </p>
-            <p className="velvet-plans-page__lead">
+            <p className="luxury-plans-page__lead">
               Metti online il tuo salone con <strong>sito dedicato</strong> e <strong>galleria servizi</strong>: tieni
               le <strong>statistiche</strong> sotto controllo e gestisci lo <strong>staff</strong> da un unico pannello.
             </p>
-            <p className="velvet-plans-page__lead-note">
-              Nessun addebito oggi · disdici quando vuoi, prima del rinnovo
-            </p>
+            <p className="luxury-plans-page__lead-note">{premiumTrialLeadFootnote()}</p>
           </div>
         ) : null}
       </header>
 
       {errorHint && (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {errorHint}
         </p>
       )}
       {registrationComplete ? (
-        <div className="velvet-plans-wrap" style={{ maxWidth: "520px", margin: "0 auto 1.5rem" }}>
+        <div className="luxury-plans-wrap" style={{ maxWidth: "520px", margin: "0 auto 1.5rem" }}>
           {registrationNeedsEmailConfirm ? (
             <VelvetRegistrationEmailConfirmBox
               email={registeredEmail}
               accountLabel="titolare salone"
-              loginReturnPath={loginReturnPathForSalonRegistration(registeredPlanTier ?? undefined)}
+              loginReturnPath={loginReturnPathForSalonRegistration(
+                registeredPlanTier ?? undefined,
+                premiumCheckoutRequired,
+              )}
             />
           ) : (
             <VelvetEmailVerifiedSuccessBox
               message={
                 registrationSuccessMessage ??
                 (registeredPlanTier === "PREMIUM"
-                  ? "Salone registrato. Completa il pagamento Premium su Stripe."
+                  ? isNativeApp
+                    ? "Salone registrato. Accedi con le credenziali del salone."
+                    : premiumCheckoutRequired
+                      ? "Salone registrato. Completa l'attivazione Premium dall'area account."
+                      : "Salone registrato. Accedi per iniziare con Premium."
                   : "Salone registrato. Accedi con le credenziali del salone.")
               }
-              loginReturnPath={loginReturnPathForSalonRegistration(registeredPlanTier ?? undefined)}
+              loginReturnPath={loginReturnPathForSalonRegistration(
+                registeredPlanTier ?? undefined,
+                premiumCheckoutRequired,
+              )}
               primaryCtaLabel={
-                registeredPlanTier === "PREMIUM" ? "Vai al pagamento Premium" : "Vai all'accesso"
+                registeredPlanTier === "PREMIUM"
+                  ? isNativeApp || !premiumCheckoutRequired
+                    ? "Vai al tuo salone"
+                    : "Vai all'attivazione Premium"
+                  : "Vai all'accesso"
               }
             />
           )}
         </div>
       ) : null}
 
-      <div className="velvet-plans-grid">
-        {SALON_PLANS.map((p) => {
+      <div className="luxury-plans-grid">
+        {SALON_PLANS.filter((p) => !isNativeApp || p.tier === "BASE").map((p) => {
           const name = planDisplayName(p.tier);
           return (
             <article
               key={p.tier}
               data-tier={p.tier}
-              className={`velvet-plan-card${p.highlighted ? " velvet-plan-card--featured" : ""}`}
+              className={`luxury-plan-card${p.highlighted ? " luxury-plan-card--featured" : ""}`}
             >
-              <h2 className="velvet-plan-card__name">{name}</h2>
+              <h2 className="luxury-plan-card__name">{name}</h2>
               {p.tier === "PREMIUM" ? (
                 <SalonPlanPremiumTrialPanel plan={p} variant="card" />
               ) : (
                 <div
-                  className="velvet-plan-card__price-block"
+                  className="luxury-plan-card__price-block"
                   aria-label={[p.priceHint, p.pricePeriod].filter(Boolean).join(". ")}
                 >
-                  <div className="velvet-plan-card__price-orbit" aria-hidden />
-                  <div className="velvet-plan-card__price-row">
+                  <div className="luxury-plan-card__price-orbit" aria-hidden />
+                  <div className="luxury-plan-card__price-row">
                     {p.priceValue != null && p.priceValue !== "" ? (
                       <>
-                        <span className="velvet-plan-card__price-value">{p.priceValue}</span>
-                        <span className="velvet-plan-card__price-euro">€</span>
+                        <span className="luxury-plan-card__price-value">{p.priceValue}</span>
+                        <span className="luxury-plan-card__price-euro">€</span>
                       </>
                     ) : (
-                      <span className="velvet-plan-card__price-value velvet-plan-card__price-value--label">{p.priceHint}</span>
+                      <span className="luxury-plan-card__price-value luxury-plan-card__price-value--label">{p.priceHint}</span>
                     )}
                   </div>
                   {p.pricePeriod != null && p.pricePeriod.length > 0 ? (
-                    <p className="velvet-plan-card__price-period">{p.pricePeriod}</p>
+                    <p className="luxury-plan-card__price-period">{p.pricePeriod}</p>
                   ) : null}
                 </div>
               )}
-              <p className="velvet-plan-card__tagline">{p.tagline}</p>
+              <SalonPlanCardTagline tier={p.tier} content={p.taglineContent} />
               {p.tier === "PREMIUM" ? (
                 <SalonPremiumPlanCardPreview />
               ) : (
-                <ul className="velvet-plan-card__list">
+                <ul className="luxury-plan-card__list">
                   {p.features.map((f) => (
                     <li key={f}>{f}</li>
                   ))}
                 </ul>
               )}
-              <button type="button" className="velvet-plan-cta" onClick={() => openRegistration(p.tier)}>
-                <span className="velvet-plan-card__cta-line">
+              <button type="button" className="luxury-plan-cta" onClick={() => openRegistration(p.tier)}>
+                <span className="luxury-plan-card__cta-line">
                   {p.tier === "PREMIUM" ? (
                     <>
-                      <span className="velvet-plan-card__cta-lead">Prova gratis</span>{" "}
-                      <span className="velvet-plan-card__cta-mid">{SALON_PREMIUM_TRIAL_DAYS} giorni</span>{" "}
-                      <span className="velvet-plan-card__cta-plan">{name}</span>
+                      <span className="luxury-plan-card__cta-lead">Prova gratis</span>{" "}
+                      <span className="luxury-plan-card__cta-mid">{SALON_PREMIUM_TRIAL_MONTHS} mesi</span>{" "}
+                      <span className="luxury-plan-card__cta-plan">{name}</span>
                     </>
                   ) : (
                     <>
-                      <span className="velvet-plan-card__cta-lead">Registrati</span>{" "}
-                      <span className="velvet-plan-card__cta-mid">con piano</span>{" "}
-                      <span className="velvet-plan-card__cta-plan">{name}</span>
+                      <span className="luxury-plan-card__cta-lead">Registrati</span>{" "}
+                      <span className="luxury-plan-card__cta-mid">gratis per sempre</span>{" "}
+                      <span className="luxury-plan-card__cta-plan">{name}</span>
                     </>
                   )}
                 </span>
@@ -970,6 +991,12 @@ export default function SalonPlansPage() {
           );
         })}
       </div>
+
+      {isNativeApp ? (
+        <p className="luxury-plans-page__lead luxury-text-muted" style={{ maxWidth: "36rem", margin: "1.25rem auto 0" }}>
+          {NATIVE_PREMIUM_BILLING_BLOCKED_MESSAGE}
+        </p>
+      ) : null}
 
     </main>
     {planModals}

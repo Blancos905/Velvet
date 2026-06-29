@@ -24,4 +24,14 @@ class BillingRegistrationPlanPolicyTest {
 		assertEquals("PREMIUM", policy.effectiveProvisionPlanTier("PREMIUM"));
 		assertFalse(policy.billingCheckoutRequiredForPremiumRegistration("PREMIUM"));
 	}
+
+	@Test
+	void salonOwnerPostConfirmPathDependsOnBilling() {
+		var enabled = new BillingRegistrationPlanPolicy(
+				new VelvetStripeProperties(true, "sk_test_x", "whsec_x", "price_x", null, null, null));
+		var disabled = new BillingRegistrationPlanPolicy(
+				new VelvetStripeProperties(false, "", "", "", null, null, null));
+		assertEquals("/account/billing/checkout", enabled.salonOwnerPostConfirmPath("PREMIUM"));
+		assertEquals("/account/salone", disabled.salonOwnerPostConfirmPath("PREMIUM"));
+	}
 }

@@ -79,17 +79,17 @@ class VelvetProfileMenuWebBridge {
   static const enableConsumerWebDropdownScript = '''
 (function() {
   try {
-    document.documentElement.classList.add('velvet-native-app');
+    document.documentElement.classList.add('luxury-native-app');
   } catch (e) {}
-  var style = document.getElementById('velvet-app-profile-menu-native');
+  var style = document.getElementById('luxury-app-profile-menu-native');
   if (style) style.remove();
-  document.querySelectorAll('.velvet-app-owner-profile-trigger').forEach(function(btn) {
+  document.querySelectorAll('.luxury-app-owner-profile-trigger').forEach(function(btn) {
     if (btn.__velvetOwnerProfileReplaced && btn.__velvetOwnerProfileReplaced.parentNode) {
       btn.replaceWith(btn.__velvetOwnerProfileReplaced);
       return;
     }
     btn.__velvetNativeProfileBound = false;
-    btn.classList.remove('velvet-app-owner-profile-trigger');
+    btn.classList.remove('luxury-app-owner-profile-trigger');
   });
   if (window.__velvetAppProfileMenuObserver) {
     try { window.__velvetAppProfileMenuObserver.disconnect(); } catch (e) {}
@@ -103,15 +103,15 @@ class VelvetProfileMenuWebBridge {
     return '''
 (function() {
   try {
-    document.documentElement.classList.add('velvet-native-app');
+    document.documentElement.classList.add('luxury-native-app');
   } catch (e) {}
 
   if (!window.__velvetAppProfileMenuStyle) {
     window.__velvetAppProfileMenuStyle = true;
     var style = document.createElement('style');
-    style.id = 'velvet-app-profile-menu-native';
+    style.id = 'luxury-app-profile-menu-native';
     style.textContent = `
-      .velvet-app-owner-profile-trigger {
+      .luxury-app-owner-profile-trigger {
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
       }
@@ -128,7 +128,7 @@ class VelvetProfileMenuWebBridge {
   }
 
   function bindOpenMenu() {
-    document.querySelectorAll('.velvet-app-owner-profile-trigger').forEach(function(btn) {
+    document.querySelectorAll('.luxury-app-owner-profile-trigger').forEach(function(btn) {
       if (btn.__velvetNativeProfileBound) return;
       btn.__velvetNativeProfileBound = true;
       var open = function(e) {
@@ -143,24 +143,24 @@ class VelvetProfileMenuWebBridge {
   }
 
   function installOwnerTrigger() {
-    if (document.querySelector('.velvet-app-owner-profile-trigger')) {
+    if (document.querySelector('.luxury-app-owner-profile-trigger')) {
       bindOpenMenu();
       return;
     }
     var anchor =
-      document.querySelector('.velvet-header-nav a[href="/account/salone"]') ||
-      document.querySelector('.velvet-header-nav a[href^="/account/salone"]') ||
-      document.querySelector('.velvet-header-nav a[href="/admin/dashboard"]') ||
-      document.querySelector('.velvet-header-nav a.velvet-header-btn-primary[href]');
+      document.querySelector('.luxury-header-nav a[href="/account/salone"]') ||
+      document.querySelector('.luxury-header-nav a[href^="/account/salone"]') ||
+      document.querySelector('.luxury-header-nav a[href="/admin/dashboard"]') ||
+      document.querySelector('.luxury-header-nav a.luxury-header-btn-primary[href]');
     if (!anchor) return;
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className =
-      'velvet-header-cta-pill velvet-header-profile-trigger velvet-app-owner-profile-trigger';
+      'luxury-header-cta-pill luxury-header-profile-trigger luxury-app-owner-profile-trigger';
     btn.setAttribute('aria-haspopup', 'menu');
     btn.setAttribute('aria-expanded', 'false');
     btn.innerHTML =
-      'Profilo<span aria-hidden class="velvet-header-profile-caret"> ▾</span>';
+      'Profilo<span aria-hidden class="luxury-header-profile-caret"> ▾</span>';
     btn.__velvetOwnerProfileReplaced = anchor;
     anchor.replaceWith(btn);
     bindOpenMenu();
@@ -175,7 +175,7 @@ class VelvetProfileMenuWebBridge {
     window.__velvetAppProfileMenuObserver = new MutationObserver(function() {
       bindOpenMenu();
     });
-    var header = document.querySelector('.velvet-site-header');
+    var header = document.querySelector('.luxury-site-header');
     if (header) {
       window.__velvetAppProfileMenuObserver.observe(header, { childList: true, subtree: true });
     }

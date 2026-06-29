@@ -243,7 +243,7 @@ export function VelvetNotificationPopupHost() {
   const modal = (
     <div
       className={
-        "velvet-notif-popup-root" + (isSalonAppointmentAlert ? " velvet-notif-popup-root--urgent" : "")
+        "luxury-notif-popup-root" + (isSalonAppointmentAlert ? " luxury-notif-popup-root--urgent" : "")
       }
       role="presentation"
       onClick={(e) => {
@@ -252,7 +252,7 @@ export function VelvetNotificationPopupHost() {
     >
       <div
         className={
-          "velvet-notif-popup" + (isSalonAppointmentAlert ? " velvet-notif-popup--booking-request" : "")
+          "luxury-notif-popup" + (isSalonAppointmentAlert ? " luxury-notif-popup--booking-request" : "")
         }
         role="dialog"
         aria-modal="true"
@@ -260,35 +260,35 @@ export function VelvetNotificationPopupHost() {
         aria-live={isSalonAppointmentAlert ? "assertive" : undefined}
       >
         {isSalonAppointmentAlert ? (
-          <div className="velvet-notif-popup__urgent-banner" aria-hidden>
-            <span className="velvet-notif-popup__urgent-pulse" />
-            <span className="velvet-notif-popup__urgent-icon">🔔</span>
-            <span className="velvet-notif-popup__urgent-label">
+          <div className="luxury-notif-popup__urgent-banner" aria-hidden>
+            <span className="luxury-notif-popup__urgent-pulse" />
+            <span className="luxury-notif-popup__urgent-icon">🔔</span>
+            <span className="luxury-notif-popup__urgent-label">
               {salonAlertBannerForType(payload.notificationType)}
             </span>
           </div>
         ) : null}
 
-        <div className="velvet-notif-popup__hero" aria-hidden>
-          <div className="velvet-notif-popup__hero-glow" />
+        <div className="luxury-notif-popup__hero" aria-hidden>
+          <div className="luxury-notif-popup__hero-glow" />
         </div>
 
-        <div className="velvet-notif-popup__head">
-          <div className="velvet-notif-popup__head-main">
-            <p className="velvet-notif-popup__kicker">
+        <div className="luxury-notif-popup__head">
+          <div className="luxury-notif-popup__head-main">
+            <p className="luxury-notif-popup__kicker">
               {isSalonAppointmentAlert ? "Avviso appuntamento" : "Notifica"}
             </p>
-            <h2 id={titleId} className="velvet-notif-popup__title">
+            <h2 id={titleId} className="luxury-notif-popup__title">
               {payload.title}
             </h2>
-            <div className="velvet-notif-popup__chips" aria-label="Dettagli rapidi">
+            <div className="luxury-notif-popup__chips" aria-label="Dettagli rapidi">
               {typeLabel ? (
-                <span className="velvet-notif-popup__chip velvet-notif-popup__chip--type">{typeLabel}</span>
+                <span className="luxury-notif-popup__chip luxury-notif-popup__chip--type">{typeLabel}</span>
               ) : null}
               {status ? (
                 <span
                   className={
-                    "velvet-notif-popup__chip velvet-notif-popup__chip--status velvet-notif-popup__chip--status-" +
+                    "luxury-notif-popup__chip luxury-notif-popup__chip--status luxury-notif-popup__chip--status-" +
                     status.tone
                   }
                 >
@@ -296,11 +296,11 @@ export function VelvetNotificationPopupHost() {
                 </span>
               ) : null}
               {canRespondToBookingRequest ? (
-                <span className="velvet-notif-popup__chip velvet-notif-popup__chip--action-hint">
+                <span className="luxury-notif-popup__chip luxury-notif-popup__chip--action-hint">
                   Invio · Accetta
                 </span>
               ) : isSalonAppointmentAlert ? (
-                <span className="velvet-notif-popup__chip velvet-notif-popup__chip--action-hint">
+                <span className="luxury-notif-popup__chip luxury-notif-popup__chip--action-hint">
                   Apri dettaglio
                 </span>
               ) : null}
@@ -308,7 +308,7 @@ export function VelvetNotificationPopupHost() {
           </div>
           <button
             type="button"
-            className="velvet-notif-popup__close"
+            className="luxury-notif-popup__close"
             aria-label="Chiudi notifica"
             disabled={respondM.isPending}
             onClick={close}
@@ -320,14 +320,14 @@ export function VelvetNotificationPopupHost() {
         {respondSuccess ? (
           <div
             className={
-              "velvet-notif-popup__success velvet-notif-popup__success--" + respondSuccess
+              "luxury-notif-popup__success luxury-notif-popup__success--" + respondSuccess
             }
             role="status"
           >
-            <span className="velvet-notif-popup__success-icon" aria-hidden>
+            <span className="luxury-notif-popup__success-icon" aria-hidden>
               {respondSuccess === "confirm" ? "✓" : "✕"}
             </span>
-            <p className="velvet-notif-popup__success-text">
+            <p className="luxury-notif-popup__success-text">
               {respondSuccess === "confirm"
                 ? "Prenotazione confermata. Il cliente riceverà la notifica."
                 : "Richiesta rifiutata. Il cliente è stato avvisato."}
@@ -336,16 +336,16 @@ export function VelvetNotificationPopupHost() {
         ) : (
           <>
             {canRespondToBookingRequest ? (
-              <div className="velvet-notif-popup__quick-actions">
+              <div className="luxury-notif-popup__quick-actions">
                 {rejectConfirmOpen ? (
-                  <div className="velvet-notif-popup__reject-confirm" role="group" aria-label="Conferma rifiuto">
-                    <p className="velvet-notif-popup__reject-confirm-text">
+                  <div className="luxury-notif-popup__reject-confirm" role="group" aria-label="Conferma rifiuto">
+                    <p className="luxury-notif-popup__reject-confirm-text">
                       Rifiutare la richiesta di <strong>{payload.clientName?.trim() || "questo cliente"}</strong>?
                     </p>
-                    <div className="velvet-notif-popup__reject-confirm-actions">
+                    <div className="luxury-notif-popup__reject-confirm-actions">
                       <button
                         type="button"
-                        className="velvet-notif-popup__cta velvet-notif-popup__cta--danger"
+                        className="luxury-notif-popup__cta luxury-notif-popup__cta--danger"
                         disabled={respondM.isPending}
                         onClick={() => respondM.mutate("reject")}
                       >
@@ -353,7 +353,7 @@ export function VelvetNotificationPopupHost() {
                       </button>
                       <button
                         type="button"
-                        className="velvet-notif-popup__cta velvet-notif-popup__cta--ghost"
+                        className="luxury-notif-popup__cta luxury-notif-popup__cta--ghost"
                         disabled={respondM.isPending}
                         onClick={() => setRejectConfirmOpen(false)}
                       >
@@ -366,54 +366,54 @@ export function VelvetNotificationPopupHost() {
                     <button
                       ref={acceptBtnRef}
                       type="button"
-                      className="velvet-notif-popup__cta velvet-notif-popup__cta--accept"
+                      className="luxury-notif-popup__cta luxury-notif-popup__cta--accept"
                       disabled={respondM.isPending}
                       onClick={() => respondM.mutate("confirm")}
                     >
-                      <span className="velvet-notif-popup__cta-icon" aria-hidden>
+                      <span className="luxury-notif-popup__cta-icon" aria-hidden>
                         ✓
                       </span>
-                      <span className="velvet-notif-popup__cta-label">
+                      <span className="luxury-notif-popup__cta-label">
                         {respondM.isPending ? "Conferma in corso…" : "Accetta prenotazione"}
                       </span>
-                      <span className="velvet-notif-popup__cta-hint">Invio</span>
+                      <span className="luxury-notif-popup__cta-hint">Invio</span>
                     </button>
                     <button
                       type="button"
-                      className="velvet-notif-popup__cta velvet-notif-popup__cta--reject"
+                      className="luxury-notif-popup__cta luxury-notif-popup__cta--reject"
                       disabled={respondM.isPending}
                       onClick={() => setRejectConfirmOpen(true)}
                     >
-                      <span className="velvet-notif-popup__cta-icon" aria-hidden>
+                      <span className="luxury-notif-popup__cta-icon" aria-hidden>
                         ✕
                       </span>
-                      <span className="velvet-notif-popup__cta-label">Rifiuta</span>
-                      <span className="velvet-notif-popup__cta-hint">R</span>
+                      <span className="luxury-notif-popup__cta-label">Rifiuta</span>
+                      <span className="luxury-notif-popup__cta-hint">R</span>
                     </button>
                   </>
                 )}
               </div>
             ) : null}
 
-            <div className="velvet-notif-popup__body">
-              <div className="velvet-notif-popup__message-card">
-                <span className="velvet-notif-popup__message-label">
+            <div className="luxury-notif-popup__body">
+              <div className="luxury-notif-popup__message-card">
+                <span className="luxury-notif-popup__message-label">
                   {isSalonAppointmentAlert ? "Dettaglio" : "Messaggio"}
                 </span>
-                <p className="velvet-notif-popup__text">{payload.body}</p>
+                <p className="luxury-notif-popup__text">{payload.body}</p>
               </div>
             </div>
 
             {payload.clientName?.trim() || sentLabel ? (
-              <dl className="velvet-notif-popup__meta">
+              <dl className="luxury-notif-popup__meta">
                 {payload.clientName?.trim() ? (
-                  <div className="velvet-notif-popup__meta-row velvet-notif-popup__meta-row--highlight">
+                  <div className="luxury-notif-popup__meta-row luxury-notif-popup__meta-row--highlight">
                     <dt>Cliente</dt>
                     <dd>{payload.clientName.trim()}</dd>
                   </div>
                 ) : null}
                 {sentLabel ? (
-                  <div className="velvet-notif-popup__meta-row">
+                  <div className="luxury-notif-popup__meta-row">
                     <dt>Data invio</dt>
                     <dd>{sentLabel}</dd>
                   </div>
@@ -421,11 +421,11 @@ export function VelvetNotificationPopupHost() {
               </dl>
             ) : null}
 
-            <div className="velvet-notif-popup__footer">
+            <div className="luxury-notif-popup__footer">
               {canDelete && !canRespondToBookingRequest ? (
                 <button
                   type="button"
-                  className="velvet-notif-popup__delete"
+                  className="luxury-notif-popup__delete"
                   disabled={deleteM.isPending}
                   onClick={() => {
                     if (!payload.id) return;
@@ -438,11 +438,11 @@ export function VelvetNotificationPopupHost() {
                 <span aria-hidden />
               )}
 
-              <div className="velvet-notif-popup__actions">
+              <div className="luxury-notif-popup__actions">
                 {appointmentHref && !canRespondToBookingRequest ? (
                   <button
                     type="button"
-                    className="velvet-notif-popup__btn velvet-notif-popup__btn--primary"
+                    className="luxury-notif-popup__btn luxury-notif-popup__btn--primary"
                     onClick={() => {
                       close();
                       navigate(appointmentHref);
@@ -454,7 +454,7 @@ export function VelvetNotificationPopupHost() {
                 {appointmentHref && canRespondToBookingRequest ? (
                   <button
                     type="button"
-                    className="velvet-notif-popup__btn velvet-notif-popup__btn--secondary"
+                    className="luxury-notif-popup__btn luxury-notif-popup__btn--secondary"
                     onClick={() => {
                       close();
                       navigate(appointmentHref);
@@ -466,7 +466,7 @@ export function VelvetNotificationPopupHost() {
                 {appointmentHref && isSalonAppointmentAlert && !canRespondToBookingRequest ? (
                   <button
                     type="button"
-                    className="velvet-notif-popup__btn velvet-notif-popup__btn--primary"
+                    className="luxury-notif-popup__btn luxury-notif-popup__btn--primary"
                     onClick={() => {
                       close();
                       navigate(appointmentHref);
@@ -477,7 +477,7 @@ export function VelvetNotificationPopupHost() {
                 ) : null}
                 <button
                   type="button"
-                  className="velvet-notif-popup__btn velvet-notif-popup__btn--secondary"
+                  className="luxury-notif-popup__btn luxury-notif-popup__btn--secondary"
                   disabled={respondM.isPending}
                   onClick={close}
                 >
@@ -489,7 +489,7 @@ export function VelvetNotificationPopupHost() {
         )}
 
         {deleteM.isError || respondM.isError ? (
-          <p className="velvet-notif-popup__error" role="alert">
+          <p className="luxury-notif-popup__error" role="alert">
             {deleteM.error instanceof Error
               ? deleteM.error.message
               : respondM.error instanceof Error

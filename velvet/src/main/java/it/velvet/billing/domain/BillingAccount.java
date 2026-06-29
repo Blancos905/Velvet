@@ -46,6 +46,10 @@ public class BillingAccount {
 	@Column(name = "cancel_at_period_end", nullable = false)
 	private boolean cancelAtPeriodEnd;
 
+	/** Impostato quando il titolare disdice (cancel at period end); azzerato se riattiva. */
+	@Column(name = "subscription_cancel_requested_at")
+	private Instant subscriptionCancelRequestedAt;
+
 	@Column(name = "synced_at")
 	private Instant syncedAt;
 
@@ -131,6 +135,14 @@ public class BillingAccount {
 
 	public void setCancelAtPeriodEnd(boolean cancelAtPeriodEnd) {
 		this.cancelAtPeriodEnd = cancelAtPeriodEnd;
+	}
+
+	public Instant getSubscriptionCancelRequestedAt() {
+		return subscriptionCancelRequestedAt;
+	}
+
+	public void setSubscriptionCancelRequestedAt(Instant subscriptionCancelRequestedAt) {
+		this.subscriptionCancelRequestedAt = subscriptionCancelRequestedAt;
 	}
 
 	public Instant getSyncedAt() {

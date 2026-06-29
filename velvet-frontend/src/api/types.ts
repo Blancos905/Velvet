@@ -126,8 +126,8 @@ export type SalonCatalogClientRow = {
   displayName: string;
   email: string | null;
   phone: string | null;
-  /** Account cliente Velvet collegato: abilita email di conferma/promemoria. */
-  velvetConsumerLinked?: boolean;
+  /** Account cliente Saloni Luxury collegato: abilita email di conferma/promemoria. */
+  luxuryConsumerLinked?: boolean;
 };
 
 export type ServicePublic = {
@@ -239,6 +239,12 @@ export type SuperAdminCountsDto = {
   studioGroupsPaying: number;
   studioGroupsPayingPremium: number;
   studioGroupsPayingBase: number;
+  /** Abbonamento Stripe attivo a pagamento (esclusi provider e prova). */
+  studioGroupsSubscribedPaying?: number;
+  /** Abbonamento Stripe in periodo di prova. */
+  studioGroupsSubscribedTrial?: number;
+  /** Disdetta registrata o abbonamento terminato. */
+  studioGroupsSubscribedCancelled?: number;
 };
 
 export type SuperAdminRecentUserRowDto = {
@@ -271,6 +277,11 @@ export type SuperAdminRecentSalonRowDto = {
   createdAt: string | null;
   provider?: boolean;
   staff?: SuperAdminSalonStaffRowDto[];
+  subscriptionStatus?: string | null;
+  cancelAtPeriodEnd?: boolean | null;
+  subscriptionCurrentPeriodEnd?: string | null;
+  /** PAYING | TRIAL | CANCELLED */
+  subscriptionBillingCategory?: string | null;
 };
 
 export type SuperAdminRecentSalonClientRowDto = {
@@ -362,7 +373,7 @@ export type SalonClientMembershipDto = {
 };
 
 /** `GET/POST /api/v1/me/salon-clients/chat/messages` — conversazione B2C per `salonClientId` (stesso id di `SalonClientMembershipDto.id`). */
-export type SalonVelvetChatMessageDto = {
+export type SalonLuxuryChatMessageDto = {
   id: string;
   sender: "CLIENT" | "OWNER";
   body: string;
@@ -372,13 +383,13 @@ export type SalonVelvetChatMessageDto = {
 };
 
 /** `GET /api/v1/me/salon-clients/chat/unread-count` */
-export type SalonVelvetChatUnreadDto = {
+export type SalonLuxuryChatUnreadDto = {
   clientUnread: number;
   ownerUnread: number;
 };
 
 /** `GET /api/v1/me/salon-clients/chat/inbox-summaries` — non letti + anteprima ultimo messaggio per conversazione. */
-export type SalonVelvetChatInboxSummaryDto = {
+export type SalonLuxuryChatInboxSummaryDto = {
   salonClientId: string;
   /** {@code null} = thread titolare; valorizzato = thread operatore staff. */
   staffOperatorId?: string | null;

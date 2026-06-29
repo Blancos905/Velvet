@@ -1,4 +1,5 @@
 import { apiJson } from "./client";
+import { SUBSCRIPTION_CANCEL_RETURN_STORAGE_KEY } from "../lib/subscriptionCancelReturn";
 
 export type BillingStatus = {
   billingEnabled: boolean;
@@ -8,6 +9,15 @@ export type BillingStatus = {
   cancelAtPeriodEnd: boolean;
   premiumAccess: boolean;
   billingProfileComplete: boolean;
+  /** ISO-8601 — quando il titolare ha disdetto l'abbonamento. */
+  subscriptionCancelRequestedAt?: string | null;
+  /** ISO-8601 — data prevista cancellazione profilo se non riattiva. */
+  accountDeletionScheduledAt?: string | null;
+  /** ISO-8601 — fine prova gratuita promozionale dalla registrazione. */
+  promotionalTrialEndsAt?: string | null;
+  promotionalTrialActive?: boolean;
+  /** true se la prova è scaduta e serve attivare l'abbonamento. */
+  subscriptionActivationRequired?: boolean;
 };
 
 export type SalonBillingProfile = {
@@ -113,6 +123,12 @@ export async function openBillingPortal(accessToken: string | null | undefined):
 
 /** Redirect diretto alla pagina di disdetta abbonamento nel Customer Portal Stripe. */
 export async function openCancelSubscriptionPortal(accessToken: string | null | undefined): Promise<void> {
-  const { portalUrl } = await createCancelSubscriptionPortalSession(accessToken);
-  window.location.assign(portalUrl);
+  sessionStorage.setItem(SUBSCRIPTION_CANCEL_RETURN_STORAGE_KEY, "1");
+  try {
+    const { portalUrl } = await createCancelSubscriptionPortalSession(accessToken);
+    window.location.assign(portalUrl);
+  } catch (error) {
+    sessionStorage.removeItem(SUBSCRIPTION_CANCEL_RETURN_STORAGE_KEY);
+    throw error;
+  }
 }

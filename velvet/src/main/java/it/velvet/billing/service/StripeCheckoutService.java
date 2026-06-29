@@ -27,6 +27,9 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "velvet.billing.enabled", havingValue = "true")
 public class StripeCheckoutService {
 
+	/** Allineato a {@code SALON_PREMIUM_TRIAL_DAYS} nel frontend ({@code salonPlans.ts}). */
+	private static final long PREMIUM_TRIAL_PERIOD_DAYS = 180L;
+
 	private final VelvetStripeProperties stripeProperties;
 	private final VelvetNotificationProperties notificationProperties;
 	private final StudioGroupOwnerResolver studioGroupOwnerResolver;
@@ -99,7 +102,7 @@ public class StripeCheckoutService {
 							.putAllMetadata(metadata)
 							.setSubscriptionData(
 									SessionCreateParams.SubscriptionData.builder()
-											.setTrialPeriodDays(30L)
+											.setTrialPeriodDays(PREMIUM_TRIAL_PERIOD_DAYS)
 											.putAllMetadata(metadata)
 											.build())
 							.setBillingAddressCollection(SessionCreateParams.BillingAddressCollection.REQUIRED)

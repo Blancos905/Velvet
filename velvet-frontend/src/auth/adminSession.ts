@@ -6,7 +6,7 @@ export const VELVET_SUPER_ADMIN_TOKEN_KEY = "velvet_super_admin_access_token";
 export const VELVET_ACCESS_TOKEN_KEY = "velvet_access_token";
 
 /** Stesso tab: `sessionStorage` non emette `storage`; `AdminAuthProvider` ascolta questo evento. */
-export const VELVET_ADMIN_SESSION_CHANGED_EVENT = "velvet-admin-session-changed";
+export const VELVET_ADMIN_SESSION_CHANGED_EVENT = "luxury-admin-session-changed";
 
 function notifyAdminSessionChanged(): void {
   if (typeof window === "undefined") return;

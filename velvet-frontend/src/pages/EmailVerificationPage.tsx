@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { apiJson } from "../api/client";
-import { startPremiumCheckout } from "../api/billing";
+import { fetchBillingStatus, startPremiumCheckout } from "../api/billing";
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
 import { VELVET_ACCESS_TOKEN_KEY } from "../auth/adminSession";
 import { refreshVelvetAccessToken, writeStoredRefreshToken } from "../auth/velvetRefreshSession";
@@ -18,6 +18,9 @@ import {
   readIntendedSalonPlanFromSession,
   setPostLoginPathForSalonRegistration,
 } from "../lib/salonRegistrationPostLogin";
+import { isSalonPremiumCheckoutRequired, SALON_OWNER_HOME_PATH } from "../lib/salonPremiumCheckoutPolicy";
+import { isNativePremiumBillingBlocked } from "../lib/nativePremiumUpgradePolicy";
+import { useSalonPremiumCheckoutPolicyQuery } from "../hooks/useSalonPremiumCheckoutPolicy";
 import { setPostLoginReturnPath } from "../lib/postLoginReturnPath";
 
 type EmailVerificationConfirmResponse = {
@@ -103,8 +106,11 @@ function isTokenAlreadyUsedError(message: string): boolean {
   );
 }
 
-function resolvePostConfirmNextPath(body: EmailVerificationConfirmResponse): string {
-  return body.nextPath?.trim() || loginReturnPathForSalonRegistration(readIntendedSalonPlanFromSession());
+function resolvePostConfirmNextPath(
+  body: EmailVerificationConfirmResponse,
+  premiumCheckoutRequired: boolean,
+): string {
+  return body.nextPath?.trim() || loginReturnPathForSalonRegistration(readIntendedSalonPlanFromSession(), premiumCheckoutRequired);
 }
 
 function isPremiumCheckoutPostConfirmPath(path: string): boolean {
@@ -146,12 +152,15 @@ export default function EmailVerificationPage() {
     cachedSessionOnMount?.nextPath?.trim() ? cachedSessionOnMount.nextPath.trim() : null,
   );
 
+  const checkoutPolicy = useSalonPremiumCheckoutPolicyQuery();
+  const premiumCheckoutRequired = isSalonPremiumCheckoutRequired(checkoutPolicy.data);
+
   const sessionCompletionRef = useRef(false);
 
   const completePostConfirmSession = async (
     body: EmailVerificationConfirmResponse,
   ): Promise<"redirected" | "premium_modal" | "failed"> => {
-    const nextPath = resolvePostConfirmNextPath(body);
+    const nextPath = resolvePostConfirmNextPath(body, premiumCheckoutRequired);
     setConfirmedNextPath(nextPath);
     setPostLoginReturnPath(nextPath);
 
@@ -171,6 +180,17 @@ export default function EmailVerificationPage() {
     issuedAccessTokenRef.current = accessToken;
 
     if (isPremiumCheckoutPostConfirmPath(nextPath)) {
+      if (isNativePremiumBillingBlocked()) {
+        setRedirectingAfterConfirm(true);
+        window.location.assign(SALON_OWNER_HOME_PATH);
+        return "redirected";
+      }
+      const billingStatus = await fetchBillingStatus(accessToken);
+      if (!billingStatus.configured) {
+        setRedirectingAfterConfirm(true);
+        window.location.assign(SALON_OWNER_HOME_PATH);
+        return "redirected";
+      }
       setShowPremiumCheckoutModal(true);
       return "premium_modal";
     }
@@ -210,9 +230,9 @@ export default function EmailVerificationPage() {
   useEffect(() => {
     const plan = parseSalonPlanTier(planParam);
     if (plan) {
-      setPostLoginPathForSalonRegistration(plan);
+      setPostLoginPathForSalonRegistration(plan, premiumCheckoutRequired);
     }
-  }, [planParam]);
+  }, [planParam, premiumCheckoutRequired]);
 
   const resendM = useMutation({
     mutationFn: async () => {
@@ -323,17 +343,17 @@ export default function EmailVerificationPage() {
   ]);
 
   return (
-    <main className="velvet-auth-page">
+    <main className="luxury-auth-page">
       <VelvetPremiumCheckoutPromptModal
-        open={showPremiumCheckoutModal}
+        open={showPremiumCheckoutModal && premiumCheckoutRequired && !isNativePremiumBillingBlocked()}
         busy={checkoutRedirectBusy}
         error={premiumCheckoutError}
         onContinue={goToPremiumCheckout}
       />
-      <div className="velvet-auth-card">
-        <div className="velvet-auth-card-toolbar">
-          <button type="button" className="velvet-auth-back" aria-label="Torna indietro" onClick={() => navigate(-1)}>
-            <svg className="velvet-auth-back-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+      <div className="luxury-auth-card">
+        <div className="luxury-auth-card-toolbar">
+          <button type="button" className="luxury-auth-back" aria-label="Torna indietro" onClick={() => navigate(-1)}>
+            <svg className="luxury-auth-back-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
               <path
                 d="M15 18l-6-6 6-6"
                 stroke="currentColor"
@@ -348,16 +368,16 @@ export default function EmailVerificationPage() {
 
         {mode === "invalid-token" ? (
           <>
-            <h1 className="velvet-auth-title">Link non valido</h1>
-            <p className="velvet-auth-lead">
+            <h1 className="luxury-auth-title">Link non valido</h1>
+            <p className="luxury-auth-lead">
               Il link è incompleto, scaduto o già utilizzato. Richiedi un nuovo invio dall&apos;email di registrazione.
             </p>
-            <p className="velvet-auth-lead">
-              <Link className="velvet-link-inline" to="/conferma-email">
+            <p className="luxury-auth-lead">
+              <Link className="luxury-link-inline" to="/conferma-email">
                 Richiedi di nuovo il link
               </Link>{" "}
               ·{" "}
-              <Link className="velvet-link-inline" to="/account">
+              <Link className="luxury-link-inline" to="/account">
                 Torna all&apos;accesso
               </Link>
             </p>
@@ -366,25 +386,25 @@ export default function EmailVerificationPage() {
           <>
             {confirmErr ? (
               <>
-                <h1 className="velvet-auth-title">Conferma email</h1>
-                <p className="velvet-alert velvet-alert--error velvet-auth-alert" role="alert">
+                <h1 className="luxury-auth-title">Conferma email</h1>
+                <p className="luxury-alert luxury-alert--error luxury-auth-alert" role="alert">
                   {confirmErr}
                 </p>
                 {isTokenAlreadyUsedError(confirmErr) ? (
-                  <p className="velvet-auth-lead">
+                  <p className="luxury-auth-lead">
                     Se hai già cliccato il link in passato, l&apos;account potrebbe essere già attivo: prova ad{" "}
-                    <Link className="velvet-link-inline" to={postVerifyLoginPath}>
+                    <Link className="luxury-link-inline" to={postVerifyLoginPath}>
                       accedere con email e password
                     </Link>
                     .
                   </p>
                 ) : null}
-                <p className="velvet-auth-lead">
-                  <Link className="velvet-link-inline" to="/conferma-email">
+                <p className="luxury-auth-lead">
+                  <Link className="luxury-link-inline" to="/conferma-email">
                     Richiedi un nuovo link
                   </Link>{" "}
                   ·{" "}
-                  <Link className="velvet-link-inline" to="/account">
+                  <Link className="luxury-link-inline" to="/account">
                     Torna all&apos;accesso
                   </Link>
                 </p>
@@ -392,8 +412,8 @@ export default function EmailVerificationPage() {
             ) : confirmMsg ? (
               redirectingAfterConfirm ? (
                 <VelvetEmailVerificationPendingBox />
-              ) : showPremiumCheckoutModal ? (
-                <p className="velvet-auth-lead" style={{ marginTop: "0.5rem", textAlign: "center" }}>
+              ) : showPremiumCheckoutModal && !isNativePremiumBillingBlocked() ? (
+                <p className="luxury-auth-lead" style={{ marginTop: "0.5rem", textAlign: "center" }}>
                   Email confermata. Completa il pagamento nel riquadro qui sopra.
                 </p>
               ) : (
@@ -408,23 +428,23 @@ export default function EmailVerificationPage() {
           </>
         ) : (
           <>
-            <h1 className="velvet-auth-title">Conferma email</h1>
-            <p className="velvet-auth-lead">
+            <h1 className="luxury-auth-title">Conferma email</h1>
+            <p className="luxury-auth-lead">
               Inserisci l&apos;email usata in registrazione: se l&apos;account è in attesa di conferma, riceverai un nuovo
               messaggio con il link di attivazione.
             </p>
             {resendErr ? (
-              <p className="velvet-alert velvet-alert--error velvet-auth-alert" role="alert">
+              <p className="luxury-alert luxury-alert--error luxury-auth-alert" role="alert">
                 {resendErr}
               </p>
             ) : null}
             {resendMsg ? (
-              <p className="velvet-alert velvet-alert--success velvet-auth-alert" role="status">
+              <p className="luxury-alert luxury-alert--success luxury-auth-alert" role="status">
                 {resendMsg}
               </p>
             ) : null}
             <form
-              className="velvet-auth-form"
+              className="luxury-auth-form"
               noValidate
               onSubmit={(e) => {
                 e.preventDefault();
@@ -438,13 +458,13 @@ export default function EmailVerificationPage() {
                 resendM.mutate();
               }}
             >
-              <div className="velvet-auth-field">
-                <label htmlFor={`${formId}-email`} className="velvet-auth-label">
+              <div className="luxury-auth-field">
+                <label htmlFor={`${formId}-email`} className="luxury-auth-label">
                   Email
                 </label>
                 <input
                   id={`${formId}-email`}
-                  className="velvet-auth-input"
+                  className="luxury-auth-input"
                   type="email"
                   autoComplete="email"
                   value={email}
@@ -452,12 +472,12 @@ export default function EmailVerificationPage() {
                   disabled={resendM.isPending}
                 />
               </div>
-              <button type="submit" className="velvet-auth-submit" disabled={resendM.isPending}>
+              <button type="submit" className="luxury-auth-submit" disabled={resendM.isPending}>
                 {resendM.isPending ? "Invio…" : "Reinvia email di conferma"}
               </button>
             </form>
-            <p className="velvet-auth-lead" style={{ marginTop: "1rem" }}>
-              <Link className="velvet-link-inline" to="/account">
+            <p className="luxury-auth-lead" style={{ marginTop: "1rem" }}>
+              <Link className="luxury-link-inline" to="/account">
                 Torna all&apos;accesso
               </Link>
             </p>

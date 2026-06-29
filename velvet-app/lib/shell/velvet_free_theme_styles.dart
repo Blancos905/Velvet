@@ -1,11 +1,11 @@
 /// CSS piano Free titolare — solo app mobile.
 /// `_ff`: override globali app Free; `_fp`: dettagli hub account.
-const String _ff = 'html.velvet-native-app-free';
-const String _fp = 'html.velvet-native-app-free.velvet-native-app-free-profile';
+const String _ff = 'html.luxury-native-app-free';
+const String _fp = 'html.luxury-native-app-free.luxury-native-app-free-profile';
 
 const String velvetAppFreeThemeCss =
     '''
-$_ff .velvet-account-hub--velvet-plans {
+$_ff .luxury-account-hub--luxury-plans {
   --hub-plans-orange: #38bdf8;
   --hub-plans-orange-hot: #0ea5e9;
   --hub-plans-edge: rgba(96, 165, 250, 0.72);
@@ -19,7 +19,7 @@ $_ff .velvet-account-hub--velvet-plans {
   --hub-plans-btn-shadow: #0c4a6e;
 }
 
-$_ff .velvet-account-hub--velvet-plans::before {
+$_ff .luxury-account-hub--luxury-plans::before {
   background:
     radial-gradient(ellipse 130% 90% at 50% -18%, rgba(186, 230, 253, 0.22), transparent 52%),
     radial-gradient(ellipse 95% 70% at 100% 35%, rgba(56, 189, 248, 0.28), transparent 48%),
@@ -28,8 +28,8 @@ $_ff .velvet-account-hub--velvet-plans::before {
     linear-gradient(180deg, #1e40af 0%, #1e3a5f 22%, #0f2744 48%, #0c1929 78%, #0a1628 100%) !important;
 }
 
-$_ff .velvet-account-hub--velvet-plans .velvet-account-hub__btn,
-$_ff #velvet-app-free-owner-nav-scroll .velvet-account-hub__btn {
+$_ff .luxury-account-hub--luxury-plans .luxury-account-hub__btn,
+$_ff #luxury-app-free-owner-nav-scroll .luxury-account-hub__btn {
   color: #0a1628 !important;
   -webkit-text-fill-color: #0a1628 !important;
   background:
@@ -38,13 +38,13 @@ $_ff #velvet-app-free-owner-nav-scroll .velvet-account-hub__btn {
   border: 2px solid rgba(2, 6, 23, 0.88) !important;
 }
 
-$_ff .velvet-brand-saloni,
-$_ff .velvet-account-hub__masthead .velvet-brand-saloni {
+$_ff .luxury-brand-saloni,
+$_ff .luxury-account-hub__masthead .luxury-brand-saloni {
   color: #0284c7 !important;
   -webkit-text-fill-color: #0284c7 !important;
 }
 
-$_ff .velvet-account-hub--native-hub .velvet-account-hub__body:empty {
+$_ff .luxury-account-hub--native-hub .luxury-account-hub__body:empty {
   display: none !important;
   min-height: 0 !important;
   padding: 0 !important;
@@ -53,7 +53,7 @@ $_ff .velvet-account-hub--native-hub .velvet-account-hub__body:empty {
   box-shadow: none !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans {
+$_fp .luxury-account-hub--luxury-plans {
   --hub-plans-orange: #38bdf8;
   --hub-plans-orange-hot: #0ea5e9;
   --hub-plans-edge: rgba(96, 165, 250, 0.72);
@@ -67,7 +67,7 @@ $_fp .velvet-account-hub--velvet-plans {
   --hub-plans-btn-shadow: #0c4a6e;
 }
 
-$_fp .velvet-account-hub--velvet-plans::before {
+$_fp .luxury-account-hub--luxury-plans::before {
   background:
     radial-gradient(ellipse 130% 90% at 50% -18%, rgba(186, 230, 253, 0.22), transparent 52%),
     radial-gradient(ellipse 95% 70% at 100% 35%, rgba(56, 189, 248, 0.28), transparent 48%),
@@ -76,7 +76,7 @@ $_fp .velvet-account-hub--velvet-plans::before {
     linear-gradient(180deg, #1e40af 0%, #1e3a5f 22%, #0f2744 48%, #0c1929 78%, #0a1628 100%) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__masthead {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__masthead {
   background: linear-gradient(
     145deg,
     rgba(186, 230, 253, 0.42) 0%,
@@ -89,11 +89,11 @@ $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__masthead {
     0 0 60px rgba(56, 189, 248, 0.14) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__masthead::before {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__masthead::before {
   background: radial-gradient(ellipse 75% 48% at 12% 20%, rgba(56, 189, 248, 0.22), transparent 55%) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__masthead-inner {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__masthead-inner {
   box-shadow:
     inset 5px 0 0 var(--hub-plans-orange-hot),
     0 0 0 1px #000 inset,
@@ -102,29 +102,29 @@ $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__masthead-inner {
     0 0 44px rgba(56, 189, 248, 0.2) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__plan {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__plan {
   border-color: var(--hub-plans-edge) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__welcome {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__welcome {
   border-top-color: rgba(56, 189, 248, 0.28) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__reg {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__reg {
   color: rgba(186, 230, 253, 0.95) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__greeting {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__greeting {
   text-shadow:
     0 1px 0 rgba(0, 0, 0, 0.85),
     0 0 28px rgba(56, 189, 248, 0.35) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__salon-name {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__salon-name {
   color: rgba(186, 230, 253, 0.95) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__nav {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__nav {
   box-shadow:
     0 0 0 1px #000 inset,
     0 5px 0 #000,
@@ -132,30 +132,30 @@ $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__nav {
     0 0 36px rgba(56, 189, 248, 0.1) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__nav::before {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__nav::before {
   background:
     radial-gradient(ellipse 70% 50% at 8% 0%, rgba(56, 189, 248, 0.16), transparent 62%),
     radial-gradient(ellipse 60% 45% at 92% 8%, rgba(186, 230, 253, 0.1), transparent 58%) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__nav-label {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__nav-label {
   color: rgba(186, 230, 253, 0.82) !important;
   border-top-color: rgba(56, 189, 248, 0.22) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__nav-scroll {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll {
   border-color: rgba(56, 189, 248, 0.28) !important;
   scrollbar-color: rgba(186, 230, 253, 0.55) rgba(0, 0, 0, 0.55) !important;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__nav-scroll:hover {
+  $_fp .luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll:hover {
     border-color: rgba(186, 230, 253, 0.45) !important;
     background: linear-gradient(180deg, rgba(56, 189, 248, 0.12) 0%, rgba(0, 0, 0, 0.55) 100%) !important;
   }
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.48) inset,
     0 4px 0 var(--hub-plans-btn-shadow),
@@ -164,7 +164,7 @@ $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn:hover {
+  $_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn:hover {
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.6) inset,
       0 7px 0 var(--hub-plans-btn-shadow),
@@ -173,7 +173,7 @@ $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn {
   }
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__nav-scroll .velvet-account-hub__btn:focus-visible {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll .luxury-account-hub__btn:focus-visible {
   box-shadow:
     0 0 0 2px var(--hub-plans-btn-ink-strong),
     0 0 0 4px #e0f2fe,
@@ -181,7 +181,7 @@ $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__nav-scroll .velvet-a
     0 18px 36px rgba(56, 189, 248, 0.28) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--active {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--active {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.72) inset,
     0 5px 0 #0369a1,
@@ -190,10 +190,10 @@ $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--active {
     0 0 48px rgba(56, 189, 248, 0.28) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--sky,
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--salon-statistiche,
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--ghost,
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--admin {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--sky,
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--salon-statistiche,
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--ghost,
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--admin {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.48) inset,
     0 4px 0 var(--hub-plans-btn-shadow),
@@ -202,10 +202,10 @@ $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--admin {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--sky:hover,
-  $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--salon-statistiche:hover,
-  $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--ghost:hover,
-  $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--admin:hover {
+  $_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--sky:hover,
+  $_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--salon-statistiche:hover,
+  $_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--ghost:hover,
+  $_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--admin:hover {
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.6) inset,
       0 7px 0 var(--hub-plans-btn-shadow),
@@ -214,10 +214,10 @@ $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--admin {
   }
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--sky.velvet-account-hub__btn--active,
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--salon-statistiche.velvet-account-hub__btn--active,
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--ghost.velvet-account-hub__btn--active,
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--admin.velvet-account-hub__btn--active {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--sky.luxury-account-hub__btn--active,
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--salon-statistiche.luxury-account-hub__btn--active,
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--ghost.luxury-account-hub__btn--active,
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__btn--admin.luxury-account-hub__btn--active {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.72) inset,
     0 5px 0 #0369a1,
@@ -226,12 +226,12 @@ $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__btn--admin.velvet-ac
     0 0 48px rgba(56, 189, 248, 0.28) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__notif-pill {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__notif-pill {
   color: var(--hub-plans-btn-ink-strong);
   background: linear-gradient(145deg, #f0f9ff 0%, #bae6fd 48%, #7dd3fc 100%) !important;
 }
 
-$_fp .velvet-account-hub--velvet-plans .velvet-account-hub__body {
+$_fp .luxury-account-hub--luxury-plans .luxury-account-hub__body {
   box-shadow:
     0 0 0 1px #000 inset,
     0 5px 0 #000,
@@ -239,27 +239,27 @@ $_fp .velvet-account-hub--velvet-plans .velvet-account-hub__body {
     0 0 36px rgba(56, 189, 248, 0.1) !important;
 }
 
-$_fp .velvet-account-salone-free-intro--hero {
+$_fp .luxury-account-salone-free-intro--hero {
   background: rgba(2, 6, 23, 0.22) !important;
   border-color: rgba(96, 165, 250, 0.18) !important;
   box-shadow: 0 16px 40px rgba(2, 6, 23, 0.35) !important;
 }
 
-$_fp .velvet-account-salone-free-intro--hero::before {
+$_fp .luxury-account-salone-free-intro--hero::before {
   background: linear-gradient(180deg, #7dd3fc, rgba(14, 165, 233, 0.65)) !important;
 }
 
-html.velvet-native-app-free a.velvet-app-free-nav-dupe-hidden,
-html.velvet-native-app-free .velvet-app-free-nav-source-hidden {
+html.luxury-native-app-free a.luxury-app-free-nav-dupe-hidden,
+html.luxury-native-app-free .luxury-app-free-nav-source-hidden {
   display: none !important;
 }
 
-html.velvet-native-app-free #velvet-app-free-owner-nav-scroll {
+html.luxury-native-app-free #luxury-app-free-owner-nav-scroll {
   display: grid !important;
   visibility: visible !important;
 }
 
-html.velvet-native-app-free #velvet-app-free-owner-nav-scroll .velvet-account-hub__btn {
+html.luxury-native-app-free #luxury-app-free-owner-nav-scroll .luxury-account-hub__btn {
   display: inline-flex !important;
   visibility: visible !important;
   opacity: 1 !important;
@@ -270,38 +270,38 @@ html.velvet-native-app-free #velvet-app-free-owner-nav-scroll .velvet-account-hu
   min-height: 2.75rem !important;
 }
 
-html.velvet-native-app-free a.velvet-app-free-hidden-nav {
+html.luxury-native-app-free a.luxury-app-free-hidden-nav {
   display: none !important;
 }
 
-$_fp .velvet-native-account-overlay__panel {
+$_fp .luxury-native-account-overlay__panel {
   background:
     linear-gradient(155deg, rgba(255, 255, 255, 0.03) 0%, transparent 36%),
     linear-gradient(168deg, #050505 0%, #020202 48%, #000000 100%) !important;
   border-color: rgba(96, 165, 250, 0.32) !important;
 }
 
-$_fp .velvet-native-account-overlay__bar {
+$_fp .luxury-native-account-overlay__bar {
   border-bottom-color: rgba(96, 165, 250, 0.22) !important;
 }
 
-$_fp .velvet-native-account-overlay__back,
-$_fp .velvet-native-account-overlay__title {
+$_fp .luxury-native-account-overlay__back,
+$_fp .luxury-native-account-overlay__title {
   color: #7dd3fc !important;
 }
 
-$_fp .velvet-native-account-overlay__close {
+$_fp .luxury-native-account-overlay__close {
   color: #f0f9ff !important;
   border-color: rgba(125, 211, 252, 0.35) !important;
   background: rgba(15, 23, 42, 0.75) !important;
 }
 
-$_fp .velvet-site-header {
+$_fp .luxury-site-header {
   border-bottom-color: rgba(96, 165, 250, 0.32) !important;
   box-shadow: 0 10px 36px rgba(8, 20, 38, 0.45) !important;
 }
 
-$_fp .velvet-header-main {
+$_fp .luxury-header-main {
   background: linear-gradient(
     180deg,
     #1a3352 0%,
@@ -310,19 +310,19 @@ $_fp .velvet-header-main {
   ) !important;
 }
 
-$_fp .velvet-brand-logo {
+$_fp .luxury-brand-logo {
   filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.38)) !important;
 }
 
-$_fp .velvet-brand-text {
+$_fp .luxury-brand-text {
   border-color: rgba(96, 165, 250, 0.28) !important;
 }
 
-$_fp .velvet-brand-saloni {
+$_fp .luxury-brand-saloni {
   color: #0284c7 !important;
 }
 
-$_fp .velvet-header-profile-trigger {
+$_fp .luxury-header-profile-trigger {
   border-color: rgba(96, 165, 250, 0.48) !important;
   color: #7dd3fc !important;
   animation: none !important;
@@ -332,8 +332,8 @@ $_fp .velvet-header-profile-trigger {
     inset 0 1px 0 rgba(186, 230, 253, 0.14) !important;
 }
 
-$_fp .velvet-header-profile-trigger:hover,
-$_fp .velvet-header-profile-trigger.is-open {
+$_fp .luxury-header-profile-trigger:hover,
+$_fp .luxury-header-profile-trigger.is-open {
   color: #bae6fd !important;
   border-color: rgba(186, 230, 253, 0.72) !important;
   box-shadow:
@@ -343,18 +343,18 @@ $_fp .velvet-header-profile-trigger.is-open {
     inset 0 1px 0 rgba(186, 230, 253, 0.2) !important;
 }
 
-$_fp .velvet-header-profile-trigger:focus-visible {
+$_fp .luxury-header-profile-trigger:focus-visible {
   outline-color: rgba(125, 211, 252, 0.95) !important;
 }
 
-$_fp .velvet-header-profile-trigger:hover .velvet-header-profile-caret,
-$_fp .velvet-header-profile-trigger.is-open .velvet-header-profile-caret {
+$_fp .luxury-header-profile-trigger:hover .luxury-header-profile-caret,
+$_fp .luxury-header-profile-trigger.is-open .luxury-header-profile-caret {
   color: #bae6fd !important;
 }
 
-$_fp .velvet-surface-card,
-$_fp .velvet-salon-services-form-card,
-$_fp .velvet-owner-dash__tile {
+$_fp .luxury-surface-card,
+$_fp .luxury-salon-services-form-card,
+$_fp .luxury-owner-dash__tile {
   border-color: rgba(96, 165, 250, 0.28) !important;
 }
 
@@ -363,16 +363,16 @@ $_fp button:focus-visible {
   outline-color: #38bdf8 !important;
 }
 
-html.velvet-native-app-free.velvet-native-app-free-servizi .velvet-salon-services-photo-panel,
-html.velvet-native-app-free.velvet-native-app-free-servizi .velvet-brand-service-photo-row,
-html.velvet-native-app-free.velvet-native-app-free-servizi .velvet-salon-services-list__crop-controls,
-html.velvet-native-app-free.velvet-native-app-free-servizi input.velvet-salon-services-hidden-file {
+html.luxury-native-app-free.luxury-native-app-free-servizi .luxury-salon-services-photo-panel,
+html.luxury-native-app-free.luxury-native-app-free-servizi .luxury-brand-service-photo-row,
+html.luxury-native-app-free.luxury-native-app-free-servizi .luxury-salon-services-list__crop-controls,
+html.luxury-native-app-free.luxury-native-app-free-servizi input.luxury-salon-services-hidden-file {
   display: none !important;
   pointer-events: none !important;
 }
 
-html.velvet-native-app-free .velvet-free-upgrade-card,
-html.velvet-native-app-free .velvet-salon-free-page__promo {
+html.luxury-native-app-free .luxury-free-upgrade-card,
+html.luxury-native-app-free .luxury-salon-free-page__promo {
   display: none !important;
 }
 ''';

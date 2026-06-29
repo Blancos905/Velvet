@@ -27,31 +27,31 @@ export function AppHeader() {
   const isConsumerAuthenticated = isAuthenticated && !isSalonTitolare && !isVelvetSuperAdmin && !isSalonStaff;
 
   return (
-    <header className="velvet-site-header">
-      <div className="velvet-header-main">
-        <Link to="/" className="velvet-brand">
+    <header className="luxury-site-header">
+      <div className="luxury-header-main">
+        <Link to="/" className="luxury-brand">
           <img
             src="/logo-saloni-luxury.png"
             alt="Saloni Luxury"
-            className="velvet-brand-logo"
+            className="luxury-brand-logo"
             width={100}
             height={100}
           />
-          <div className="velvet-brand-text">
-            <span className="velvet-brand-saloni">Saloni</span>
-            <span className="velvet-brand-velvet">Luxury</span>
+          <div className="luxury-brand-text">
+            <span className="luxury-brand-saloni">Saloni</span>
+            <span className="luxury-brand-luxury">Luxury</span>
           </div>
         </Link>
-        <nav className="velvet-header-nav" aria-label="Navigazione principale">
+        <nav className="luxury-header-nav" aria-label="Navigazione principale">
           {!isAuthenticated ? (
-            <Link to="/registrati" className="velvet-header-cta-pill velvet-header-partner-cta">
-              <span className="velvet-header-partner-label">Registrati</span>
+            <Link to="/registrati" className="luxury-header-cta-pill luxury-header-partner-cta">
+              <span className="luxury-header-partner-label">Registrati</span>
             </Link>
           ) : null}
           {!isAuthenticated || isConsumerAuthenticated ? (
-            <PartnerSignupLink className="velvet-header-cta-pill velvet-header-partner-cta">
+            <PartnerSignupLink className="luxury-header-cta-pill luxury-header-partner-cta">
               <svg
-                className="velvet-header-partner-icon"
+                className="luxury-header-partner-icon"
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 xmlns="http://www.w3.org/2000/svg"
@@ -59,7 +59,7 @@ export function AppHeader() {
               >
                 <path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z" />
               </svg>
-              <span className="velvet-header-partner-label">Diventa partner</span>
+              <span className="luxury-header-partner-label">Diventa partner</span>
             </PartnerSignupLink>
           ) : null}
           {isAuthenticated && (
@@ -90,7 +90,7 @@ export function AppHeader() {
                   <NavLink
                     to="/account/salone"
                     className={({ isActive }) =>
-                      `velvet-header-cta-pill velvet-header-btn-primary${isActive ? " active" : ""}`
+                      `luxury-header-cta-pill luxury-header-btn-primary${isActive ? " active" : ""}`
                     }
                   >
                     Il mio salone
@@ -111,7 +111,7 @@ export function AppHeader() {
               {isAuthenticated && (isNativeApp || !isConsumerAuthenticated || hideOwnerSalonHeaderLink) ? (
                 <button
                   type="button"
-                  className="velvet-header-cta-pill velvet-header-btn-primary"
+                  className="luxury-header-cta-pill luxury-header-btn-primary"
                   onClick={() => void signOut()}
                 >
                   Esci
@@ -123,7 +123,7 @@ export function AppHeader() {
             <NavLink
               to="/account"
               className={({ isActive }) =>
-                `velvet-header-cta-pill velvet-header-btn-primary${isActive ? " active" : ""}`
+                `luxury-header-cta-pill luxury-header-btn-primary${isActive ? " active" : ""}`
               }
               onClick={() => {
                 setPostLoginReturnPath("/account");

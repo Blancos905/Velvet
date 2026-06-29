@@ -24,6 +24,7 @@ Rischio residuo principale: **documenti organizzativi** (DPA firmati con saloni,
 | Gate geocodifica Nominatim (`locateByPlace`, CAP non-IT, reverse geocode, GPS) dietro consenso «Mappe e geocodifica» | `velvet-frontend/src/pages/HomePage.tsx` |
 | CAP italiano risolto localmente senza API quando manca consenso maps | `velvet-frontend/src/data/searchLocations.ts` (`resolveItalianCityForCap`) |
 | Aggiornata cookie policy (revoca immediata, geocodifica gated) | `velvet-frontend/src/pages/legal/CookiePolicyPage.tsx` |
+| Registro server-side scelte cookie (`cookie_consent_events`, API pubblica) | `velvet/.../PublicCookieConsentController.java`, `velvet-frontend/src/lib/cookieConsent.ts` |
 
 **Già presenti (verificati):** Unsplash gated su HomePage, `SalonLocationMapCard`, banner cookie v2, font self-hosted.
 
@@ -86,6 +87,7 @@ Rischio residuo principale: **documenti organizzativi** (DPA firmati con saloni,
 ### Backend (`velvet/`)
 - `consumer/service/ConsumerAccountService.java`
 - `consumer/service/MePersonalDataExportService.java`
+- `legal/cookie/**`, `publicapi/api/PublicCookieConsentController.java`
 - `notification/domain/ScheduledNotificationRepository.java`
 - `review/domain/ReviewRepository.java`
 - `review/service/ReviewShowcaseService.java`
@@ -151,7 +153,7 @@ Rischio residuo principale: **documenti organizzativi** (DPA firmati con saloni,
 |-------|-------|
 | `npm run test` (velvet-frontend) | 38 test PASS |
 | `npm run build` (velvet-frontend) | PASS (dopo fix import) |
-| `./mvnw test -Dtest=MeAccountControllerTest,MeDataExportControllerTest` | PASS |
+| `./mvnw test -Dtest=MeAccountControllerTest,MeDataExportControllerTest,PublicCookieConsentControllerTest` | PASS |
 | `./go-live-check.sh` | 0 FAIL (WARN attesi infra/env) |
 
 ---

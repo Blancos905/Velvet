@@ -79,10 +79,16 @@ public class RegistrationEmailDispatchService {
 			helper.setTo(recipient);
 			helper.setSubject(subject);
 			helper.setText(textBody, htmlBody);
-			helper.addInline(
-					TransactionalBookingEmailHtml.LOGO_CONTENT_ID,
-					new ClassPathResource("email/logo-saloni-luxury.png"),
-					"image/png");
+			ClassPathResource logo = new ClassPathResource("email/logo-saloni-luxury.png");
+			if (logo.exists()) {
+				helper.addInline(
+						TransactionalBookingEmailHtml.LOGO_CONTENT_ID,
+						logo,
+						"image/png");
+			}
+			else {
+				log.warn("Logo email non trovato in classpath: email/logo-saloni-luxury.png");
+			}
 			javaMailSender.send(message);
 			log.info("[Velvet email] conferma registrazione inviata to={}", recipient);
 		}

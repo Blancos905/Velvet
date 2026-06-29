@@ -11,7 +11,8 @@ import { useBillingStatusQuery } from "../../hooks/useSalonFeaturePlanTier";
 import { useMeSalonSummaryQuery } from "../../hooks/useMeSalonSummary";
 import { clearPostLoginReturnPath } from "../../lib/postLoginReturnPath";
 import { clearIntendedSalonPlan } from "../../lib/salonRegistrationPostLogin";
-import "../../styles/velvet-account-page-shell.css";
+import { isNativePremiumBillingBlocked } from "../../lib/nativePremiumUpgradePolicy";
+import "../../styles/luxury-account-page-shell.css";
 
 const POLL_MS = 2000;
 const TIMEOUT_MS = 90_000;
@@ -70,10 +71,14 @@ export default function AccountBillingSuccessPage() {
     return <Navigate to="/account/salone" replace />;
   }
 
+  if (isNativePremiumBillingBlocked()) {
+    return <Navigate to="/account/salone" replace />;
+  }
+
   const salonName = meSalon.data?.primaryLocationName ?? null;
 
   return (
-    <div className="velvet-account-page-shell velvet-account-page-shell--narrow velvet-account-page-shell--billing-success">
+    <div className="luxury-account-page-shell luxury-account-page-shell--narrow luxury-account-page-shell--billing-success">
       {!showSuccess ? (
         <VelvetPremiumSubscriptionPendingBox />
       ) : (

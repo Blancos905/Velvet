@@ -1,5 +1,7 @@
 package it.velvet.publicapi.api;
 
+import it.velvet.testsupport.SalonSeoDemoSalonFixture;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +22,14 @@ class SalonSeoPageControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
+
+	@Autowired
+	private SalonSeoDemoSalonFixture salonSeoDemoSalonFixture;
+
+	@BeforeEach
+	void ensureDemoSalon() {
+		salonSeoDemoSalonFixture.ensureDemoPremiumSalon();
+	}
 
 	@Test
 	void salonSeoPage_demoSalon_returnsHtmlWithJsonLd() throws Exception {

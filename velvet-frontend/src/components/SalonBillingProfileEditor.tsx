@@ -43,12 +43,12 @@ export function SalonBillingProfileEditor({
   });
 
   if (billingProfile.isPending) {
-    return <p className="velvet-text-muted" aria-live="polite">Caricamento dati fatturazione…</p>;
+    return <p className="luxury-text-muted" aria-live="polite">Caricamento dati fatturazione…</p>;
   }
 
   if (billingProfile.isError) {
     return (
-      <p className="velvet-alert velvet-alert--error" role="alert">
+      <p className="luxury-alert luxury-alert--error" role="alert">
         {billingProfile.error instanceof Error
           ? billingProfile.error.message
           : "Impossibile caricare i dati di fatturazione."}
@@ -62,32 +62,25 @@ export function SalonBillingProfileEditor({
   return (
     <>
       {context === "checkout" && profile && !profile.persisted ? (
-        <p className="velvet-text-muted" style={{ margin: "0 0 1rem", lineHeight: 1.55 }}>
+        <p className="luxury-text-muted" style={{ margin: "0 0 1rem", lineHeight: 1.55 }}>
           Abbiamo precompilato i campi con i dati del salone. Controlla e salva prima di procedere al pagamento.
         </p>
       ) : null}
 
-      {context === "profile" ? (
-        <p className="velvet-text-muted" style={{ margin: "0 0 1rem", lineHeight: 1.55 }}>
-          Usati per le fatture dell&apos;abbonamento Premium. Puoi aggiornarli in qualsiasi momento: al salvataggio
-          sincronizziamo anche Stripe se il pagamento è attivo.
-        </p>
-      ) : null}
-
-      {profile?.persisted && profile.complete && !saveProfileM.isPending && !saveNotice ? (
-        <p className="velvet-alert velvet-alert--success" role="status" style={{ marginBottom: "1rem" }}>
+      {context === "checkout" && profile?.persisted && profile.complete && !saveProfileM.isPending && !saveNotice ? (
+        <p className="luxury-alert luxury-alert--success" role="status" style={{ marginBottom: "1rem" }}>
           Dati fatturazione già salvati nel profilo. Puoi modificarli qui sotto se serve.
         </p>
       ) : null}
 
       {saveNotice ? (
-        <p className="velvet-alert velvet-alert--success" role="status" style={{ marginBottom: "1rem" }}>
+        <p className="luxury-alert luxury-alert--success" role="status" style={{ marginBottom: "1rem" }}>
           {saveNotice}
         </p>
       ) : null}
 
       {saveProfileM.isError ? (
-        <p className="velvet-alert velvet-alert--error" role="alert" style={{ marginBottom: "1rem" }}>
+        <p className="luxury-alert luxury-alert--error" role="alert" style={{ marginBottom: "1rem" }}>
           {saveProfileM.error.message}
         </p>
       ) : null}

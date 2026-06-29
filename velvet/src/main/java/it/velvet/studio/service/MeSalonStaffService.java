@@ -133,7 +133,7 @@ public class MeSalonStaffService {
 			throw new BusinessException(
 					HttpStatus.CONFLICT,
 					"SALON_NO_LOCATION",
-					"Organizzazione senza sede: contatta l’assistenza Velvet.");
+					"Organizzazione senza sede: contatta l’assistenza Saloni Luxury.");
 		}
 		return locs.get(0);
 	}

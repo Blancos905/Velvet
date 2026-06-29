@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Popup «Passa a Premium» con card piano Premium — palette azzurra (solo app Free).
+/// Overlay informativo per sezioni non incluse nel piano Free (solo app nativa).
+/// Nessun prezzo, CTA commerciale o riferimento ad acquisti esterni (Apple 3.1.1 / Play billing).
 class VelvetPremiumPaywallDialog extends StatefulWidget {
   const VelvetPremiumPaywallDialog({
     super.key,
@@ -20,25 +21,13 @@ class VelvetPremiumPaywallDialog extends StatefulWidget {
   static const Color onSurface = Color(0xFFE0F2FE);
   static const Color onMuted = Color(0xFFBAE6FD);
 
-  static const features = [
-    'Brand, layout catalogo, contenuti del sito e ricerca geolocalizzata.',
-    'Notifiche su prenotazioni e messaggi di servizio.',
-    'Staff, servizi, clienti e agenda per operatore.',
-    'Statistiche con ricavo stimato e report PDF semestrale.',
-  ];
-
-  static const steps = [
-    ('Carica logo e foto.', 'Brand'),
-    ('Completa testi e galleria del sito pubblico.', 'Crea il sito'),
-    ('Verifica indirizzo e posizione sulla mappa.', 'Posizione'),
-    ('Servizi in listino e team con agenda.', 'Servizi'),
-    ('Controlla trend e (se serve) report PDF semestrale.', 'Statistiche'),
-  ];
-
   static const billingNotice =
       "Questo account non dispone di licenze attive per l'accesso a questa sezione. "
       'Se fai parte di un\'organizzazione, contatta l\'amministratore del sistema '
       'all\'indirizzo assistenza@saloniluxury.it.';
+
+  static const featureBlockedLead =
+      'Questa sezione non è disponibile con la configurazione attuale del tuo account.';
 
   @override
   State<VelvetPremiumPaywallDialog> createState() => _VelvetPremiumPaywallDialogState();
@@ -126,143 +115,49 @@ class _VelvetPremiumPaywallDialogState extends State<VelvetPremiumPaywallDialog>
                                   ),
                                 ],
                               ),
-                              child: Stack(
-                                children: [
-                                  Positioned(
-                                    left: 0,
-                                    top: 48,
-                                    bottom: 48,
-                                    child: Container(
-                                      width: 3,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(4),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            VelvetPremiumPaywallDialog.sky.withValues(alpha: 0.95),
-                                            VelvetPremiumPaywallDialog.skyDeep.withValues(alpha: 0.55),
-                                            VelvetPremiumPaywallDialog.skyDeep.withValues(alpha: 0.15),
-                                          ],
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: VelvetPremiumPaywallDialog.skyDeep.withValues(alpha: 0.35),
-                                            blurRadius: 12,
-                                          ),
-                                        ],
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    const Text(
+                                      'Accesso alla sezione',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: VelvetPremiumPaywallDialog.sky,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: -0.3,
+                                        height: 1.15,
                                       ),
                                     ),
-                                  ),
-                                  Positioned.fill(
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(18),
-                                        gradient: RadialGradient(
-                                          center: const Alignment(1, -0.2),
-                                          radius: 1.1,
-                                          colors: [
-                                            VelvetPremiumPaywallDialog.skyDeep.withValues(alpha: 0.18),
-                                            Colors.transparent,
-                                          ],
-                                        ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      hasFeature
+                                          ? '${VelvetPremiumPaywallDialog.featureBlockedLead}\n\nSezione: $feature.'
+                                          : VelvetPremiumPaywallDialog.featureBlockedLead,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: VelvetPremiumPaywallDialog.onMuted,
+                                        fontSize: 14,
+                                        height: 1.5,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                                      children: [
-                                        Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            const Expanded(
-                                              child: Text(
-                                                'Premium',
-                                                style: TextStyle(
-                                                  color: VelvetPremiumPaywallDialog.sky,
-                                                  fontSize: 28,
-                                                  fontWeight: FontWeight.w800,
-                                                  letterSpacing: -0.4,
-                                                  height: 1.05,
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 10,
-                                                vertical: 5,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                gradient: const LinearGradient(
-                                                  colors: [
-                                                    Color(0xFFE0F2FE),
-                                                    VelvetPremiumPaywallDialog.sky,
-                                                  ],
-                                                ),
-                                                borderRadius: BorderRadius.circular(999),
-                                                border: Border.all(
-                                                  color: VelvetPremiumPaywallDialog.skyHot.withValues(alpha: 0.65),
-                                                ),
-                                              ),
-                                              child: const Text(
-                                                'CONSIGLIATO',
-                                                style: TextStyle(
-                                                  color: VelvetPremiumPaywallDialog.ink,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w800,
-                                                  letterSpacing: 0.08,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        if (hasFeature) ...[
-                                          const SizedBox(height: 14),
-                                          Text(
-                                            'Passa a premium per utilizzare $feature',
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              color: VelvetPremiumPaywallDialog.sky,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w700,
-                                              height: 1.35,
-                                            ),
-                                          ),
-                                        ],
-                                        const SizedBox(height: 16),
-                                        const _PriceBlock(),
-                                        const SizedBox(height: 14),
-                                        const Text(
-                                          'Abbonamento pensato per la vetrina completa: sito del salone '
-                                          'personalizzabile, brand in evidenza e strumenti per gestire e '
-                                          'misurare l\'attività.',
-                                          style: TextStyle(
-                                            color: VelvetPremiumPaywallDialog.onMuted,
-                                            fontSize: 13.5,
-                                            height: 1.45,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 14),
-                                        const _PreviewBlock(),
-                                        const SizedBox(height: 16),
-                                        _CtaButton(onClose: _close),
-                                        const SizedBox(height: 14),
-                                        Text(
-                                          VelvetPremiumPaywallDialog.billingNotice,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: VelvetPremiumPaywallDialog.onMuted.withValues(alpha: 0.72),
-                                            fontSize: 12,
-                                            height: 1.45,
-                                          ),
-                                        ),
-                                      ],
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      VelvetPremiumPaywallDialog.billingNotice,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: VelvetPremiumPaywallDialog.onMuted.withValues(alpha: 0.88),
+                                        fontSize: 13,
+                                        height: 1.45,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 20),
+                                    _CloseButton(onClose: _close),
+                                  ],
+                                ),
                               ),
                             ),
                             Positioned(
@@ -300,173 +195,8 @@ class _VelvetPremiumPaywallDialogState extends State<VelvetPremiumPaywallDialog>
   }
 }
 
-class _PriceBlock extends StatelessWidget {
-  const _PriceBlock();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: VelvetPremiumPaywallDialog.skyHot.withValues(alpha: 0.55),
-          width: 1.5,
-        ),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            VelvetPremiumPaywallDialog.skyDeep.withValues(alpha: 0.12),
-            Colors.black.withValues(alpha: 0.35),
-          ],
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              ShaderMask(
-                shaderCallback: (bounds) => const LinearGradient(
-                  colors: [
-                    Color(0xFFE0F2FE),
-                    VelvetPremiumPaywallDialog.sky,
-                    VelvetPremiumPaywallDialog.skyDeep,
-                  ],
-                ).createShader(bounds),
-                child: const Text(
-                  '20',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 42,
-                    fontWeight: FontWeight.w800,
-                    height: 1,
-                    letterSpacing: -1,
-                  ),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 6, left: 2),
-                child: Text(
-                  '€',
-                  style: TextStyle(
-                    color: VelvetPremiumPaywallDialog.sky,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'AL MESE',
-            style: TextStyle(
-              color: VelvetPremiumPaywallDialog.skyHot,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PreviewBlock extends StatelessWidget {
-  const _PreviewBlock();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: VelvetPremiumPaywallDialog.skyHot.withValues(alpha: 0.35),
-        ),
-        color: Colors.black.withValues(alpha: 0.28),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: VelvetPremiumPaywallDialog.skyDeep.withValues(alpha: 0.22),
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(
-                  color: VelvetPremiumPaywallDialog.sky.withValues(alpha: 0.35),
-                ),
-              ),
-              child: const Text(
-                '4 AREE',
-                style: TextStyle(
-                  color: VelvetPremiumPaywallDialog.onMuted,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.08,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          ...VelvetPremiumPaywallDialog.features.map(
-            (f) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Text(
-                f,
-                style: const TextStyle(
-                  color: VelvetPremiumPaywallDialog.onSurface,
-                  fontSize: 12.5,
-                  height: 1.4,
-                ),
-              ),
-            ),
-          ),
-          Divider(color: Colors.white.withValues(alpha: 0.08), height: 20),
-          ...VelvetPremiumPaywallDialog.steps.map(
-            (step) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      step.$1,
-                      style: TextStyle(
-                        color: VelvetPremiumPaywallDialog.onSurface.withValues(alpha: 0.88),
-                        fontSize: 12,
-                        height: 1.35,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    step.$2,
-                    style: const TextStyle(
-                      color: VelvetPremiumPaywallDialog.sky,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CtaButton extends StatelessWidget {
-  const _CtaButton({required this.onClose});
+class _CloseButton extends StatelessWidget {
+  const _CloseButton({required this.onClose});
 
   final VoidCallback onClose;
 
@@ -475,58 +205,26 @@ class _CtaButton extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFE0F2FE),
-            VelvetPremiumPaywallDialog.sky,
-            VelvetPremiumPaywallDialog.skyDeep,
-          ],
+        border: Border.all(
+          color: VelvetPremiumPaywallDialog.skyHot.withValues(alpha: 0.55),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: VelvetPremiumPaywallDialog.skyDeep.withValues(alpha: 0.35),
-            offset: const Offset(0, 4),
-            blurRadius: 16,
-          ),
-        ],
+        color: Colors.black.withValues(alpha: 0.22),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onClose,
           borderRadius: BorderRadius.circular(999),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Passa a',
-                  style: TextStyle(
-                    color: VelvetPremiumPaywallDialog.ink,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: VelvetPremiumPaywallDialog.ink.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    'Premium',
-                    style: TextStyle(
-                      color: VelvetPremiumPaywallDialog.ink,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ],
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            child: Text(
+              'Chiudi',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: VelvetPremiumPaywallDialog.onSurface,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ),

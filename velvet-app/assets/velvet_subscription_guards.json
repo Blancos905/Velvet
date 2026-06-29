@@ -22,6 +22,7 @@
       "/account/salone/servizi"
     ],
     "blockedPathPrefixes": [
+      "/account/billing",
       "/account/salone/staff",
       "/account/feedback-velvet",
       "/account/salone/statistiche",

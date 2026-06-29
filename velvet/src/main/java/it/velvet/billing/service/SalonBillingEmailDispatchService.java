@@ -118,14 +118,17 @@ public class SalonBillingEmailDispatchService {
 		String accessPlain = scheduledEnd
 				? "Il piano Premium resterà attivo fino al "
 						+ formatInstantDateTime(accessUntil)
-						+ ". Dopo questa data tornerai automaticamente al piano Free.\n\n"
-				: "L'abbonamento Premium è stato disattivato.\n\n";
+						+ ". Dopo questa data il profilo verrà bloccato.\n\n"
+						+ "Se non riattivi Premium entro 30 giorni dalla scadenza dell'abbonamento, "
+						+ "il profilo del salone verrà cancellato automaticamente.\n\n"
+				: "L'abbonamento Premium è stato disattivato.\n\n"
+						+ "Se non riattivi Premium entro 30 giorni, il profilo del salone verrà cancellato automaticamente.\n\n";
 		String accessDetail = scheduledEnd
 				? "attivo fino al " + formatInstantDateTime(accessUntil)
 				: "disattivato";
 		String planDetail = scheduledEnd
-				? "Dopo la scadenza: piano Free"
-				: "Piano attuale: Free";
+				? "Dopo la scadenza: profilo bloccato · cancellazione entro 30 giorni se non riattivi"
+				: "Piano attuale: Free · cancellazione entro 30 giorni se non riattivi";
 		String introLine = scheduledEnd
 				? "Disdetta Premium registrata."
 				: "Abbonamento Premium disattivato.";

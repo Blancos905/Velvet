@@ -136,67 +136,67 @@ export default function AdminAssistenzaPage() {
   const hasFilterMismatch = Boolean(search.trim() && filtered.length < total && total > 0);
 
   return (
-    <div className="velvet-admin-panel velvet-admin-panel--support-inbox">
+    <div className="luxury-admin-panel luxury-admin-panel--support-inbox">
       {actionBanner}
-      <p className="velvet-admin-support-page__back">
-        <Link to="/admin/dashboard" className="velvet-admin-back-link">
+      <p className="luxury-admin-support-page__back">
+        <Link to="/admin/dashboard" className="luxury-admin-back-link">
           ← Panoramica
         </Link>
       </p>
 
-      <nav className="velvet-admin-subchips" aria-label="Vista inbox" style={{ marginBottom: "1rem" }}>
+      <nav className="luxury-admin-subchips" aria-label="Vista inbox" style={{ marginBottom: "1rem" }}>
         <Link
           to="/admin/messaggi"
-          className={`velvet-admin-subchip ${fromSalonsOnly ? "is-active" : ""}`}
+          className={`luxury-admin-subchip ${fromSalonsOnly ? "is-active" : ""}`}
           aria-current={fromSalonsOnly ? "page" : undefined}
         >
           Messaggi dai saloni
         </Link>
         <Link
           to="/admin/assistenza"
-          className={`velvet-admin-subchip ${!fromSalonsOnly ? "is-active" : ""}`}
+          className={`luxury-admin-subchip ${!fromSalonsOnly ? "is-active" : ""}`}
           aria-current={!fromSalonsOnly ? "page" : undefined}
         >
           Tutte le richieste
         </Link>
       </nav>
 
-      <h1 className="velvet-admin-page-title">{title}</h1>
-      <p className="velvet-admin-muted" style={{ marginTop: 0, maxWidth: "42rem" }}>
+      <h1 className="luxury-admin-page-title">{title}</h1>
+      <p className="luxury-admin-muted" style={{ marginTop: 0, maxWidth: "42rem" }}>
         {intro}
       </p>
 
-      <div className="velvet-admin-support-toolbar">
-        <div className="velvet-admin-support-toolbar__actions" aria-label="Azioni elenco">
+      <div className="luxury-admin-support-toolbar">
+        <div className="luxury-admin-support-toolbar__actions" aria-label="Azioni elenco">
           <button
             type="button"
-            className={`velvet-admin-subchip ${listQ.isFetching ? "is-loading" : ""}`}
+            className={`luxury-admin-subchip ${listQ.isFetching ? "is-loading" : ""}`}
             disabled={!isAdminSession || listQ.isFetching}
             onClick={() => void listQ.refetch()}
           >
             {listQ.isFetching ? "Aggiornamento…" : "Aggiorna elenco"}
           </button>
           {listQ.data != null ? (
-            <span className="velvet-admin-muted velvet-admin-support-toolbar__count">
+            <span className="luxury-admin-muted luxury-admin-support-toolbar__count">
               {search.trim() ? (
                 <>
-                  <strong className="velvet-admin-support-toolbar__count-strong">{filtered.length}</strong>
+                  <strong className="luxury-admin-support-toolbar__count-strong">{filtered.length}</strong>
                   <span> di {total}</span>
                 </>
               ) : (
                 <>
-                  <strong className="velvet-admin-support-toolbar__count-strong">{total}</strong>
+                  <strong className="luxury-admin-support-toolbar__count-strong">{total}</strong>
                   <span> {total === 1 ? "richiesta" : "richieste"}</span>
                 </>
               )}
             </span>
           ) : null}
         </div>
-        <label className="velvet-admin-support-search">
-          <span className="velvet-admin-support-search__label">Cerca</span>
+        <label className="luxury-admin-support-search">
+          <span className="luxury-admin-support-search__label">Cerca</span>
           <input
             type="search"
-            className="velvet-admin-support-search__input"
+            className="luxury-admin-support-search__input"
             placeholder="Oggetto, testo, email, tipo…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -208,44 +208,44 @@ export default function AdminAssistenzaPage() {
       </div>
 
       {hasFilterMismatch ? (
-        <p className="velvet-admin-support-filter-hint" role="status">
+        <p className="luxury-admin-support-filter-hint" role="status">
           Nessun risultato con questo filtro.{" "}
-          <button type="button" className="velvet-admin-support-filter-hint__clear" onClick={() => setSearch("")}>
+          <button type="button" className="luxury-admin-support-filter-hint__clear" onClick={() => setSearch("")}>
             Cancella filtri
           </button>
         </p>
       ) : null}
 
-      {listQ.isLoading ? <p className="velvet-admin-muted">Caricamento…</p> : null}
+      {listQ.isLoading ? <p className="luxury-admin-muted">Caricamento…</p> : null}
       {listQ.isError ? (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {errText}
         </p>
       ) : null}
 
       {!isAdminSession && accessToken ? (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           Sessione non valida per il pannello super admin (manca il ruolo ADMIN). Esci e accedi di nuovo.
         </p>
       ) : null}
 
       {listQ.data && listQ.data.length === 0 ? (
-        <p className="velvet-admin-muted velvet-admin-profile-card velvet-admin-profile-card--notice" role="status">
+        <p className="luxury-admin-muted luxury-admin-profile-card luxury-admin-profile-card--notice" role="status">
           {emptyHint}
         </p>
       ) : null}
 
       {listQ.data && listQ.data.length > 0 && filtered.length === 0 ? (
-        <p className="velvet-admin-muted velvet-admin-profile-card velvet-admin-profile-card--notice" role="status">
+        <p className="luxury-admin-muted luxury-admin-profile-card luxury-admin-profile-card--notice" role="status">
           Nessuna richiesta corrisponde alla ricerca.{" "}
-          <button type="button" className="velvet-admin-support-filter-hint__clear" onClick={() => setSearch("")}>
+          <button type="button" className="luxury-admin-support-filter-hint__clear" onClick={() => setSearch("")}>
             Cancella filtri
           </button>
         </p>
       ) : null}
 
       {filtered.length > 0 ? (
-        <ul className="velvet-admin-support-inbox-list" aria-label={listLabel}>
+        <ul className="luxury-admin-support-inbox-list" aria-label={listLabel}>
           {filtered.map((m) => {
             const parsed = parseSupportInboxBody(m.previewLine);
             const isOpen = expanded.has(m.id);
@@ -257,11 +257,11 @@ export default function AdminAssistenzaPage() {
               parsed.userMessage.split(/\n/).find((l) => l.trim())?.trim() || parsed.userMessage.trim() || "—";
 
             return (
-              <li key={m.id} className={`velvet-admin-support-inbox-item ${isOpen ? "is-expanded" : ""}`}>
-                <div className="velvet-admin-support-inbox-item__top">
+              <li key={m.id} className={`luxury-admin-support-inbox-item ${isOpen ? "is-expanded" : ""}`}>
+                <div className="luxury-admin-support-inbox-item__top">
                   <button
                     type="button"
-                    className="velvet-admin-support-inbox-item__expand"
+                    className="luxury-admin-support-inbox-item__expand"
                     aria-expanded={isOpen}
                     aria-label={
                       isOpen
@@ -272,18 +272,18 @@ export default function AdminAssistenzaPage() {
                     }
                     onClick={() => toggleExpanded(m.id)}
                   >
-                    <span className="velvet-admin-support-inbox-item__chevron" aria-hidden={true} />
-                    <span className="velvet-admin-support-inbox-item__expand-text" aria-hidden={true}>
-                      <span className="velvet-admin-support-inbox-item__title-row">
-                        <span className="velvet-admin-support-inbox-item__title">{m.clientName}</span>
+                    <span className="luxury-admin-support-inbox-item__chevron" aria-hidden={true} />
+                    <span className="luxury-admin-support-inbox-item__expand-text" aria-hidden={true}>
+                      <span className="luxury-admin-support-inbox-item__title-row">
+                        <span className="luxury-admin-support-inbox-item__title">{m.clientName}</span>
                         {!isOpen ? (
-                          <span className="velvet-admin-support-inbox-item__preview-line">{primaryLine}</span>
+                          <span className="luxury-admin-support-inbox-item__preview-line">{primaryLine}</span>
                         ) : null}
                       </span>
-                      <span className="velvet-admin-support-inbox-item__dates">
-                        {relative ? <span className="velvet-admin-support-inbox-item__rel">{relative}</span> : null}
+                      <span className="luxury-admin-support-inbox-item__dates">
+                        {relative ? <span className="luxury-admin-support-inbox-item__rel">{relative}</span> : null}
                         <span
-                          className="velvet-admin-support-inbox-item__abs"
+                          className="luxury-admin-support-inbox-item__abs"
                           title={m.sentAt ? new Date(m.sentAt).toISOString() : undefined}
                         >
                           {m.sentAt ? new Date(m.sentAt).toLocaleString("it-IT") : "—"}
@@ -293,52 +293,52 @@ export default function AdminAssistenzaPage() {
                   </button>
                 </div>
 
-                <div className="velvet-admin-support-inbox-item__chips" aria-label="Tipo notifica">
-                  <span className="velvet-admin-support-chip velvet-admin-support-chip--type">
+                <div className="luxury-admin-support-inbox-item__chips" aria-label="Tipo notifica">
+                  <span className="luxury-admin-support-chip luxury-admin-support-chip--type">
                     {humanizeNotificationType(m.notificationType)}
                   </span>
-                  <span className="velvet-admin-support-chip">{humanizeNotificationStatus(m.status)}</span>
+                  <span className="luxury-admin-support-chip">{humanizeNotificationStatus(m.status)}</span>
                   {m.appointmentId ? (
-                    <span className="velvet-admin-support-chip velvet-admin-support-chip--muted" title="Appuntamento collegato">
+                    <span className="luxury-admin-support-chip luxury-admin-support-chip--muted" title="Appuntamento collegato">
                       Appuntamento
                     </span>
                   ) : null}
                 </div>
 
-                <div className="velvet-admin-support-inbox-item__body-wrap" hidden={!isOpen}>
-                  <div className="velvet-admin-support-inbox-message">
-                    <div className="velvet-admin-support-inbox-message__head">
-                      <span className="velvet-admin-support-inbox-message__label">Messaggio</span>
-                      <div className="velvet-admin-support-inbox-message__tools">
+                <div className="luxury-admin-support-inbox-item__body-wrap" hidden={!isOpen}>
+                  <div className="luxury-admin-support-inbox-message">
+                    <div className="luxury-admin-support-inbox-message__head">
+                      <span className="luxury-admin-support-inbox-message__label">Messaggio</span>
+                      <div className="luxury-admin-support-inbox-message__tools">
                         <button
                           type="button"
-                          className="velvet-admin-btn velvet-admin-btn--ghost"
+                          className="luxury-admin-btn luxury-admin-btn--ghost"
                           onClick={() => void copyText(`${m.id}:msg`, parsed.userMessage || m.previewLine)}
                         >
                           {copyFlash === `${m.id}:msg` ? "Copiato" : "Copia testo"}
                         </button>
                         {mailtoEmail ? (
-                          <a className="velvet-admin-btn velvet-admin-btn--ghost" href={`mailto:${mailtoEmail}`}>
+                          <a className="luxury-admin-btn luxury-admin-btn--ghost" href={`mailto:${mailtoEmail}`}>
                             Apri email
                           </a>
                         ) : null}
                       </div>
                     </div>
-                    <p className="velvet-admin-support-inbox-message__text">
+                    <p className="luxury-admin-support-inbox-message__text">
                       {parsed.userMessage || (
-                        <span className="velvet-admin-muted">Nessun testo nel corpo della richiesta.</span>
+                        <span className="luxury-admin-muted">Nessun testo nel corpo della richiesta.</span>
                       )}
                     </p>
                   </div>
 
                   {parsed.hasStructuredMeta ? (
-                    <div className="velvet-admin-support-inbox-meta">
-                      <h3 className="velvet-admin-support-inbox-meta__title">Dettagli richiedente</h3>
-                      <dl className="velvet-admin-support-inbox-dl">
+                    <div className="luxury-admin-support-inbox-meta">
+                      <h3 className="luxury-admin-support-inbox-meta__title">Dettagli richiedente</h3>
+                      <dl className="luxury-admin-support-inbox-dl">
                         {parsed.metaLines
                           .filter((row) => !["profilo id", "keycloak sub"].includes(row.label.toLowerCase()))
                           .map((row) => (
-                            <div key={row.label} className="velvet-admin-support-inbox-dl__row">
+                            <div key={row.label} className="luxury-admin-support-inbox-dl__row">
                               <dt>{row.label}</dt>
                               <dd>{row.value}</dd>
                             </div>
@@ -347,28 +347,28 @@ export default function AdminAssistenzaPage() {
 
                       <button
                         type="button"
-                        className="velvet-admin-support-tech-toggle"
+                        className="luxury-admin-support-tech-toggle"
                         aria-expanded={techExpanded}
                         onClick={() => toggleTech(m.id)}
                       >
                         <span
-                          className={`velvet-admin-support-inbox-item__chevron ${techExpanded ? "is-open" : ""}`}
+                          className={`luxury-admin-support-inbox-item__chevron ${techExpanded ? "is-open" : ""}`}
                           aria-hidden={true}
                         />
                         Identificativi tecnici
                       </button>
                       {techExpanded ? (
-                        <dl className="velvet-admin-support-inbox-dl velvet-admin-support-inbox-dl--mono">
+                        <dl className="luxury-admin-support-inbox-dl luxury-admin-support-inbox-dl--mono">
                           {parsed.metaLines
                             .filter((row) => ["profilo id", "keycloak sub", "timestamp utc"].includes(row.label.toLowerCase()))
                             .map((row) => (
-                              <div key={row.label} className="velvet-admin-support-inbox-dl__row">
+                              <div key={row.label} className="luxury-admin-support-inbox-dl__row">
                                 <dt>{row.label}</dt>
                                 <dd>
-                                  <span className="velvet-admin-support-inbox-dl__value">{row.value}</span>
+                                  <span className="luxury-admin-support-inbox-dl__value">{row.value}</span>
                                   <button
                                     type="button"
-                                    className="velvet-admin-btn velvet-admin-btn--ghost velvet-admin-support-inbox-dl__copy"
+                                    className="luxury-admin-btn luxury-admin-btn--ghost luxury-admin-support-inbox-dl__copy"
                                     onClick={() => void copyText(`${m.id}:${row.label}`, row.value)}
                                   >
                                     {copyFlash === `${m.id}:${row.label}` ? "OK" : "Copia"}
@@ -380,18 +380,18 @@ export default function AdminAssistenzaPage() {
                       ) : null}
                     </div>
                   ) : (
-                    <pre className="velvet-admin-support-inbox-item__body velvet-admin-support-inbox-item__body--fallback">
+                    <pre className="luxury-admin-support-inbox-item__body luxury-admin-support-inbox-item__body--fallback">
                       {m.previewLine}
                     </pre>
                   )}
 
-                  <div className="velvet-admin-support-inbox-item__actions">
+                  <div className="luxury-admin-support-inbox-item__actions">
                     {pendingArchiveId === m.id ? (
-                      <div className="velvet-admin-support-archive-confirm">
+                      <div className="luxury-admin-support-archive-confirm">
                         <span>Sei sicuro di voler archiviare questa richiesta?</span>
                         <button
                           type="button"
-                          className="velvet-admin-btn velvet-admin-btn--danger"
+                          className="luxury-admin-btn luxury-admin-btn--danger"
                           disabled={deleteM.isPending}
                           onClick={() => deleteM.mutate(m.id)}
                         >
@@ -399,7 +399,7 @@ export default function AdminAssistenzaPage() {
                         </button>
                         <button
                           type="button"
-                          className="velvet-admin-btn velvet-admin-btn--ghost"
+                          className="luxury-admin-btn luxury-admin-btn--ghost"
                           disabled={deleteM.isPending}
                           onClick={() => setPendingArchiveId(null)}
                         >
@@ -409,7 +409,7 @@ export default function AdminAssistenzaPage() {
                     ) : (
                       <button
                         type="button"
-                        className="velvet-admin-btn velvet-admin-btn--danger"
+                        className="luxury-admin-btn luxury-admin-btn--danger"
                         disabled={deleteM.isPending}
                         onClick={() => setPendingArchiveId(m.id)}
                       >

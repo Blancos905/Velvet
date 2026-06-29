@@ -2,8 +2,8 @@ package it.velvet.testsupport;
 
 import it.velvet.appointment.domain.AppointmentRepository;
 import it.velvet.catalog.domain.SalonClientRepository;
-import it.velvet.catalog.domain.SalonVelvetChatMessageRepository;
-import it.velvet.catalog.domain.SalonVelvetChatReadStateRepository;
+import it.velvet.catalog.domain.SalonLuxuryChatMessageRepository;
+import it.velvet.catalog.domain.SalonLuxuryChatReadStateRepository;
 import it.velvet.catalog.domain.StaffOperatorRepository;
 import it.velvet.consumer.domain.ConsumerProfileRepository;
 import it.velvet.consumer.domain.FavoriteLocationRepository;
@@ -24,8 +24,8 @@ public class VelvetConsumerTestCleanup {
 	private final ReviewRepository reviewRepository;
 	private final PlatformReviewRepository platformReviewRepository;
 	private final ScheduledNotificationRepository scheduledNotificationRepository;
-	private final SalonVelvetChatMessageRepository salonVelvetChatMessageRepository;
-	private final SalonVelvetChatReadStateRepository salonVelvetChatReadStateRepository;
+	private final SalonLuxuryChatMessageRepository salonLuxuryChatMessageRepository;
+	private final SalonLuxuryChatReadStateRepository salonLuxuryChatReadStateRepository;
 	private final SalonClientRepository salonClientRepository;
 	private final FavoriteLocationRepository favoriteLocationRepository;
 	private final StaffOperatorRepository staffOperatorRepository;
@@ -38,8 +38,8 @@ public class VelvetConsumerTestCleanup {
 			ReviewRepository reviewRepository,
 			PlatformReviewRepository platformReviewRepository,
 			ScheduledNotificationRepository scheduledNotificationRepository,
-			SalonVelvetChatMessageRepository salonVelvetChatMessageRepository,
-			SalonVelvetChatReadStateRepository salonVelvetChatReadStateRepository,
+			SalonLuxuryChatMessageRepository salonLuxuryChatMessageRepository,
+			SalonLuxuryChatReadStateRepository salonLuxuryChatReadStateRepository,
 			SalonClientRepository salonClientRepository,
 			FavoriteLocationRepository favoriteLocationRepository,
 			StaffOperatorRepository staffOperatorRepository,
@@ -50,8 +50,8 @@ public class VelvetConsumerTestCleanup {
 		this.reviewRepository = reviewRepository;
 		this.platformReviewRepository = platformReviewRepository;
 		this.scheduledNotificationRepository = scheduledNotificationRepository;
-		this.salonVelvetChatMessageRepository = salonVelvetChatMessageRepository;
-		this.salonVelvetChatReadStateRepository = salonVelvetChatReadStateRepository;
+		this.salonLuxuryChatMessageRepository = salonLuxuryChatMessageRepository;
+		this.salonLuxuryChatReadStateRepository = salonLuxuryChatReadStateRepository;
 		this.salonClientRepository = salonClientRepository;
 		this.favoriteLocationRepository = favoriteLocationRepository;
 		this.staffOperatorRepository = staffOperatorRepository;
@@ -61,8 +61,8 @@ public class VelvetConsumerTestCleanup {
 	@Transactional
 	public void deleteAllConsumerProfiles() {
 		authRefreshTokenRepository.deleteAll();
-		salonVelvetChatReadStateRepository.deleteAll();
-		salonVelvetChatMessageRepository.deleteAll();
+		salonLuxuryChatReadStateRepository.deleteAll();
+		salonLuxuryChatMessageRepository.deleteAll();
 		reviewRepository.deleteAll();
 		platformReviewRepository.deleteAll();
 		scheduledNotificationRepository.deleteAll();

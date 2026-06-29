@@ -1,0 +1,8 @@
+{
+  "name": "velvet-codegraph",
+  "private": true,
+  "description": "CodeGraph locale per indicizzazione MCP del monorepo Velvet",
+  "devDependencies": {
+    "@colbymchenry/codegraph": "1.0.1"
+  }
+}

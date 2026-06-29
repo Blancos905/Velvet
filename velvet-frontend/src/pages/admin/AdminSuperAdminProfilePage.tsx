@@ -43,24 +43,24 @@ export default function AdminSuperAdminProfilePage() {
   const p = extractSuperAdminProfileFromOverview(overviewQ.data, accessToken);
 
   return (
-    <div className="velvet-admin-panel">
-      <p className="velvet-admin-support-page__back">
-        <Link to="/admin/dashboard" className="velvet-admin-back-link">
+    <div className="luxury-admin-panel">
+      <p className="luxury-admin-support-page__back">
+        <Link to="/admin/dashboard" className="luxury-admin-back-link">
           ← Panoramica
         </Link>
       </p>
-      <h1 className="velvet-admin-page-title">Profilo super admin</h1>
+      <h1 className="luxury-admin-page-title">Profilo super admin</h1>
 
-      {overviewQ.isLoading ? <p className="velvet-admin-muted">Sincronizzazione con il server…</p> : null}
+      {overviewQ.isLoading ? <p className="luxury-admin-muted">Sincronizzazione con il server…</p> : null}
       {overviewQ.isError ? (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {overviewQ.error instanceof Error ? overviewQ.error.message : "Impossibile caricare l’overview."} Mostriamo comunque
           quanto ricavabile dal token di sessione.
         </p>
       ) : null}
 
       {!p.persistedProfile ? (
-        <p className="velvet-admin-muted velvet-admin-profile-card velvet-admin-profile-card--notice" role="status">
+        <p className="luxury-admin-muted luxury-admin-profile-card luxury-admin-profile-card--notice" role="status">
           <strong>Profilo non ancora persistito</strong> (nessun record consumer allineato al super admin). Completa il
           bootstrap avviando il backend con credenziali super admin, oppure segui la documentazione SQL in{" "}
           <code>deploy/sql/</code>. Finché manca, il telefono non può essere salvato sul database.
@@ -77,18 +77,18 @@ export default function AdminSuperAdminProfilePage() {
         />
       ) : null}
 
-      <section className="velvet-admin-profile-card" aria-labelledby="admin-profile-dl-h">
-        <h2 id="admin-profile-dl-h" className="velvet-admin-profile-card__title">
+      <section className="luxury-admin-profile-card" aria-labelledby="admin-profile-dl-h">
+        <h2 id="admin-profile-dl-h" className="luxury-admin-profile-card__title">
           Dettaglio tecnico
         </h2>
-        <dl className="velvet-admin-dl velvet-admin-profile-card__dl">
+        <dl className="luxury-admin-dl luxury-admin-profile-card__dl">
           <div>
             <dt>Nome in evidenza (database)</dt>
             <dd>{dash(p.displayName)}</dd>
           </div>
           <div>
             <dt>ID profilo</dt>
-            <dd className="velvet-admin-mono">{dash(p.profileId)}</dd>
+            <dd className="luxury-admin-mono">{dash(p.profileId)}</dd>
           </div>
           {sessionEmail && sessionEmail !== (p.email ?? "").trim() ? (
             <div>

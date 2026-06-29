@@ -318,7 +318,7 @@ public class MeNotificationInboxService {
 			case REMINDER_1H ->
 					"Promemoria (circa 2 ore prima) presso " + location + " il " + dateStr + " alle " + timeStr + ".";
 			case REVIEW_INVITE -> "Invito recensione per " + location + " (" + dateStr + ", " + timeStr + ").";
-			case ADMIN_PLATFORM_MESSAGE, SUPPORT_REQUEST_TO_VELVET -> "Messaggio da Velvet.";
+			case ADMIN_PLATFORM_MESSAGE, SUPPORT_REQUEST_TO_VELVET -> "Messaggio da Saloni Luxury.";
 		};
 	}
 

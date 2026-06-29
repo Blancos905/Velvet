@@ -289,7 +289,7 @@ export function AdminSalonPlanSection({
       subject: row.name,
       subjectLabel: "Salone",
       message:
-        "Stai per rimuovere definitivamente questo salone dalla piattaforma Velvet. Conferma solo se sei certo di voler procedere.",
+        "Stai per rimuovere definitivamente questo salone dalla piattaforma Saloni Luxury. Conferma solo se sei certo di voler procedere.",
       warningNotes: [
         "Sedi, staff, prenotazioni e dati operativi collegati verranno eliminati.",
         "L'operazione non può essere annullata da questa schermata.",
@@ -324,14 +324,14 @@ export function AdminSalonPlanSection({
     <>
       {confirmDialog}
       {actionBanner}
-      <section className="velvet-admin-panel velvet-admin-premium-card" aria-labelledby={headingId}>
-        <h2 id={headingId} className="velvet-admin-section-title">
+      <section className="luxury-admin-panel luxury-admin-premium-card" aria-labelledby={headingId}>
+        <h2 id={headingId} className="luxury-admin-section-title">
           {title}
         </h2>
-        <div className="velvet-admin-subchips velvet-admin-premium-card__toolbar">
+        <div className="luxury-admin-subchips luxury-admin-premium-card__toolbar">
           <button
             type="button"
-            className="velvet-admin-btn"
+            className="luxury-admin-btn"
             onClick={() =>
               setShowCreateForm((v) => {
                 const next = !v;
@@ -346,7 +346,7 @@ export function AdminSalonPlanSection({
           </button>
           <button
             type="button"
-            className="velvet-admin-btn"
+            className="luxury-admin-btn"
             onClick={() =>
               setShowNotificationForm((v) => {
                 const next = !v;
@@ -361,7 +361,7 @@ export function AdminSalonPlanSection({
           </button>
           <button
             type="button"
-            className="velvet-admin-subchip"
+            className="luxury-admin-subchip"
             onClick={() => setSelectedSalonIds([])}
             disabled={selectedSalonIds.length === 0}
           >
@@ -369,28 +369,28 @@ export function AdminSalonPlanSection({
           </button>
         </div>
         {showNotificationForm ? (
-          <div className="velvet-admin-actions velvet-admin-premium-card__notify-box">
-            <p className="velvet-admin-premium-card__notify-hint">
+          <div className="luxury-admin-actions luxury-admin-premium-card__notify-box">
+            <p className="luxury-admin-premium-card__notify-hint">
               Seleziona i saloni con le checkbox nella tabella, poi invia: il messaggio compare nel centro notifiche del
               titolare (sezione «Messaggi Luxury»).
             </p>
             <input
               type="text"
-              className="velvet-admin-input"
+              className="luxury-admin-input"
               aria-label="Oggetto messaggio"
               placeholder="Oggetto (titolo breve)"
               value={notificationSubject}
               onChange={(e) => setNotificationSubject(e.target.value)}
             />
             <textarea
-              className="velvet-admin-input"
+              className="luxury-admin-input"
               placeholder="Testo del messaggio per i titolari selezionati…"
               value={notificationMessage}
               onChange={(e) => setNotificationMessage(e.target.value)}
             />
             <button
               type="button"
-              className="velvet-admin-btn velvet-admin-premium-card__notify-send"
+              className="luxury-admin-btn luxury-admin-premium-card__notify-send"
               disabled={
                 sendNotificationM.isPending || !notificationMessage.trim() || selectedSalonIds.length === 0
               }
@@ -401,31 +401,31 @@ export function AdminSalonPlanSection({
           </div>
         ) : null}
         {sendNotificationM.isError ? (
-          <p className="velvet-alert velvet-alert--error" role="alert">
+          <p className="luxury-alert luxury-alert--error" role="alert">
             {sendNotificationM.error instanceof Error ? sendNotificationM.error.message : "Invio messaggio fallito."}
           </p>
         ) : null}
         {sendNotificationM.isSuccess ? (
-          <p className="velvet-alert" role="status">
+          <p className="luxury-alert" role="status">
             Messaggio inviato nel centro notifiche di {sendNotificationM.data?.deliveredCount ?? 0} salone/i
             selezionato/i.
           </p>
         ) : null}
         {salonOwnerLoginM.isError ? (
-          <p className="velvet-alert velvet-alert--error" role="alert">
+          <p className="luxury-alert luxury-alert--error" role="alert">
             {salonOwnerLoginM.error instanceof Error ? salonOwnerLoginM.error.message : "Login titolare non riuscito."}
           </p>
         ) : null}
-        <div className="velvet-admin-subreveal is-open">
-          <div className="velvet-admin-premium-card__search-panel">
-            <label className="velvet-admin-premium-card__search-label" htmlFor={`${idPrefix}-search`}>
+        <div className="luxury-admin-subreveal is-open">
+          <div className="luxury-admin-premium-card__search-panel">
+            <label className="luxury-admin-premium-card__search-label" htmlFor={`${idPrefix}-search`}>
               Cerca per nome salone
             </label>
-            <div className="velvet-admin-premium-card__search-row">
+            <div className="luxury-admin-premium-card__search-row">
               <input
                 id={`${idPrefix}-search`}
                 type="search"
-                className="velvet-admin-input velvet-admin-premium-card__search-input"
+                className="luxury-admin-input luxury-admin-premium-card__search-input"
                 placeholder="Es. Luxury, Bologna…"
                 value={salonSearch}
                 onChange={(e) => setSalonSearch(e.target.value)}
@@ -433,14 +433,14 @@ export function AdminSalonPlanSection({
                 spellCheck={false}
               />
               {salonSearch.trim() ? (
-                <button type="button" className="velvet-admin-premium-card__search-clear" onClick={() => setSalonSearch("")}>
+                <button type="button" className="luxury-admin-premium-card__search-clear" onClick={() => setSalonSearch("")}>
                   Azzera
                 </button>
               ) : null}
             </div>
           </div>
-          <div className="velvet-admin-table-wrap velvet-admin-premium-card__table-wrap">
-            <table className="velvet-admin-table velvet-admin-table--compact velvet-admin-premium-card__table velvet-admin-premium-card__table--accordion">
+          <div className="luxury-admin-table-wrap luxury-admin-premium-card__table-wrap">
+            <table className="luxury-admin-table luxury-admin-table--compact luxury-admin-premium-card__table luxury-admin-premium-card__table--accordion">
               <thead>
                 <tr>
                   <th>
@@ -476,9 +476,9 @@ export function AdminSalonPlanSection({
                       <Fragment key={row.studioGroupId}>
                         <tr
                           className={[
-                            "velvet-admin-premium-card__salon-row",
+                            "luxury-admin-premium-card__salon-row",
                             selectedSalonIds.includes(row.studioGroupId) ? "is-selected" : "",
-                            isOpen ? "velvet-admin-premium-card__salon-row--open" : "",
+                            isOpen ? "luxury-admin-premium-card__salon-row--open" : "",
                           ]
                             .filter(Boolean)
                             .join(" ")}
@@ -498,10 +498,10 @@ export function AdminSalonPlanSection({
                             />
                           </td>
                           <td>
-                            <div className="velvet-admin-premium-card__salon-row-main">
+                            <div className="luxury-admin-premium-card__salon-row-main">
                               <button
                                 type="button"
-                                className="velvet-admin-premium-card__salon-name-btn"
+                                className="luxury-admin-premium-card__salon-name-btn"
                                 aria-expanded={isOpen}
                                 aria-controls={`${idPrefix}-detail-${row.studioGroupId}`}
                                 id={`${idPrefix}-toggle-${row.studioGroupId}`}
@@ -509,9 +509,9 @@ export function AdminSalonPlanSection({
                                   setExpandedSalonId((id) => (id === row.studioGroupId ? null : row.studioGroupId))
                                 }
                               >
-                                <span className="velvet-admin-premium-card__salon-name-text">{row.name}</span>
+                                <span className="luxury-admin-premium-card__salon-name-text">{row.name}</span>
                                 <span
-                                  className={`velvet-admin-premium-card__salon-chevron${isOpen ? " is-open" : ""}`}
+                                  className={`luxury-admin-premium-card__salon-chevron${isOpen ? " is-open" : ""}`}
                                   aria-hidden
                                 >
                                   {isOpen ? "▲" : "▼"}
@@ -521,7 +521,7 @@ export function AdminSalonPlanSection({
                                 <>
                                   <button
                                     type="button"
-                                    className="velvet-admin-btn velvet-admin-premium-card__action-btn velvet-admin-premium-card__salon-row-login"
+                                    className="luxury-admin-btn luxury-admin-premium-card__action-btn luxury-admin-premium-card__salon-row-login"
                                     title={
                                       row.ownerEmail
                                         ? "Apri l’account titolare nell’area salone (sessione Luxury)"
@@ -536,7 +536,7 @@ export function AdminSalonPlanSection({
                                   </button>
                                   <button
                                     type="button"
-                                    className="velvet-admin-btn velvet-admin-btn--danger velvet-admin-premium-card__action-btn velvet-admin-premium-card__salon-row-login"
+                                    className="luxury-admin-btn luxury-admin-btn--danger luxury-admin-premium-card__action-btn luxury-admin-premium-card__salon-row-login"
                                     disabled={deleteSalonM.isPending || salonOwnerLoginM.isPending}
                                     onClick={() => askDeleteSalon(row)}
                                   >
@@ -548,7 +548,7 @@ export function AdminSalonPlanSection({
                               ) : (
                                 <button
                                   type="button"
-                                  className="velvet-admin-btn velvet-admin-btn--danger velvet-admin-premium-card__action-btn velvet-admin-premium-card__salon-row-login"
+                                  className="luxury-admin-btn luxury-admin-btn--danger luxury-admin-premium-card__action-btn luxury-admin-premium-card__salon-row-login"
                                   disabled={deleteSalonM.isPending || salonOwnerLoginM.isPending}
                                   onClick={() => askDeleteSalon(row)}
                                 >
@@ -563,7 +563,7 @@ export function AdminSalonPlanSection({
                         {isOpen ? (
                           <tr
                             className={[
-                              "velvet-admin-premium-card__salon-detail-row",
+                              "luxury-admin-premium-card__salon-detail-row",
                               selectedSalonIds.includes(row.studioGroupId) ? "is-selected" : "",
                             ]
                               .filter(Boolean)
@@ -571,58 +571,58 @@ export function AdminSalonPlanSection({
                           >
                             <td colSpan={2}>
                               <div
-                                className="velvet-admin-premium-card__detail-panel"
+                                className="luxury-admin-premium-card__detail-panel"
                                 id={`${idPrefix}-detail-${row.studioGroupId}`}
                                 role="region"
                                 aria-labelledby={`${idPrefix}-toggle-${row.studioGroupId}`}
                               >
-                                <div className="velvet-admin-premium-card__detail-grid">
+                                <div className="luxury-admin-premium-card__detail-grid">
                                   <div>
-                                    <span className="velvet-admin-premium-card__detail-label">Titolare</span>
-                                    <span className="velvet-admin-premium-card__detail-value">{row.ownerEmail ?? "—"}</span>
+                                    <span className="luxury-admin-premium-card__detail-label">Titolare</span>
+                                    <span className="luxury-admin-premium-card__detail-value">{row.ownerEmail ?? "—"}</span>
                                   </div>
                                   <div>
-                                    <span className="velvet-admin-premium-card__detail-label">Città</span>
-                                    <span className="velvet-admin-premium-card__detail-value">
+                                    <span className="luxury-admin-premium-card__detail-label">Città</span>
+                                    <span className="luxury-admin-premium-card__detail-value">
                                       {row.primaryLocationCity
                                         ? formatSalonCityForDisplay(row.primaryLocationCity) ?? row.primaryLocationCity
                                         : "—"}
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="velvet-admin-premium-card__detail-label">Sede</span>
-                                    <span className="velvet-admin-premium-card__detail-value">
+                                    <span className="luxury-admin-premium-card__detail-label">Sede</span>
+                                    <span className="luxury-admin-premium-card__detail-value">
                                       {row.primaryLocationName ?? "—"}
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="velvet-admin-premium-card__detail-label">Creato</span>
-                                    <span className="velvet-admin-premium-card__detail-value">{formatDate(row.createdAt)}</span>
+                                    <span className="luxury-admin-premium-card__detail-label">Creato</span>
+                                    <span className="luxury-admin-premium-card__detail-value">{formatDate(row.createdAt)}</span>
                                   </div>
                                   {row.planTier ? (
                                     <div>
-                                      <span className="velvet-admin-premium-card__detail-label">Piano</span>
-                                      <span className="velvet-admin-premium-card__detail-value">{row.planTier}</span>
+                                      <span className="luxury-admin-premium-card__detail-label">Piano</span>
+                                      <span className="luxury-admin-premium-card__detail-value">{row.planTier}</span>
                                     </div>
                                   ) : null}
                                   <div>
-                                    <span className="velvet-admin-premium-card__detail-label">Provider</span>
-                                    <span className="velvet-admin-premium-card__detail-value">
+                                    <span className="luxury-admin-premium-card__detail-label">Provider</span>
+                                    <span className="luxury-admin-premium-card__detail-value">
                                       {row.provider ? "Sì — senza pagamento" : "No — a pagamento"}
                                     </span>
                                   </div>
                                 </div>
-                                <div className="velvet-admin-premium-card__actions-cell">
+                                <div className="luxury-admin-premium-card__actions-cell">
                                   <button
                                     type="button"
-                                    className="velvet-admin-btn velvet-admin-premium-card__action-btn"
+                                    className="luxury-admin-btn luxury-admin-premium-card__action-btn"
                                     onClick={() => onEditSalon(row)}
                                   >
                                     Modifica
                                   </button>
                                   <button
                                     type="button"
-                                    className="velvet-admin-btn velvet-admin-btn--danger velvet-admin-premium-card__action-btn"
+                                    className="luxury-admin-btn luxury-admin-btn--danger luxury-admin-premium-card__action-btn"
                                     disabled={deleteSalonM.isPending || salonOwnerLoginM.isPending}
                                     onClick={() => askDeleteSalon(row)}
                                   >
@@ -630,7 +630,7 @@ export function AdminSalonPlanSection({
                                   </button>
                                   <button
                                     type="button"
-                                    className="velvet-admin-btn velvet-admin-premium-card__action-btn"
+                                    className="luxury-admin-btn luxury-admin-premium-card__action-btn"
                                     title={
                                       row.ownerEmail
                                         ? "Apri l’account titolare nell’area salone (sessione Luxury)"
@@ -644,42 +644,42 @@ export function AdminSalonPlanSection({
                                       : "Login"}
                                   </button>
                                 </div>
-                                <div className="velvet-admin-premium-card__staff-block">
-                                  <h3 className="velvet-admin-premium-card__staff-title">Staff (operatori)</h3>
+                                <div className="luxury-admin-premium-card__staff-block">
+                                  <h3 className="luxury-admin-premium-card__staff-title">Staff (operatori)</h3>
                                   {deleteStaffOperatorM.isError ? (
-                                    <p className="velvet-alert velvet-alert--error" role="alert">
+                                    <p className="luxury-alert luxury-alert--error" role="alert">
                                       {deleteStaffOperatorM.error instanceof Error
                                         ? deleteStaffOperatorM.error.message
                                         : "Eliminazione staff non riuscita."}
                                     </p>
                                   ) : null}
                                   {row.staff === undefined ? (
-                                    <p className="velvet-admin-premium-card__staff-muted">
+                                    <p className="luxury-admin-premium-card__staff-muted">
                                       Lo staff non è incluso nella risposta del backend. Ricompila e riavvia Spring con la
                                       versione di Luxury che aggiunge il campo <code>staff</code> a{" "}
                                       <code>GET /api/v1/admin/overview/salons</code>.
                                     </p>
                                   ) : !row.staff.length ? (
-                                    <p className="velvet-admin-premium-card__staff-muted">Nessun operatore in elenco.</p>
+                                    <p className="luxury-admin-premium-card__staff-muted">Nessun operatore in elenco.</p>
                                   ) : (
-                                    <ul className="velvet-admin-premium-card__staff-list">
+                                    <ul className="luxury-admin-premium-card__staff-list">
                                       {row.staff.map((op) => (
-                                        <li key={op.operatorId} className="velvet-admin-premium-card__staff-item">
-                                          <div className="velvet-admin-premium-card__staff-item-main">
+                                        <li key={op.operatorId} className="luxury-admin-premium-card__staff-item">
+                                          <div className="luxury-admin-premium-card__staff-item-main">
                                             <strong>{op.displayName}</strong>
                                             {op.role ? ` · ${op.role}` : ""} · {op.locationName}
                                             {op.accountLinked ? (
                                               <>
                                                 {" "}
-                                                <span className="velvet-admin-muted">— account: {op.staffEmail ?? "—"}</span>
+                                                <span className="luxury-admin-muted">— account: {op.staffEmail ?? "—"}</span>
                                               </>
                                             ) : (
-                                              <span className="velvet-admin-muted"> — senza account di accesso</span>
+                                              <span className="luxury-admin-muted"> — senza account di accesso</span>
                                             )}
                                           </div>
                                           <button
                                             type="button"
-                                            className="velvet-admin-btn velvet-admin-btn--danger velvet-admin-premium-card__staff-remove"
+                                            className="luxury-admin-btn luxury-admin-btn--danger luxury-admin-premium-card__staff-remove"
                                             disabled={
                                               deleteStaffOperatorM.isPending ||
                                               deleteSalonM.isPending ||
@@ -709,21 +709,21 @@ export function AdminSalonPlanSection({
             </table>
           </div>
           {totalPages > 1 ? (
-            <div className="velvet-admin-subchips velvet-admin-premium-card__pagination" aria-label={paginationAriaLabel}>
+            <div className="luxury-admin-subchips luxury-admin-premium-card__pagination" aria-label={paginationAriaLabel}>
               <button
                 type="button"
-                className="velvet-admin-subchip"
+                className="luxury-admin-subchip"
                 disabled={pageSafe === 0}
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
               >
                 ← Precedente
               </button>
-              <span className="velvet-admin-muted">
+              <span className="luxury-admin-muted">
                 Pagina {pageSafe + 1} di {totalPages}
               </span>
               <button
                 type="button"
-                className="velvet-admin-subchip"
+                className="luxury-admin-subchip"
                 disabled={pageSafe >= totalPages - 1}
                 onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               >
@@ -736,7 +736,7 @@ export function AdminSalonPlanSection({
 
       {showCreateForm ? (
         <div
-          className="velvet-plans-modal-root"
+          className="luxury-plans-modal-root"
           role="presentation"
           onMouseDown={(ev) => {
             if (ev.target === ev.currentTarget && !createSalonM.isPending) {
@@ -745,18 +745,18 @@ export function AdminSalonPlanSection({
           }}
         >
           <div
-            className="velvet-plans-modal velvet-plans-modal--wide"
+            className="luxury-plans-modal luxury-plans-modal--wide"
             role="dialog"
             aria-modal="true"
             aria-labelledby={`${idPrefix}-create-title`}
           >
-            <div className="velvet-plans-modal__head">
-              <h2 id={`${idPrefix}-create-title`} className="velvet-plans-modal__title">
+            <div className="luxury-plans-modal__head">
+              <h2 id={`${idPrefix}-create-title`} className="luxury-plans-modal__title">
                 {modalCreateTitle}
               </h2>
               <button
                 type="button"
-                className="velvet-plans-modal__close"
+                className="luxury-plans-modal__close"
                 onClick={() => setShowCreateForm(false)}
                 disabled={createSalonM.isPending}
                 aria-label="Chiudi"
@@ -765,25 +765,25 @@ export function AdminSalonPlanSection({
               </button>
             </div>
             {modalCreateIntro}
-            <p className="velvet-plans-modal__note" role="note">
+            <p className="luxury-plans-modal__note" role="note">
               <strong>Backend:</strong> account e password sono gestiti da Luxury (Spring Security).
             </p>
             {createErrorHint ? (
-              <p className="velvet-alert velvet-alert--error velvet-plans-modal__alert" role="alert">
+              <p className="luxury-alert luxury-alert--error luxury-plans-modal__alert" role="alert">
                 {createErrorHint}
               </p>
             ) : createSalonM.isError ? (
-              <p className="velvet-alert velvet-alert--error velvet-plans-modal__alert" role="alert">
+              <p className="luxury-alert luxury-alert--error luxury-plans-modal__alert" role="alert">
                 {createSalonM.error instanceof Error ? createSalonM.error.message : createErrorDefault}
               </p>
             ) : null}
             {createSalonM.isSuccess ? (
-              <p className="velvet-alert velvet-alert--success velvet-plans-modal__alert" role="status">
+              <p className="luxury-alert luxury-alert--success luxury-plans-modal__alert" role="status">
                 {createSuccessMessage}
               </p>
             ) : null}
-            <form className="velvet-plans-modal__form" noValidate onSubmit={submitCreateSalon}>
-              <label className="velvet-plans-field">
+            <form className="luxury-plans-modal__form" noValidate onSubmit={submitCreateSalon}>
+              <label className="luxury-plans-field">
                 <span>Nome</span>
                 <input
                   value={createSalonForm.firstName}
@@ -793,7 +793,7 @@ export function AdminSalonPlanSection({
                   maxLength={100}
                 />
               </label>
-              <label className="velvet-plans-field">
+              <label className="luxury-plans-field">
                 <span>Cognome</span>
                 <input
                   value={createSalonForm.lastName}
@@ -803,7 +803,7 @@ export function AdminSalonPlanSection({
                   maxLength={100}
                 />
               </label>
-              <label className="velvet-plans-field velvet-plans-field--full">
+              <label className="luxury-plans-field luxury-plans-field--full">
                 <span>Email</span>
                 <input
                   type="email"
@@ -814,7 +814,7 @@ export function AdminSalonPlanSection({
                   maxLength={320}
                 />
               </label>
-              <label className="velvet-plans-field velvet-plans-field--full">
+              <label className="luxury-plans-field luxury-plans-field--full">
                 <span>Telefono</span>
                 <input
                   value={createSalonForm.phone}
@@ -823,14 +823,14 @@ export function AdminSalonPlanSection({
                   maxLength={40}
                 />
               </label>
-              <fieldset className="velvet-plans-fieldset velvet-plans-field--full velvet-plans-provider">
-                <legend className="velvet-plans-salon-types__legend">Salone provider</legend>
-                <p className="velvet-plans-provider__hint">
+              <fieldset className="luxury-plans-fieldset luxury-plans-field--full luxury-plans-provider">
+                <legend className="luxury-plans-salon-types__legend">Salone provider</legend>
+                <p className="luxury-plans-provider__hint">
                   I saloni provider non effettuano alcun pagamento abbonamento a Luxury (anche se creati come Premium) e
                   sono esclusi dai conteggi «a pagamento» nelle statistiche.
                 </p>
-                <div className="velvet-plans-provider__options">
-                  <label className="velvet-plans-provider__option">
+                <div className="luxury-plans-provider__options">
+                  <label className="luxury-plans-provider__option">
                     <input
                       type="radio"
                       name={`${idPrefix}-provider`}
@@ -840,7 +840,7 @@ export function AdminSalonPlanSection({
                     />
                     <span>No — salone standard</span>
                   </label>
-                  <label className="velvet-plans-provider__option">
+                  <label className="luxury-plans-provider__option">
                     <input
                       type="radio"
                       name={`${idPrefix}-provider`}
@@ -852,7 +852,7 @@ export function AdminSalonPlanSection({
                   </label>
                 </div>
               </fieldset>
-              <label className="velvet-plans-field velvet-plans-field--full">
+              <label className="luxury-plans-field luxury-plans-field--full">
                 <span>Nome del salone</span>
                 <input
                   value={createSalonForm.salonName}
@@ -862,7 +862,7 @@ export function AdminSalonPlanSection({
                   maxLength={200}
                 />
               </label>
-              <label className="velvet-plans-field velvet-plans-field--full">
+              <label className="luxury-plans-field luxury-plans-field--full">
                 <span>Indirizzo sede (via e civico)</span>
                 <input
                   value={createSalonForm.salonAddressLine1}
@@ -872,7 +872,7 @@ export function AdminSalonPlanSection({
                   maxLength={200}
                 />
               </label>
-              <label className="velvet-plans-field">
+              <label className="luxury-plans-field">
                 <span>CAP</span>
                 <input
                   value={createSalonForm.salonPostalCode}
@@ -882,7 +882,7 @@ export function AdminSalonPlanSection({
                   maxLength={12}
                 />
               </label>
-              <label className="velvet-plans-field">
+              <label className="luxury-plans-field">
                 <span>Città</span>
                 <input
                   value={createSalonForm.salonCity}
@@ -892,7 +892,7 @@ export function AdminSalonPlanSection({
                   maxLength={100}
                 />
               </label>
-              <label className="velvet-plans-field">
+              <label className="luxury-plans-field">
                 <span>Provincia (sigla)</span>
                 <input
                   value={createSalonForm.salonProvince}
@@ -903,7 +903,7 @@ export function AdminSalonPlanSection({
                   placeholder="es. MI"
                 />
               </label>
-              <label className="velvet-plans-field">
+              <label className="luxury-plans-field">
                 <span>Paese (ISO)</span>
                 <input
                   value={createSalonForm.salonCountry}
@@ -913,8 +913,8 @@ export function AdminSalonPlanSection({
                   placeholder="IT"
                 />
               </label>
-              <div className="velvet-plans-password-pair">
-                <label className="velvet-plans-field">
+              <div className="luxury-plans-password-pair">
+                <label className="luxury-plans-field">
                   <span>Password</span>
                   <input
                     type="password"
@@ -926,7 +926,7 @@ export function AdminSalonPlanSection({
                     maxLength={200}
                   />
                 </label>
-                <label className="velvet-plans-field">
+                <label className="luxury-plans-field">
                   <span>Ripeti password</span>
                   <input
                     type="password"
@@ -939,8 +939,8 @@ export function AdminSalonPlanSection({
                   />
                 </label>
               </div>
-              <div className="velvet-plans-privacy-terms velvet-plans-field--full">
-                <label className="velvet-plans-field velvet-plans-field--check">
+              <div className="luxury-plans-privacy-terms luxury-plans-field--full">
+                <label className="luxury-plans-field luxury-plans-field--check">
                   <input
                     type="checkbox"
                     checked={createSalonForm.acceptTerms}
@@ -949,11 +949,11 @@ export function AdminSalonPlanSection({
                   />
                   <span>
                     Dichiaro di aver letto e accetto i{" "}
-                    <Link to="/termini" className="velvet-link-inline" target="_blank" rel="noopener noreferrer">
+                    <Link to="/termini" className="luxury-link-inline" target="_blank" rel="noopener noreferrer">
                       termini di servizio
                     </Link>{" "}
                     e l&apos;
-                    <Link to="/privacy" className="velvet-link-inline" target="_blank" rel="noopener noreferrer">
+                    <Link to="/privacy" className="luxury-link-inline" target="_blank" rel="noopener noreferrer">
                       informativa privacy
                     </Link>
                     .
@@ -961,23 +961,23 @@ export function AdminSalonPlanSection({
                 </label>
                 <button
                   type="button"
-                  className="velvet-plans-privacy-open"
+                  className="luxury-plans-privacy-open"
                   onClick={() => setPrivacyNoticeOpen(true)}
                   disabled={createSalonM.isPending}
                 >
                   Leggi info e privacy
                 </button>
               </div>
-              <div className="velvet-plans-modal__actions">
+              <div className="luxury-plans-modal__actions">
                 <button
                   type="button"
-                  className="velvet-plan-cta velvet-plan-cta--secondary"
+                  className="luxury-plan-cta luxury-plan-cta--secondary"
                   onClick={() => setShowCreateForm(false)}
                   disabled={createSalonM.isPending}
                 >
                   Annulla
                 </button>
-                <button type="submit" className="velvet-plan-cta" disabled={createSalonM.isPending}>
+                <button type="submit" className="luxury-plan-cta" disabled={createSalonM.isPending}>
                   {createSalonM.isPending ? "Creazione account…" : "Crea account e continua"}
                 </button>
               </div>

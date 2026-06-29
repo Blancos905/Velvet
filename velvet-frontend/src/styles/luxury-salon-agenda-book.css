@@ -1,0 +1,202 @@
+.luxury-salon-agenda-book-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(12, 4, 2, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.luxury-salon-agenda-book {
+  width: min(100%, 32rem);
+  max-height: min(92vh, 44rem);
+  overflow: auto;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 237, 213, 0.14);
+  background: linear-gradient(165deg, rgba(45, 16, 6, 0.98) 0%, rgba(24, 8, 3, 0.99) 100%);
+  box-shadow:
+    0 0 0 1px #000 inset,
+    0 24px 56px rgba(0, 0, 0, 0.55);
+}
+
+.luxury-salon-agenda-book__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1.25rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 237, 213, 0.1);
+}
+
+.luxury-salon-agenda-book__title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff7ed;
+}
+
+.luxury-salon-agenda-book__close {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: rgba(255, 251, 235, 0.75);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+}
+
+.luxury-salon-agenda-book__close:hover {
+  color: #fdba74;
+}
+
+.luxury-salon-agenda-book__body {
+  padding: 1rem 1.25rem 1.25rem;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.luxury-salon-agenda-book__operator-line {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(249, 115, 22, 0.28);
+  background: rgba(249, 115, 22, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.65rem;
+}
+
+.luxury-salon-agenda-book__operator-line strong {
+  color: #fff7ed;
+  font-size: 1rem;
+}
+
+.luxury-salon-agenda-book__notify-hint {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.luxury-salon-agenda-book__fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.luxury-salon-agenda-book__legend {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(253, 186, 116, 0.9);
+}
+
+.luxury-salon-agenda-book__mode-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+.luxury-salon-agenda-book__radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.92rem;
+  color: rgba(255, 251, 235, 0.88);
+  cursor: pointer;
+}
+
+.luxury-salon-agenda-book__field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.luxury-salon-agenda-book__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 251, 235, 0.65);
+}
+
+.luxury-salon-agenda-book__input,
+.luxury-salon-agenda-book__select {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 237, 213, 0.18);
+  background: rgba(12, 4, 2, 0.55);
+  color: #fff7ed;
+  font: inherit;
+}
+
+.luxury-salon-agenda-book__hint {
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.luxury-salon-agenda-book__slots {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.luxury-salon-agenda-book__slot-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.luxury-salon-agenda-book__slot {
+  min-width: 4.1rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 237, 213, 0.2);
+  background: rgba(24, 8, 3, 0.5);
+  color: #fff7ed;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.luxury-salon-agenda-book__slot:hover {
+  border-color: rgba(249, 115, 22, 0.55);
+}
+
+.luxury-salon-agenda-book__slot--active {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.22);
+  box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.35);
+}
+
+.luxury-salon-agenda-book__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  margin-top: 0.35rem;
+}
+
+.luxury-salon-agenda__toolbar-book {
+  margin-left: auto;
+}
+
+@media (max-width: 520px) {
+  .luxury-salon-agenda__toolbar {
+    flex-wrap: wrap;
+  }
+
+  .luxury-salon-agenda__toolbar-book {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .luxury-salon-agenda__toolbar-book .luxury-btn {
+    width: 100%;
+  }
+}

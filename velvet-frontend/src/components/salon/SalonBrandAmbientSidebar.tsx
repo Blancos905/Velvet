@@ -13,8 +13,8 @@ type Props = {
  */
 export function SalonBrandAmbientSidebar({ selectedIndex, onSelect }: Props) {
   return (
-    <aside className="velvet-brand-layout-sidebar velvet-brand-ambient-sidebar" aria-label="Sfondi animati card vetrina">
-      <p className="velvet-brand-layout-sidebar__head">100 sfondi · scena</p>
+    <aside className="luxury-brand-layout-sidebar luxury-brand-ambient-sidebar" aria-label="Sfondi animati card vetrina">
+      <p className="luxury-brand-layout-sidebar__head">100 sfondi · scena</p>
       <ul>
         {PREVIEW_ANIMATED_BG_LABELS.map((label, i) => {
           const active = selectedIndex === i;
@@ -22,20 +22,20 @@ export function SalonBrandAmbientSidebar({ selectedIndex, onSelect }: Props) {
             <li key={`ambient-bg-${i}`}>
               <button
                 type="button"
-                className={`velvet-brand-layout-sidebar__item${active ? " velvet-brand-layout-sidebar__item--active" : ""}`}
+                className={`luxury-brand-layout-sidebar__item${active ? " luxury-brand-layout-sidebar__item--active" : ""}`}
                 onClick={() => onSelect(i)}
                 aria-pressed={active}
                 title={label}
               >
-                <span className="velvet-brand-layout-sidebar__item-index" aria-hidden="true">
+                <span className="luxury-brand-layout-sidebar__item-index" aria-hidden="true">
                   {String(i + 1).padStart(3, "0")}
                 </span>
                 <span
-                  className="velvet-brand-ambient-sidebar__thumb"
+                  className="luxury-brand-ambient-sidebar__thumb"
                   style={{ background: PREVIEW_AMBIENT_SWATCH_HEX[i] ?? "#64748b" }}
                   aria-hidden={true}
                 />
-                <span className="velvet-brand-layout-sidebar__item-text">{label}</span>
+                <span className="luxury-brand-layout-sidebar__item-text">{label}</span>
               </button>
             </li>
           );

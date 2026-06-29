@@ -6,6 +6,9 @@ import it.velvet.admin.dto.SuperAdminOverviewDtos.SuperAdminRecentSalonRow;
 import it.velvet.admin.dto.SuperAdminOverviewDtos.SuperAdminSalonStaffRow;
 import it.velvet.admin.dto.SuperAdminOverviewDtos.SuperAdminPlatformReviewRow;
 import it.velvet.review.dto.SuperAdminSalonReviewSummaryRow;
+import it.velvet.billing.domain.BillingAccount;
+import it.velvet.billing.domain.BillingAccountRepository;
+import it.velvet.billing.domain.SalonSubscriptionBillingCategory;
 import it.velvet.appointment.domain.AppointmentRepository;
 import it.velvet.catalog.domain.StaffOperator;
 import it.velvet.catalog.domain.StaffOperatorRepository;
@@ -36,6 +39,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -70,6 +74,7 @@ public class SuperAdminOverviewActionsService {
 	private final PlatformReviewRepository platformReviewRepository;
 	private final StaffOperatorRepository staffOperatorRepository;
 	private final AppointmentRepository appointmentRepository;
+	private final BillingAccountRepository billingAccountRepository;
 	private final SuperAdminProfileAccessNotificationService profileAccessNotificationService;
 	private final PendingRegistrationRepository pendingRegistrationRepository;
 	private final ConsumerAccountService consumerAccountService;
@@ -90,6 +95,7 @@ public class SuperAdminOverviewActionsService {
 			PlatformReviewRepository platformReviewRepository,
 			StaffOperatorRepository staffOperatorRepository,
 			AppointmentRepository appointmentRepository,
+			BillingAccountRepository billingAccountRepository,
 			SuperAdminProfileAccessNotificationService profileAccessNotificationService,
 			PendingRegistrationRepository pendingRegistrationRepository,
 			ConsumerAccountService consumerAccountService) {
@@ -108,19 +114,43 @@ public class SuperAdminOverviewActionsService {
 		this.platformReviewRepository = platformReviewRepository;
 		this.staffOperatorRepository = staffOperatorRepository;
 		this.appointmentRepository = appointmentRepository;
+		this.billingAccountRepository = billingAccountRepository;
 		this.profileAccessNotificationService = profileAccessNotificationService;
 		this.pendingRegistrationRepository = pendingRegistrationRepository;
 		this.consumerAccountService = consumerAccountService;
 	}
 
 	@Transactional(readOnly = true)
-	public Page<SuperAdminRecentSalonRow> listSalons(Pageable pageable, String planTier) {
-		Page<StudioGroup> groups = planTier != null && !planTier.isBlank()
-				? studioGroupRepository.findByPlanTierIgnoreCase(planTier, pageable)
-				: studioGroupRepository.findAll(pageable);
+	public Page<SuperAdminRecentSalonRow> listSalons(Pageable pageable, String planTier, String subscriptionBilling) {
+		SalonSubscriptionBillingCategory billingCategory = SalonSubscriptionBillingCategory.parseFilter(subscriptionBilling);
+		Page<StudioGroup> groups;
+		if (billingCategory != null) {
+			groups = switch (billingCategory) {
+				case PAYING -> billingAccountRepository.findPageSubscribedPayingNonProvider(pageable);
+				case TRIAL -> billingAccountRepository.findPageSubscribedTrialNonProvider(pageable);
+				case CANCELLED -> billingAccountRepository.findPageSubscribedCancelledNonProvider(pageable);
+			};
+		}
+		else {
+			groups = planTier != null && !planTier.isBlank()
+					? studioGroupRepository.findByPlanTierIgnoreCase(planTier, pageable)
+					: studioGroupRepository.findAll(pageable);
+		}
 		List<UUID> pageIds = groups.getContent().stream().map(StudioGroup::getId).toList();
 		Map<UUID, List<SuperAdminSalonStaffRow>> staffByGroup = loadStaffRowsForStudioGroups(pageIds);
-		return groups.map(g -> toRecentSalonRow(g, staffByGroup.getOrDefault(g.getId(), List.of())));
+		Map<UUID, BillingAccount> billingByGroup = loadBillingAccounts(pageIds);
+		return groups.map(g -> toRecentSalonRow(g, staffByGroup.getOrDefault(g.getId(), List.of()), billingByGroup.get(g.getId())));
+	}
+
+	private Map<UUID, BillingAccount> loadBillingAccounts(List<UUID> studioGroupIds) {
+		if (studioGroupIds.isEmpty()) {
+			return Map.of();
+		}
+		Map<UUID, BillingAccount> out = new HashMap<>();
+		for (BillingAccount account : billingAccountRepository.findByStudioGroup_IdIn(studioGroupIds)) {
+			out.put(account.getStudioGroupId(), account);
+		}
+		return out;
 	}
 
 	private Map<UUID, List<SuperAdminSalonStaffRow>> loadStaffRowsForStudioGroups(List<UUID> studioGroupIds) {
@@ -131,7 +161,8 @@ public class SuperAdminOverviewActionsService {
 		return SuperAdminSalonStaffRowMapper.groupByStudioGroupId(ops);
 	}
 
-	private SuperAdminRecentSalonRow toRecentSalonRow(StudioGroup g, List<SuperAdminSalonStaffRow> staff) {
+	private SuperAdminRecentSalonRow toRecentSalonRow(
+			StudioGroup g, List<SuperAdminSalonStaffRow> staff, BillingAccount billingAccount) {
 		List<Location> locations = locationRepository.findByStudioGroup_IdOrderByNameAsc(g.getId());
 		Location first = locations.isEmpty() ? null : locations.get(0);
 		String city = locations.stream()
@@ -141,6 +172,9 @@ public class SuperAdminOverviewActionsService {
 				.filter(s -> !s.isEmpty())
 				.findFirst()
 				.orElse(first != null ? first.getCity() : null);
+		SalonSubscriptionBillingCategory category = g.isProvider()
+				? null
+				: SalonSubscriptionBillingCategory.fromBillingAccount(billingAccount);
 		return new SuperAdminRecentSalonRow(
 				g.getId(),
 				g.getName(),
@@ -151,7 +185,11 @@ public class SuperAdminOverviewActionsService {
 				city,
 				g.getCreatedAt(),
 				g.isProvider(),
-				staff);
+				staff,
+				billingAccount != null ? billingAccount.getSubscriptionStatus() : null,
+				billingAccount != null ? billingAccount.isCancelAtPeriodEnd() : null,
+				billingAccount != null ? billingAccount.getCurrentPeriodEnd() : null,
+				category != null ? category.name() : null);
 	}
 
 	@Transactional(readOnly = true)
@@ -324,7 +362,7 @@ public class SuperAdminOverviewActionsService {
 				group.getId());
 		jdbcTemplate.update(
 				"""
-				delete from salon_velvet_chat_messages
+				delete from salon_luxury_chat_messages
 				where salon_client_id in (
 					select id from salon_clients
 					where location_id in (select id from locations where studio_group_id = ?)
@@ -333,7 +371,7 @@ public class SuperAdminOverviewActionsService {
 				group.getId());
 		jdbcTemplate.update(
 				"""
-				delete from salon_velvet_chat_read_state
+				delete from salon_luxury_chat_read_state
 				where salon_client_id in (
 					select id from salon_clients
 					where location_id in (select id from locations where studio_group_id = ?)
@@ -442,7 +480,7 @@ public class SuperAdminOverviewActionsService {
 				.orElseThrow(() -> new BusinessException(
 						HttpStatus.BAD_REQUEST,
 						"OWNER_PROFILE_NOT_FOUND",
-						"Nessun account Velvet attivo per l’email titolare del salone. Verifica che il titolare sia registrato con la stessa email."));
+						"Nessun account Saloni Luxury attivo per l’email titolare del salone. Verifica che il titolare sia registrato con la stessa email."));
 		salonOwnerRoleAlignmentService.alignAfterSuccessfulPasswordLogin(profile);
 		ConsumerProfile forToken = consumerProfileRepository.findById(profile.getId()).orElse(profile);
 		String accessToken = velvetTokenService.createAccessToken(forToken);
@@ -479,7 +517,7 @@ public class SuperAdminOverviewActionsService {
 		validateSystemNotificationBody(body);
 		String message = body.message().trim();
 		String subjectRaw = body.subject() != null ? body.subject().trim() : "";
-		String subject = subjectRaw.isEmpty() ? "Messaggio da Velvet" : subjectRaw;
+		String subject = subjectRaw.isEmpty() ? "Messaggio da Saloni Luxury" : subjectRaw;
 		List<UUID> ids = parseStudioGroupIdList(body.studioGroupIds());
 		if (ids.size() > 200) {
 			throw new BusinessException(

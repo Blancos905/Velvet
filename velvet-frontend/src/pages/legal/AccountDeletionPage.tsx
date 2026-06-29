@@ -47,21 +47,21 @@ export default function AccountDeletionPage() {
         },
       ]}
     >
-      <section className="velvet-legal-public__section">
-        <h2 className="velvet-legal-public__section-title">Avvia eliminazione (con account)</h2>
-        <ul className="velvet-legal-public__actions">
+      <section className="luxury-legal-public__section">
+        <h2 className="luxury-legal-public__section-title">Avvia eliminazione (con account)</h2>
+        <ul className="luxury-legal-public__actions">
           <li>
-            <Link to="/account/profilo" className="velvet-legal-public__action-link">
+            <Link to="/account/profilo" className="luxury-legal-public__action-link">
               Vai a Profilo → Chiudi account
             </Link>
           </li>
           <li>
-            <Link to="/account" className="velvet-legal-public__action-link">
+            <Link to="/account" className="luxury-legal-public__action-link">
               Accedi all’area account
             </Link>
           </li>
           <li>
-            <a href={"mailto:" + LEGAL_CONTACT_EMAIL} className="velvet-legal-public__action-link">
+            <a href={"mailto:" + LEGAL_CONTACT_EMAIL} className="luxury-legal-public__action-link">
               Scrivi a {LEGAL_CONTACT_EMAIL}
             </a>
           </li>

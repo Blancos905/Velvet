@@ -92,6 +92,18 @@ class VelvetPublicEndpointsSmokeTest {
 	}
 
 	@Test
+	void publicCookieConsentRecord_returnsCreated() throws Exception {
+		String body =
+				"""
+				{"visitorId":"550e8400-e29b-41d4-a716-446655440000","version":2,"decidedAt":"2026-06-25T10:00:00.000Z","action":"accept_all","maps":true,"editorial":true,"policyVersion":"2026-06-25"}
+				""";
+		mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/v1/public/cookie-consent")
+						.contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+						.content(body))
+				.andExpect(status().isCreated());
+	}
+
+	@Test
 	void adminOverview_requiresAuth() throws Exception {
 		mockMvc.perform(get("/api/v1/admin/overview")).andExpect(status().isUnauthorized());
 	}

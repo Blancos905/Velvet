@@ -48,37 +48,37 @@ class TransactionalEmailDispatchServiceTest {
 
 	@Test
 	void resolveRecipientEmail_confirmation_prefersConsumerProfile() {
-		ConsumerProfile consumer = new ConsumerProfile("sub-1", "cliente@gmail.com", "Cliente");
+		ConsumerProfile consumer = new ConsumerProfile("sub-1", "cliente@example.org", "Cliente");
 		SalonClient salonClient = mock(SalonClient.class);
-		when(salonClient.getEmail()).thenReturn("altro@gmail.com");
+		when(salonClient.getEmail()).thenReturn("altro@example.org");
 		Appointment appointment = appointmentWith(consumer, salonClient);
 
 		assertThat(TransactionalEmailDispatchService.resolveRecipientEmail(
 						NotificationType.BOOKING_CONFIRMATION, appointment))
-				.isEqualTo("cliente@gmail.com");
+				.isEqualTo("cliente@example.org");
 	}
 
 	@Test
 	void resolveRecipientEmail_confirmation_fallsBackToSalonClient() {
-		Appointment appointment = appointmentWith(null, salonClientWithEmail("cliente.salone@gmail.com"));
+		Appointment appointment = appointmentWith(null, salonClientWithEmail("cliente.salone@example.org"));
 
 		assertThat(TransactionalEmailDispatchService.resolveRecipientEmail(
 						NotificationType.BOOKING_CONFIRMATION, appointment))
-				.isEqualTo("cliente.salone@gmail.com");
+				.isEqualTo("cliente.salone@example.org");
 	}
 
 	@Test
 	void resolveRecipientEmail_reminder_usesOnlyConsumerProfile() {
-		ConsumerProfile consumer = new ConsumerProfile("sub-1", "cliente@gmail.com", "Cliente");
+		ConsumerProfile consumer = new ConsumerProfile("sub-1", "cliente@example.org", "Cliente");
 		Appointment appointment = appointmentWith(consumer, null);
 
 		assertThat(TransactionalEmailDispatchService.resolveRecipientEmail(NotificationType.REMINDER_24H, appointment))
-				.isEqualTo("cliente@gmail.com");
+				.isEqualTo("cliente@example.org");
 	}
 
 	@Test
 	void resolveRecipientEmail_reminder_withoutConsumer_returnsNull() {
-		Appointment appointment = appointmentWith(null, salonClientWithEmail("altro@gmail.com"));
+		Appointment appointment = appointmentWith(null, salonClientWithEmail("altro@example.org"));
 
 		assertThat(TransactionalEmailDispatchService.resolveRecipientEmail(NotificationType.REMINDER_1H, appointment))
 				.isNull();
@@ -87,7 +87,7 @@ class TransactionalEmailDispatchServiceTest {
 	@Test
 	void dispatch_whenDisabled_doesNotSend() {
 		mailProperties.setEnabled(false);
-		ConsumerProfile consumer = new ConsumerProfile("sub-1", "cliente@gmail.com", "Cliente");
+		ConsumerProfile consumer = new ConsumerProfile("sub-1", "cliente@example.org", "Cliente");
 		Appointment appointment = appointmentWith(consumer, null);
 
 		service.dispatchForBookingNotification(
@@ -110,7 +110,7 @@ class TransactionalEmailDispatchServiceTest {
 
 	@Test
 	void dispatch_whenEnabled_sendsPlainTextEmail() throws Exception {
-		ConsumerProfile consumer = new ConsumerProfile("sub-1", "cliente@gmail.com", "Cliente");
+		ConsumerProfile consumer = new ConsumerProfile("sub-1", "cliente@example.org", "Cliente");
 		Appointment appointment = appointmentWith(consumer, null);
 		when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
@@ -122,7 +122,7 @@ class TransactionalEmailDispatchServiceTest {
 
 	@Test
 	void dispatch_ignoresUnsupportedNotificationTypes() {
-		ConsumerProfile consumer = new ConsumerProfile("sub-1", "cliente@gmail.com", "Cliente");
+		ConsumerProfile consumer = new ConsumerProfile("sub-1", "cliente@example.org", "Cliente");
 		Appointment appointment = appointmentWith(consumer, null);
 
 		service.dispatchForBookingNotification(

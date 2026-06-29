@@ -38,7 +38,7 @@ public class MeSupportController {
 	}
 
 	@PostMapping("/requests")
-	@Operation(summary = "Invia richiesta assistenza al team Saloni Velvet")
+	@Operation(summary = "Invia richiesta assistenza al team Saloni Luxury")
 	@PreAuthorize("hasAnyAuthority('ROLE_CLIENT','ROLE_OWNER','ROLE_STAFF','ROLE_ADMIN')")
 	public ResponseEntity<SupportRequestAccepted> createRequest(
 			@AuthenticationPrincipal VelvetUserPrincipal principal,

@@ -83,30 +83,30 @@ export function AppHeaderProfileMenu({
   }, [location.pathname, location.search, location.hash]);
 
   return (
-    <div className="velvet-header-profile-menu" ref={profileMenuRef}>
+    <div className="luxury-header-profile-menu" ref={profileMenuRef}>
       <button
         ref={profileTriggerRef}
         type="button"
-        className={`velvet-header-cta-pill velvet-header-profile-trigger${profileMenuOpen ? " is-open" : ""}`}
+        className={`luxury-header-cta-pill luxury-header-profile-trigger${profileMenuOpen ? " is-open" : ""}`}
         aria-haspopup="menu"
         aria-expanded={profileMenuOpen}
-        aria-controls="velvet-header-profile-dropdown"
+        aria-controls="luxury-header-profile-dropdown"
         onClick={() => setProfileMenuOpen((open) => !open)}
       >
         Profilo
-        <span aria-hidden className="velvet-header-profile-caret">
+        <span aria-hidden className="luxury-header-profile-caret">
           ▾
         </span>
       </button>
       <div
         ref={profileDropdownRef}
-        id="velvet-header-profile-dropdown"
-        className={`velvet-header-profile-dropdown${profileMenuOpen ? " is-open" : ""}`}
+        id="luxury-header-profile-dropdown"
+        className={`luxury-header-profile-dropdown${profileMenuOpen ? " is-open" : ""}`}
         role="menu"
         aria-label={ariaLabel}
         aria-hidden={!profileMenuOpen}
       >
-        <p className="velvet-header-profile-dropdown__header" role="presentation">
+        <p className="luxury-header-profile-dropdown__header" role="presentation">
           {headerLabel}
         </p>
         {items.map((item) =>
@@ -115,7 +115,7 @@ export function AppHeaderProfileMenu({
               key={item.label}
               type="button"
               role="menuitem"
-              className="velvet-header-profile-item velvet-header-profile-item--button velvet-header-profile-item--logout"
+              className="luxury-header-profile-item luxury-header-profile-item--button luxury-header-profile-item--logout"
               onClick={() => void signOut()}
             >
               {item.label}
@@ -125,7 +125,7 @@ export function AppHeaderProfileMenu({
               key={item.label}
               to={item.to ?? "/"}
               role="menuitem"
-              className="velvet-header-profile-item"
+              className="luxury-header-profile-item"
               onClick={() => setProfileMenuOpen(false)}
             >
               {item.label}

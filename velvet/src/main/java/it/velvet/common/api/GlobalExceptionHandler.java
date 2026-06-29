@@ -3,6 +3,7 @@ package it.velvet.common.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -40,6 +42,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex) {
 		return ResponseEntity.status(HttpStatus.FORBIDDEN)
 				.body(new ApiError("FORBIDDEN", "Permessi insufficienti per questa operazione.", null));
+	}
+
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<ApiError> handleDataIntegrity(DataIntegrityViolationException ex) {
+		Optional<ApiError> mapped = VelvetDataIntegritySupport.toApiError(ex);
+		if (mapped.isPresent()) {
+			log.debug("Violazione integrità dati: {}", ex.getMessage());
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(mapped.get());
+		}
+		log.warn("Violazione integrità dati non mappata", ex);
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(new ApiError("DATA_INTEGRITY", "Operazione non consentita per conflitto sui dati.", null));
 	}
 
 	@ExceptionHandler({ CannotCreateTransactionException.class, DataAccessException.class })

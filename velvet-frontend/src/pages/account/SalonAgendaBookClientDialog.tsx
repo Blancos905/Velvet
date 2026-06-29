@@ -8,7 +8,7 @@ import { useMeSalonSummaryQuery } from "../../hooks/useMeSalonSummary";
 import { notifySalonCatalogClientsChanged } from "../../lib/salonCatalogClientsSync";
 import { isSlotWithinBookingWindow, resolveBookingHoursWindow } from "../../lib/salonOpeningHours";
 import { formatLocalYmd } from "./SalonAgendaBoard";
-import "../../styles/velvet-salon-agenda-book.css";
+import "../../styles/luxury-salon-agenda-book.css";
 
 function normalizeApiDateYmd(date: string): string {
   return date.trim().slice(0, 10);
@@ -246,13 +246,13 @@ export function SalonAgendaBookClientDialog({
 
   const notificationHint = (() => {
     if (clientMode === "new") {
-      return "Cliente nuovo senza account Velvet: nessuna email di conferma verrà inviata.";
+      return "Cliente nuovo senza account Saloni Luxury: nessuna email di conferma verrà inviata.";
     }
-    if (selectedClient?.velvetConsumerLinked) {
-      return "Cliente registrato su Velvet: riceverà conferma e promemoria via email.";
+    if (selectedClient?.luxuryConsumerLinked) {
+      return "Cliente registrato su Saloni Luxury: riceverà conferma e promemoria via email.";
     }
     if (selectedClient) {
-      return "Cliente non registrato su Velvet: nessuna notifica email al cliente.";
+      return "Cliente non registrato su Saloni Luxury: nessuna notifica email al cliente.";
     }
     return null;
   })();
@@ -267,42 +267,42 @@ export function SalonAgendaBookClientDialog({
 
   return createPortal(
     <div
-      className="velvet-salon-agenda-book-root"
+      className="luxury-salon-agenda-book-root"
       role="presentation"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget && !busy) onClose();
       }}
     >
       <div
-        className="velvet-salon-agenda-book"
+        className="luxury-salon-agenda-book"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="velvet-salon-agenda-book-title"
+        aria-labelledby="luxury-salon-agenda-book-title"
       >
-        <header className="velvet-salon-agenda-book__head">
-          <h2 id="velvet-salon-agenda-book-title" className="velvet-salon-agenda-book__title">
+        <header className="luxury-salon-agenda-book__head">
+          <h2 id="luxury-salon-agenda-book-title" className="luxury-salon-agenda-book__title">
             Prenota un cliente
           </h2>
-          <button type="button" className="velvet-salon-agenda-book__close" onClick={onClose} disabled={busy}>
+          <button type="button" className="luxury-salon-agenda-book__close" onClick={onClose} disabled={busy}>
             Chiudi
           </button>
         </header>
 
         {!locationId || !slug ? (
-          <p className="velvet-alert velvet-alert--error" role="alert">
+          <p className="luxury-alert luxury-alert--error" role="alert">
             Sede del salone non disponibile. Attendi il caricamento o verifica la registrazione.
           </p>
         ) : (
-          <div className="velvet-salon-agenda-book__body">
-            <p className="velvet-salon-agenda-book__operator-line">
-              <span className="velvet-salon-agenda-book__label">Operatore</span>
+          <div className="luxury-salon-agenda-book__body">
+            <p className="luxury-salon-agenda-book__operator-line">
+              <span className="luxury-salon-agenda-book__label">Operatore</span>
               <strong>{operatorDisplay}</strong>
             </p>
 
-            <fieldset className="velvet-salon-agenda-book__fieldset">
-              <legend className="velvet-salon-agenda-book__legend">Cliente</legend>
-              <div className="velvet-salon-agenda-book__mode-row">
-                <label className="velvet-salon-agenda-book__radio">
+            <fieldset className="luxury-salon-agenda-book__fieldset">
+              <legend className="luxury-salon-agenda-book__legend">Cliente</legend>
+              <div className="luxury-salon-agenda-book__mode-row">
+                <label className="luxury-salon-agenda-book__radio">
                   <input
                     type="radio"
                     name="client-mode"
@@ -311,7 +311,7 @@ export function SalonAgendaBookClientDialog({
                   />
                   Anagrafica
                 </label>
-                <label className="velvet-salon-agenda-book__radio">
+                <label className="luxury-salon-agenda-book__radio">
                   <input
                     type="radio"
                     name="client-mode"
@@ -322,10 +322,10 @@ export function SalonAgendaBookClientDialog({
                 </label>
               </div>
               {clientMode === "existing" ? (
-                <label className="velvet-salon-agenda-book__field">
-                  <span className="velvet-salon-agenda-book__label">Cliente *</span>
+                <label className="luxury-salon-agenda-book__field">
+                  <span className="luxury-salon-agenda-book__label">Cliente *</span>
                   <select
-                    className="velvet-salon-agenda-book__select"
+                    className="luxury-salon-agenda-book__select"
                     value={salonClientId}
                     onChange={(e) => setSalonClientId(e.target.value)}
                     disabled={clientsQ.isLoading}
@@ -334,44 +334,44 @@ export function SalonAgendaBookClientDialog({
                     {(clientsQ.data ?? []).map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.displayName}
-                        {c.velvetConsumerLinked ? " · account Velvet" : ""}
+                        {c.luxuryConsumerLinked ? " · account Saloni Luxury" : ""}
                         {c.phone ? ` · ${c.phone}` : ""}
                       </option>
                     ))}
                   </select>
                   {clientsQ.data?.length === 0 && !clientsQ.isLoading ? (
-                    <span className="velvet-text-muted velvet-salon-agenda-book__hint">
+                    <span className="luxury-text-muted luxury-salon-agenda-book__hint">
                       Nessun cliente in anagrafica: usa «Nuovo cliente».
                     </span>
                   ) : null}
                 </label>
               ) : (
                 <>
-                  <label className="velvet-salon-agenda-book__field">
-                    <span className="velvet-salon-agenda-book__label">Nome *</span>
+                  <label className="luxury-salon-agenda-book__field">
+                    <span className="luxury-salon-agenda-book__label">Nome *</span>
                     <input
-                      className="velvet-salon-agenda-book__input"
+                      className="luxury-salon-agenda-book__input"
                       value={newClientFirstName}
                       onChange={(e) => setNewClientFirstName(e.target.value)}
                       autoComplete="given-name"
                     />
                   </label>
-                  <label className="velvet-salon-agenda-book__field">
-                    <span className="velvet-salon-agenda-book__label">Cognome *</span>
+                  <label className="luxury-salon-agenda-book__field">
+                    <span className="luxury-salon-agenda-book__label">Cognome *</span>
                     <input
-                      className="velvet-salon-agenda-book__input"
+                      className="luxury-salon-agenda-book__input"
                       value={newClientLastName}
                       onChange={(e) => setNewClientLastName(e.target.value)}
                       autoComplete="family-name"
                     />
                   </label>
-                  <p className="velvet-text-muted velvet-salon-agenda-book__hint">
-                    Email e telefono sono facoltativi. Senza account Velvet il cliente non riceve email.
+                  <p className="luxury-text-muted luxury-salon-agenda-book__hint">
+                    Email e telefono sono facoltativi. Senza account Saloni Luxury il cliente non riceve email.
                   </p>
-                  <label className="velvet-salon-agenda-book__field">
-                    <span className="velvet-salon-agenda-book__label">Email (opzionale)</span>
+                  <label className="luxury-salon-agenda-book__field">
+                    <span className="luxury-salon-agenda-book__label">Email (opzionale)</span>
                     <input
-                      className="velvet-salon-agenda-book__input"
+                      className="luxury-salon-agenda-book__input"
                       type="text"
                       inputMode="email"
                       autoCapitalize="off"
@@ -381,10 +381,10 @@ export function SalonAgendaBookClientDialog({
                       placeholder="es. maria@email.it"
                     />
                   </label>
-                  <label className="velvet-salon-agenda-book__field">
-                    <span className="velvet-salon-agenda-book__label">Telefono (opzionale)</span>
+                  <label className="luxury-salon-agenda-book__field">
+                    <span className="luxury-salon-agenda-book__label">Telefono (opzionale)</span>
                     <input
-                      className="velvet-salon-agenda-book__input"
+                      className="luxury-salon-agenda-book__input"
                       type="tel"
                       value={newClientPhone}
                       onChange={(e) => setNewClientPhone(e.target.value)}
@@ -395,14 +395,14 @@ export function SalonAgendaBookClientDialog({
                 </>
               )}
               {notificationHint ? (
-                <p className="velvet-salon-agenda-book__notify-hint velvet-text-muted">{notificationHint}</p>
+                <p className="luxury-salon-agenda-book__notify-hint luxury-text-muted">{notificationHint}</p>
               ) : null}
             </fieldset>
 
-            <label className="velvet-salon-agenda-book__field">
-              <span className="velvet-salon-agenda-book__label">Servizio *</span>
+            <label className="luxury-salon-agenda-book__field">
+              <span className="luxury-salon-agenda-book__label">Servizio *</span>
               <select
-                className="velvet-salon-agenda-book__select"
+                className="luxury-salon-agenda-book__select"
                 value={serviceId}
                 onChange={(e) => {
                   setServiceId(e.target.value);
@@ -419,17 +419,17 @@ export function SalonAgendaBookClientDialog({
                 ))}
               </select>
               {servicesForOperator.length === 0 && !servicesQ.isLoading ? (
-                <span className="velvet-text-muted velvet-salon-agenda-book__hint">
+                <span className="luxury-text-muted luxury-salon-agenda-book__hint">
                   Nessun servizio abilitato per {operatorDisplay}. Collega i servizi allo staff in Aggiungi servizi.
                 </span>
               ) : null}
             </label>
 
-            <label className="velvet-salon-agenda-book__field">
-              <span className="velvet-salon-agenda-book__label">Giorno *</span>
+            <label className="luxury-salon-agenda-book__field">
+              <span className="luxury-salon-agenda-book__label">Giorno *</span>
               <input
                 type="date"
-                className="velvet-salon-agenda-book__input"
+                className="luxury-salon-agenda-book__input"
                 value={dateYmd}
                 onChange={(e) => {
                   setDateYmd(e.target.value);
@@ -439,25 +439,25 @@ export function SalonAgendaBookClientDialog({
             </label>
 
             {canPickTime ? (
-              <label className="velvet-salon-agenda-book__field">
-                <span className="velvet-salon-agenda-book__label">Orario *</span>
+              <label className="luxury-salon-agenda-book__field">
+                <span className="luxury-salon-agenda-book__label">Orario *</span>
                 {availabilityQ.isLoading || availabilityQ.isFetching ? (
-                  <p className="velvet-text-muted" style={{ margin: 0 }}>
+                  <p className="luxury-text-muted" style={{ margin: 0 }}>
                     Caricamento orari disponibili…
                   </p>
                 ) : availabilityQ.isError ? (
-                  <p className="velvet-alert velvet-alert--error" role="alert">
+                  <p className="luxury-alert luxury-alert--error" role="alert">
                     {availabilityQ.error instanceof Error
                       ? availabilityQ.error.message
                       : "Impossibile leggere gli orari liberi."}
                   </p>
                 ) : daySlots.length === 0 ? (
-                  <p className="velvet-text-muted" style={{ margin: 0 }}>
+                  <p className="luxury-text-muted" style={{ margin: 0 }}>
                     Nessun orario libero in questo giorno. Scegli un altro giorno o un altro servizio.
                   </p>
                 ) : (
                   <select
-                    className="velvet-salon-agenda-book__select"
+                    className="luxury-salon-agenda-book__select"
                     value={slotIso}
                     onChange={(e) => setSlotIso(e.target.value)}
                     aria-label="Orario disponibile"
@@ -474,16 +474,16 @@ export function SalonAgendaBookClientDialog({
             ) : null}
 
             {formMsg ? (
-              <p className="velvet-alert velvet-alert--error" role="alert">
+              <p className="luxury-alert luxury-alert--error" role="alert">
                 {formMsg}
               </p>
             ) : null}
 
-            <div className="velvet-salon-agenda-book__actions">
-              <button type="button" className="velvet-btn velvet-btn--ghost" onClick={onClose} disabled={busy}>
+            <div className="luxury-salon-agenda-book__actions">
+              <button type="button" className="luxury-btn luxury-btn--ghost" onClick={onClose} disabled={busy}>
                 Annulla
               </button>
-              <button type="button" className="velvet-btn velvet-btn--primary" onClick={() => void onSubmit()} disabled={busy}>
+              <button type="button" className="luxury-btn luxury-btn--primary" onClick={() => void onSubmit()} disabled={busy}>
                 {busy ? "Salvataggio…" : "Conferma appuntamento"}
               </button>
             </div>

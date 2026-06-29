@@ -3,25 +3,25 @@
 }
 
 :root {
-  --velvet-orange: #f97316;
-  --velvet-orange-dark: #ea580c;
-  --velvet-orange-soft: #fff7ed;
-  --velvet-orange-deep: #7c2d12;
-  --velvet-black: #0a0a0a;
-  --velvet-gray-900: #171717;
-  --velvet-gray-700: #404040;
-  --velvet-gray-500: #737373;
-  --velvet-white: #fafafa;
-  --velvet-surface: #ffffff;
-  --velvet-font: "DM Sans", system-ui, -apple-system, sans-serif;
+  --luxury-orange: #f97316;
+  --luxury-orange-dark: #ea580c;
+  --luxury-orange-soft: #fff7ed;
+  --luxury-orange-deep: #7c2d12;
+  --luxury-black: #0a0a0a;
+  --luxury-gray-900: #171717;
+  --luxury-gray-700: #404040;
+  --luxury-gray-500: #737373;
+  --luxury-white: #fafafa;
+  --luxury-surface: #ffffff;
+  --luxury-font: "DM Sans", system-ui, -apple-system, sans-serif;
   /* Superfici coerenti con sfondo tutto arancio */
-  --velvet-glass-dark: rgba(67, 20, 7, 0.55);
-  --velvet-glass-mid: rgba(124, 45, 18, 0.5);
-  --velvet-glass-light: rgba(255, 247, 237, 0.14);
-  --velvet-link-warm: #ffedd5;
-  --velvet-link-accent: #fdba74;
+  --luxury-glass-dark: rgba(67, 20, 7, 0.55);
+  --luxury-glass-mid: rgba(124, 45, 18, 0.5);
+  --luxury-glass-light: rgba(255, 247, 237, 0.14);
+  --luxury-link-warm: #ffedd5;
+  --luxury-link-accent: #fdba74;
   /* Stesso gradiente ovunque (account, ecc.) — niente “fascia” bianca */
-  --velvet-body-gradient: linear-gradient(
+  --luxury-body-gradient: linear-gradient(
     168deg,
     #7c2d12 0%,
     #9a3412 20%,
@@ -40,13 +40,13 @@ html {
   min-height: 100vh;
   min-height: 100dvh;
   background-color: #9a3412;
-  background-image: var(--velvet-body-gradient);
+  background-image: var(--luxury-body-gradient);
   background-attachment: fixed;
 }
 
 body {
   margin: 0;
-  font-family: var(--velvet-font);
+  font-family: var(--luxury-font);
   color: #e5e5e5;
   min-height: 100vh;
   min-height: 100dvh;
@@ -62,7 +62,7 @@ body {
   background: transparent;
 }
 
-.velvet-layout-main {
+.luxury-layout-main {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
@@ -71,7 +71,7 @@ body {
 }
 
 /* Area /admin: niente padding del layout pubblico (chrome già nascosto in RootLayout). */
-.velvet-layout-main--admin {
+.luxury-layout-main--admin {
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -79,37 +79,37 @@ body {
 
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid var(--velvet-orange);
+  outline: 2px solid var(--luxury-orange);
   outline-offset: 2px;
 }
 
-a.velvet-search-hit {
+a.luxury-search-hit {
   color: #fafafa !important;
 }
 
-a.velvet-search-hit:hover {
+a.luxury-search-hit:hover {
   color: #fdba74 !important;
 }
 
 /* Pagine interne (testo chiaro sul gradiente arancio) */
-.velvet-page-main {
+.luxury-page-main {
   padding: 2rem 24px 3rem;
   max-width: 720px;
   margin: 0 auto;
   color: rgba(255, 251, 235, 0.88);
 }
 
-.velvet-page-main > h1 {
+.luxury-page-main > h1 {
   color: #fffbeb;
 }
 
 /* Altezza vetrina /s/…: simmetrico sopra/sotto verso header e footer. */
 :root {
-  --velvet-immersive-chrome-top: clamp(96px, 17vw, 158px);
-  --velvet-immersive-chrome-bottom: clamp(72px, 12vh, 140px);
+  --luxury-immersive-chrome-top: clamp(96px, 17vw, 158px);
+  --luxury-immersive-chrome-bottom: clamp(72px, 12vh, 140px);
 }
 
-.velvet-page-main--salon-showcase-immersive {
+.luxury-page-main--salon-showcase-immersive {
   max-width: none;
   width: 100%;
   margin: 0;
@@ -117,7 +117,7 @@ a.velvet-search-hit:hover {
   overflow-x: clip;
 }
 
-.velvet-page-salon-after-showcase {
+.luxury-page-salon-after-showcase {
   max-width: 720px;
   margin: 0 auto;
   padding: 0 24px 1.25rem;
@@ -125,7 +125,7 @@ a.velvet-search-hit:hover {
 }
 
 /* Con vetrina: contatti sotto la card (prenotazione spostata altrove). */
-.velvet-page-salon-meta-below-showcase {
+.luxury-page-salon-meta-below-showcase {
   margin-top: clamp(0.75rem, 2.5vw, 1.35rem);
   padding-top: clamp(0.65rem, 2vw, 1.1rem);
   border-top: 1px solid rgba(255, 251, 235, 0.12);
@@ -135,26 +135,26 @@ a.velvet-search-hit:hover {
  * App mobile (WebView): pseudo-elementi con inset negativo (hero, header) allargano
  * scrollWidth oltre lo schermo → fascia vuota a destra (sfondo shell Flutter).
  */
-html.velvet-native-app {
+html.luxury-native-app {
   width: 100%;
   overflow-x: hidden;
   background-attachment: scroll;
 }
 
-html.velvet-native-app body,
-html.velvet-native-app #root,
-html.velvet-native-app .velvet-layout-main {
+html.luxury-native-app body,
+html.luxury-native-app #root,
+html.luxury-native-app .luxury-layout-main {
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
 }
 
-.velvet-native-app .velvet-site-header,
-.velvet-native-app .velvet-hero-wrap {
+.luxury-native-app .luxury-site-header,
+.luxury-native-app .luxury-hero-wrap {
   overflow-x: clip;
 }
 
-.velvet-native-app .velvet-hero-wrap::before {
+.luxury-native-app .luxury-hero-wrap::before {
   left: 0;
   right: 0;
   width: 100%;

@@ -29,28 +29,28 @@ export function AdminLayout() {
   const salonUnreadLabel = salonUnread > 99 ? "99+" : String(salonUnread);
 
   return (
-    <div className="velvet-admin-shell velvet-admin-shell--velvet-plans">
-      <header className="velvet-admin-header">
-        <div className="velvet-admin-brand-block">
-          <div className="velvet-admin-brand-title">Gestione piattaforma</div>
-          <div className="velvet-admin-brand-sub">Super admin · Saloni Luxury</div>
+    <div className="luxury-admin-shell luxury-admin-shell--luxury-plans">
+      <header className="luxury-admin-header">
+        <div className="luxury-admin-brand-block">
+          <div className="luxury-admin-brand-title">Gestione piattaforma</div>
+          <div className="luxury-admin-brand-sub">Super admin · Saloni Luxury</div>
         </div>
         {!isProfilePage ? (
-          <nav className="velvet-admin-nav" aria-label="Sezioni pannello">
+          <nav className="luxury-admin-nav" aria-label="Sezioni pannello">
             <NavLink to="/admin/dashboard" className={({ isActive }) => (isActive ? "is-active" : "")} end>
               Panoramica
             </NavLink>
             <NavLink
               to="/admin/messaggi"
-              className={({ isActive }) => `velvet-admin-nav-link ${isActive ? "is-active" : ""}`}
+              className={({ isActive }) => `luxury-admin-nav-link ${isActive ? "is-active" : ""}`}
               title="Messaggi inviati da titolari e staff salone dal modulo Assistenza"
               aria-label={
                 salonUnread > 0 ? `Messaggi, ${salonUnread} richieste non lette dai saloni` : "Messaggi dai saloni"
               }
             >
-              <span className="velvet-admin-nav-link__text">Messaggi</span>
+              <span className="luxury-admin-nav-link__text">Messaggi</span>
               {salonUnread > 0 ? (
-                <span className="velvet-admin-nav-badge" aria-hidden={true}>
+                <span className="luxury-admin-nav-badge" aria-hidden={true}>
                   {salonUnreadLabel}
                 </span>
               ) : null}
@@ -62,18 +62,25 @@ export function AdminLayout() {
             >
               Assistenza
             </NavLink>
+            <NavLink
+              to="/admin/fatture"
+              className={({ isActive }) => (isActive ? "is-active" : "")}
+              title="Fatture elettroniche FatturaPA generate dai pagamenti Premium"
+            >
+              Fatture
+            </NavLink>
             <NavLink to="/admin/profilo" className={({ isActive }) => (isActive ? "is-active" : "")}>
               Profilo
             </NavLink>
           </nav>
         ) : null}
-        <div className="velvet-admin-header-actions">
-          <button type="button" className="velvet-plan-cta velvet-admin-header-cta" onClick={() => signOut()}>
+        <div className="luxury-admin-header-actions">
+          <button type="button" className="luxury-plan-cta luxury-admin-header-cta" onClick={() => signOut()}>
             Esci
           </button>
         </div>
       </header>
-      <main className="velvet-admin-main">
+      <main className="luxury-admin-main">
         <Outlet />
       </main>
     </div>

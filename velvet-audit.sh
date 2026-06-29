@@ -393,6 +393,18 @@ if [[ "$RUN_STORE" -eq 1 ]]; then
   assert_grep warn store "Link legali con embed per in-app" 'embed=1' \
     "$ROOT_DIR/velvet-frontend/src/content/velvetLegalPanelPaths.ts"
 
+  echo ""
+  echo "${C_CYAN}▶ [store] Paywall nativo senza prezzo abbonamento (Apple 3.1.1)${C_RESET}"
+  if grep -qE 'AL MESE|_PriceBlock|Passa a' "$ROOT_DIR/velvet-app/lib/shell/velvet_premium_paywall_dialog.dart" 2>/dev/null; then
+    echo "${C_RED}✘ [store] Paywall nativo contiene prezzo o CTA commerciale — rimuovere prima dell'invio${C_RESET}"
+    FAIL_COUNT=$((FAIL_COUNT + 1))
+    OVERALL_STATUS=1
+    SUMMARY+=("${C_RED}✘ FAIL${C_RESET}  store :: Paywall nativo prezzo abbonamento")
+  else
+    echo "${C_GREEN}✔ [store] Paywall nativo senza prezzo abbonamento (Apple 3.1.1) — PASS${C_RESET}"
+    SUMMARY+=("${C_GREEN}✔ PASS${C_RESET}  store :: Paywall nativo senza prezzo abbonamento")
+  fi
+
   if command -v flutter >/dev/null 2>&1; then
     pushd "$ROOT_DIR/velvet-app" >/dev/null
     run_step warn store "Flutter analyze (shell)" flutter analyze

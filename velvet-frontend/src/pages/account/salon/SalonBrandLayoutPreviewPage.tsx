@@ -28,9 +28,9 @@ import {
   type ShowcaseCustomLayout,
   type ShowcaseCustomTextStyles,
 } from "../../../lib/salonShowcaseStorage";
-import "../../../styles/velvet-salon-showcase.css";
-import "../../../styles/velvet-brand-layout-preview.css";
-import "../../../styles/velvet-brand-layout-preview-scenes.css";
+import "../../../styles/luxury-salon-showcase.css";
+import "../../../styles/luxury-brand-layout-preview.css";
+import "../../../styles/luxury-brand-layout-preview-scenes.css";
 import { SalonStandardSectionGuard } from "./SalonStandardSectionGuard";
 
 /**
@@ -110,22 +110,22 @@ export default function SalonBrandLayoutPreviewPage() {
 
   return (
     <SalonStandardSectionGuard>
-      <div className="velvet-brand-layout-preview--fullscreen" aria-label="Anteprima layout vetrina">
-        <div className="velvet-brand-layout-preview__topbar">
-          <Link to="/account/salone/brand" className="velvet-link-back" style={{ margin: 0 }}>
+      <div className="luxury-brand-layout-preview--fullscreen" aria-label="Anteprima layout vetrina">
+        <div className="luxury-brand-layout-preview__topbar">
+          <Link to="/account/salone/brand" className="luxury-link-back" style={{ margin: 0 }}>
             ← Brand e vetrina
           </Link>
-          <div className="velvet-brand-layout-preview__topbar-right">
-            <h1 className="velvet-brand-layout-preview__topbar-title">
-              <span className="velvet-brand-layout-preview__topbar-title-pre">Anteprima layout · </span>
-              <span className="velvet-brand-layout-preview__topbar-title-accent">vetrina pubblica</span>
+          <div className="luxury-brand-layout-preview__topbar-right">
+            <h1 className="luxury-brand-layout-preview__topbar-title">
+              <span className="luxury-brand-layout-preview__topbar-title-pre">Anteprima layout · </span>
+              <span className="luxury-brand-layout-preview__topbar-title-accent">vetrina pubblica</span>
             </h1>
             {slug ? (
-              <div className="velvet-brand-layout-preview__save-row">
-                <button type="button" className="velvet-btn velvet-btn--primary" onClick={() => void onSaveVetrina()}>
+              <div className="luxury-brand-layout-preview__save-row">
+                <button type="button" className="luxury-btn luxury-btn--primary" onClick={() => void onSaveVetrina()}>
                   Salva vetrina
                 </button>
-                <span className="velvet-brand-layout-preview__save-note velvet-text-muted">
+                <span className="luxury-brand-layout-preview__save-note luxury-text-muted">
                   Salva layout, tipografia e scena in questo browser dopo aver modificato il creator.
                 </span>
               </div>
@@ -134,7 +134,7 @@ export default function SalonBrandLayoutPreviewPage() {
         </div>
         {saveFeedback ? (
           <p
-            className={`velvet-alert ${saveFeedback.kind === "success" ? "velvet-alert--success" : "velvet-alert--error"}`}
+            className={`luxury-alert ${saveFeedback.kind === "success" ? "luxury-alert--success" : "luxury-alert--error"}`}
             role={saveFeedback.kind === "error" ? "alert" : "status"}
             style={{ marginTop: "0.5rem", marginBottom: 0 }}
           >
@@ -143,15 +143,15 @@ export default function SalonBrandLayoutPreviewPage() {
         ) : null}
 
         {!slug ? (
-          <p className="velvet-alert velvet-alert--error" role="alert">
+          <p className="luxury-alert luxury-alert--error" role="alert">
             Slug sede non disponibile: torna a Brand dopo il provisioning del salone.
           </p>
         ) : (
-          <div className="velvet-brand-layout-preview__grid velvet-brand-layout-preview__grid--tri">
-            <div className="velvet-brand-layout-preview__ambient-column">
+          <div className="luxury-brand-layout-preview__grid luxury-brand-layout-preview__grid--tri">
+            <div className="luxury-brand-layout-preview__ambient-column">
               <SalonBrandAmbientSidebar selectedIndex={animatedBgIndex} onSelect={onPickAnimatedBg} />
             </div>
-            <div className="velvet-brand-layout-preview__main">
+            <div className="luxury-brand-layout-preview__main">
               <SalonCustomLayoutShowcase
                 salonName={previewName}
                 city={meSalon.data?.primaryLocationCity ?? null}
@@ -167,7 +167,7 @@ export default function SalonBrandLayoutPreviewPage() {
                   photoObjectPosition: state.servicePhotoObjectPositions[x.id] ?? "50% 50%",
                 }))}
                 themeClass={previewThemeClass}
-                cardAmbientClass={`velvet-brand-preview-bg--${animatedBgIndex}`}
+                cardAmbientClass={`luxury-brand-preview-bg--${animatedBgIndex}`}
                 cardAmbientUiTone={PREVIEW_AMBIENT_UI_TONE[Math.min(animatedBgIndex, PREVIEW_AMBIENT_UI_TONE.length - 1)]}
                 layout={customLayout}
                 editable
@@ -175,26 +175,26 @@ export default function SalonBrandLayoutPreviewPage() {
                 textStyles={customTextStyles}
               />
               {!hasPreview ? (
-                <p className="velvet-brand-layout-preview__hint">
+                <p className="luxury-brand-layout-preview__hint">
                   Suggerimento: da Brand carica logo o immagini sito per vedere il carousel; qui provi subito posizionamento,
                   dimensioni, colori e tipografia del tuo layout personalizzato.
                 </p>
               ) : null}
-              <p className="velvet-text-muted" style={{ margin: "0.75rem 0 0", fontSize: "0.82rem", lineHeight: 1.5 }}>
+              <p className="luxury-text-muted" style={{ margin: "0.75rem 0 0", fontSize: "0.82rem", lineHeight: 1.5 }}>
                 Scheda pubblica di esempio:{" "}
-                <Link to={`/s/${encodeURIComponent(slug)}`} className="velvet-link-inline">
+                <Link to={`/s/${encodeURIComponent(slug)}`} className="luxury-link-inline">
                   /s/{slug}
                 </Link>
               </p>
             </div>
-            <aside className="velvet-brand-layout-preview__sidebar">
-              <div className="velvet-surface-card velvet-surface-card--plan-standard" style={{ marginBottom: "0.75rem" }}>
-                <p className="velvet-text-muted" style={{ margin: "0 0 0.45rem", fontSize: "0.78rem" }}>
+            <aside className="luxury-brand-layout-preview__sidebar">
+              <div className="luxury-surface-card luxury-surface-card--plan-standard" style={{ marginBottom: "0.75rem" }}>
+                <p className="luxury-text-muted" style={{ margin: "0 0 0.45rem", fontSize: "0.78rem" }}>
                   Creator layout
                 </p>
                 <button
                   type="button"
-                  className="velvet-btn velvet-btn--secondary"
+                  className="luxury-btn luxury-btn--secondary"
                   onClick={() => {
                     setCustomLayout(defaultShowcaseCustomLayout());
                     setCustomTextStyles(defaultShowcaseCustomTextStyles());
@@ -203,10 +203,10 @@ export default function SalonBrandLayoutPreviewPage() {
                   Reset blocchi + stili
                 </button>
                 <div style={{ marginTop: "0.65rem", display: "grid", gap: "0.5rem" }}>
-                  <label className="velvet-form-label" style={{ margin: 0 }}>
+                  <label className="luxury-form-label" style={{ margin: 0 }}>
                     Font titolo
                     <select
-                      className="velvet-soft-field"
+                      className="luxury-soft-field"
                       value={customTextStyles.titleStyleId}
                       onChange={(e) =>
                         setCustomTextStyles((p) => ({ ...p, titleStyleId: e.target.value as ShowcaseCustomTextStyles["titleStyleId"] }))
@@ -219,10 +219,10 @@ export default function SalonBrandLayoutPreviewPage() {
                       ))}
                     </select>
                   </label>
-                  <label className="velvet-form-label" style={{ margin: 0 }}>
+                  <label className="luxury-form-label" style={{ margin: 0 }}>
                     Font testo
                     <select
-                      className="velvet-soft-field"
+                      className="luxury-soft-field"
                       value={customTextStyles.bodyStyleId}
                       onChange={(e) =>
                         setCustomTextStyles((p) => ({ ...p, bodyStyleId: e.target.value as ShowcaseCustomTextStyles["bodyStyleId"] }))
@@ -235,10 +235,10 @@ export default function SalonBrandLayoutPreviewPage() {
                       ))}
                     </select>
                   </label>
-                  <label className="velvet-form-label" style={{ margin: 0 }}>
+                  <label className="luxury-form-label" style={{ margin: 0 }}>
                     Font pulsanti servizi
                     <select
-                      className="velvet-soft-field"
+                      className="luxury-soft-field"
                       value={customTextStyles.buttonStyleId}
                       onChange={(e) =>
                         setCustomTextStyles((p) => ({ ...p, buttonStyleId: e.target.value as ShowcaseCustomTextStyles["buttonStyleId"] }))
@@ -251,7 +251,7 @@ export default function SalonBrandLayoutPreviewPage() {
                       ))}
                     </select>
                   </label>
-                  <div className="velvet-form-label" style={{ margin: 0 }}>
+                  <div className="luxury-form-label" style={{ margin: 0 }}>
                     Colore titolo
                     <div style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
                       <input
@@ -262,7 +262,7 @@ export default function SalonBrandLayoutPreviewPage() {
                       />
                       <button
                         type="button"
-                        className="velvet-btn velvet-btn--secondary"
+                        className="luxury-btn luxury-btn--secondary"
                         style={{ fontSize: "0.72rem", padding: "0.2rem 0.45rem" }}
                         onClick={() => setCustomTextStyles((p) => ({ ...p, titleColorHex: null }))}
                       >
@@ -270,7 +270,7 @@ export default function SalonBrandLayoutPreviewPage() {
                       </button>
                     </div>
                   </div>
-                  <div className="velvet-form-label" style={{ margin: 0 }}>
+                  <div className="luxury-form-label" style={{ margin: 0 }}>
                     Colore testo
                     <div style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
                       <input
@@ -281,7 +281,7 @@ export default function SalonBrandLayoutPreviewPage() {
                       />
                       <button
                         type="button"
-                        className="velvet-btn velvet-btn--secondary"
+                        className="luxury-btn luxury-btn--secondary"
                         style={{ fontSize: "0.72rem", padding: "0.2rem 0.45rem" }}
                         onClick={() => setCustomTextStyles((p) => ({ ...p, bodyColorHex: null }))}
                       >
@@ -289,7 +289,7 @@ export default function SalonBrandLayoutPreviewPage() {
                       </button>
                     </div>
                   </div>
-                  <div className="velvet-form-label" style={{ margin: 0 }}>
+                  <div className="luxury-form-label" style={{ margin: 0 }}>
                     Colore testo pulsanti
                     <div style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
                       <input
@@ -300,7 +300,7 @@ export default function SalonBrandLayoutPreviewPage() {
                       />
                       <button
                         type="button"
-                        className="velvet-btn velvet-btn--secondary"
+                        className="luxury-btn luxury-btn--secondary"
                         style={{ fontSize: "0.72rem", padding: "0.2rem 0.45rem" }}
                         onClick={() => setCustomTextStyles((p) => ({ ...p, buttonTextColorHex: null }))}
                       >
@@ -308,7 +308,7 @@ export default function SalonBrandLayoutPreviewPage() {
                       </button>
                     </div>
                   </div>
-                  <div className="velvet-form-label" style={{ margin: 0 }}>
+                  <div className="luxury-form-label" style={{ margin: 0 }}>
                     Sfondo pulsanti
                     <div style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
                       <input
@@ -319,7 +319,7 @@ export default function SalonBrandLayoutPreviewPage() {
                       />
                       <button
                         type="button"
-                        className="velvet-btn velvet-btn--secondary"
+                        className="luxury-btn luxury-btn--secondary"
                         style={{ fontSize: "0.72rem", padding: "0.2rem 0.45rem" }}
                         onClick={() => setCustomTextStyles((p) => ({ ...p, buttonBgColorHex: null }))}
                       >
@@ -330,7 +330,7 @@ export default function SalonBrandLayoutPreviewPage() {
                 </div>
                 <button
                   type="button"
-                  className="velvet-btn velvet-btn--primary"
+                  className="luxury-btn luxury-btn--primary"
                   style={{ marginTop: "0.85rem", width: "100%" }}
                   onClick={() => void onSaveVetrina()}
                 >

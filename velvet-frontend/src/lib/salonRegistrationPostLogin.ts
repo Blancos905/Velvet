@@ -1,4 +1,5 @@
 import { parseSalonPlanTier, SALON_PLAN_STORAGE_KEY, type SalonPlanTier } from "../data/salonPlans";
+import { postLoginPathForSalonPlan } from "./salonPremiumCheckoutPolicy";
 import { setPostLoginReturnPath } from "./postLoginReturnPath";
 
 export const PREMIUM_SALON_POST_LOGIN_PATH = "/account/billing/checkout";
@@ -42,21 +43,19 @@ export function clearIntendedSalonPlan(): void {
   }
 }
 
-export function setPostLoginPathForSalonRegistration(plan: SalonPlanTier): void {
+export function setPostLoginPathForSalonRegistration(
+  plan: SalonPlanTier,
+  premiumCheckoutRequired = false,
+): void {
   persistIntendedSalonPlan(plan);
-  if (plan === "PREMIUM") {
-    setPostLoginReturnPath(PREMIUM_SALON_POST_LOGIN_PATH);
-    return;
-  }
-  if (plan === "BASE") {
-    setPostLoginReturnPath("/account/salone");
-    return;
-  }
-  setPostLoginReturnPath("/account/salone");
+  setPostLoginReturnPath(postLoginPathForSalonPlan(plan, premiumCheckoutRequired));
 }
 
-export function loginReturnPathForSalonRegistration(plan: SalonPlanTier | undefined): string {
-  return plan === "PREMIUM" ? PREMIUM_SALON_POST_LOGIN_PATH : "/account";
+export function loginReturnPathForSalonRegistration(
+  plan: SalonPlanTier | undefined,
+  premiumCheckoutRequired = false,
+): string {
+  return postLoginPathForSalonPlan(plan, premiumCheckoutRequired);
 }
 
 export function isPremiumSalonRegistrationPending(): boolean {

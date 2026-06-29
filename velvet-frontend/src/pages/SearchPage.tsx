@@ -16,7 +16,7 @@ import { formatSalonCityForDisplay } from "../lib/formatSalonCityForDisplay";
 import { formatSalonClientAudienceLabel } from "../lib/formatSalonClientAudience";
 import { prefetchSalonPublicPage } from "../lib/prefetchSalonPublicPage";
 import type { SalonOrgNavState } from "../lib/publicOrganizationDetail";
-import "../styles/velvet-search-page.css";
+import "../styles/luxury-search-page.css";
 
 /** Saloni per pagina nell’impaginatore risultati ricerca. */
 const SEARCH_RESULTS_PAGE_SIZE = 8;
@@ -116,7 +116,7 @@ function highlightName(name: string, query: string): ReactNode {
     if (part === "") return null;
     if (part.toLowerCase() === t.toLowerCase()) {
       return (
-        <mark key={i} className="velvet-search-hit-mark">
+        <mark key={i} className="luxury-search-hit-mark">
           {part}
         </mark>
       );
@@ -127,7 +127,7 @@ function highlightName(name: string, query: string): ReactNode {
 
 function ChevronIcon() {
   return (
-    <svg className="velvet-search-card-chevron" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg className="luxury-search-card-chevron" viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
         d="M9 6l6 6-6 6"
         stroke="currentColor"
@@ -178,50 +178,52 @@ function buildPaginationItems(total: number, current: number): (number | null)[]
   return out;
 }
 
+function SearchEmptyIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="10.5" cy="10.5" r="6.25" stroke="currentColor" strokeWidth="1.75" />
+      <path d="M15.5 15.5L20 20" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function SearchEmptyState({
-  variant = "no-results",
-  queryLabel,
+  hasTypeFilters = false,
   activeTypeLabels = [],
-  onClearTypeFilters,
 }: {
-  variant?: "no-results" | "filter-no-match";
-  queryLabel?: string;
+  hasTypeFilters?: boolean;
   activeTypeLabels?: string[];
-  onClearTypeFilters?: () => void;
 }) {
-  const nav = useNavigate();
-  const titleId = "velvet-search-empty-title";
-  const isFilter = variant === "filter-no-match";
-  const typesLine = activeTypeLabels.length > 0 ? activeTypeLabels.join(", ") : "selezionati";
+  const titleId = "luxury-search-empty-title";
+  const typesLine = activeTypeLabels.length > 0 ? activeTypeLabels.join(", ") : null;
 
   return (
-    <section className="velvet-search-empty-state" aria-labelledby={titleId}>
-      <h2 id={titleId} className="velvet-search-empty-title">
-        {isFilter ? "Nessun salone con questi filtri" : "Nessun salone trovato"}
+    <section className="luxury-search-empty-state" aria-labelledby={titleId} role="status">
+      <div className="luxury-search-empty-state__glow" aria-hidden />
+      <div className="luxury-search-empty-state__icon" aria-hidden>
+        <SearchEmptyIcon />
+      </div>
+      <h2 id={titleId} className="luxury-search-empty-title">
+        Nessun salone trovato
       </h2>
-      <p className="velvet-search-empty-lead">
-        {isFilter ? (
-          <>
-            Tra i risultati{queryLabel ? <> per «{queryLabel}»</> : null} non c&apos;è un salone con tipologia{" "}
-            <strong>{typesLine}</strong>. Prova a togliere un filtro o cerca con un&apos;altra parola.
-          </>
+      <p className="luxury-search-empty-lead">
+        {hasTypeFilters ? (
+          typesLine ? (
+            <>
+              Nessun risultato per <strong className="luxury-search-empty-hl">{typesLine}</strong>
+              {activeTypeLabels.length > 1 ? " con i filtri selezionati" : ""}.
+            </>
+          ) : (
+            <>Nessun risultato con i filtri attivi.</>
+          )
         ) : (
-          <>Prova un&apos;altra parola, un&apos;altra città o torna indietro e modifica la ricerca.</>
+          <>Prova un&apos;altra parola o un&apos;altra città, oppure torna alla home per ripartire.</>
         )}
       </p>
-      <div className="velvet-search-empty-actions">
-        {isFilter && onClearTypeFilters ? (
-          <button type="button" className="velvet-search-empty-btn velvet-search-empty-btn--primary" onClick={onClearTypeFilters}>
-            Mostra tutti i risultati
-          </button>
-        ) : null}
-        <button
-          type="button"
-          className={`velvet-search-empty-btn${isFilter ? "" : " velvet-search-empty-btn--primary"}`}
-          onClick={() => goBackOrHome(nav)}
-        >
-          Indietro
-        </button>
+      <div className="luxury-search-empty-actions">
+        <Link to="/" className="luxury-search-empty-btn luxury-search-empty-btn--primary">
+          Torna alla home
+        </Link>
       </div>
     </section>
   );
@@ -257,16 +259,6 @@ export default function SearchPage() {
     );
   };
 
-  const clearBusinessTypeFilters = () => {
-    setParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        next.delete("businessType");
-        return next;
-      },
-      { replace: true },
-    );
-  };
   const [resultsPage, setResultsPage] = useState(1);
   const resultsAnchorRef = useRef<HTMLDivElement>(null);
   const skipResultsPageScrollRef = useRef(true);
@@ -379,15 +371,15 @@ export default function SearchPage() {
   );
 
   return (
-    <main className="velvet-page-main velvet-search-page">
-      <div className="velvet-search-back-row">
+    <main className="luxury-page-main luxury-search-page">
+      <div className="luxury-search-back-row">
         <button
           type="button"
-          className="velvet-search-back"
+          className="luxury-search-back"
           aria-label="Torna indietro"
           onClick={() => goBackOrHome(navigate)}
         >
-          <svg className="velvet-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <svg className="luxury-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path
               d="M15 18l-6-6 6-6"
               stroke="currentColor"
@@ -399,18 +391,18 @@ export default function SearchPage() {
           Torna indietro
         </button>
       </div>
-      <header className="velvet-search-hero">
-        <div className="velvet-search-hero__glow" aria-hidden />
-        <h1 className="velvet-page-title">
-          <span className="velvet-search-hero__title-text">Cerca salone</span>
+      <header className="luxury-search-hero">
+        <div className="luxury-search-hero__glow" aria-hidden />
+        <h1 className="luxury-page-title">
+          <span className="luxury-search-hero__title-text">Cerca salone</span>
         </h1>
         {date ? (
-          <p className="velvet-page-subtitle velvet-search-hero__subtitle">Data richiesta: {date}.</p>
+          <p className="luxury-page-subtitle luxury-search-hero__subtitle">Data richiesta: {date}.</p>
         ) : null}
       </header>
 
       <div
-        className="velvet-search-typefilter"
+        className="luxury-search-typefilter"
         role="group"
         aria-label="Filtra per tipologia di salone"
       >
@@ -421,38 +413,38 @@ export default function SearchPage() {
               key={opt.id}
               type="button"
               className={[
-                "velvet-header-cta-pill",
-                "velvet-search-typechip",
-                active ? "velvet-search-typechip--active" : "",
+                "luxury-header-cta-pill",
+                "luxury-search-typechip",
+                active ? "luxury-search-typechip--active" : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
               aria-pressed={active}
               onClick={() => toggleBusinessType(opt.id)}
             >
-              <span className="velvet-header-partner-label">{SALON_BUSINESS_TYPE_SHORT_LABELS[opt.id]}</span>
+              <span className="luxury-header-partner-label">{SALON_BUSINESS_TYPE_SHORT_LABELS[opt.id]}</span>
             </button>
           );
         })}
       </div>
 
       {error && (
-        <p className="velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-alert luxury-alert--error" role="alert">
           {error instanceof Error ? error.message : "Errore"}
         </p>
       )}
 
       {showSkeleton ? (
-        <div className="velvet-search-skeleton-grid" aria-hidden>
+        <div className="luxury-search-skeleton-grid" aria-hidden>
           {[0, 1, 2, 3].map((k) => (
-            <div key={k} className="velvet-search-skeleton-card" />
+            <div key={k} className="luxury-search-skeleton-card" />
           ))}
         </div>
       ) : null}
 
       {data && !showSkeleton && sortedHits.length > 0 ? (
         <>
-          <p className="velvet-search-a11y-live" aria-live="polite" aria-atomic="true">
+          <p className="luxury-search-a11y-live" aria-live="polite" aria-atomic="true">
             {sortedHits.length} saloni trovati. Pagina {resultsPage} di {totalResultsPages}.
             {sortByRating ? " Ordinati per valutazione." : ""}
             {nearFromUrl.nearActive ? ` Entro circa ${nearFromUrl.nearKm} km dalla posizione richiesta.` : ""}
@@ -461,17 +453,17 @@ export default function SearchPage() {
               : ""}
             {isFetching ? " Aggiornamento in corso." : ""}
           </p>
-          <div ref={resultsAnchorRef} className="velvet-search-results-anchor" />
+          <div ref={resultsAnchorRef} className="luxury-search-results-anchor" />
           <div
             className={
-              "velvet-search-results-head" +
-              (resultsRefreshing && sortedHits.length === 0 ? " velvet-search-results-head--fetching" : "")
+              "luxury-search-results-head" +
+              (resultsRefreshing && sortedHits.length === 0 ? " luxury-search-results-head--fetching" : "")
             }
           >
-            <div className="velvet-search-results-head__text">
-              <h2 className="velvet-search-results-title">Risultati</h2>
-              <p className="velvet-search-results-count">
-                <strong className="velvet-search-results-count__num">{sortedHits.length}</strong> saloni
+            <div className="luxury-search-results-head__text">
+              <h2 className="luxury-search-results-title">Risultati</h2>
+              <p className="luxury-search-results-count">
+                <strong className="luxury-search-results-count__num">{sortedHits.length}</strong> saloni
                 {urlQ.trim() ? (
                   <>
                     {" "}
@@ -482,7 +474,7 @@ export default function SearchPage() {
                   <>
                     {" "}
                     ·{" "}
-                    <span className="velvet-search-results-count__page-hint">
+                    <span className="luxury-search-results-count__page-hint">
                       {SEARCH_RESULTS_PAGE_SIZE} per pagina
                     </span>
                   </>
@@ -490,14 +482,14 @@ export default function SearchPage() {
                 {sortByRating ? (
                   <>
                     {" "}
-                    · <span className="velvet-search-results-count__page-hint">ordinati per stelle</span>
+                    · <span className="luxury-search-results-count__page-hint">ordinati per stelle</span>
                   </>
                 ) : null}
                 {nearFromUrl.nearActive ? (
                   <>
                     {" "}
                     ·{" "}
-                    <span className="velvet-search-results-count__page-hint">
+                    <span className="luxury-search-results-count__page-hint">
                       entro ~{nearFromUrl.nearKm} km dalla tua posizione
                     </span>
                   </>
@@ -506,23 +498,23 @@ export default function SearchPage() {
             </div>
             <button
               type="button"
-              className="velvet-search-results-refresh"
+              className="luxury-search-results-refresh"
               onClick={() => void refetch()}
               disabled={isFetching}
               aria-busy={isFetching}
               title="Scarica di nuovo l’elenco dal server"
             >
-              <span className={isFetching ? "velvet-search-results-refresh__icon is-spinning" : "velvet-search-results-refresh__icon"} aria-hidden>
+              <span className={isFetching ? "luxury-search-results-refresh__icon is-spinning" : "luxury-search-results-refresh__icon"} aria-hidden>
                 ↻
               </span>
-              <span className="velvet-search-results-refresh__label">Aggiorna</span>
+              <span className="luxury-search-results-refresh__label">Aggiorna</span>
             </button>
           </div>
           <ul
             key={resultsPage}
             className={
-              "velvet-search-grid velvet-search-grid--paged" +
-              (resultsRefreshing ? " velvet-search-grid--refreshing" : "")
+              "luxury-search-grid luxury-search-grid--paged" +
+              (resultsRefreshing ? " luxury-search-grid--refreshing" : "")
             }
           >
             {pagedHits.map((o) => {
@@ -533,45 +525,45 @@ export default function SearchPage() {
               const audienceLabel = formatSalonClientAudienceLabel(o.salonClientGenders);
               const businessTypeIds = normalizeSalonBusinessTypeIds(o.salonBusinessTypes);
               const pageToneClass =
-                resultsPage === 1 ? " velvet-search-card--page-lead" : " velvet-search-card--page-following";
+                resultsPage === 1 ? " luxury-search-card--page-lead" : " luxury-search-card--page-following";
               return (
-                <li key={o.id} className={"velvet-search-card" + pageToneClass}>
+                <li key={o.id} className={"luxury-search-card" + pageToneClass}>
                   <Link
                     to={`/s/${encodeURIComponent(o.slug)}`}
                     replace
                     state={{ orgPreview: o } satisfies SalonOrgNavState}
                     onMouseEnter={() => prefetchSalonPublicPage(queryClient, o.slug)}
                     onFocus={() => prefetchSalonPublicPage(queryClient, o.slug)}
-                    className="velvet-search-card__link"
+                    className="luxury-search-card__link"
                   >
                     <SearchHitLogoAvatar
                       slug={o.slug}
                       name={o.name}
-                      avatarClass="velvet-search-card-avatar"
-                      logoExtraClass="velvet-search-card-avatar--logo"
+                      avatarClass="luxury-search-card-avatar"
+                      logoExtraClass="luxury-search-card-avatar--logo"
                     />
-                    <div className="velvet-search-card-body">
-                      <h3 className="velvet-search-card-name">{highlightName(o.name, urlQ)}</h3>
+                    <div className="luxury-search-card-body">
+                      <h3 className="luxury-search-card-name">{highlightName(o.name, urlQ)}</h3>
                       {showReview ? (
-                        <div className="velvet-search-card-rating">
+                        <div className="luxury-search-card-rating">
                           <StarRatingDisplay rating={avg} caption={reviewCaption} />
                         </div>
                       ) : null}
                       {businessTypeIds.length > 0 ? (
-                        <div className="velvet-search-card-types">
+                        <div className="luxury-search-card-types">
                           {businessTypeIds.map((bt) => (
-                            <span key={bt} className="velvet-search-card-type">
+                            <span key={bt} className="luxury-search-card-type">
                               {SALON_BUSINESS_TYPE_SHORT_LABELS[bt]}
                             </span>
                           ))}
                         </div>
                       ) : null}
-                      <div className="velvet-search-card-footer">
+                      <div className="luxury-search-card-footer">
                         {audienceLabel ? (
-                          <span className="velvet-search-card-audience">{audienceLabel}</span>
+                          <span className="luxury-search-card-audience">{audienceLabel}</span>
                         ) : null}
                         {o.city ? (
-                          <span className="velvet-search-card-city">
+                          <span className="luxury-search-card-city">
                             <PinIcon />
                             {formatSalonCityForDisplay(o.city) ?? o.city}
                           </span>
@@ -585,23 +577,23 @@ export default function SearchPage() {
             })}
           </ul>
           {totalResultsPages > 1 ? (
-            <nav className="velvet-search-pagination" aria-label="Pagine risultati ricerca">
-              <span className="velvet-search-pagination__status">
+            <nav className="luxury-search-pagination" aria-label="Pagine risultati ricerca">
+              <span className="luxury-search-pagination__status">
                 Pagina <strong>{resultsPage}</strong> di {totalResultsPages}
               </span>
-              <div className="velvet-search-pagination__bar">
+              <div className="luxury-search-pagination__bar">
                 <button
                   type="button"
-                  className="velvet-search-pagination__btn"
+                  className="luxury-search-pagination__btn"
                   disabled={resultsPage <= 1}
                   onClick={() => setResultsPage((p) => Math.max(1, p - 1))}
                 >
                   ← Precedente
                 </button>
-                <div className="velvet-search-pagination__pages">
+                <div className="luxury-search-pagination__pages">
                   {buildPaginationItems(totalResultsPages, resultsPage).map((n, idx) =>
                     n === null ? (
-                      <span key={`gap-${idx}`} className="velvet-search-pagination__ellipsis" aria-hidden>
+                      <span key={`gap-${idx}`} className="luxury-search-pagination__ellipsis" aria-hidden>
                         …
                       </span>
                     ) : (
@@ -609,8 +601,8 @@ export default function SearchPage() {
                         key={n}
                         type="button"
                         className={
-                          "velvet-search-pagination__page" +
-                          (n === resultsPage ? " velvet-search-pagination__page--active" : "")
+                          "luxury-search-pagination__page" +
+                          (n === resultsPage ? " luxury-search-pagination__page--active" : "")
                         }
                         onClick={() => setResultsPage(n)}
                         aria-current={n === resultsPage ? "page" : undefined}
@@ -622,7 +614,7 @@ export default function SearchPage() {
                 </div>
                 <button
                   type="button"
-                  className="velvet-search-pagination__btn"
+                  className="luxury-search-pagination__btn"
                   disabled={resultsPage >= totalResultsPages}
                   onClick={() => setResultsPage((p) => Math.min(totalResultsPages, p + 1))}
                 >
@@ -635,15 +627,10 @@ export default function SearchPage() {
       ) : null}
 
       {showFilterEmpty ? (
-        <SearchEmptyState
-          variant="filter-no-match"
-          queryLabel={urlQ.trim() || undefined}
-          activeTypeLabels={activeTypeLabels}
-          onClearTypeFilters={clearBusinessTypeFilters}
-        />
+        <SearchEmptyState hasTypeFilters activeTypeLabels={activeTypeLabels} />
       ) : null}
 
-      {showSearchEmpty ? <SearchEmptyState variant="no-results" /> : null}
+      {showSearchEmpty ? <SearchEmptyState /> : null}
     </main>
   );
 }

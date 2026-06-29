@@ -100,7 +100,6 @@ export const playStoreUrl = (
 /**
  * App Store — footer download app.
  * Impostare VITE_APP_STORE_URL con il link definitivo (es. https://apps.apple.com/app/id…).
+ * Se assente, il badge App Store non viene mostrato (evita link placeholder in produzione).
  */
-export const appStoreUrl = (
-  import.meta.env.VITE_APP_STORE_URL ?? "https://apps.apple.com/it/search?term=Saloni+Luxury"
-).trim();
+export const appStoreUrl = (import.meta.env.VITE_APP_STORE_URL ?? "").trim();

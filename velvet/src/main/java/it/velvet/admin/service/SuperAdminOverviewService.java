@@ -6,6 +6,9 @@ import it.velvet.admin.dto.SuperAdminOverviewDtos.SuperAdminRecentSalonClientRow
 import it.velvet.admin.dto.SuperAdminOverviewDtos.SuperAdminRecentSalonRow;
 import it.velvet.admin.dto.SuperAdminOverviewDtos.SuperAdminSalonStaffRow;
 import it.velvet.admin.dto.SuperAdminOverviewDtos.SuperAdminRecentUserRow;
+import it.velvet.billing.domain.BillingAccount;
+import it.velvet.billing.domain.BillingAccountRepository;
+import it.velvet.billing.domain.SalonSubscriptionBillingCategory;
 import it.velvet.appointment.domain.AppointmentRepository;
 import it.velvet.appointment.domain.AppointmentStatus;
 import it.velvet.catalog.domain.SalonClient;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +54,7 @@ public class SuperAdminOverviewService {
 	private final ReviewRepository reviewRepository;
 	private final PlatformReviewRepository platformReviewRepository;
 	private final FavoriteLocationRepository favoriteLocationRepository;
+	private final BillingAccountRepository billingAccountRepository;
 	private final SuperAdminMeProfileService superAdminMeProfileService;
 	private final SuperAdminSupportInboxService superAdminSupportInboxService;
 	private final SuperAdminPlatformInsightsService superAdminPlatformInsightsService;
@@ -65,6 +70,7 @@ public class SuperAdminOverviewService {
 			ReviewRepository reviewRepository,
 			PlatformReviewRepository platformReviewRepository,
 			FavoriteLocationRepository favoriteLocationRepository,
+			BillingAccountRepository billingAccountRepository,
 			SuperAdminMeProfileService superAdminMeProfileService,
 			SuperAdminSupportInboxService superAdminSupportInboxService,
 			SuperAdminPlatformInsightsService superAdminPlatformInsightsService) {
@@ -78,6 +84,7 @@ public class SuperAdminOverviewService {
 		this.reviewRepository = reviewRepository;
 		this.platformReviewRepository = platformReviewRepository;
 		this.favoriteLocationRepository = favoriteLocationRepository;
+		this.billingAccountRepository = billingAccountRepository;
 		this.superAdminMeProfileService = superAdminMeProfileService;
 		this.superAdminSupportInboxService = superAdminSupportInboxService;
 		this.superAdminPlatformInsightsService = superAdminPlatformInsightsService;
@@ -104,7 +111,10 @@ public class SuperAdminOverviewService {
 				studioGroupRepository.countByProviderTrue(),
 				studioGroupRepository.countByProviderFalse(),
 				studioGroupRepository.countPayingSalonsOnPremiumPlan(),
-				studioGroupRepository.countPayingSalonsOnBasePlan());
+				studioGroupRepository.countPayingSalonsOnBasePlan(),
+				billingAccountRepository.countSubscribedPayingNonProvider(),
+				billingAccountRepository.countSubscribedTrialNonProvider(),
+				billingAccountRepository.countSubscribedCancelledNonProvider());
 		var sortUsers = Sort.by(Sort.Order.desc("createdAt").nullsLast()).and(Sort.by(Sort.Order.desc("id")));
 		List<ConsumerProfile> users = consumerProfileRepository.findAll(PageRequest.of(0, RECENT_LIMIT, sortUsers)).getContent();
 		List<SuperAdminRecentUserRow> recentUsers = users.stream()
@@ -125,10 +135,15 @@ public class SuperAdminOverviewService {
 				? List.of()
 				: staffOperatorRepository.findFetchedByStudioGroupIdIn(salonIds);
 		Map<UUID, List<SuperAdminSalonStaffRow>> staffByGroup = SuperAdminSalonStaffRowMapper.groupByStudioGroupId(recentStaff);
+		Map<UUID, BillingAccount> billingByGroup = loadBillingAccounts(salonIds);
 		List<SuperAdminRecentSalonRow> recentSalons = new ArrayList<>();
 		for (StudioGroup g : salons) {
 			List<Location> locs = locationRepository.findByStudioGroup_IdOrderByNameAsc(g.getId());
 			Location first = locs.isEmpty() ? null : locs.get(0);
+			BillingAccount billingAccount = billingByGroup.get(g.getId());
+			SalonSubscriptionBillingCategory category = g.isProvider()
+					? null
+					: SalonSubscriptionBillingCategory.fromBillingAccount(billingAccount);
 			recentSalons.add(new SuperAdminRecentSalonRow(
 					g.getId(),
 					g.getName(),
@@ -139,7 +154,11 @@ public class SuperAdminOverviewService {
 					first != null ? first.getCity() : null,
 					g.getCreatedAt(),
 					g.isProvider(),
-					staffByGroup.getOrDefault(g.getId(), List.of())));
+					staffByGroup.getOrDefault(g.getId(), List.of()),
+					billingAccount != null ? billingAccount.getSubscriptionStatus() : null,
+					billingAccount != null ? billingAccount.isCancelAtPeriodEnd() : null,
+					billingAccount != null ? billingAccount.getCurrentPeriodEnd() : null,
+					category != null ? category.name() : null));
 		}
 
 		var sortClients = Sort.by(Sort.Order.desc("createdAt").nullsLast()).and(Sort.by(Sort.Order.desc("id")));
@@ -172,5 +191,16 @@ public class SuperAdminOverviewService {
 				supportInboxSalonUnreadCount,
 				supportInboxMessages,
 				platformInsights);
+	}
+
+	private Map<UUID, BillingAccount> loadBillingAccounts(List<UUID> studioGroupIds) {
+		if (studioGroupIds.isEmpty()) {
+			return Map.of();
+		}
+		Map<UUID, BillingAccount> out = new HashMap<>();
+		for (BillingAccount account : billingAccountRepository.findByStudioGroup_IdIn(studioGroupIds)) {
+			out.put(account.getStudioGroupId(), account);
+		}
+		return out;
 	}
 }

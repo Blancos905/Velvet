@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useId, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { VelvetEuropeanContactFields } from "../components/VelvetEuropeanContactFields";
 import { VelvetRegistrationEmailConfirmBox } from "../components/VelvetRegistrationEmailConfirmBox";
@@ -13,17 +14,72 @@ import { velvetJwtHintsFromAccessToken } from "../lib/velvetJwtHintsFromAccessTo
 import { optionalEuropeanPhoneForRegisterApi } from "../lib/europeanPhone";
 import { setPostLoginReturnPath } from "../lib/postLoginReturnPath";
 import { humanizeOidcNetworkError, humanizePostRegistrationAuthError } from "../utils/oidcErrors";
-import "../styles/velvet-plans.css";
-import "../styles/velvet-search-page.css";
-import "../styles/velvet-email-confirm-box.css";
-import "../styles/velvet-salon-plans-register.css";
-import "../styles/velvet-client-signup-page.css";
+import "../styles/luxury-search-page.css";
+import "../styles/luxury-email-confirm-box.css";
+import "../styles/luxury-salon-plans-register.css";
+import "../styles/luxury-client-signup-page.css";
+import "../styles/luxury-info-privacy-premium.css";
+import "../styles/luxury-legal-public.css";
 
 /**
  * Registrazione **cliente finale** (consumatore): form in-app + backend (ruolo `CLIENT`) — vedi
  * `docs/INGRESSI-RUOLI-E-PORTALI.md` §5.2. Stesso modello della registrazione salone su `/piani`.
  */
 const VELVET_ACCESS_TOKEN_KEY = "velvet_access_token";
+
+function ConsumerSignupLegalModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  if (!open || typeof document === "undefined") return null;
+
+  return createPortal(
+    <div
+      className="luxury-info-privacy-premium-modal-root"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <div
+        className="luxury-info-privacy-premium-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="luxury-client-signup-legal-title"
+      >
+        <div className="luxury-info-privacy-premium-modal__toolbar">
+          <h2 id="luxury-client-signup-legal-title" className="luxury-info-privacy-premium-modal__title">
+            Termini e privacy
+          </h2>
+          <button type="button" className="luxury-info-privacy-premium-modal__close" onClick={onClose}>
+            Chiudi
+          </button>
+        </div>
+        <div className="luxury-client-signup-legal-modal__body">
+          <p>
+            Per creare l&apos;account cliente devi accettare i documenti legali. Puoi leggerli per intero qui sotto.
+          </p>
+          <div className="luxury-client-signup-legal-modal__links">
+            <Link
+              to="/termini"
+              className="luxury-plans-privacy-open"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Termini di servizio
+            </Link>
+            <Link
+              to="/privacy/clienti"
+              className="luxury-plans-privacy-open"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Informativa privacy clienti
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
 
 export default function ClientSignupPage() {
   const navigate = useNavigate();
@@ -51,6 +107,7 @@ export default function ClientSignupPage() {
   const [superAdminNote, setSuperAdminNote] = useState<string | null>(null);
   const [registrationComplete, setRegistrationComplete] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
+  const [privacyNoticeOpen, setPrivacyNoticeOpen] = useState(false);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,10 +182,11 @@ export default function ClientSignupPage() {
   const titleId = `${formId}-title`;
 
   return (
-    <main className="velvet-page-main velvet-search-page velvet-plans-wrap velvet-client-signup-page">
-      <div className="velvet-search-back-row">
-        <Link to="/" className="velvet-search-back">
-          <svg className="velvet-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <>
+    <main className="luxury-page-main luxury-search-page luxury-plans-wrap luxury-client-signup-page">
+      <div className="luxury-search-back-row">
+        <Link to="/" className="luxury-search-back">
+          <svg className="luxury-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path
               d="M15 18l-6-6 6-6"
               stroke="currentColor"
@@ -141,7 +199,7 @@ export default function ClientSignupPage() {
         </Link>
       </div>
 
-      <div className="velvet-client-signup-shell">
+      <div className="luxury-client-signup-shell">
         {registrationComplete ? (
           <VelvetRegistrationEmailConfirmBox
             email={registeredEmail}
@@ -150,13 +208,13 @@ export default function ClientSignupPage() {
           />
         ) : (
           <section
-            className="velvet-email-confirm-box velvet-salon-register-box velvet-salon-register-box--wide"
+            className="luxury-email-confirm-box luxury-salon-register-box luxury-salon-register-box--wide"
             role="region"
             aria-labelledby={titleId}
           >
-            <div className="velvet-email-confirm-box__glow" aria-hidden />
-            <div className="velvet-email-confirm-box__icon-wrap" aria-hidden>
-              <svg className="velvet-email-confirm-box__icon" viewBox="0 0 24 24" fill="none">
+            <div className="luxury-email-confirm-box__glow" aria-hidden />
+            <div className="luxury-email-confirm-box__icon-wrap" aria-hidden>
+              <svg className="luxury-email-confirm-box__icon" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M4 8.5V18a2 2 0 002 2h12a2 2 0 002-2V8.5M4 8.5L12 13l8-4.5M4 8.5l8-4.5 8 4.5"
                   stroke="currentColor"
@@ -172,26 +230,26 @@ export default function ClientSignupPage() {
                 />
               </svg>
             </div>
-            <p className="velvet-email-confirm-box__kicker">
+            <p className="luxury-email-confirm-box__kicker">
               {superAdminIntent ? "Prima installazione" : "Registrazione cliente"}
             </p>
-            <h1 id={titleId} className="velvet-email-confirm-box__title">
+            <h1 id={titleId} className="luxury-email-confirm-box__title">
               {superAdminIntent ? "Super admin" : "Crea il tuo account"}
             </h1>
             {superAdminIntent ? (
-              <p className="velvet-email-confirm-box__lead">
+              <p className="luxury-email-confirm-box__lead">
                 Stesso modulo della registrazione cliente: se il sistema <strong>non ha ancora</strong> un super admin
                 (nessuna credenziale in configurazione né in database), questo account diventa amministratore e dopo il
                 login entri nel <strong>pannello di gestione</strong>. Altrimenti resti un normale account cliente.
               </p>
             ) : null}
             {errorHint ? (
-              <p className="velvet-alert velvet-alert--error velvet-salon-register-box__alert" role="alert">
+              <p className="luxury-alert luxury-alert--error luxury-salon-register-box__alert" role="alert">
                 {errorHint}
               </p>
             ) : null}
-            <form className="velvet-salon-register-box__form velvet-plans-modal__form" noValidate onSubmit={onSubmit}>
-            <label className="velvet-plans-field">
+            <form className="luxury-salon-register-box__form luxury-plans-modal__form" noValidate onSubmit={onSubmit}>
+            <label className="luxury-plans-field">
               <span>Nome</span>
               <input
                 name="firstName"
@@ -203,7 +261,7 @@ export default function ClientSignupPage() {
                 disabled={submitting}
               />
             </label>
-            <label className="velvet-plans-field">
+            <label className="luxury-plans-field">
               <span>Cognome</span>
               <input
                 name="lastName"
@@ -215,7 +273,7 @@ export default function ClientSignupPage() {
                 disabled={submitting}
               />
             </label>
-            <label className="velvet-plans-field velvet-plans-field--full">
+            <label className="luxury-plans-field luxury-plans-field--full">
               <span>Email</span>
               <input
                 name="email"
@@ -240,10 +298,10 @@ export default function ClientSignupPage() {
               prefixSelectId={`${formId}-phone-prefix`}
               phoneInputId={`${formId}-phone-local`}
             />
-            <div className="velvet-plans-password-pair">
-              <label className="velvet-plans-field">
+            <div className="luxury-plans-password-pair">
+              <label className="luxury-plans-field">
                 <span>Password</span>
-                <div className="velvet-plans-password-wrap">
+                <div className="luxury-plans-password-wrap">
                   <input
                     name="password"
                     type={showPassword ? "text" : "password"}
@@ -257,7 +315,7 @@ export default function ClientSignupPage() {
                   />
                   <button
                     type="button"
-                    className="velvet-plans-password-toggle"
+                    className="luxury-plans-password-toggle"
                     onClick={() => setShowPassword((v) => !v)}
                     disabled={submitting}
                     aria-label={showPassword ? "Nascondi password" : "Mostra password"}
@@ -265,7 +323,7 @@ export default function ClientSignupPage() {
                   >
                     {showPassword ? (
                       <svg
-                        className="velvet-plans-password-toggle__icon"
+                        className="luxury-plans-password-toggle__icon"
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -281,7 +339,7 @@ export default function ClientSignupPage() {
                       </svg>
                     ) : (
                       <svg
-                        className="velvet-plans-password-toggle__icon"
+                        className="luxury-plans-password-toggle__icon"
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -306,9 +364,9 @@ export default function ClientSignupPage() {
                   </button>
                 </div>
               </label>
-              <label className="velvet-plans-field">
+              <label className="luxury-plans-field">
                 <span>Ripeti password</span>
-                <div className="velvet-plans-password-wrap">
+                <div className="luxury-plans-password-wrap">
                   <input
                     name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
@@ -322,7 +380,7 @@ export default function ClientSignupPage() {
                   />
                   <button
                     type="button"
-                    className="velvet-plans-password-toggle"
+                    className="luxury-plans-password-toggle"
                     onClick={() => setShowConfirmPassword((v) => !v)}
                     disabled={submitting}
                     aria-label={showConfirmPassword ? "Nascondi ripeti password" : "Mostra ripeti password"}
@@ -330,7 +388,7 @@ export default function ClientSignupPage() {
                   >
                     {showConfirmPassword ? (
                       <svg
-                        className="velvet-plans-password-toggle__icon"
+                        className="luxury-plans-password-toggle__icon"
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -346,7 +404,7 @@ export default function ClientSignupPage() {
                       </svg>
                     ) : (
                       <svg
-                        className="velvet-plans-password-toggle__icon"
+                        className="luxury-plans-password-toggle__icon"
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -372,8 +430,8 @@ export default function ClientSignupPage() {
                 </div>
               </label>
             </div>
-            <div className="velvet-plans-privacy-terms velvet-plans-field--full">
-              <label className="velvet-plans-field velvet-plans-field--check">
+            <div className="luxury-plans-privacy-terms luxury-plans-field--full">
+              <label className="luxury-plans-field luxury-plans-field--check">
                 <input
                   type="checkbox"
                   checked={acceptTerms}
@@ -382,17 +440,17 @@ export default function ClientSignupPage() {
                 />
                 <span>
                   Accetto i{" "}
-                  <Link to="/termini" className="velvet-link-inline" target="_blank" rel="noopener noreferrer">
+                  <Link to="/termini" className="luxury-link-inline" target="_blank" rel="noopener noreferrer">
                     termini di servizio
                   </Link>{" "}
                   e l&apos;
-                  <Link to="/privacy/clienti" className="velvet-link-inline" target="_blank" rel="noopener noreferrer">
+                  <Link to="/privacy/clienti" className="luxury-link-inline" target="_blank" rel="noopener noreferrer">
                     informativa privacy clienti
                   </Link>
                   .
                 </span>
               </label>
-              <label className="velvet-plans-field velvet-plans-field--check">
+              <label className="luxury-plans-field luxury-plans-field--check">
                 <input
                   type="checkbox"
                   checked={confirmAdult16}
@@ -401,22 +459,30 @@ export default function ClientSignupPage() {
                 />
                 <span>Confermo di avere almeno 16 anni.</span>
               </label>
+              <button
+                type="button"
+                className="luxury-plans-privacy-open"
+                onClick={() => setPrivacyNoticeOpen(true)}
+                disabled={submitting}
+              >
+                Leggi termini e privacy
+              </button>
             </div>
-            <div className="velvet-salon-register-box__actions velvet-email-confirm-box__actions">
+            <div className="luxury-salon-register-box__actions luxury-email-confirm-box__actions">
               <button
                 type="submit"
-                className="velvet-email-confirm-box__cta velvet-email-confirm-box__cta--primary"
+                className="luxury-email-confirm-box__cta luxury-email-confirm-box__cta--primary"
                 disabled={submitting}
               >
                 {submitting ? "Registrazione…" : "Crea account cliente"}
               </button>
             </div>
             </form>
-            <p className="velvet-client-signup-footnote">
+            <p className="luxury-client-signup-footnote">
               Hai già un account?{" "}
               <Link
                 to="/account"
-                className="velvet-link-inline"
+                className="luxury-link-inline"
                 onClick={() => setPostLoginReturnPath("/account")}
               >
                 Accedi
@@ -426,5 +492,7 @@ export default function ClientSignupPage() {
         )}
       </div>
     </main>
+    <ConsumerSignupLegalModal open={privacyNoticeOpen} onClose={() => setPrivacyNoticeOpen(false)} />
+    </>
   );
 }

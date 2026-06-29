@@ -9,9 +9,9 @@ export function AdminProtectedRoute({ children }: { children: ReactNode }) {
 
   if (isLoading) {
     return (
-      <main className="velvet-auth-page">
-        <div className="velvet-auth-card">
-          <p className="velvet-auth-loading">Verifica sessione…</p>
+      <main className="luxury-auth-page">
+        <div className="luxury-auth-card">
+          <p className="luxury-auth-loading">Verifica sessione…</p>
         </div>
       </main>
     );

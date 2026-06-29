@@ -24,7 +24,7 @@ export function RootLayout() {
       {!hideSiteChrome ? <VelvetDevBackendBanner /> : null}
       {!hideSiteChrome ? <AppHeader /> : null}
       {!hideSiteChrome ? <PendingBookingResume /> : null}
-      <div className={hideSiteChrome ? "velvet-layout-main velvet-layout-main--admin" : "velvet-layout-main"}>
+      <div className={hideSiteChrome ? "luxury-layout-main luxury-layout-main--admin" : "luxury-layout-main"}>
         <Outlet />
       </div>
       {!hideSiteChrome ? <AppFooter /> : null}

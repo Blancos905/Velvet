@@ -1,0 +1,120 @@
+.luxury-premium-cancel-notice {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 0 0 1.25rem;
+  padding: 1.55rem 1.35rem 1.35rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(196, 181, 160, 0.35);
+  background:
+    radial-gradient(ellipse 85% 55% at 50% -15%, rgba(196, 181, 160, 0.14), transparent 58%),
+    linear-gradient(168deg, rgba(28, 24, 20, 0.98) 0%, rgba(12, 10, 8, 0.99) 100%);
+  color: #f5ead8;
+  text-align: left;
+}
+
+.luxury-premium-cancel-notice__glow {
+  position: absolute;
+  inset: -40% -20% auto;
+  height: 70%;
+  background: radial-gradient(circle, rgba(196, 181, 160, 0.12), transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.luxury-premium-cancel-notice__icon-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-bottom: 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(196, 181, 160, 0.35);
+  background: rgba(42, 36, 32, 0.85);
+  color: #e8dfd0;
+}
+
+.luxury-premium-cancel-notice__icon {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.luxury-premium-cancel-notice__kicker {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #c4b5a0;
+}
+
+.luxury-premium-cancel-notice__title {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 0.85rem;
+  font-size: 1.35rem;
+  line-height: 1.3;
+  font-weight: 600;
+  color: #f5ead8;
+}
+
+.luxury-premium-cancel-notice__body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #e8dfd0;
+}
+
+.luxury-premium-cancel-notice__body p {
+  margin: 0;
+}
+
+.luxury-premium-cancel-notice__actions {
+  position: relative;
+  z-index: 1;
+  margin-top: 1.15rem;
+}
+
+.luxury-premium-cancel-notice__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.65rem 1.35rem;
+  border: none;
+  border-radius: 999px;
+  background: #f5ead8;
+  color: #1c1814;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.luxury-premium-cancel-notice__cta:hover:not(:disabled) {
+  background: #fff7ed;
+}
+
+.luxury-premium-cancel-notice__cta:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+@media (min-width: 640px) {
+  .luxury-premium-cancel-notice {
+    padding: 1.75rem 1.65rem 1.5rem;
+  }
+
+  .luxury-premium-cancel-notice__title {
+    font-size: 1.45rem;
+  }
+}

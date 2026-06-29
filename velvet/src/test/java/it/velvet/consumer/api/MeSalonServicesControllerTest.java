@@ -84,11 +84,13 @@ class MeSalonServicesControllerTest {
 	}
 
 	@Test
-	void list_ownerNotProvisioned_notFound() throws Exception {
-		ConsumerProfile p = saveOwner("ghost-" + UUID.randomUUID(), "ghost@b.c");
+	void list_ownerWithoutStudio_autoRepairsAndReturnsEmptyList() throws Exception {
+		String email = "ghost-" + UUID.randomUUID() + "@b.c";
+		ConsumerProfile p = saveOwner("ghost-" + UUID.randomUUID(), email);
 		mockMvc.perform(get("/api/v1/me/salon/services").header("Authorization", bearer(p)))
-				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.code").value("SALON_NOT_PROVISIONED"));
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.length()").value(0));
+		assert studioGroupRepository.findByOwnerEmailIgnoreCase(email).isPresent();
 	}
 
 	@Test

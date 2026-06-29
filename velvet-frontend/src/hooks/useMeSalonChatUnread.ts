@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiJson } from "../api/client";
-import type { SalonVelvetChatUnreadDto } from "../api/types";
+import type { SalonLuxuryChatUnreadDto } from "../api/types";
 import { useVelvetAuth } from "../auth/VelvetAuthProvider";
 
 /** Base query key per invalidare dopo lettura/invio in chat. */
 export const ME_SALON_CHAT_UNREAD_QUERY_KEY = ["me", "salon-clients", "chat", "unread"] as const;
 
-const CHAT_UNREAD_EMPTY: SalonVelvetChatUnreadDto = { clientUnread: 0, ownerUnread: 0 };
+const CHAT_UNREAD_EMPTY: SalonLuxuryChatUnreadDto = { clientUnread: 0, ownerUnread: 0 };
 
 function isChatUnreadEndpointTransientFailure(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
@@ -30,7 +30,7 @@ export function useMeSalonChatUnreadQuery(enabled: boolean, salonSideLocationId?
     queryKey: [...ME_SALON_CHAT_UNREAD_QUERY_KEY, accessToken, loc],
     queryFn: async () => {
       try {
-        return await apiJson<SalonVelvetChatUnreadDto>("/api/v1/me/salon-clients/chat/unread-count", {
+        return await apiJson<SalonLuxuryChatUnreadDto>("/api/v1/me/salon-clients/chat/unread-count", {
           accessToken,
           ...(loc ? { headers: { "X-Location-Id": loc } } : {}),
         });

@@ -12,9 +12,9 @@ import { SalonStandardSectionGuard } from "./SalonStandardSectionGuard";
 
 function countBadge(value: number, title: string) {
   const cls =
-    "velvet-salon-notif-badge velvet-salon-notif-badge--" +
+    "luxury-salon-notif-badge luxury-salon-notif-badge--" +
     "incoming" +
-    (value === 0 ? " velvet-salon-notif-badge--zero" : "");
+    (value === 0 ? " luxury-salon-notif-badge--zero" : "");
   return (
     <span className={cls} title={title}>
       {value}
@@ -147,18 +147,18 @@ export default function SalonStandardToolsPage() {
 
   return (
     <SalonStandardSectionGuard>
-      <div className="velvet-salon-notif-page">
-        <Link to="/account/salone" className="velvet-link-back">
+      <div className="luxury-salon-notif-page">
+        <Link to="/account/salone" className="luxury-link-back">
           ← Panoramica salone
         </Link>
-        <header className="velvet-salon-notif-page__hero">
-          <div className="velvet-salon-notif-page__hero-glow" aria-hidden />
-          <div className="velvet-salon-notif-page__hero-inner">
-            <h1 className="velvet-salon-notif-page__headline">
-              <span className="velvet-salon-notif-page__headline-pre">Le tue </span>
-              <span className="velvet-salon-notif-page__headline-accent">notifiche</span>
+        <header className="luxury-salon-notif-page__hero">
+          <div className="luxury-salon-notif-page__hero-glow" aria-hidden />
+          <div className="luxury-salon-notif-page__hero-inner">
+            <h1 className="luxury-salon-notif-page__headline">
+              <span className="luxury-salon-notif-page__headline-pre">Le tue </span>
+              <span className="luxury-salon-notif-page__headline-accent">notifiche</span>
             </h1>
-            <p className="velvet-page-subtitle">
+            <p className="luxury-page-subtitle">
               Conteggi email per tipo, messaggi in coda e cronologia: apri una riga per lo storico (puoi eliminare i singoli
               messaggi); richiudila per azzerare il numerino fino a nuove notifiche.
             </p>
@@ -166,35 +166,35 @@ export default function SalonStandardToolsPage() {
         </header>
 
         {inbox.isPending ? (
-          <div className="velvet-surface-card velvet-salon-notif-hub-card">
-            <p className="velvet-text-muted" style={{ margin: 0 }}>
+          <div className="luxury-surface-card luxury-salon-notif-hub-card">
+            <p className="luxury-text-muted" style={{ margin: 0 }}>
               Caricamento…
             </p>
           </div>
         ) : inbox.isError ? (
-          <div className="velvet-surface-card velvet-salon-notif-hub-card">
-            <p className="velvet-text-muted" style={{ margin: 0 }}>
+          <div className="luxury-surface-card luxury-salon-notif-hub-card">
+            <p className="luxury-text-muted" style={{ margin: 0 }}>
               Non riusciamo a leggere i conteggi. Verifica la connessione e l&apos;API{" "}
-              <code className="velvet-text-muted">/api/v1/me/salon/notifications</code>.
+              <code className="luxury-text-muted">/api/v1/me/salon/notifications</code>.
               {inbox.error instanceof Error && inbox.error.message.trim() ? (
                 <>
                   {" "}
-                  <span className="velvet-text-muted">({inbox.error.message.trim()})</span>
+                  <span className="luxury-text-muted">({inbox.error.message.trim()})</span>
                 </>
               ) : null}
             </p>
           </div>
         ) : (
-          <div className="velvet-surface-card velvet-salon-notif-hub-card">
-            <div className="velvet-salon-notif-card-head">
-              <h2 className="velvet-card-title">Email e avvisi automatici</h2>
+          <div className="luxury-surface-card luxury-salon-notif-hub-card">
+            <div className="luxury-salon-notif-card-head">
+              <h2 className="luxury-card-title">Email e avvisi automatici</h2>
             </div>
-            <ul className="velvet-salon-notif-list" aria-label="Conteggi per tipo di notifica">
-              <li className="velvet-salon-notif-row velvet-salon-notif-row--head" aria-hidden>
-                <span className="velvet-salon-notif-row__label">Tipo di messaggio</span>
-                <div className="velvet-salon-notif-row__counts velvet-salon-notif-row__counts--head">
-                  <span className="velvet-salon-notif-row__incoming-label">
-                    <span className="velvet-salon-notif-row__incoming-dot" />
+            <ul className="luxury-salon-notif-list" aria-label="Conteggi per tipo di notifica">
+              <li className="luxury-salon-notif-row luxury-salon-notif-row--head" aria-hidden>
+                <span className="luxury-salon-notif-row__label">Tipo di messaggio</span>
+                <div className="luxury-salon-notif-row__counts luxury-salon-notif-row__counts--head">
+                  <span className="luxury-salon-notif-row__incoming-label">
+                    <span className="luxury-salon-notif-row__incoming-dot" />
                     In arrivo
                   </span>
                 </div>
@@ -202,11 +202,11 @@ export default function SalonStandardToolsPage() {
               {rowsForView.map((row) => {
                 const expanded = openBucket === row.type;
                 return (
-                  <li key={row.type} className="velvet-salon-notif-item">
+                  <li key={row.type} className="luxury-salon-notif-item">
                     <div
                       className={
-                        "velvet-salon-notif-row velvet-salon-notif-row--interactive" +
-                        (expanded ? " velvet-salon-notif-row--expanded" : "")
+                        "luxury-salon-notif-row luxury-salon-notif-row--interactive" +
+                        (expanded ? " luxury-salon-notif-row--expanded" : "")
                       }
                       role="button"
                       tabIndex={0}
@@ -216,22 +216,22 @@ export default function SalonStandardToolsPage() {
                       onClick={() => toggleBucket(row.type)}
                       onKeyDown={(e) => onRowKeyDown(e, row.type)}
                     >
-                      <p className="velvet-salon-notif-row__label">{row.label}</p>
-                      <div className="velvet-salon-notif-row__counts" aria-label={`Conteggi per ${row.label}`}>
+                      <p className="luxury-salon-notif-row__label">{row.label}</p>
+                      <div className="luxury-salon-notif-row__counts" aria-label={`Conteggi per ${row.label}`}>
                         {countBadge(row.sent + row.pending, "In arrivo")}
                       </div>
                     </div>
                     {expanded && (
                       <div
-                        className="velvet-salon-notif-detail"
+                        className="luxury-salon-notif-detail"
                         id={`salon-notif-detail-${row.type}`}
                         role="region"
                         aria-labelledby={`salon-notif-trigger-${row.type}`}
                       >
                         {messages.isPending ? (
-                          <p className="velvet-salon-notif-detail__status">Caricamento messaggi…</p>
+                          <p className="luxury-salon-notif-detail__status">Caricamento messaggi…</p>
                         ) : messages.isError ? (
-                          <p className="velvet-salon-notif-detail__status">
+                          <p className="luxury-salon-notif-detail__status">
                             Non riusciamo a caricare l&apos;elenco
                             {messages.error instanceof Error && messages.error.message.trim()
                               ? ` (${messages.error.message.trim()})`
@@ -239,7 +239,7 @@ export default function SalonStandardToolsPage() {
                             .{" "}
                             <button
                               type="button"
-                              className="velvet-link-back"
+                              className="luxury-link-back"
                               style={{ display: "inline", padding: 0, border: "none", background: "none", cursor: "pointer" }}
                               onClick={() => void messages.refetch()}
                             >
@@ -247,9 +247,9 @@ export default function SalonStandardToolsPage() {
                             </button>
                           </p>
                         ) : messages.data && messages.data.length === 0 ? (
-                          <p className="velvet-salon-notif-detail__status">Nessun messaggio in questa categoria.</p>
+                          <p className="luxury-salon-notif-detail__status">Nessun messaggio in questa categoria.</p>
                         ) : (
-                          <ul className="velvet-salon-notif-detail__list" aria-label={`Messaggi: ${row.label}`}>
+                          <ul className="luxury-salon-notif-detail__list" aria-label={`Messaggi: ${row.label}`}>
                             {messages.data?.map((m) => (
                               <SalonNotificationMessageLine
                                 key={m.id}

@@ -102,11 +102,11 @@ export default function PasswordResetPage() {
   });
 
   return (
-    <main className="velvet-auth-page">
-      <div className="velvet-auth-card">
-        <div className="velvet-auth-card-toolbar">
-          <button type="button" className="velvet-auth-back" aria-label="Torna indietro" onClick={() => navigate(-1)}>
-            <svg className="velvet-auth-back-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+    <main className="luxury-auth-page">
+      <div className="luxury-auth-card">
+        <div className="luxury-auth-card-toolbar">
+          <button type="button" className="luxury-auth-back" aria-label="Torna indietro" onClick={() => navigate(-1)}>
+            <svg className="luxury-auth-back-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
               <path
                 d="M15 18l-6-6 6-6"
                 stroke="currentColor"
@@ -121,39 +121,39 @@ export default function PasswordResetPage() {
 
         {mode === "invalid-token" ? (
           <>
-            <h1 className="velvet-auth-title">Link non valido</h1>
-            <p className="velvet-auth-lead">
+            <h1 className="luxury-auth-title">Link non valido</h1>
+            <p className="luxury-auth-lead">
               Il link è incompleto, scaduto o già utilizzato. Richiedi un nuovo invio dall&apos;email di recupero.
             </p>
-            <p className="velvet-auth-lead">
-              <Link className="velvet-link-inline" to="/reimposta-password">
+            <p className="luxury-auth-lead">
+              <Link className="luxury-link-inline" to="/reimposta-password">
                 Richiedi di nuovo il link
               </Link>{" "}
               ·{" "}
-              <Link className="velvet-link-inline" to="/account">
+              <Link className="luxury-link-inline" to="/account">
                 Torna all&apos;accesso
               </Link>
             </p>
           </>
         ) : mode === "confirm" ? (
           <>
-            <h1 className="velvet-auth-title">Nuova password</h1>
-            <p className="velvet-auth-lead">Scegli una password sicura (almeno 8 caratteri).</p>
+            <h1 className="luxury-auth-title">Nuova password</h1>
+            <p className="luxury-auth-lead">Scegli una password sicura (almeno 8 caratteri).</p>
             {confirmErr ? (
-              <p className="velvet-alert velvet-alert--error velvet-auth-alert" role="alert">
+              <p className="luxury-alert luxury-alert--error luxury-auth-alert" role="alert">
                 {confirmErr}
               </p>
             ) : null}
             {confirmMsg ? (
-              <p className="velvet-alert velvet-alert--success velvet-auth-alert" role="status">
+              <p className="luxury-alert luxury-alert--success luxury-auth-alert" role="status">
                 {confirmMsg}{" "}
-                <Link className="velvet-link-inline" to="/account">
+                <Link className="luxury-link-inline" to="/account">
                   Vai all&apos;accesso
                 </Link>
               </p>
             ) : null}
             <form
-              className="velvet-auth-form"
+              className="luxury-auth-form"
               noValidate
               onSubmit={(e) => {
                 e.preventDefault();
@@ -170,13 +170,13 @@ export default function PasswordResetPage() {
                 confirmM.mutate();
               }}
             >
-              <div className="velvet-auth-field">
-                <label htmlFor={`${formId}-new`} className="velvet-auth-label">
+              <div className="luxury-auth-field">
+                <label htmlFor={`${formId}-new`} className="luxury-auth-label">
                   Nuova password
                 </label>
                 <input
                   id={`${formId}-new`}
-                  className="velvet-auth-input"
+                  className="luxury-auth-input"
                   type="password"
                   autoComplete="new-password"
                   minLength={8}
@@ -186,13 +186,13 @@ export default function PasswordResetPage() {
                   disabled={confirmM.isPending || !hasValidTokenFormat}
                 />
               </div>
-              <div className="velvet-auth-field">
-                <label htmlFor={`${formId}-c2`} className="velvet-auth-label">
+              <div className="luxury-auth-field">
+                <label htmlFor={`${formId}-c2`} className="luxury-auth-label">
                   Conferma password
                 </label>
                 <input
                   id={`${formId}-c2`}
-                  className="velvet-auth-input"
+                  className="luxury-auth-input"
                   type="password"
                   autoComplete="new-password"
                   minLength={8}
@@ -202,30 +202,30 @@ export default function PasswordResetPage() {
                   disabled={confirmM.isPending || !hasValidTokenFormat}
                 />
               </div>
-              <button type="submit" className="velvet-auth-submit" disabled={confirmM.isPending || !hasValidTokenFormat}>
+              <button type="submit" className="luxury-auth-submit" disabled={confirmM.isPending || !hasValidTokenFormat}>
                 {confirmM.isPending ? "Salvataggio…" : "Salva nuova password"}
               </button>
             </form>
           </>
         ) : (
           <>
-            <h1 className="velvet-auth-title">Recupera password</h1>
-            <p className="velvet-auth-lead">
+            <h1 className="luxury-auth-title">Recupera password</h1>
+            <p className="luxury-auth-lead">
               Inserisci l&apos;email di registrazione: se è associata a un account attivo, riceverai un messaggio con il link
               per reimpostare la password.
             </p>
             {requestErr ? (
-              <p className="velvet-alert velvet-alert--error velvet-auth-alert" role="alert">
+              <p className="luxury-alert luxury-alert--error luxury-auth-alert" role="alert">
                 {requestErr}
               </p>
             ) : null}
             {requestMsg ? (
-              <p className="velvet-alert velvet-alert--success velvet-auth-alert" role="status">
+              <p className="luxury-alert luxury-alert--success luxury-auth-alert" role="status">
                 {requestMsg}
               </p>
             ) : null}
             <form
-              className="velvet-auth-form"
+              className="luxury-auth-form"
               noValidate
               onSubmit={(e) => {
                 e.preventDefault();
@@ -239,13 +239,13 @@ export default function PasswordResetPage() {
                 requestM.mutate();
               }}
             >
-              <div className="velvet-auth-field">
-                <label htmlFor={`${formId}-email`} className="velvet-auth-label">
+              <div className="luxury-auth-field">
+                <label htmlFor={`${formId}-email`} className="luxury-auth-label">
                   Email
                 </label>
                 <input
                   id={`${formId}-email`}
-                  className="velvet-auth-input"
+                  className="luxury-auth-input"
                   type="email"
                   autoComplete="email"
                   value={email}
@@ -253,12 +253,12 @@ export default function PasswordResetPage() {
                   disabled={requestM.isPending}
                 />
               </div>
-              <button type="submit" className="velvet-auth-submit" disabled={requestM.isPending}>
+              <button type="submit" className="luxury-auth-submit" disabled={requestM.isPending}>
                 {requestM.isPending ? "Invio…" : "Invia link"}
               </button>
             </form>
-            <p className="velvet-auth-lead" style={{ marginTop: "1rem" }}>
-              <Link className="velvet-link-inline" to="/account">
+            <p className="luxury-auth-lead" style={{ marginTop: "1rem" }}>
+              <Link className="luxury-link-inline" to="/account">
                 Torna all&apos;accesso
               </Link>
             </p>

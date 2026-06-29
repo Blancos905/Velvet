@@ -22,7 +22,7 @@ export function useVelvetNativeAppDocumentClass(): void {
     if (!isVelvetNativeAppShell()) {
       return;
     }
-    document.documentElement.classList.add("velvet-native-app");
-    return () => document.documentElement.classList.remove("velvet-native-app");
+    document.documentElement.classList.add("luxury-native-app");
+    return () => document.documentElement.classList.remove("luxury-native-app");
   }, []);
 }

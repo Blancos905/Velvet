@@ -6,8 +6,8 @@ import type { MeSalonSummary } from "../../../api/types";
 import { useVelvetAuth } from "../../../auth/VelvetAuthProvider";
 import { SalonLocationMapCard } from "../../../components/salon/SalonLocationMapCard";
 import { useMeSalonSummaryQuery } from "../../../hooks/useMeSalonSummary";
-import "../../../styles/velvet-account-page-shell.css";
-import "../../../styles/velvet-account-salon-services.css";
+import "../../../styles/luxury-account-page-shell.css";
+import "../../../styles/luxury-account-salon-services.css";
 import "../../../styles/salon-location-map.css";
 
 export default function SalonLocationPage() {
@@ -76,20 +76,20 @@ export default function SalonLocationPage() {
 
   return (
     <>
-      <div className="velvet-account-page-shell velvet-account-page-shell--narrow velvet-account-page-shell--salon-location">
-        <header className="velvet-account-page-shell__hero">
-          <div className="velvet-account-page-shell__hero-glow" aria-hidden />
-          <div className="velvet-account-page-shell__hero-inner">
-            <Link to="/account/salone" className="velvet-link-back">
+      <div className="luxury-account-page-shell luxury-account-page-shell--narrow luxury-account-page-shell--salon-location">
+        <header className="luxury-account-page-shell__hero">
+          <div className="luxury-account-page-shell__hero-glow" aria-hidden />
+          <div className="luxury-account-page-shell__hero-inner">
+            <Link to="/account/salone" className="luxury-link-back">
               ← Panoramica salone
             </Link>
-            <h1 className="velvet-salon-location-hero__headline">
-              <span className="velvet-salon-location-hero__headline-pre">Posizione del </span>
-              <span className="velvet-salon-location-hero__headline-accent">salone</span>
+            <h1 className="luxury-salon-location-hero__headline">
+              <span className="luxury-salon-location-hero__headline-pre">Posizione del </span>
+              <span className="luxury-salon-location-hero__headline-accent">salone</span>
             </h1>
-            <p className="velvet-account-page-shell__hero-sub">
+            <p className="luxury-account-page-shell__hero-sub">
               Indirizzo usato per ricerca, scheda pubblica e mappa. Nome commerciale e URL restano in{" "}
-              <Link className="velvet-link-inline" to="/account/profilo">
+              <Link className="luxury-link-inline" to="/account/profilo">
                 Profilo
               </Link>
               .
@@ -98,32 +98,32 @@ export default function SalonLocationPage() {
         </header>
       </div>
 
-      <div className="velvet-salon-services-page velvet-salon-location-account">
+      <div className="luxury-salon-services-page luxury-salon-location-account">
         {meSalon.isSuccess && meSalon.data && !meSalon.data.provisioned ? (
-          <p className="velvet-alert velvet-alert--error velvet-salon-location-page__alert" role="alert">
+          <p className="luxury-alert luxury-alert--error luxury-salon-location-page__alert" role="alert">
             Nessun salone collegato all&apos;account. Quando il salone sarà attivo potrai impostare l&apos;indirizzo qui.
           </p>
         ) : null}
         {meSalon.isError ? (
-          <p className="velvet-alert velvet-alert--error velvet-salon-location-page__alert" role="alert">
+          <p className="luxury-alert luxury-alert--error luxury-salon-location-page__alert" role="alert">
             Impossibile caricare il salone ({meSalon.error instanceof Error ? meSalon.error.message : "errore"}).
           </p>
         ) : null}
 
         {showEditor ? (
-          <div className="velvet-salon-location-account__stack">
-            <div className="velvet-surface-card velvet-salon-services-form-card velvet-salon-location-page__editor">
-              <h2 className="velvet-card-title">Aggiorna indirizzo sede</h2>
-              <p className="velvet-text-muted velvet-salon-location-page__hint">
+          <div className="luxury-salon-location-account__stack">
+            <div className="luxury-surface-card luxury-salon-services-form-card luxury-salon-location-page__editor">
+              <h2 className="luxury-card-title">Aggiorna indirizzo sede</h2>
+              <p className="luxury-text-muted luxury-salon-location-page__hint">
                 Modifica i campi qui sotto: l&apos;anteprima sulla mappa si aggiorna subito. Nome commerciale e URL pubblico
                 restano nel{" "}
-                <Link className="velvet-link-inline" to="/account/profilo">
+                <Link className="luxury-link-inline" to="/account/profilo">
                   Profilo
                 </Link>
                 .
               </p>
               <form
-                className="velvet-salon-services-form"
+                className="luxury-salon-services-form"
                 onSubmit={(e) => {
                   e.preventDefault();
                   setFormMsg(null);
@@ -131,10 +131,10 @@ export default function SalonLocationPage() {
                   saveM.mutate();
                 }}
               >
-                <label className="velvet-form-label">
+                <label className="luxury-form-label">
                   Indirizzo (via e numero)
                   <input
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={addressLine}
                     onChange={(e) => setAddressLine(e.target.value)}
                     maxLength={240}
@@ -142,10 +142,10 @@ export default function SalonLocationPage() {
                     placeholder="Es. Via Roma 12"
                   />
                 </label>
-                <label className="velvet-form-label velvet-salon-services-form__label-tight">
+                <label className="luxury-form-label luxury-salon-services-form__label-tight">
                   CAP
                   <input
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.target.value)}
                     maxLength={16}
@@ -154,10 +154,10 @@ export default function SalonLocationPage() {
                     placeholder="40121"
                   />
                 </label>
-                <label className="velvet-form-label velvet-salon-services-form__label-tight">
+                <label className="luxury-form-label luxury-salon-services-form__label-tight">
                   Città
                   <input
-                    className="velvet-soft-field"
+                    className="luxury-soft-field"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     maxLength={120}
@@ -167,20 +167,20 @@ export default function SalonLocationPage() {
                 </label>
                 {formMsg ? (
                   <p
-                    className={`velvet-salon-services-form__alert velvet-alert ${formMsgTone === "err" ? "velvet-alert--error" : "velvet-alert--success"}`}
+                    className={`luxury-salon-services-form__alert luxury-alert ${formMsgTone === "err" ? "luxury-alert--error" : "luxury-alert--success"}`}
                     role={formMsgTone === "err" ? "alert" : "status"}
                     style={{ margin: 0, lineHeight: 1.5 }}
                   >
                     {formMsg}
                   </p>
                 ) : null}
-                <div className="velvet-salon-location-page__actions">
-                  <button type="submit" className="velvet-btn velvet-btn--primary" disabled={saveM.isPending}>
+                <div className="luxury-salon-location-page__actions">
+                  <button type="submit" className="luxury-btn luxury-btn--primary" disabled={saveM.isPending}>
                     {saveM.isPending ? "Salvataggio…" : "Salva indirizzo"}
                   </button>
                   <button
                     type="button"
-                    className="velvet-btn velvet-btn--secondary"
+                    className="luxury-btn luxury-btn--secondary"
                     disabled={saveM.isPending || !meSalon.data}
                     onClick={() => {
                       if (!meSalon.data) return;
@@ -197,7 +197,7 @@ export default function SalonLocationPage() {
               </form>
             </div>
 
-            <div className="velvet-salon-location-page__map-wrap">
+            <div className="luxury-salon-location-page__map-wrap">
               <SalonLocationMapCard
                 meSalon={previewSalon}
                 isPending={meSalon.isPending}

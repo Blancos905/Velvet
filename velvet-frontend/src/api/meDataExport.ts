@@ -15,7 +15,7 @@ export async function downloadMeDataExport(accessToken: string): Promise<void> {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = "saloni-velvet-data-export.json";
+  anchor.download = "saloni-luxury-data-export.json";
   anchor.click();
   URL.revokeObjectURL(url);
 }

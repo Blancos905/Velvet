@@ -1,0 +1,2275 @@
+/* Vetrina standard salone (pubblico + editor brand) — token per tema layout */
+
+.luxury-salon-showcase {
+  --vs-border: rgba(125, 211, 252, 0.22);
+  --vs-shell-a: rgba(15, 23, 42, 0.92);
+  --vs-shell-b: rgba(30, 27, 75, 0.55);
+  --vs-hero-bg: rgba(2, 6, 23, 0.45);
+  --vs-hero-border: rgba(148, 163, 184, 0.12);
+  --vs-logo-bg: rgba(255, 251, 235, 0.06);
+  --vs-logo-border: rgba(255, 251, 235, 0.12);
+  --vs-title: #fffbeb;
+  --vs-subtitle: rgba(226, 232, 240, 0.82);
+  --vs-carousel-bg: rgba(15, 23, 42, 0.65);
+  --vs-viewport-bg: rgba(2, 6, 23, 0.55);
+  --vs-nav-bg: rgba(255, 251, 235, 0.88);
+  --vs-nav-color: #0f172a;
+  --vs-dot: rgba(148, 163, 184, 0.35);
+  --vs-dot-active: rgba(125, 211, 252, 0.95);
+  --vs-shadow: 0 22px 56px rgba(0, 0, 0, 0.42);
+  --vs-shell-glow: rgba(56, 189, 248, 0.12);
+  --vs-carousel-aspect: 21 / 9;
+  --vs-carousel-max-h: min(220px, 38vw);
+  --vs-page-head-bg: var(--vs-hero-bg);
+  --vs-service-strip-bg: rgba(2, 6, 23, 0.35);
+  --vs-page-title-font: inherit;
+  --vs-page-title-weight: 700;
+  --vs-page-title-size: clamp(1.45rem, 4.8vw, 2.45rem);
+  --vs-page-title-letter-spacing: 0;
+  --vs-page-title-transform: none;
+  --vs-pill-bg: rgba(255, 251, 235, 0.07);
+  --vs-pill-border: rgba(255, 251, 235, 0.14);
+  --vs-pill-text: var(--vs-title);
+  --vs-pill-active-bg: rgba(56, 189, 248, 0.28);
+  --vs-pill-active-border: rgba(125, 211, 252, 0.55);
+  --vs-pill-radius: 999px;
+  --vs-pill-font-size: 0.84rem;
+
+  margin: 0 0 1.5rem;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--vs-border);
+  background: linear-gradient(155deg, var(--vs-shell-a) 0%, var(--vs-shell-b) 52%, var(--vs-shell-a) 100%);
+  box-shadow: var(--vs-shadow), 0 0 60px var(--vs-shell-glow);
+}
+
+.luxury-salon-showcase__page {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.luxury-salon-showcase__carousel-block {
+  position: relative;
+  padding: 0.5rem 0.65rem 0.45rem;
+  background: var(--vs-carousel-bg);
+  border-bottom: 1px solid #000000;
+}
+
+.luxury-salon-showcase__carousel-block--with-logo {
+  padding-top: 0.65rem;
+}
+
+.luxury-salon-showcase__logo-float {
+  position: absolute;
+  left: 0.6rem;
+  top: 0.55rem;
+  z-index: 3;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.45));
+}
+
+.luxury-salon-showcase__logo-frame {
+  border-radius: 50%;
+  background: var(--vs-logo-bg);
+  border: 2px solid var(--vs-logo-border);
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+}
+
+.luxury-salon-showcase__logo-frame--compact {
+  width: 48px;
+  height: 48px;
+}
+
+/* Logo vetrina (dimensione leggibile su desktop e mobile) */
+.luxury-salon-showcase__logo-frame--hero {
+  width: clamp(76px, 18vw, 104px);
+  height: clamp(76px, 18vw, 104px);
+  border-width: 3px;
+  box-shadow:
+    0 0 0 2px rgba(255, 251, 235, 0.12),
+    0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+.luxury-salon-showcase__logo-frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.luxury-salon-showcase__carousel {
+  position: relative;
+  background: transparent;
+}
+
+.luxury-salon-showcase__carousel--in-page .luxury-salon-showcase__carousel-viewport {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  max-width: min(100%, 720px);
+  aspect-ratio: var(--vs-carousel-aspect);
+  max-height: var(--vs-carousel-max-h);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--vs-viewport-bg);
+  border: 1px solid #000000;
+  box-sizing: border-box;
+}
+
+.luxury-salon-showcase__carousel--placeholder {
+  min-height: 76px;
+  max-height: var(--vs-carousel-max-h);
+  border-radius: 10px;
+  margin: 0 auto;
+  max-width: min(100%, 720px);
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.09) 50%, rgba(255, 255, 255, 0.04) 100%);
+  border: 1px dashed #000000;
+  box-sizing: border-box;
+}
+
+.luxury-salon-showcase__carousel--empty.luxury-salon-showcase__carousel--in-page {
+  aspect-ratio: var(--vs-carousel-aspect);
+  max-height: var(--vs-carousel-max-h);
+  min-height: 72px;
+  margin: 0 auto;
+  max-width: min(100%, 720px);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.85rem;
+  text-align: center;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--vs-subtitle);
+  border: 1px dashed #000000;
+  box-sizing: border-box;
+  background: rgba(2, 6, 23, 0.35);
+}
+
+.luxury-salon-showcase__page-head {
+  padding: 0.75rem 1rem 0.55rem;
+  text-align: center;
+  background: var(--vs-page-head-bg);
+  border-bottom: 1px solid var(--vs-hero-border);
+}
+
+.luxury-salon-showcase__hero-head {
+  padding: 1rem 1.1rem 0.9rem;
+  background: linear-gradient(185deg, rgba(255, 255, 255, 0.04) 0%, var(--vs-page-head-bg) 55%, var(--vs-page-head-bg) 100%);
+  border-bottom: 1px solid var(--vs-hero-border);
+  position: relative;
+}
+
+.luxury-salon-showcase__hero-head::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: min(12rem, 55%);
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(90deg, transparent, var(--vs-dot-active), transparent);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.luxury-salon-showcase__page-title {
+  margin: 0;
+  font-family: var(--vs-page-title-font);
+  font-weight: var(--vs-page-title-weight);
+  font-size: var(--vs-page-title-size);
+  letter-spacing: var(--vs-page-title-letter-spacing);
+  text-transform: var(--vs-page-title-transform);
+  color: var(--vs-title);
+  line-height: 1.15;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
+}
+
+.luxury-salon-showcase__page-sub {
+  margin: 0.3rem 0 0;
+  font-size: 0.86rem;
+  color: var(--vs-subtitle);
+}
+
+/* Descrizione salone (testo da pannello Brand) — pannello decorato */
+@keyframes luxury-showcase-site-desc-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.luxury-salon-showcase__site-desc-wrap {
+  position: relative;
+  width: 100%;
+  max-width: min(40rem, 100%);
+  margin: 0.65rem auto 0;
+  padding: 0 0.15rem;
+  animation: luxury-showcase-site-desc-in 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.luxury-salon-showcase__site-desc-flourish {
+  display: block;
+  height: 1px;
+  margin: 0 auto;
+  max-width: min(14rem, 72%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--vs-site-desc-flourish, rgba(255, 251, 235, 0.35)) 18%,
+    var(--vs-site-desc-flourish-strong, rgba(255, 251, 235, 0.72)) 50%,
+    var(--vs-site-desc-flourish, rgba(255, 251, 235, 0.35)) 82%,
+    transparent 100%
+  );
+  opacity: 0.9;
+}
+
+.luxury-salon-showcase__site-desc-flourish--top {
+  margin-bottom: 0.55rem;
+}
+
+.luxury-salon-showcase__site-desc-flourish--top::before,
+.luxury-salon-showcase__site-desc-flourish--top::after,
+.luxury-salon-showcase__site-desc-flourish--bottom::before,
+.luxury-salon-showcase__site-desc-flourish--bottom::after {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--vs-site-desc-flourish-strong, rgba(255, 251, 235, 0.75));
+  vertical-align: middle;
+  box-shadow: 0 0 10px var(--vs-site-desc-flourish-glow, rgba(255, 251, 235, 0.35));
+}
+
+.luxury-salon-showcase__site-desc-flourish--top::before,
+.luxury-salon-showcase__site-desc-flourish--bottom::before {
+  margin-right: 0.45rem;
+}
+
+.luxury-salon-showcase__site-desc-flourish--top::after,
+.luxury-salon-showcase__site-desc-flourish--bottom::after {
+  margin-left: 0.45rem;
+}
+
+.luxury-salon-showcase__site-desc-flourish--bottom {
+  margin-top: 0.55rem;
+}
+
+.luxury-salon-showcase__site-desc-panel {
+  position: relative;
+  padding: clamp(0.85rem, 2.4vw, 1.15rem) clamp(1rem, 3vw, 1.35rem);
+  border-radius: 1rem;
+  text-align: center;
+  background: var(
+    --vs-site-desc-panel-bg,
+    linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 48%, rgba(0, 0, 0, 0.12) 100%)
+  );
+  border: 1px solid var(--vs-site-desc-panel-border, rgba(255, 251, 235, 0.22));
+  box-shadow:
+    var(--vs-site-desc-panel-shadow, 0 14px 36px rgba(0, 0, 0, 0.22)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px) saturate(1.15);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.luxury-salon-showcase__site-desc-panel::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    var(--vs-site-desc-ring-a, rgba(255, 255, 255, 0.45)) 0%,
+    var(--vs-site-desc-ring-b, rgba(255, 255, 255, 0.08)) 40%,
+    var(--vs-site-desc-ring-c, rgba(0, 0, 0, 0.25)) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.luxury-salon-showcase__site-desc-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 55% at 50% -10%, rgba(255, 255, 255, 0.22) 0%, transparent 62%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.luxury-salon-showcase__site-desc-quote {
+  position: absolute;
+  font-family: var(--vs-site-desc-quote-font, ui-serif, Georgia, "Times New Roman", serif);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--vs-site-desc-quote-color, rgba(255, 251, 235, 0.28));
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+.luxury-salon-showcase__site-desc-quote--open {
+  top: 0.15rem;
+  left: 0.55rem;
+  font-size: clamp(2.4rem, 7vw, 3.4rem);
+}
+
+.luxury-salon-showcase__site-desc-quote--close {
+  right: 0.5rem;
+  bottom: -0.15rem;
+  font-size: clamp(2rem, 5.5vw, 2.85rem);
+}
+
+.luxury-salon-showcase__site-desc {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  padding: 0 0.15rem;
+  font-family: var(--vs-site-desc-font, ui-serif, Georgia, "Times New Roman", serif);
+  font-size: clamp(0.92rem, 2.35vw, 1.08rem);
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.62;
+  letter-spacing: 0.015em;
+  text-wrap: balance;
+  color: var(--vs-showcase-custom-site-desc, var(--vs-subtitle));
+  text-align: center;
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+  white-space: pre-wrap;
+  text-shadow: var(--vs-site-desc-text-shadow, 0 1px 14px rgba(0, 0, 0, 0.28));
+}
+
+.luxury-salon-showcase__site-desc::first-letter {
+  font-size: 1.35em;
+  font-weight: 700;
+  font-style: normal;
+  color: var(--vs-site-desc-cap-color, var(--vs-showcase-custom-site-desc, var(--vs-title)));
+  margin-right: 0.04em;
+}
+
+.luxury-salon-showcase__service-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 0.85rem 0.95rem;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, var(--vs-service-strip-bg) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.luxury-salon-showcase__pill--static,
+.luxury-salon-showcase__pill:not(.luxury-header-cta-pill) {
+  appearance: none;
+  font: inherit;
+  cursor: default;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.42rem 0.72rem;
+  font-size: var(--vs-pill-font-size);
+  font-weight: 600;
+  line-height: 1.2;
+  border-radius: var(--vs-pill-radius);
+  border: 1px solid var(--vs-pill-border);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.08) 0%, var(--vs-pill-bg) 100%);
+  color: var(--vs-showcase-custom-service-text, var(--vs-pill-text));
+  max-width: min(100%, 200px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
+}
+
+.luxury-salon-showcase__pill:not(.luxury-header-cta-pill) {
+  cursor: pointer;
+}
+
+.luxury-salon-showcase__pill:not(.luxury-header-cta-pill):hover {
+  filter: brightness(1.08);
+}
+
+.luxury-salon-showcase__pill--active:not(.active) {
+  background: var(--vs-pill-active-bg);
+  border-color: var(--vs-pill-active-border);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.luxury-salon-showcase__service-detail {
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0%, rgba(2, 6, 23, 0.35) 100%);
+}
+
+.luxury-salon-showcase__service-detail-title {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--vs-title);
+  letter-spacing: 0.01em;
+}
+
+.luxury-salon-showcase__service-detail-body {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--vs-subtitle);
+  white-space: pre-wrap;
+}
+
+.luxury-salon-showcase__service-detail-body--muted {
+  font-style: italic;
+  opacity: 0.85;
+}
+
+/* Layout pubblico: logo a sinistra, titolo staccato, carousel pieno larghezza, card servizi */
+.luxury-salon-showcase__page--detached {
+  gap: 0;
+}
+
+.luxury-salon-showcase__brand-top {
+  display: flex;
+  gap: 1rem 1.25rem;
+  align-items: flex-start;
+  padding: 1.05rem 1.1rem 1.2rem;
+  background: linear-gradient(185deg, rgba(255, 255, 255, 0.05) 0%, var(--vs-page-head-bg) 50%, var(--vs-page-head-bg) 100%);
+  border-bottom: 1px solid var(--vs-hero-border);
+}
+
+.luxury-salon-showcase__brand-top--no-logo .luxury-salon-showcase__brand-text {
+  width: 100%;
+}
+
+.luxury-salon-showcase__brand-logo-side {
+  flex-shrink: 0;
+}
+
+.luxury-salon-showcase__logo-frame--detached {
+  width: clamp(88px, 20vw, 120px);
+  height: clamp(88px, 20vw, 120px);
+}
+
+.luxury-salon-showcase__logo-frame--detached.luxury-salon-showcase__logo-frame--public-hero {
+  width: clamp(104px, 24vw, 156px);
+  height: clamp(104px, 24vw, 156px);
+}
+
+.luxury-salon-showcase__logo-placeholder-letter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--vs-page-title-font, ui-serif, Georgia, "Times New Roman", serif);
+  font-weight: 800;
+  font-size: clamp(2rem, 6.5vw, 3.25rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--vs-title);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.14) 0%, rgba(0, 0, 0, 0.2) 100%);
+  user-select: none;
+}
+
+/* Scheda pubblica detached: logo + nome centrati, titolo più grande. */
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__brand-top--detached-centered {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem 1rem;
+  text-align: center;
+  padding: 1.2rem 1rem 1.35rem;
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__brand-top--detached-centered .luxury-salon-showcase__brand-text {
+  flex: none;
+  width: 100%;
+  max-width: min(38rem, 100%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__brand-top--detached-centered .luxury-salon-showcase__page-title--detached {
+  text-align: center;
+  font-size: clamp(2.4rem, 7.2vw, 4rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin: 0;
+  color: #000000;
+  font-weight: 800;
+  text-transform: capitalize;
+  text-shadow: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Logo salone: bordo nero (scheda pubblica detached). */
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__logo-frame {
+  border: 2px solid #000000;
+  box-shadow:
+    0 0 0 1px #000000,
+    0 10px 28px rgba(0, 0, 0, 0.2);
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__logo-frame--hero {
+  border-width: 3px;
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__logo-placeholder-letter {
+  color: #0a0a0a;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 100%);
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__brand-top--detached-centered .luxury-salon-showcase__page-sub--detached {
+  text-align: center;
+  font-size: clamp(0.98rem, 2.5vw, 1.15rem);
+  font-weight: 600;
+  margin: 0.2rem 0 0;
+  opacity: 0.95;
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__brand-top--detached-centered .luxury-salon-showcase__site-desc-wrap--detached {
+  margin-top: 0.75rem;
+  max-width: min(36rem, 100%);
+}
+
+.luxury-salon-showcase--detached-public
+  .luxury-salon-showcase__brand-top--detached-centered
+  .luxury-salon-showcase__site-desc-wrap--detached
+  .luxury-salon-showcase__site-desc-panel,
+.luxury-salon-showcase--detached-public
+  .luxury-salon-showcase__brand-top--detached-centered
+  .luxury-salon-showcase__site-desc-wrap--detached
+  .luxury-salon-showcase__site-desc--detached {
+  text-align: center;
+}
+
+.luxury-salon-showcase--detached-public
+  .luxury-salon-showcase__brand-top--detached-centered
+  .luxury-salon-showcase__site-desc-wrap--detached
+  .luxury-salon-showcase__site-desc-flourish {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Scheda pubblica: descrizione in evidenza su sfondo brand (es. arancione) */
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__site-desc-wrap--detached {
+  --vs-site-desc-flourish: rgba(0, 0, 0, 0.22);
+  --vs-site-desc-flourish-strong: rgba(0, 0, 0, 0.55);
+  --vs-site-desc-flourish-glow: rgba(0, 0, 0, 0.12);
+  --vs-site-desc-panel-bg: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.94) 0%,
+    rgba(255, 252, 245, 0.88) 42%,
+    rgba(255, 248, 235, 0.82) 100%
+  );
+  --vs-site-desc-panel-border: rgba(0, 0, 0, 0.14);
+  --vs-site-desc-panel-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.18),
+    0 4px 0 rgba(0, 0, 0, 0.06);
+  --vs-site-desc-ring-a: rgba(0, 0, 0, 0.22);
+  --vs-site-desc-ring-b: rgba(255, 255, 255, 0.65);
+  --vs-site-desc-ring-c: rgba(0, 0, 0, 0.12);
+  --vs-site-desc-quote-color: rgba(0, 0, 0, 0.1);
+  --vs-site-desc-text-shadow: none;
+  --vs-showcase-custom-site-desc: #1a1208;
+  --vs-site-desc-cap-color: #0a0a0a;
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__site-desc-wrap--detached .luxury-salon-showcase__site-desc-flourish {
+  max-width: min(18rem, 88%);
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__site-desc-wrap--detached .luxury-salon-showcase__site-desc-panel {
+  border-width: 2px;
+  border-radius: 1.12rem;
+  box-shadow:
+    var(--vs-site-desc-panel-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.04);
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__site-desc-wrap--detached .luxury-salon-showcase__site-desc {
+  font-size: clamp(0.98rem, 2.65vw, 1.14rem);
+  font-weight: 600;
+  line-height: 1.68;
+  letter-spacing: 0.02em;
+  color: #1c140c;
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__site-desc-wrap--detached .luxury-salon-showcase__site-desc::first-letter {
+  font-size: 1.42em;
+  font-weight: 800;
+  color: #000000;
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__site-desc-wrap--detached .luxury-salon-showcase__site-desc-quote--open {
+  color: rgba(0, 0, 0, 0.12);
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__site-desc-wrap--detached .luxury-salon-showcase__site-desc-quote--close {
+  color: rgba(0, 0, 0, 0.08);
+}
+
+/* Messaggio libero non ancora compilato — stesso box, testo guida */
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__site-desc-wrap--placeholder .luxury-salon-showcase__site-desc-panel {
+  border-style: dashed;
+  border-color: rgba(0, 0, 0, 0.2);
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.82) 0%,
+    rgba(255, 252, 245, 0.72) 100%
+  );
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__site-desc--placeholder {
+  font-style: normal;
+  font-weight: 500;
+  font-size: clamp(0.92rem, 2.4vw, 1.05rem);
+  line-height: 1.6;
+  color: rgba(28, 20, 12, 0.72) !important;
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__site-desc--placeholder::first-letter {
+  font-size: 1em;
+  font-weight: 600;
+  color: rgba(28, 20, 12, 0.72);
+}
+
+.luxury-salon-showcase__brand-text {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.luxury-salon-showcase__page-title--detached {
+  text-align: left;
+}
+
+.luxury-salon-showcase__page-sub--detached {
+  text-align: left;
+}
+
+.luxury-salon-showcase__site-desc-wrap--detached {
+  margin-left: 0;
+  margin-right: 0;
+  max-width: none;
+}
+
+.luxury-salon-showcase__site-desc--detached {
+  text-align: left;
+}
+
+.luxury-salon-showcase__site-desc-wrap--detached .luxury-salon-showcase__site-desc-panel,
+.luxury-salon-showcase__site-desc-wrap--detached .luxury-salon-showcase__site-desc--detached {
+  text-align: left;
+}
+
+.luxury-salon-showcase__site-desc-wrap--detached .luxury-salon-showcase__site-desc-flourish {
+  margin-left: 0;
+  margin-right: auto;
+  max-width: min(12rem, 55%);
+}
+
+.luxury-salon-showcase__carousel-block--detached-wide {
+  padding: 0.9rem 0.35rem 0.75rem;
+  background: var(--vs-carousel-bg);
+  border-bottom: 1px solid #000000;
+  border-top: 1px solid #000000;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Anteprima layout: sfondo scena su tutta la card (`cardAmbientClass` + `--ambient-scene` + `data-ambient-ui`) */
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Decorazioni `::before`/`::after` delle scene (CSS in `luxury-brand-layout-preview-scenes.css`): non devono intercettare click. */
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene::before,
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene::after {
+  pointer-events: none;
+}
+
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene .luxury-salon-showcase__carousel-block--detached-wide {
+  background: transparent;
+  box-shadow: none;
+}
+
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene[data-ambient-ui="on-light"] .luxury-salon-showcase__brand-top {
+  background: linear-gradient(185deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.22) 100%);
+  border-bottom-color: rgba(15, 23, 42, 0.12);
+}
+
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene[data-ambient-ui="on-dark"] .luxury-salon-showcase__brand-top {
+  background: linear-gradient(185deg, rgba(15, 23, 42, 0.45) 0%, rgba(15, 23, 42, 0.22) 100%);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene[data-ambient-ui="on-light"] .luxury-salon-showcase__carousel-block--detached-wide {
+  border-top-color: #000000;
+  border-bottom-color: #000000;
+}
+
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene[data-ambient-ui="on-dark"] .luxury-salon-showcase__carousel-block--detached-wide {
+  border-top-color: #000000;
+  border-bottom-color: #000000;
+}
+
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene[data-ambient-ui="on-light"] .luxury-salon-showcase__service-cards,
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene[data-ambient-ui="on-light"] .luxury-salon-showcase__service-pick-wrap {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.18) 100%);
+  border-top-color: rgba(15, 23, 42, 0.08);
+}
+
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene[data-ambient-ui="on-dark"] .luxury-salon-showcase__service-cards,
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene[data-ambient-ui="on-dark"] .luxury-salon-showcase__service-pick-wrap {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.35) 100%);
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Token leggibilità su sfondi scena chiari */
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene[data-ambient-ui="on-light"] {
+  --vs-title: #0f172a;
+  --vs-subtitle: rgba(15, 23, 42, 0.78);
+  --vs-border: rgba(15, 23, 42, 0.14);
+  --vs-hero-border: rgba(15, 23, 42, 0.1);
+  --vs-logo-bg: rgba(255, 255, 255, 0.55);
+  --vs-logo-border: rgba(15, 23, 42, 0.18);
+  --vs-carousel-bg: transparent;
+  --vs-viewport-bg: rgba(15, 23, 42, 0.12);
+  --vs-nav-bg: rgba(255, 255, 255, 0.92);
+  --vs-nav-color: #0f172a;
+  --vs-dot: rgba(15, 23, 42, 0.28);
+  --vs-dot-active: #0284c7;
+  --vs-pill-bg: rgba(255, 255, 255, 0.55);
+  --vs-pill-border: rgba(15, 23, 42, 0.2);
+  --vs-pill-text: #0f172a;
+  --vs-pill-active-bg: rgba(14, 165, 233, 0.28);
+  --vs-pill-active-border: rgba(2, 132, 199, 0.55);
+  --vs-service-strip-bg: rgba(255, 255, 255, 0.25);
+  --vs-page-head-bg: rgba(255, 255, 255, 0.35);
+}
+
+/* Token leggibilità su sfondi scena scuri */
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene[data-ambient-ui="on-dark"] {
+  --vs-title: #fffbeb;
+  --vs-subtitle: rgba(241, 245, 249, 0.88);
+  --vs-border: rgba(255, 255, 255, 0.18);
+  --vs-hero-border: rgba(255, 255, 255, 0.12);
+  --vs-logo-bg: rgba(255, 255, 255, 0.12);
+  --vs-logo-border: rgba(255, 251, 235, 0.35);
+  --vs-carousel-bg: transparent;
+  --vs-viewport-bg: rgba(2, 6, 23, 0.45);
+  --vs-nav-bg: rgba(15, 23, 42, 0.88);
+  --vs-nav-color: #fef9c3;
+  --vs-dot: rgba(255, 255, 255, 0.35);
+  --vs-dot-active: #fde047;
+  --vs-pill-bg: rgba(255, 255, 255, 0.1);
+  --vs-pill-border: rgba(255, 255, 255, 0.22);
+  --vs-pill-text: #fffbeb;
+  --vs-pill-active-bg: rgba(56, 189, 248, 0.28);
+  --vs-pill-active-border: rgba(125, 211, 252, 0.55);
+  --vs-service-strip-bg: rgba(2, 6, 23, 0.35);
+  --vs-page-head-bg: rgba(15, 23, 42, 0.35);
+}
+
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene[data-ambient-ui="on-light"] .luxury-salon-showcase__service-card {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.75) 0%, rgba(248, 250, 252, 0.9) 100%);
+  border: 2px solid #000000;
+}
+
+.luxury-salon-showcase.luxury-salon-showcase--ambient-scene[data-ambient-ui="on-dark"] .luxury-salon-showcase__service-card {
+  background: linear-gradient(165deg, rgba(15, 23, 42, 0.55) 0%, rgba(30, 41, 59, 0.72) 100%);
+  border: 2px solid #000000;
+}
+
+/* Pagina salone pubblica: larghezza full-bleed; altezza segue il contenuto (niente riempimento fisso viewport). */
+.luxury-salon-showcase.luxury-salon-showcase--site-fullscreen {
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  border-radius: 0;
+  margin-top: clamp(-10px, -1.2vw, -4px);
+  margin-bottom: clamp(-8px, -1vw, -2px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: auto;
+  overflow: visible;
+}
+
+.luxury-salon-showcase--site-fullscreen .luxury-salon-showcase__page--detached {
+  flex: 0 0 auto;
+  min-height: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.luxury-salon-showcase--site-fullscreen .luxury-salon-showcase__brand-top {
+  flex-shrink: 0;
+}
+
+/* Carousel: fascia centrale; non espande a riempire lo spazio — stack naturale sotto brand. */
+.luxury-salon-showcase--site-fullscreen .luxury-salon-showcase__carousel-block--detached-wide {
+  flex: 0 0 auto;
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: clamp(0.5rem, 1.8vw, 0.85rem);
+  padding-bottom: clamp(0.5rem, 1.8vw, 0.85rem);
+  padding-left: max(env(safe-area-inset-left, 0px), clamp(0.75rem, 4vw, 2rem));
+  padding-right: max(env(safe-area-inset-right, 0px), clamp(0.75rem, 4vw, 2rem));
+  box-sizing: border-box;
+}
+
+.luxury-salon-showcase--site-fullscreen .luxury-salon-showcase__carousel--wide.luxury-salon-showcase__carousel--in-page {
+  width: 100%;
+  max-width: min(912px, calc(100vw - 1.5rem));
+  margin-left: auto;
+  margin-right: auto;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: auto;
+}
+
+.luxury-salon-showcase--site-fullscreen
+  .luxury-salon-showcase__carousel--in-page
+  .luxury-salon-showcase__carousel-viewport--wide {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  flex: 0 1 auto;
+  aspect-ratio: unset;
+  max-height: none;
+  height: clamp(280px, 46dvh, 460px);
+  border-radius: 14px;
+}
+
+.luxury-salon-showcase--site-fullscreen
+  .luxury-salon-showcase__carousel--wide.luxury-salon-showcase__carousel--placeholder,
+.luxury-salon-showcase--site-fullscreen .luxury-salon-showcase__carousel--wide.luxury-salon-showcase__carousel--empty {
+  width: 100%;
+  max-width: min(912px, calc(100vw - 1.5rem));
+  margin-left: auto;
+  margin-right: auto;
+  flex: 0 1 auto;
+  aspect-ratio: unset;
+  max-height: none;
+  height: clamp(248px, 40dvh, 400px);
+}
+
+@media (max-width: 520px) {
+  .luxury-salon-showcase--site-fullscreen
+    .luxury-salon-showcase__carousel--in-page
+    .luxury-salon-showcase__carousel-viewport--wide {
+    height: clamp(300px, 50dvh, 420px);
+  }
+
+  .luxury-salon-showcase--site-fullscreen
+    .luxury-salon-showcase__carousel--wide.luxury-salon-showcase__carousel--placeholder,
+  .luxury-salon-showcase--site-fullscreen .luxury-salon-showcase__carousel--wide.luxury-salon-showcase__carousel--empty {
+    height: clamp(268px, 44dvh, 380px);
+  }
+
+  .luxury-salon-showcase--site-fullscreen .luxury-salon-showcase__carousel--wide.luxury-salon-showcase__carousel--in-page {
+    max-width: min(768px, calc(100vw - 1rem));
+  }
+
+  .luxury-salon-showcase--site-fullscreen .luxury-salon-showcase__carousel-block--detached-wide {
+    padding-left: max(env(safe-area-inset-left, 0px), clamp(0.65rem, 4vw, 1rem));
+    padding-right: max(env(safe-area-inset-right, 0px), clamp(0.65rem, 4vw, 1rem));
+  }
+
+  .luxury-salon-showcase--site-fullscreen .luxury-salon-showcase__service-pick-wrap {
+    max-width: min(768px, calc(100vw - 1rem));
+  }
+}
+
+.luxury-salon-showcase--site-fullscreen .luxury-salon-showcase__service-pick-wrap {
+  flex: 0 0 auto;
+  margin-top: 0;
+  width: 100%;
+  max-width: min(912px, calc(100vw - 1.5rem));
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+  border-radius: 0 0 12px 12px;
+}
+
+/* Pulsante «I nostri servizi» sotto carousel (layout detached + card servizi). */
+.luxury-salon-showcase__services-toggle-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0.45rem 0.75rem 0.2rem;
+  box-sizing: border-box;
+}
+
+.luxury-salon-showcase--site-fullscreen .luxury-salon-showcase__services-toggle-wrap {
+  width: 100%;
+  max-width: min(912px, calc(100vw - 1.5rem));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 520px) {
+  .luxury-salon-showcase--site-fullscreen .luxury-salon-showcase__services-toggle-wrap {
+    max-width: min(768px, calc(100vw - 1rem));
+  }
+}
+
+.luxury-salon-showcase__services-toggle.luxury-btn--primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(249, 115, 22, 0.65);
+  background: #000000;
+  color: #fb923c;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  font-size: 0.78rem;
+  min-width: min(100%, 15rem);
+  box-shadow: 0 1px 0 rgba(251, 146, 60, 0.12) inset;
+}
+
+.luxury-salon-showcase__services-toggle.luxury-btn--primary:hover:not(:disabled) {
+  filter: none;
+  background: #171717;
+  border-color: rgba(251, 146, 60, 0.9);
+  color: #fdba74;
+  box-shadow:
+    0 1px 0 rgba(251, 146, 60, 0.18) inset,
+    0 6px 20px rgba(234, 88, 12, 0.18);
+}
+
+.luxury-salon-showcase__services-toggle.luxury-btn--primary:active:not(:disabled) {
+  filter: none;
+  background: #0a0a0a;
+  color: #fb923c;
+  box-shadow: 0 1px 0 rgba(251, 146, 60, 0.1) inset;
+}
+
+.luxury-salon-showcase__services-toggle.luxury-btn--primary:focus-visible {
+  outline: 2px solid rgba(251, 146, 60, 0.9);
+  outline-offset: 2px;
+}
+
+.luxury-salon-showcase__service-pick-wrap--toggle-closed {
+  display: none !important;
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__carousel-viewport--wide {
+  max-width: 100%;
+  width: 100%;
+  max-height: min(168px, 28vw);
+  aspect-ratio: 3.35 / 1;
+  border-radius: 12px;
+}
+
+@media (max-width: 520px) {
+  .luxury-salon-showcase--detached-public .luxury-salon-showcase__carousel-viewport--wide {
+    max-height: min(132px, 34vw);
+    aspect-ratio: 2.85 / 1;
+  }
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__carousel--wide.luxury-salon-showcase__carousel--placeholder,
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__carousel--wide.luxury-salon-showcase__carousel--empty {
+  max-width: 100%;
+  width: 100%;
+  min-height: 68px;
+  max-height: min(152px, 30vw);
+  aspect-ratio: 3.2 / 1;
+}
+
+.luxury-salon-showcase__service-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
+  gap: 0.85rem;
+  padding: 1rem 0.85rem 1.15rem;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, var(--vs-service-strip-bg) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.luxury-salon-showcase__service-card-photo {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  max-height: 9.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 0 0 0.35rem;
+  background: rgba(2, 6, 23, 0.45);
+  flex-shrink: 0;
+}
+
+.luxury-salon-showcase__service-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.luxury-salon-showcase__service-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-height: 100%;
+  padding: 0.85rem 0.95rem;
+  border-radius: 12px;
+  border: 2px solid #000000;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.07) 0%, var(--vs-pill-bg) 100%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.luxury-salon-showcase__service-card:hover {
+  border-color: #000000;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.luxury-salon-showcase__service-card--active {
+  border: 2px solid #000000;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.luxury-salon-showcase__service-card-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--vs-title);
+  line-height: 1.25;
+}
+
+.luxury-salon-showcase__service-card-meta {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--vs-subtitle);
+}
+
+.luxury-salon-showcase__service-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 0.35rem;
+}
+
+.luxury-salon-showcase__service-card-desc {
+  margin: 0;
+  flex: 1;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--vs-subtitle);
+}
+
+.luxury-salon-showcase__service-card-desc--muted {
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.luxury-salon-showcase__service-card-book {
+  margin-top: 0.5rem;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.luxury-salon-showcase__service-card-demo-note {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+}
+
+/* Lista pulsanti servizi + modale dettaglio (variante cards). */
+.luxury-salon-showcase__service-pick-wrap {
+  padding: 0.75rem 0.85rem 0.95rem;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, var(--vs-service-strip-bg) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.luxury-salon-showcase--detached-public .luxury-salon-showcase__service-pick-wrap {
+  padding: 0.85rem clamp(0.75rem, 4vw, 1.25rem) 1rem;
+}
+
+.luxury-salon-showcase__service-pick-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.55rem;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Servizi selezionabili: stessa pill «Accedi» (app-header.css) */
+.luxury-salon-showcase .luxury-salon-showcase__service-pick-btn.luxury-header-cta-pill,
+.luxury-salon-showcase .luxury-salon-showcase__pill.luxury-header-cta-pill {
+  cursor: pointer;
+  font-family: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  max-width: min(100%, 18rem);
+  white-space: normal;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.luxury-salon-showcase .luxury-salon-showcase__pill-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.luxury-salon-showcase__service-detail-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.luxury-salon-showcase__service-detail-dialog {
+  position: relative;
+  width: min(100%, 26rem);
+  max-height: min(88dvh, 36rem);
+  overflow: auto;
+  padding: 1.35rem 1.25rem 1.2rem;
+  border-radius: 16px;
+  border: 1px solid var(--vs-border);
+  background: linear-gradient(165deg, var(--vs-shell-a) 0%, var(--vs-shell-b) 100%);
+  box-shadow: var(--vs-shadow), 0 0 48px var(--vs-shell-glow);
+}
+
+.luxury-salon-showcase__service-detail-close {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--vs-title);
+  background: rgba(255, 251, 235, 0.1);
+  cursor: pointer;
+}
+
+.luxury-salon-showcase__service-detail-close:hover {
+  background: rgba(255, 251, 235, 0.16);
+}
+
+.luxury-salon-showcase__service-detail-photo {
+  width: 100%;
+  max-height: 14rem;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0 0 0.85rem;
+  background: rgba(2, 6, 23, 0.45);
+}
+
+.luxury-salon-showcase__service-detail-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.luxury-salon-showcase__service-detail-dialog-title {
+  margin: 0 2.25rem 0.35rem 0;
+  font-size: clamp(1.15rem, 4vw, 1.45rem);
+  font-weight: 700;
+  color: var(--vs-title);
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.luxury-salon-showcase__service-detail-dialog-meta {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--vs-subtitle);
+}
+
+.luxury-salon-showcase__service-detail-dialog-desc {
+  margin: 0 0 1.1rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--vs-subtitle);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.luxury-salon-showcase__service-detail-dialog-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.luxury-salon-showcase__service-detail-dialog-book {
+  align-self: center;
+  width: auto;
+  min-width: min(100%, 15rem);
+  justify-content: center;
+}
+
+.luxury-salon-showcase__service-detail-dialog-demo {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.luxury-salon-showcase__carousel--in-page .luxury-salon-showcase__carousel-viewport img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.luxury-salon-showcase__carousel--in-page .luxury-salon-showcase__carousel-nav button {
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 0.92rem;
+}
+
+.luxury-salon-showcase__carousel--in-page .luxury-salon-showcase__carousel-dots {
+  padding: 0.3rem 0.45rem 0.45rem;
+}
+
+.luxury-salon-showcase__carousel-nav {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.35rem;
+  pointer-events: none;
+}
+
+.luxury-salon-showcase__carousel-nav button {
+  pointer-events: auto;
+  border: 1px solid #000000;
+  border-radius: 999px;
+  width: 2.35rem;
+  height: 2.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--vs-nav-color);
+  background: var(--vs-nav-bg);
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.luxury-salon-showcase__carousel-nav button:hover {
+  filter: brightness(1.06);
+}
+
+.luxury-salon-showcase__carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.75rem 0.75rem;
+}
+
+.luxury-salon-showcase__carousel-dots button {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  background: var(--vs-dot);
+  cursor: pointer;
+}
+
+.luxury-salon-showcase__carousel-dots button[aria-current="true"] {
+  background: var(--vs-dot-active);
+  width: 18px;
+}
+
+/* Temi: sfondo, tipografia titolo, strip servizi, carousel — 10 layout strutturali + varianti colore */
+.luxury-salon-showcase--t-essenziale {
+  --vs-border: rgba(56, 189, 248, 0.32);
+  --vs-shell-a: rgba(15, 23, 42, 0.97);
+  --vs-shell-b: rgba(30, 58, 138, 0.5);
+  --vs-carousel-bg: rgba(15, 23, 42, 0.55);
+  --vs-viewport-bg: rgba(2, 6, 23, 0.65);
+  --vs-page-head-bg: rgba(15, 23, 42, 0.75);
+  --vs-service-strip-bg: rgba(2, 6, 23, 0.45);
+  --vs-page-title-font: ui-sans-serif, system-ui, sans-serif;
+  --vs-page-title-weight: 700;
+  --vs-page-title-letter-spacing: -0.02em;
+  --vs-pill-bg: rgba(56, 189, 248, 0.12);
+  --vs-pill-border: rgba(125, 211, 252, 0.35);
+  --vs-pill-active-bg: rgba(56, 189, 248, 0.35);
+  --vs-pill-active-border: rgba(125, 211, 252, 0.65);
+  --vs-carousel-aspect: 2.2 / 1;
+  --vs-carousel-max-h: min(200px, 38vw);
+  --vs-dot-active: rgba(56, 189, 248, 0.95);
+  --vs-shell-glow: rgba(56, 189, 248, 0.28);
+  --vs-page-title-size: clamp(1.38rem, 4.2vw, 2.2rem);
+}
+
+.luxury-salon-showcase--t-focus-giornata {
+  --vs-border: rgba(251, 191, 36, 0.4);
+  --vs-shell-a: rgba(55, 20, 0, 0.72);
+  --vs-shell-b: rgba(30, 27, 75, 0.82);
+  --vs-carousel-bg: rgba(49, 46, 129, 0.55);
+  --vs-viewport-bg: rgba(30, 20, 60, 0.55);
+  --vs-page-head-bg: rgba(120, 53, 15, 0.42);
+  --vs-service-strip-bg: rgba(30, 27, 75, 0.5);
+  --vs-title: #fff7ed;
+  --vs-subtitle: rgba(254, 215, 170, 0.88);
+  --vs-page-title-font: ui-sans-serif, system-ui, sans-serif;
+  --vs-page-title-weight: 800;
+  --vs-page-title-letter-spacing: 0.04em;
+  --vs-page-title-transform: uppercase;
+  --vs-page-title-size: clamp(1.2rem, 3.6vw, 2rem);
+  --vs-shell-glow: rgba(251, 191, 36, 0.32);
+  --vs-pill-bg: rgba(251, 191, 36, 0.12);
+  --vs-pill-border: rgba(251, 191, 36, 0.35);
+  --vs-pill-text: #fffbeb;
+  --vs-pill-active-bg: rgba(251, 191, 36, 0.32);
+  --vs-pill-active-border: rgba(253, 224, 71, 0.75);
+  --vs-carousel-aspect: 2 / 1;
+  --vs-carousel-max-h: min(196px, 36vw);
+  --vs-dot-active: rgba(251, 191, 36, 0.95);
+  --vs-nav-bg: rgba(254, 243, 199, 0.92);
+}
+
+.luxury-salon-showcase--t-operatore-solo {
+  --vs-border: rgba(45, 212, 191, 0.35);
+  --vs-shell-a: rgba(10, 25, 30, 0.96);
+  --vs-shell-b: rgba(17, 94, 89, 0.48);
+  --vs-carousel-bg: rgba(15, 50, 48, 0.55);
+  --vs-viewport-bg: rgba(6, 40, 38, 0.72);
+  --vs-page-head-bg: rgba(15, 118, 110, 0.32);
+  --vs-service-strip-bg: rgba(10, 35, 33, 0.55);
+  --vs-title: #ecfdf5;
+  --vs-subtitle: rgba(153, 246, 228, 0.85);
+  --vs-page-title-font: ui-sans-serif, system-ui, sans-serif;
+  --vs-page-title-weight: 650;
+  --vs-page-title-letter-spacing: -0.03em;
+  --vs-pill-bg: rgba(45, 212, 191, 0.1);
+  --vs-pill-border: rgba(45, 212, 191, 0.32);
+  --vs-pill-active-bg: rgba(20, 184, 166, 0.35);
+  --vs-pill-active-border: rgba(94, 234, 212, 0.55);
+  --vs-carousel-aspect: 2.15 / 1;
+  --vs-carousel-max-h: min(196px, 36vw);
+  --vs-dot-active: rgba(45, 212, 191, 0.95);
+  --vs-shell-glow: rgba(45, 212, 191, 0.26);
+  --vs-page-title-size: clamp(1.32rem, 4vw, 2.1rem);
+}
+
+.luxury-salon-showcase--t-studio-calmo {
+  --vs-border: rgba(196, 181, 253, 0.28);
+  --vs-shell-a: rgba(35, 30, 55, 0.9);
+  --vs-shell-b: rgba(49, 46, 129, 0.38);
+  --vs-carousel-bg: rgba(35, 30, 55, 0.5);
+  --vs-viewport-bg: rgba(25, 22, 45, 0.55);
+  --vs-page-head-bg: rgba(76, 29, 149, 0.22);
+  --vs-service-strip-bg: rgba(30, 27, 50, 0.48);
+  --vs-logo-bg: rgba(255, 251, 235, 0.05);
+  --vs-title: rgba(245, 243, 255, 0.96);
+  --vs-subtitle: rgba(196, 181, 253, 0.78);
+  --vs-page-title-font: ui-serif, Georgia, "Times New Roman", serif;
+  --vs-page-title-weight: 500;
+  --vs-page-title-letter-spacing: 0.02em;
+  --vs-page-title-size: clamp(1.32rem, 3.8vw, 2rem);
+  --vs-shell-glow: rgba(167, 139, 250, 0.3);
+  --vs-pill-bg: rgba(167, 139, 250, 0.1);
+  --vs-pill-border: rgba(196, 181, 253, 0.28);
+  --vs-pill-text: rgba(245, 243, 255, 0.92);
+  --vs-pill-active-bg: rgba(139, 92, 246, 0.28);
+  --vs-pill-active-border: rgba(196, 181, 253, 0.45);
+  --vs-carousel-aspect: 2.35 / 1;
+  --vs-carousel-max-h: min(188px, 36vw);
+  --vs-dot-active: rgba(196, 181, 253, 0.88);
+  --vs-nav-bg: rgba(237, 233, 254, 0.9);
+  --vs-nav-color: #3730a3;
+}
+
+.luxury-salon-showcase--t-alta-densita {
+  --vs-border: rgba(250, 204, 21, 0.32);
+  --vs-shell-a: rgba(10, 12, 18, 0.98);
+  --vs-shell-b: rgba(55, 35, 5, 0.55);
+  --vs-carousel-bg: rgba(15, 18, 28, 0.88);
+  --vs-viewport-bg: rgba(5, 8, 14, 0.85);
+  --vs-page-head-bg: rgba(15, 18, 28, 0.92);
+  --vs-service-strip-bg: rgba(8, 10, 16, 0.92);
+  --vs-title: #fefce8;
+  --vs-subtitle: rgba(250, 204, 21, 0.75);
+  --vs-page-title-font: ui-monospace, "Cascadia Code", monospace;
+  --vs-page-title-weight: 700;
+  --vs-page-title-letter-spacing: -0.06em;
+  --vs-page-title-size: clamp(1.18rem, 3.2vw, 1.85rem);
+  --vs-shell-glow: rgba(250, 204, 21, 0.28);
+  --vs-pill-font-size: 0.72rem;
+  --vs-pill-radius: 6px;
+  --vs-pill-bg: rgba(250, 204, 21, 0.08);
+  --vs-pill-border: rgba(250, 204, 21, 0.22);
+  --vs-pill-active-bg: rgba(250, 204, 21, 0.22);
+  --vs-pill-active-border: rgba(253, 224, 71, 0.5);
+  --vs-carousel-aspect: 2.5 / 1;
+  --vs-carousel-max-h: min(176px, 34vw);
+  --vs-dot-active: rgba(250, 204, 21, 0.95);
+  --vs-nav-bg: rgba(254, 249, 195, 0.92);
+}
+
+.luxury-salon-showcase--t-mobile-first-estremo {
+  --vs-border: rgba(167, 139, 250, 0.38);
+  --vs-shell-a: rgba(18, 16, 28, 0.96);
+  --vs-shell-b: rgba(59, 7, 100, 0.5);
+  --vs-carousel-bg: rgba(24, 20, 35, 0.78);
+  --vs-viewport-bg: rgba(12, 10, 20, 0.75);
+  --vs-page-head-bg: rgba(39, 32, 55, 0.72);
+  --vs-service-strip-bg: rgba(20, 16, 32, 0.82);
+  --vs-title: #faf5ff;
+  --vs-subtitle: rgba(216, 180, 254, 0.85);
+  --vs-page-title-font: ui-sans-serif, system-ui, sans-serif;
+  --vs-page-title-weight: 800;
+  --vs-page-title-letter-spacing: -0.025em;
+  --vs-pill-radius: 14px;
+  --vs-pill-font-size: 0.78rem;
+  --vs-pill-bg: rgba(167, 139, 250, 0.12);
+  --vs-pill-border: rgba(167, 139, 250, 0.32);
+  --vs-pill-active-bg: rgba(126, 34, 206, 0.38);
+  --vs-pill-active-border: rgba(192, 132, 252, 0.55);
+  --vs-carousel-aspect: 2 / 1;
+  --vs-carousel-max-h: min(212px, 40vw);
+  --vs-dot-active: rgba(167, 139, 250, 0.95);
+  --vs-shell-glow: rgba(167, 139, 250, 0.32);
+  --vs-page-title-size: clamp(1.35rem, 4.2vw, 2.15rem);
+  --vs-nav-bg: rgba(237, 233, 254, 0.92);
+  --vs-nav-color: #3b0764;
+}
+
+.luxury-salon-showcase--t-dual-column {
+  --vs-border: rgba(52, 211, 153, 0.34);
+  --vs-shell-a: rgba(12, 28, 24, 0.94);
+  --vs-shell-b: rgba(6, 78, 59, 0.42);
+  --vs-carousel-bg: rgba(15, 40, 34, 0.55);
+  --vs-viewport-bg: rgba(6, 45, 38, 0.65);
+  --vs-page-head-bg: rgba(6, 95, 70, 0.28);
+  --vs-service-strip-bg: rgba(10, 35, 30, 0.55);
+  --vs-title: #ecfdf5;
+  --vs-subtitle: rgba(167, 243, 208, 0.88);
+  --vs-page-title-font: ui-sans-serif, system-ui, sans-serif;
+  --vs-page-title-weight: 700;
+  --vs-pill-bg: rgba(52, 211, 153, 0.1);
+  --vs-pill-border: rgba(52, 211, 153, 0.3);
+  --vs-pill-active-bg: rgba(16, 185, 129, 0.32);
+  --vs-pill-active-border: rgba(110, 231, 183, 0.55);
+  --vs-carousel-aspect: 2.1 / 1;
+  --vs-carousel-max-h: min(196px, 37vw);
+  --vs-dot-active: rgba(52, 211, 153, 0.92);
+  --vs-shell-glow: rgba(52, 211, 153, 0.26);
+  --vs-page-title-size: clamp(1.32rem, 4vw, 2.1rem);
+  --vs-nav-bg: rgba(209, 250, 229, 0.92);
+  --vs-nav-color: #064e3b;
+}
+
+.luxury-salon-showcase--t-dual-column .luxury-salon-showcase__service-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 520px) {
+  .luxury-salon-showcase--t-dual-column .luxury-salon-showcase__service-strip {
+    grid-template-columns: 1fr;
+    justify-content: stretch;
+  }
+}
+
+.luxury-salon-showcase--t-card-timeline {
+  --vs-border: rgba(14, 165, 233, 0.36);
+  --vs-shell-a: rgba(8, 47, 73, 0.55);
+  --vs-shell-b: rgba(12, 20, 38, 0.94);
+  --vs-carousel-bg: rgba(10, 40, 62, 0.55);
+  --vs-viewport-bg: rgba(6, 32, 52, 0.72);
+  --vs-page-head-bg: rgba(8, 47, 73, 0.45);
+  --vs-service-strip-bg: rgba(6, 28, 48, 0.62);
+  --vs-title: #f0f9ff;
+  --vs-subtitle: rgba(125, 211, 252, 0.88);
+  --vs-page-title-font: ui-sans-serif, system-ui, sans-serif;
+  --vs-page-title-weight: 700;
+  --vs-pill-radius: 10px;
+  --vs-pill-bg: rgba(14, 165, 233, 0.12);
+  --vs-pill-border: rgba(56, 189, 248, 0.28);
+  --vs-pill-active-bg: rgba(2, 132, 199, 0.38);
+  --vs-pill-active-border: rgba(125, 211, 252, 0.5);
+  --vs-carousel-aspect: 2.25 / 1;
+  --vs-carousel-max-h: min(192px, 36vw);
+  --vs-dot-active: rgba(14, 165, 233, 0.95);
+  --vs-shell-glow: rgba(14, 165, 233, 0.28);
+  --vs-page-title-size: clamp(1.32rem, 4vw, 2.1rem);
+}
+
+.luxury-salon-showcase--t-minimal-notifiche {
+  --vs-border: rgba(161, 161, 170, 0.32);
+  --vs-shell-a: rgba(28, 28, 32, 0.94);
+  --vs-shell-b: rgba(45, 45, 52, 0.72);
+  --vs-carousel-bg: rgba(32, 32, 36, 0.75);
+  --vs-viewport-bg: rgba(22, 22, 26, 0.82);
+  --vs-page-head-bg: rgba(42, 42, 48, 0.62);
+  --vs-service-strip-bg: rgba(26, 26, 30, 0.88);
+  --vs-title: #fafafa;
+  --vs-subtitle: rgba(212, 212, 216, 0.88);
+  --vs-page-title-font: ui-sans-serif, system-ui, sans-serif;
+  --vs-page-title-weight: 600;
+  --vs-page-title-letter-spacing: 0.01em;
+  --vs-pill-bg: rgba(244, 244, 245, 0.06);
+  --vs-pill-border: rgba(161, 161, 170, 0.28);
+  --vs-pill-text: #fafafa;
+  --vs-pill-active-bg: rgba(192, 132, 252, 0.22);
+  --vs-pill-active-border: rgba(192, 132, 252, 0.45);
+  --vs-carousel-aspect: 2.15 / 1;
+  --vs-carousel-max-h: min(180px, 34vw);
+  --vs-dot-active: rgba(192, 132, 252, 0.92);
+  --vs-shell-glow: rgba(192, 132, 252, 0.22);
+  --vs-page-title-size: clamp(1.28rem, 3.8vw, 2rem);
+  --vs-nav-bg: rgba(244, 244, 245, 0.92);
+  --vs-nav-color: #18181b;
+}
+
+.luxury-salon-showcase--t-brand-hero {
+  --vs-border: rgba(255, 247, 237, 0.32);
+  /* Sfondo arancio (scheda pubblica / brand hero). */
+  --vs-shell-a: rgba(251, 146, 60, 0.96);
+  --vs-shell-b: rgba(234, 88, 12, 0.94);
+  --vs-carousel-bg: rgba(194, 65, 12, 0.45);
+  --vs-viewport-bg: rgba(15, 23, 42, 0.55);
+  --vs-page-head-bg: rgba(249, 115, 22, 0.42);
+  --vs-service-strip-bg: rgba(194, 65, 12, 0.72);
+  --vs-logo-bg: rgba(255, 251, 235, 0.14);
+  --vs-logo-border: rgba(255, 247, 237, 0.45);
+  --vs-title: #fffbeb;
+  --vs-subtitle: rgba(255, 251, 235, 0.92);
+  --vs-page-title-font: ui-serif, Georgia, "Times New Roman", serif;
+  --vs-page-title-weight: 700;
+  --vs-page-title-letter-spacing: 0.01em;
+  --vs-page-title-size: clamp(1.42rem, 4.4vw, 2.25rem);
+  --vs-shell-glow: rgba(253, 224, 71, 0.35);
+  --vs-pill-bg: rgba(255, 251, 235, 0.16);
+  --vs-pill-border: rgba(255, 247, 237, 0.38);
+  --vs-pill-active-bg: rgba(255, 251, 235, 0.28);
+  --vs-pill-active-border: rgba(255, 255, 255, 0.55);
+  --vs-carousel-aspect: 2 / 1;
+  --vs-carousel-max-h: min(240px, 44vw);
+  --vs-dot-active: rgba(255, 251, 235, 0.95);
+  --vs-nav-bg: rgba(255, 251, 235, 0.94);
+}
+
+/* Tema dinamico: varianti vet-palette-011…100 — `--showcase-h` unità 0–359 (impostato da JS). */
+.luxury-salon-showcase--palette-hue {
+  --vs-border: hsl(calc(var(--showcase-h) * 1deg) 50% 55% / 0.4);
+  --vs-shell-a: hsl(calc(var(--showcase-h) * 1deg) 26% 11% / 0.94);
+  --vs-shell-b: hsl(calc((var(--showcase-h) + 28) * 1deg) 42% 22% / 0.52);
+  --vs-carousel-bg: hsl(calc(var(--showcase-h) * 1deg) 24% 15% / 0.65);
+  --vs-viewport-bg: hsl(calc(var(--showcase-h) * 1deg) 28% 9% / 0.72);
+  --vs-page-head-bg: hsl(calc(var(--showcase-h) * 1deg) 30% 14% / 0.78);
+  --vs-service-strip-bg: hsl(calc(var(--showcase-h) * 1deg) 22% 9% / 0.5);
+  --vs-hero-border: hsl(calc(var(--showcase-h) * 1deg) 40% 55% / 0.14);
+  --vs-logo-bg: hsl(calc((var(--showcase-h) + 42) * 1deg) 85% 96% / 0.08);
+  --vs-logo-border: hsl(calc((var(--showcase-h) + 38) * 1deg) 70% 70% / 0.22);
+  --vs-title: hsl(calc((var(--showcase-h) + 48) * 1deg) 96% 97% / 0.98);
+  --vs-subtitle: hsl(calc((var(--showcase-h) + 28) * 1deg) 42% 88% / 0.84);
+  --vs-nav-bg: hsl(calc((var(--showcase-h) + 50) * 1deg) 30% 96% / 0.92);
+  --vs-nav-color: hsl(calc(var(--showcase-h) * 1deg) 28% 10% / 0.96);
+  --vs-dot: hsl(calc(var(--showcase-h) * 1deg) 30% 55% / 0.32);
+  --vs-dot-active: hsl(calc((var(--showcase-h) + 8) * 1deg) 72% 62% / 0.95);
+  --vs-pill-bg: hsl(calc(var(--showcase-h) * 1deg) 55% 58% / 0.14);
+  --vs-pill-border: hsl(calc(var(--showcase-h) * 1deg) 58% 62% / 0.32);
+  --vs-pill-text: var(--vs-title);
+  --vs-pill-active-bg: hsl(calc((var(--showcase-h) + 6) * 1deg) 58% 52% / 0.32);
+  --vs-pill-active-border: hsl(calc((var(--showcase-h) + 10) * 1deg) 70% 65% / 0.52);
+  --vs-shell-glow: hsl(calc((var(--showcase-h) + 12) * 1deg) 65% 55% / 0.2);
+  --vs-carousel-aspect: 2.15 / 1;
+  --vs-carousel-max-h: min(200px, 38vw);
+}
+
+/* Sfondi multistrato per palette (9 preset, `data-palette-skin` da JS). */
+.luxury-salon-showcase--palette-hue[data-palette-skin="0"] {
+  background:
+    radial-gradient(ellipse 92% 58% at 92% 6%, hsl(calc((var(--showcase-h) + 42) * 1deg) 58% 32% / 0.44) 0%, transparent 58%),
+    radial-gradient(ellipse 72% 52% at 10% 92%, hsl(calc(var(--showcase-h) * 1deg) 42% 14% / 0.52) 0%, transparent 52%),
+    linear-gradient(152deg, var(--vs-shell-a) 0%, var(--vs-shell-b) 50%, var(--vs-shell-a) 100%);
+}
+
+.luxury-salon-showcase--palette-hue[data-palette-skin="1"] {
+  background:
+    radial-gradient(ellipse 118% 78% at 50% 128%, hsl(calc((var(--showcase-h) - 6) * 1deg) 50% 17% / 0.72) 0%, transparent 54%),
+    linear-gradient(8deg, var(--vs-shell-a) 0%, hsl(calc((var(--showcase-h) + 20) * 1deg) 30% 12% / 0.94) 100%);
+}
+
+.luxury-salon-showcase--palette-hue[data-palette-skin="2"] {
+  background:
+    conic-gradient(
+      from 200deg at 58% 42%,
+      hsl(calc(var(--showcase-h) * 1deg) 38% 13% / 0.38) 0deg,
+      transparent 95deg,
+      hsl(calc((var(--showcase-h) + 58) * 1deg) 34% 12% / 0.32) 210deg,
+      transparent 320deg
+    ),
+    linear-gradient(96deg, var(--vs-shell-a), var(--vs-shell-b));
+}
+
+.luxury-salon-showcase--palette-hue[data-palette-skin="3"] {
+  background: linear-gradient(
+    180deg,
+    hsl(calc((var(--showcase-h) + 12) * 1deg) 32% 10% / 0.93) 0%,
+    var(--vs-shell-b) 38%,
+    var(--vs-shell-a) 68%,
+    hsl(calc(var(--showcase-h) * 1deg) 28% 8% / 0.94) 100%
+  );
+}
+
+.luxury-salon-showcase--palette-hue[data-palette-skin="4"] {
+  background:
+    radial-gradient(ellipse 55% 70% at 0% 50%, hsl(calc((var(--showcase-h) + 30) * 1deg) 48% 20% / 0.42) 0%, transparent 58%),
+    radial-gradient(ellipse 55% 70% at 100% 50%, hsl(calc((var(--showcase-h) - 18) * 1deg) 44% 18% / 0.4) 0%, transparent 58%),
+    linear-gradient(168deg, var(--vs-shell-a) 0%, var(--vs-shell-b) 100%);
+}
+
+.luxury-salon-showcase--palette-hue[data-palette-skin="5"] {
+  background:
+    radial-gradient(ellipse 85% 85% at 0% 0%, rgba(0, 0, 0, 0.38) 0%, transparent 52%),
+    radial-gradient(ellipse 85% 85% at 100% 100%, rgba(0, 0, 0, 0.32) 0%, transparent 55%),
+    linear-gradient(132deg, var(--vs-shell-a), var(--vs-shell-b));
+}
+
+.luxury-salon-showcase--palette-hue[data-palette-skin="6"] {
+  background: linear-gradient(
+    118deg,
+    hsl(calc(var(--showcase-h) * 1deg) 28% 11% / 0.96) 0%,
+    hsl(calc(var(--showcase-h) * 1deg) 28% 11% / 0.96) 46%,
+    hsl(calc((var(--showcase-h) + 52) * 1deg) 36% 19% / 0.52) 46%,
+    hsl(calc((var(--showcase-h) + 48) * 1deg) 32% 14% / 0.88) 100%
+  );
+}
+
+.luxury-salon-showcase--palette-hue[data-palette-skin="7"] {
+  background:
+    radial-gradient(circle 55% at 50% 32%, hsl(calc((var(--showcase-h) + 22) * 1deg) 46% 24% / 0.4) 0%, transparent 48%),
+    linear-gradient(168deg, var(--vs-shell-a) 0%, var(--vs-shell-b) 100%);
+}
+
+.luxury-salon-showcase--palette-hue[data-palette-skin="8"] {
+  background:
+    linear-gradient(
+      180deg,
+      hsl(calc(var(--showcase-h) * 1deg) 36% 13% / 0.28) 0%,
+      transparent 14%,
+      transparent 86%,
+      hsl(calc((var(--showcase-h) + 38) * 1deg) 40% 15% / 0.26) 100%
+    ),
+    linear-gradient(86deg, var(--vs-shell-a), var(--vs-shell-b));
+}
+
+/* Menu layout: lista 100 template (anteprima pagina intera + catalogo) */
+.luxury-brand-layout-sidebar__services-block {
+  margin-bottom: 0.75rem;
+  padding: 0.55rem 0.45rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  background: linear-gradient(145deg, rgba(55, 20, 0, 0.55) 0%, rgba(15, 23, 42, 0.72) 100%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.luxury-brand-layout-sidebar__services-head {
+  margin: 0 0 0.45rem;
+  padding: 0 0.15rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fde68a;
+}
+
+@supports (-webkit-background-clip: text) {
+  .luxury-brand-layout-sidebar__services-head {
+    background: linear-gradient(90deg, #fde68a, #fb923c, #f472b6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+.luxury-brand-layout-sidebar__services-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-height: 9.5rem;
+  overflow-y: auto;
+  padding-right: 0.1rem;
+}
+
+.luxury-brand-layout-sidebar__service-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.28rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #fffbeb;
+  border: 1px solid rgba(125, 211, 252, 0.35);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.22) 0%, rgba(139, 92, 246, 0.2) 100%);
+  box-shadow: 0 2px 10px rgba(2, 6, 23, 0.35);
+}
+
+.luxury-brand-layout-sidebar__services-empty {
+  margin: 0;
+  padding: 0 0.2rem;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: rgba(226, 232, 240, 0.82);
+}
+
+.luxury-brand-layout-sidebar {
+  border-radius: 12px;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  background: rgba(2, 6, 23, 0.45);
+  padding: 0.65rem 0.5rem 0.75rem;
+  max-height: min(72vh, 640px);
+  overflow-y: auto;
+  position: sticky;
+  top: 0.75rem;
+}
+
+.luxury-brand-layout-sidebar__head {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(125, 211, 252, 0.9);
+  margin: 0 0.35rem 0.5rem;
+  padding: 0 0.15rem;
+}
+
+.luxury-brand-layout-sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.luxury-brand-layout-sidebar__item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: left;
+  margin: 0;
+  padding: 0.4rem 0.45rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: rgba(15, 23, 42, 0.35);
+  cursor: pointer;
+  color: rgba(255, 251, 235, 0.92);
+  font-size: 0.78rem;
+  line-height: 1.25;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.luxury-brand-layout-sidebar__item:hover {
+  border-color: rgba(125, 211, 252, 0.25);
+  background: rgba(30, 41, 59, 0.55);
+}
+
+.luxury-brand-layout-sidebar__item--active {
+  border-color: rgba(125, 211, 252, 0.45);
+  background: rgba(30, 58, 138, 0.35);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.12);
+}
+
+.luxury-brand-layout-sidebar__item-index {
+  flex: 0 0 auto;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: rgba(148, 163, 184, 0.95);
+  width: 1.35rem;
+}
+
+.luxury-brand-layout-sidebar__item-text {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+@media (max-width: 880px) {
+  .luxury-brand-layout-sidebar {
+    position: relative;
+    top: auto;
+    max-height: none;
+    overflow: visible;
+    order: -1;
+  }
+
+  .luxury-brand-layout-sidebar ul {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.45rem;
+    padding-bottom: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .luxury-brand-layout-sidebar__item {
+    flex: 0 0 auto;
+    flex-direction: column;
+    width: 104px;
+    padding: 0.45rem 0.35rem;
+    align-items: center;
+    text-align: center;
+  }
+
+  .luxury-brand-layout-sidebar__item-index {
+    display: none;
+  }
+
+  .luxury-brand-layout-sidebar__item-text {
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+}
+
+/* Editor cards */
+.luxury-brand-upload-zone {
+  border: 1px dashed rgba(125, 211, 252, 0.35);
+  border-radius: 12px;
+  padding: 0.85rem;
+  text-align: center;
+  background: rgba(2, 6, 23, 0.25);
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.luxury-brand-upload-zone--logo {
+  width: min(152px, 42vw);
+  height: min(152px, 42vw);
+  aspect-ratio: 1;
+  min-height: unset;
+  margin: 0 auto;
+  border-radius: 50%;
+}
+
+.luxury-brand-preview-logo {
+  width: min(152px, 42vw);
+  height: min(152px, 42vw);
+  aspect-ratio: 1;
+  max-width: 100%;
+  margin: 0 auto;
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255, 251, 235, 0.06);
+  border: 2px solid rgba(255, 251, 235, 0.14);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.28);
+}
+
+.luxury-brand-preview-logo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.luxury-brand-site-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.65rem;
+}
+
+.luxury-brand-site-slot {
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(2, 6, 23, 0.35);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  position: relative;
+  isolation: isolate;
+}
+
+/* `height: %` sul figlio spesso fallisce con genitore solo `aspect-ratio` → immagine “vuota” */
+.luxury-brand-site-slot > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 0;
+}
+
+.luxury-brand-site-slot__toolbar {
+  position: absolute;
+  z-index: 2;
+  bottom: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.luxury-brand-site-slot__toolbar > * {
+  pointer-events: auto;
+}
+
+@keyframes luxury-brand-site-slot-empty-border {
+  0%,
+  100% {
+    border-color: rgba(125, 211, 252, 0.3);
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+  }
+  50% {
+    border-color: rgba(251, 191, 36, 0.38);
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.12);
+  }
+}
+
+.luxury-brand-site-slot__placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  min-height: 0;
+  height: auto;
+  margin: 0;
+  padding: 0.4rem 0.35rem 2.15rem;
+  justify-content: center;
+  border-radius: inherit;
+  border: 1px dashed rgba(125, 211, 252, 0.3) !important;
+  background: rgba(2, 6, 23, 0.28) !important;
+  animation: luxury-brand-site-slot-empty-border 3.2s ease-in-out infinite;
+  transition:
+    border-color 0.28s ease,
+    background 0.28s ease,
+    transform 0.32s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+.luxury-brand-site-slot__glyph {
+  font-size: 1.5rem;
+  font-weight: 300;
+  line-height: 1;
+  color: rgba(251, 191, 36, 0.55);
+  text-shadow: 0 0 18px rgba(249, 115, 22, 0.25);
+  transition:
+    color 0.25s ease,
+    transform 0.32s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+.luxury-brand-site-slot__label {
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.92);
+}
+
+.luxury-brand-site-slot__btn {
+  cursor: pointer;
+  margin: 0;
+  font-size: 0.72rem;
+  padding: 0.28rem 0.5rem;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.45, 0.64, 1),
+    box-shadow 0.22s ease,
+    filter 0.2s ease;
+}
+
+.luxury-brand-site-slot--filled > img {
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.luxury-brand-site-slot--filled::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(165deg, transparent 40%, rgba(2, 6, 23, 0.55) 100%);
+  transition: opacity 0.32s ease;
+}
+
+.luxury-salon-services-form-card .luxury-brand-site-slot {
+  transition:
+    transform 0.32s cubic-bezier(0.34, 1.45, 0.64, 1),
+    border-color 0.26s ease,
+    box-shadow 0.32s ease;
+}
+
+.luxury-brand-site-slot:focus-within {
+  border-color: rgba(56, 189, 248, 0.48);
+  box-shadow:
+    0 0 0 2px rgba(56, 189, 248, 0.12),
+    0 10px 26px rgba(2, 6, 23, 0.38);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-services-form-card .luxury-brand-site-slot:hover {
+    transform: translateY(-4px) scale(1.02);
+    border-color: rgba(251, 191, 36, 0.45);
+    box-shadow:
+      0 0 0 1px rgba(251, 191, 36, 0.14),
+      0 14px 32px rgba(2, 6, 23, 0.48),
+      0 0 28px rgba(249, 115, 22, 0.08);
+  }
+
+  .luxury-salon-services-form-card .luxury-brand-site-slot--empty:hover .luxury-brand-site-slot__placeholder {
+    background: rgba(2, 6, 23, 0.42) !important;
+    border-color: rgba(251, 191, 36, 0.42) !important;
+    transform: scale(1.02);
+  }
+
+  .luxury-salon-services-form-card .luxury-brand-site-slot--empty:hover .luxury-brand-site-slot__glyph {
+    color: rgba(254, 243, 199, 0.9);
+    transform: scale(1.08);
+  }
+
+  .luxury-salon-services-form-card .luxury-brand-site-slot--filled:hover > img {
+    transform: scale(1.06);
+  }
+
+  .luxury-salon-services-form-card .luxury-brand-site-slot--filled:hover::after {
+    opacity: 1;
+  }
+
+  .luxury-salon-services-form-card .luxury-brand-site-slot__toolbar .luxury-brand-site-slot__btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+    box-shadow: 0 6px 16px rgba(2, 6, 23, 0.35);
+  }
+
+  .luxury-salon-services-form-card .luxury-brand-site-slot__toolbar .luxury-brand-site-slot__btn:active:not(:disabled) {
+    transform: translateY(0);
+    transition-duration: 0.1s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-brand-site-slot__placeholder {
+    animation: none;
+  }
+
+  .luxury-brand-site-slot--filled > img,
+  .luxury-brand-site-slot__placeholder,
+  .luxury-brand-site-slot__glyph,
+  .luxury-salon-services-form-card .luxury-brand-site-slot,
+  .luxury-brand-site-slot__btn {
+    transition: none;
+  }
+
+  .luxury-salon-services-form-card .luxury-brand-site-slot:hover,
+  .luxury-salon-services-form-card .luxury-brand-site-slot--empty:hover .luxury-brand-site-slot__placeholder,
+  .luxury-salon-services-form-card .luxury-brand-site-slot--empty:hover .luxury-brand-site-slot__glyph {
+    transform: none;
+  }
+}
+
+.luxury-brand-service-photo-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.luxury-brand-service-thumb {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.luxury-brand-service-thumb > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.luxury-brand-service-thumb > .luxury-brand-upload-zone {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  border-radius: inherit;
+}
+
+/* Lista servizi pubblica con foto */
+.luxury-service-radio-with-photo label {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+}
+
+.luxury-service-radio-with-photo .luxury-service-radio-photo {
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(15, 23, 42, 0.6);
+  margin-top: 2px;
+}
+
+.luxury-service-radio-with-photo .luxury-service-radio-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.luxury-brand-showcase-colors {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.luxury-brand-showcase-colors__head {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: rgba(248, 250, 252, 0.96);
+}
+
+.luxury-brand-showcase-colors__sub {
+  margin: 0 0 0.65rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: rgba(203, 213, 225, 0.9);
+}
+
+.luxury-brand-showcase-colors__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.55rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.luxury-brand-showcase-colors__row:last-child {
+  border-bottom: none;
+}
+
+.luxury-brand-showcase-colors__grow {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
+.luxury-brand-showcase-colors__label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: rgba(248, 250, 252, 0.94);
+}
+
+.luxury-brand-showcase-colors__hint {
+  margin: 0.12rem 0 0;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: rgba(148, 163, 184, 0.95);
+}
+
+.luxury-brand-showcase-colors__picker {
+  width: 2.5rem;
+  height: 2.1rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.luxury-brand-showcase-colors__picker:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.luxury-soft-field.luxury-brand-showcase-colors__hex {
+  width: 6.5rem;
+  flex-shrink: 0;
+  font-size: 0.76rem;
+  padding: 0.35rem 0.45rem;
+}
+
+.luxury-brand-showcase-colors__reset {
+  margin: 0;
+  font-size: 0.68rem;
+  padding: 0.28rem 0.45rem;
+  flex-shrink: 0;
+}

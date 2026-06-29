@@ -49,12 +49,12 @@ export function VelvetEuropeanContactFields({
   return (
     <>
       {showCountryField ? (
-        <label className="velvet-plans-field velvet-plans-field--full">
+        <label className="luxury-plans-field luxury-plans-field--full">
           <span>Nazione</span>
           <select
             id={countrySelectId}
             name="country"
-            className="velvet-eu-contact-select"
+            className="luxury-eu-contact-select"
             value={countryCode || DEFAULT_EUROPEAN_COUNTRY_CODE}
             onChange={(ev) => onCountryChange(ev.target.value)}
             disabled={disabled}
@@ -69,13 +69,13 @@ export function VelvetEuropeanContactFields({
         </label>
       ) : null}
 
-      <div className="velvet-plans-field velvet-plans-field--full velvet-eu-phone-field">
+      <div className="luxury-plans-field luxury-plans-field--full luxury-eu-phone-field">
         <span>Telefono</span>
-        <div className="velvet-eu-phone-row">
+        <div className="luxury-eu-phone-row">
           <select
             id={prefixSelectId}
             name="phonePrefix"
-            className="velvet-eu-contact-select velvet-eu-phone-row__prefix"
+            className="luxury-eu-contact-select luxury-eu-phone-row__prefix"
             value={dialCode}
             onChange={(ev) => onPrefixChange(ev.target.value)}
             disabled={disabled}
@@ -91,7 +91,7 @@ export function VelvetEuropeanContactFields({
             id={phoneInputId}
             name="phoneLocal"
             type="tel"
-            className="velvet-eu-phone-row__number"
+            className="luxury-eu-phone-row__number"
             inputMode="tel"
             autoComplete="tel-national"
             maxLength={20}

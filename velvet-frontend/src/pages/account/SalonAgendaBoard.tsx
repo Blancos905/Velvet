@@ -197,32 +197,32 @@ export function SalonAgendaBoard({
   const singleOperator = Boolean(staffMode || operatorId?.trim());
 
   return (
-    <div className={"velvet-salon-agenda" + (size === "large" ? " velvet-salon-agenda--large" : "")}>
-      <div className="velvet-salon-agenda__ambient" aria-hidden />
-      <div className="velvet-salon-agenda__panel">
-        <div className="velvet-salon-agenda__toolbar">
+    <div className={"luxury-salon-agenda" + (size === "large" ? " luxury-salon-agenda--large" : "")}>
+      <div className="luxury-salon-agenda__ambient" aria-hidden />
+      <div className="luxury-salon-agenda__panel">
+        <div className="luxury-salon-agenda__toolbar">
           <button
             type="button"
-            className="velvet-btn velvet-btn--secondary"
+            className="luxury-btn luxury-btn--secondary"
             onClick={() => setWeekAnchor(addDays(weekStart, -7))}
           >
             ← Settimana
           </button>
           <button
             type="button"
-            className="velvet-btn velvet-btn--secondary"
+            className="luxury-btn luxury-btn--secondary"
             onClick={() => setWeekAnchor(addDays(weekStart, 7))}
           >
             Settimana →
           </button>
-          <button type="button" className="velvet-btn velvet-btn--ghost" onClick={() => setWeekAnchor(new Date())}>
+          <button type="button" className="luxury-btn luxury-btn--ghost" onClick={() => setWeekAnchor(new Date())}>
             Oggi
           </button>
           {showOwnerBookClient ? (
-            <div className="velvet-salon-agenda__toolbar-book">
+            <div className="luxury-salon-agenda__toolbar-book">
               <button
                 type="button"
-                className="velvet-btn velvet-btn--primary"
+                className="luxury-btn luxury-btn--primary"
                 onClick={() => setBookDialogOpen(true)}
               >
                 Prenota cliente
@@ -231,17 +231,17 @@ export function SalonAgendaBoard({
           ) : null}
         </div>
 
-        <div className="velvet-salon-agenda__range-filter" ref={rangeFilterRef}>
-          <span className="velvet-salon-agenda__range-filter-label" id="velvet-agenda-range-label">
+        <div className="luxury-salon-agenda__range-filter" ref={rangeFilterRef}>
+          <span className="luxury-salon-agenda__range-filter-label" id="luxury-agenda-range-label">
             Periodo
           </span>
           <button
             type="button"
-            className="velvet-salon-agenda__range-filter-trigger"
+            className="luxury-salon-agenda__range-filter-trigger"
             aria-expanded={rangePickerOpen}
             aria-haspopup="dialog"
-            aria-controls="velvet-agenda-range-popover"
-            aria-labelledby="velvet-agenda-range-label"
+            aria-controls="luxury-agenda-range-popover"
+            aria-labelledby="luxury-agenda-range-label"
             onClick={() => {
               setRangePickerDraft(selectedYmd);
               setRangePickerOpen((o) => !o);
@@ -251,19 +251,19 @@ export function SalonAgendaBoard({
           </button>
           {rangePickerOpen ? (
             <div
-              id="velvet-agenda-range-popover"
-              className="velvet-salon-agenda__range-popover"
+              id="luxury-agenda-range-popover"
+              className="luxury-salon-agenda__range-popover"
               role="dialog"
               aria-label="Cerca giorno nella settimana"
             >
-              <p className="velvet-salon-agenda__range-popover-hint">
+              <p className="luxury-salon-agenda__range-popover-hint">
                 Scegli un giorno: l&apos;agenda mostra la settimana (lun–dom) che lo contiene.
               </p>
-              <label className="velvet-salon-agenda__range-popover-field">
-                <span className="velvet-salon-agenda__range-popover-field-label">Giorno</span>
+              <label className="luxury-salon-agenda__range-popover-field">
+                <span className="luxury-salon-agenda__range-popover-field-label">Giorno</span>
                 <input
                   type="date"
-                  className="velvet-salon-agenda__range-date-input"
+                  className="luxury-salon-agenda__range-date-input"
                   value={rangePickerDraft}
                   onChange={(e) => {
                     const v = e.target.value;
@@ -276,7 +276,7 @@ export function SalonAgendaBoard({
                   }}
                 />
               </label>
-              <button type="button" className="velvet-btn velvet-btn--ghost velvet-salon-agenda__range-popover-close" onClick={() => setRangePickerOpen(false)}>
+              <button type="button" className="luxury-btn luxury-btn--ghost luxury-salon-agenda__range-popover-close" onClick={() => setRangePickerOpen(false)}>
                 Chiudi
               </button>
             </div>
@@ -285,27 +285,27 @@ export function SalonAgendaBoard({
       </div>
 
       {q.isLoading && (
-        <p className="velvet-salon-agenda__loading velvet-text-muted">
-          <span className="velvet-salon-agenda__loading-dot" aria-hidden />
+        <p className="luxury-salon-agenda__loading luxury-text-muted">
+          <span className="luxury-salon-agenda__loading-dot" aria-hidden />
           Caricamento agenda…
         </p>
       )}
       {q.error && (
-        <p className="velvet-salon-agenda__error velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-salon-agenda__error luxury-alert luxury-alert--error" role="alert">
           {q.error instanceof Error ? q.error.message : "Errore"}
         </p>
       )}
 
       {q.data !== undefined && (
-        <div className="velvet-salon-agenda__body">
-          <div className="velvet-salon-agenda__week-shell">
-            <div className="velvet-salon-agenda__week-head">
-              <span className="velvet-salon-agenda__week-kicker">{weekKicker ?? "Calendario"}</span>
-              <span className="velvet-salon-agenda__week-sub">
+        <div className="luxury-salon-agenda__body">
+          <div className="luxury-salon-agenda__week-shell">
+            <div className="luxury-salon-agenda__week-head">
+              <span className="luxury-salon-agenda__week-kicker">{weekKicker ?? "Calendario"}</span>
+              <span className="luxury-salon-agenda__week-sub">
                 {weekSub ?? "Tocca un giorno per vedere le prenotazioni"}
               </span>
             </div>
-            <div className="velvet-salon-agenda__week" role="group" aria-label="Scegli il giorno della settimana">
+            <div className="luxury-salon-agenda__week" role="group" aria-label="Scegli il giorno della settimana">
             {days.map((day) => {
               const ymd = formatLocalYmd(day);
               const count = agendaRows.filter((a) => sameLocalDay(a.start, day)).length;
@@ -320,18 +320,18 @@ export function SalonAgendaBoard({
                   aria-pressed={isSelected}
                   aria-label={label}
                   className={
-                    "velvet-salon-agenda__day-cell" +
-                    (isToday ? " velvet-salon-agenda__day-cell--today" : "") +
-                    (isSelected ? " velvet-salon-agenda__day-cell--selected" : "")
+                    "luxury-salon-agenda__day-cell" +
+                    (isToday ? " luxury-salon-agenda__day-cell--today" : "") +
+                    (isSelected ? " luxury-salon-agenda__day-cell--selected" : "")
                   }
                   onClick={() => setSelectedYmd(ymd)}
                 >
-                  <span className="velvet-salon-agenda__day-cell-dow">{agendaWeekdayLabel(day)}</span>
-                  <span className="velvet-salon-agenda__day-cell-dom">{day.getDate()}</span>
+                  <span className="luxury-salon-agenda__day-cell-dow">{agendaWeekdayLabel(day)}</span>
+                  <span className="luxury-salon-agenda__day-cell-dom">{day.getDate()}</span>
                   <span
                     className={
-                      "velvet-salon-agenda__day-cell-count" +
-                      (count === 0 ? " velvet-salon-agenda__day-cell-count--zero" : "")
+                      "luxury-salon-agenda__day-cell-count" +
+                      (count === 0 ? " luxury-salon-agenda__day-cell-count--zero" : "")
                     }
                     aria-hidden
                   >
@@ -344,18 +344,18 @@ export function SalonAgendaBoard({
           </div>
 
           {selectedDay && (
-            <section className="velvet-salon-agenda__day-block velvet-salon-agenda__detail" aria-live="polite">
+            <section className="luxury-salon-agenda__day-block luxury-salon-agenda__detail" aria-live="polite">
               <header
                 className={
-                  "velvet-salon-agenda__dayhead" +
-                  (formatLocalYmd(selectedDay) === todayYmd ? " velvet-salon-agenda__dayhead--today" : "")
+                  "luxury-salon-agenda__dayhead" +
+                  (formatLocalYmd(selectedDay) === todayYmd ? " luxury-salon-agenda__dayhead--today" : "")
                 }
               >
-                <span className="velvet-salon-agenda__dayhead-accent" aria-hidden />
-                <div className="velvet-salon-agenda__dayhead-main">
-                  <span className="velvet-salon-agenda__dow">{agendaWeekdayLabel(selectedDay)}</span>
-                  <span className="velvet-salon-agenda__dom">{selectedDay.getDate()}</span>
-                  <span className="velvet-salon-agenda__date-long">
+                <span className="luxury-salon-agenda__dayhead-accent" aria-hidden />
+                <div className="luxury-salon-agenda__dayhead-main">
+                  <span className="luxury-salon-agenda__dow">{agendaWeekdayLabel(selectedDay)}</span>
+                  <span className="luxury-salon-agenda__dom">{selectedDay.getDate()}</span>
+                  <span className="luxury-salon-agenda__date-long">
                     {selectedDay.toLocaleDateString("it-IT", {
                       weekday: "long",
                       day: "numeric",
@@ -364,7 +364,7 @@ export function SalonAgendaBoard({
                     })}
                   </span>
                 </div>
-                <span className="velvet-salon-agenda__day-count">
+                <span className="luxury-salon-agenda__day-count">
                   {selectedItems.length === 0
                     ? "Nessuna prenotazione"
                     : selectedItems.length === 1
@@ -373,9 +373,9 @@ export function SalonAgendaBoard({
                 </span>
               </header>
 
-              <div className="velvet-salon-agenda__table-wrap">
-                <table className="velvet-salon-agenda__table">
-                  <caption className="velvet-salon-agenda__caption">
+              <div className="luxury-salon-agenda__table-wrap">
+                <table className="luxury-salon-agenda__table">
+                  <caption className="luxury-salon-agenda__caption">
                     Agenda del{" "}
                     {selectedDay.toLocaleDateString("it-IT", {
                       day: "numeric",
@@ -392,7 +392,7 @@ export function SalonAgendaBoard({
                       <th scope="col">Sede</th>
                       <th scope="col">Prezzo</th>
                       <th scope="col">Stato</th>
-                      <th scope="col" className="velvet-salon-agenda__th-action">
+                      <th scope="col" className="luxury-salon-agenda__th-action">
                         Dettaglio
                       </th>
                     </tr>
@@ -400,7 +400,7 @@ export function SalonAgendaBoard({
                   <tbody>
                     {selectedItems.length === 0 ? (
                       <tr>
-                        <td colSpan={singleOperator ? 7 : 8} className="velvet-salon-agenda__table-empty">
+                        <td colSpan={singleOperator ? 7 : 8} className="luxury-salon-agenda__table-empty">
                           Nessuna prenotazione in questo giorno. Scegli un altro giorno nella settimana sopra.
                         </td>
                       </tr>
@@ -409,8 +409,8 @@ export function SalonAgendaBoard({
                         <tr
                           key={a.id}
                           className={
-                            "velvet-salon-agenda__data-row" +
-                            (staffMode ? "" : " velvet-salon-agenda__data-row--openable")
+                            "luxury-salon-agenda__data-row" +
+                            (staffMode ? "" : " luxury-salon-agenda__data-row--openable")
                           }
                           onClick={
                             staffMode
@@ -422,30 +422,30 @@ export function SalonAgendaBoard({
                                 }
                           }
                         >
-                          <td className="velvet-salon-agenda__cell-time">
-                            <span className="velvet-salon-agenda__time-range">
+                          <td className="luxury-salon-agenda__cell-time">
+                            <span className="luxury-salon-agenda__time-range">
                               {formatHm(a.start)} – {formatHm(a.end)}
                             </span>
                           </td>
-                          <td className="velvet-salon-agenda__cell-strong">{a.serviceName}</td>
+                          <td className="luxury-salon-agenda__cell-strong">{a.serviceName}</td>
                           <td>{a.salonClientDisplayName}</td>
                           {!singleOperator ? <td>{a.operatorName}</td> : null}
-                          <td className="velvet-salon-agenda__cell-muted">{a.locationName}</td>
-                          <td className="velvet-salon-agenda__cell-num">{formatPriceEUR(a.priceCents)}</td>
+                          <td className="luxury-salon-agenda__cell-muted">{a.locationName}</td>
+                          <td className="luxury-salon-agenda__cell-num">{formatPriceEUR(a.priceCents)}</td>
                           <td>
                             <span
-                              className="velvet-salon-agenda__status"
+                              className="luxury-salon-agenda__status"
                               data-agenda-status={agendaStatusTone(a.status)}
                               title={a.status}
                             >
                               {a.status}
                             </span>
                           </td>
-                          <td className="velvet-salon-agenda__cell-action">
+                          <td className="luxury-salon-agenda__cell-action">
                             {staffMode ? (
-                              <span className="velvet-salon-agenda__row-muted">—</span>
+                              <span className="luxury-salon-agenda__row-muted">—</span>
                             ) : (
-                              <Link to={`/account/prenotazioni/${a.id}`} className="velvet-salon-agenda__row-link">
+                              <Link to={`/account/prenotazioni/${a.id}`} className="luxury-salon-agenda__row-link">
                                 Apri
                               </Link>
                             )}

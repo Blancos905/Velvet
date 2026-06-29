@@ -5,10 +5,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.velvet.catalog.domain.SalonClient;
 import it.velvet.consumer.service.SalonClientMembershipService;
-import it.velvet.consumer.service.SalonVelvetChatService;
-import it.velvet.consumer.service.SalonVelvetChatService.SalonVelvetChatInboxSummaryDto;
-import it.velvet.consumer.service.SalonVelvetChatService.SalonVelvetChatMessageDto;
-import it.velvet.consumer.service.SalonVelvetChatService.SalonVelvetChatUnreadDto;
+import it.velvet.consumer.service.SalonLuxuryChatService;
+import it.velvet.consumer.service.SalonLuxuryChatService.SalonLuxuryChatInboxSummaryDto;
+import it.velvet.consumer.service.SalonLuxuryChatService.SalonLuxuryChatMessageDto;
+import it.velvet.consumer.service.SalonLuxuryChatService.SalonLuxuryChatUnreadDto;
 import it.velvet.security.auth.VelvetUserPrincipal;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -40,13 +40,13 @@ import java.util.UUID;
 public class MeSalonClientsController {
 
 	private final SalonClientMembershipService salonClientMembershipService;
-	private final SalonVelvetChatService salonVelvetChatService;
+	private final SalonLuxuryChatService salonLuxuryChatService;
 
 	public MeSalonClientsController(
 			SalonClientMembershipService salonClientMembershipService,
-			SalonVelvetChatService salonVelvetChatService) {
+			SalonLuxuryChatService salonLuxuryChatService) {
 		this.salonClientMembershipService = salonClientMembershipService;
-		this.salonVelvetChatService = salonVelvetChatService;
+		this.salonLuxuryChatService = salonLuxuryChatService;
 	}
 
 	@GetMapping
@@ -91,39 +91,39 @@ public class MeSalonClientsController {
 	@GetMapping("/chat/unread-count")
 	@Operation(summary = "Messaggi chat non letti (lato cliente e lato titolare Premium)")
 	@PreAuthorize("isAuthenticated()")
-	public SalonVelvetChatUnreadDto chatUnreadCount(@AuthenticationPrincipal VelvetUserPrincipal principal) {
-		return salonVelvetChatService.unreadTotals(principal);
+	public SalonLuxuryChatUnreadDto chatUnreadCount(@AuthenticationPrincipal VelvetUserPrincipal principal) {
+		return salonLuxuryChatService.unreadTotals(principal);
 	}
 
 	@GetMapping("/chat/inbox-summaries")
 	@Operation(summary = "Riepilogo conversazioni chat (non letti + anteprima ultimo messaggio)")
 	@PreAuthorize("isAuthenticated()")
-	public List<SalonVelvetChatInboxSummaryDto> chatInboxSummaries(
+	public List<SalonLuxuryChatInboxSummaryDto> chatInboxSummaries(
 			@AuthenticationPrincipal VelvetUserPrincipal principal,
 			@RequestHeader(value = "X-Location-Id", required = false) UUID xLocationId) {
-		return salonVelvetChatService.listInboxSummaries(principal, xLocationId);
+		return salonLuxuryChatService.listInboxSummaries(principal, xLocationId);
 	}
 
 	@GetMapping("/chat/messages")
 	@Operation(summary = "Messaggi chat B2C (salon_client_id; staff_operator_id opzionale per thread operatore)")
 	@PreAuthorize("isAuthenticated()")
-	public List<SalonVelvetChatMessageDto> listChatMessages(
+	public List<SalonLuxuryChatMessageDto> listChatMessages(
 			@AuthenticationPrincipal VelvetUserPrincipal principal,
 			@RequestParam("salonClientId") UUID salonClientId,
 			@RequestParam(value = "staffOperatorId", required = false) UUID staffOperatorId) {
-		return salonVelvetChatService.listMessages(principal, salonClientId, staffOperatorId);
+		return salonLuxuryChatService.listMessages(principal, salonClientId, staffOperatorId);
 	}
 
 	@PostMapping("/chat/messages")
 	@Operation(summary = "Invia messaggio chat B2C")
 	@PreAuthorize("isAuthenticated()")
-	public SalonVelvetChatMessageDto postChatMessage(
+	public SalonLuxuryChatMessageDto postChatMessage(
 			@AuthenticationPrincipal VelvetUserPrincipal principal,
-			@Valid @RequestBody PostSalonVelvetChatBody body) {
-		return salonVelvetChatService.postMessage(principal, body.salonClientId(), body.staffOperatorId(), body.body());
+			@Valid @RequestBody PostSalonLuxuryChatBody body) {
+		return salonLuxuryChatService.postMessage(principal, body.salonClientId(), body.staffOperatorId(), body.body());
 	}
 
-	public record PostSalonVelvetChatBody(
+	public record PostSalonLuxuryChatBody(
 			@NotNull UUID salonClientId,
 			UUID staffOperatorId,
 			@NotBlank @Size(max = 4000) String body) {

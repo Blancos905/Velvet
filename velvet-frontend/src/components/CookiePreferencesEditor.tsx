@@ -21,22 +21,25 @@ export function CookiePreferencesEditor() {
     setSavedAt(prefs?.decidedAt ?? null);
   }
 
-  function save(prefs: ReturnType<typeof defaultCookieConsent>) {
-    writeCookieConsent(prefs);
+  function save(
+    prefs: ReturnType<typeof defaultCookieConsent>,
+    action: "accept_all" | "reject_non_essential" | "custom",
+  ) {
+    writeCookieConsent(prefs, action);
     setSavedAt(prefs.decidedAt);
     setMaps(prefs.maps);
     setEditorial(prefs.editorial);
   }
 
   return (
-    <div className="velvet-cookie-prefs">
-      <p className="velvet-legal-public__text">
+    <div className="luxury-cookie-prefs">
+      <p className="luxury-legal-public__text">
         Puoi aggiornare in qualsiasi momento le preferenze su mappe e contenuti editoriali. I cookie strettamente necessari
         restano sempre attivi.
       </p>
-      <ul className="velvet-cookie-banner__categories">
-        <li className="velvet-cookie-banner__category">
-          <label className="velvet-cookie-banner__toggle">
+      <ul className="luxury-cookie-banner__categories">
+        <li className="luxury-cookie-banner__category">
+          <label className="luxury-cookie-banner__toggle">
             <input type="checkbox" checked={maps} onChange={(e) => setMaps(e.target.checked)} />
             <span>
               <strong>Mappe e geocodifica</strong>
@@ -44,8 +47,8 @@ export function CookiePreferencesEditor() {
             </span>
           </label>
         </li>
-        <li className="velvet-cookie-banner__category">
-          <label className="velvet-cookie-banner__toggle">
+        <li className="luxury-cookie-banner__category">
+          <label className="luxury-cookie-banner__toggle">
             <input type="checkbox" checked={editorial} onChange={(e) => setEditorial(e.target.checked)} />
             <span>
               <strong>Contenuti editoriali</strong>
@@ -54,39 +57,42 @@ export function CookiePreferencesEditor() {
           </label>
         </li>
       </ul>
-      <div className="velvet-cookie-banner__actions">
+      <div className="luxury-cookie-banner__actions">
         <button
           type="button"
-          className="velvet-cookie-banner__button velvet-cookie-banner__button--ghost"
-          onClick={() => save(defaultCookieConsent())}
+          className="luxury-cookie-banner__button luxury-cookie-banner__button--ghost"
+          onClick={() => save(defaultCookieConsent(), "reject_non_essential")}
         >
           Rifiuta non necessari
         </button>
-        <button type="button" className="velvet-cookie-banner__button velvet-cookie-banner__button--ghost" onClick={() => save(acceptAllCookieConsent())}>
+        <button type="button" className="luxury-cookie-banner__button luxury-cookie-banner__button--ghost" onClick={() => save(acceptAllCookieConsent(), "accept_all")}>
           Accetta tutti
         </button>
         <button
           type="button"
-          className="velvet-cookie-banner__button"
+          className="luxury-cookie-banner__button"
           onClick={() =>
-            save({
-              version: 2,
-              decidedAt: new Date().toISOString(),
-              necessary: true,
-              maps,
-              editorial,
-            })
+            save(
+              {
+                version: 2,
+                decidedAt: new Date().toISOString(),
+                necessary: true,
+                maps,
+                editorial,
+              },
+              "custom",
+            )
           }
         >
           Salva preferenze
         </button>
       </div>
       {savedAt ? (
-        <p className="velvet-cookie-banner__fineprint">Ultimo aggiornamento: {new Date(savedAt).toLocaleString("it-IT")}</p>
+        <p className="luxury-cookie-banner__fineprint">Ultimo aggiornamento: {new Date(savedAt).toLocaleString("it-IT")}</p>
       ) : (
-        <p className="velvet-cookie-banner__fineprint">
+        <p className="luxury-cookie-banner__fineprint">
           Nessuna preferenza salvata.{" "}
-          <button type="button" className="velvet-cookie-banner__link" style={{ background: "none", border: 0, padding: 0, cursor: "pointer" }} onClick={syncFromStorage}>
+          <button type="button" className="luxury-cookie-banner__link" style={{ background: "none", border: 0, padding: 0, cursor: "pointer" }} onClick={syncFromStorage}>
             Ricarica
           </button>
         </p>

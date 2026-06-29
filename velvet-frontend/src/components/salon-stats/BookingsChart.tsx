@@ -22,17 +22,17 @@ export default function BookingsChart({
   compareLine,
 }: BookingsChartProps) {
   return (
-    <section className="velvet-stats-pro-panel velvet-stats-metric-card">
-      <div className="velvet-stats-chart-card__head">
-        <h2 className="velvet-stats-chart-card__title">{title}</h2>
-        <p className="velvet-stats-chart-card__subtitle">{subtitle}</p>
+    <section className="luxury-stats-pro-panel luxury-stats-metric-card">
+      <div className="luxury-stats-chart-card__head">
+        <h2 className="luxury-stats-chart-card__title">{title}</h2>
+        <p className="luxury-stats-chart-card__subtitle">{subtitle}</p>
       </div>
       {loading ? (
-        <p className="velvet-stats-metric-muted velvet-stats-chart-card__loading">Caricamento serie storica…</p>
+        <p className="luxury-stats-metric-muted luxury-stats-chart-card__loading">Caricamento serie storica…</p>
       ) : (
         <>
-          <div className="velvet-stats-month-chart" role="img" aria-label="Grafico a barre appuntamenti per mese">
-            <svg viewBox="0 0 100 42" className="velvet-stats-month-chart__svg" preserveAspectRatio="xMidYMid meet">
+          <div className="luxury-stats-month-chart" role="img" aria-label="Grafico a barre appuntamenti per mese">
+            <svg viewBox="0 0 100 42" className="luxury-stats-month-chart__svg" preserveAspectRatio="xMidYMid meet">
               <defs>
                 <linearGradient id={barGradientId} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="rgba(120, 103, 255, 0.95)" />
@@ -63,15 +63,15 @@ export default function BookingsChart({
                 );
               })}
             </svg>
-            <div className="velvet-stats-month-chart__labels">
+            <div className="luxury-stats-month-chart__labels">
               {monthlySeries.map((row) => (
-                <span key={row.key} className="velvet-stats-month-chart__lab">
+                <span key={row.key} className="luxury-stats-month-chart__lab">
                   {row.label}
                 </span>
               ))}
             </div>
           </div>
-          <div className="velvet-stats-chart-card__compare">{compareLine}</div>
+          <div className="luxury-stats-chart-card__compare">{compareLine}</div>
         </>
       )}
     </section>

@@ -104,3 +104,34 @@ Le chiamate API restano gestite dal **frontend** (proxy Vite in dev, `VITE_API_B
 ## Documentazione prodotto
 
 `../docs/GOOGLE-PLAY-E-CANALI-CLIENTE-VELVET.md`, `../docs/AMBIENTI-E-CONFIGURAZIONE.md`
+
+## Release Android (Google Play)
+
+### 1. Firma release (una tantum)
+
+```bash
+cd velvet-app
+./scripts/setup-android-release-signing.sh
+```
+
+Crea `android/upload-keystore.jks` e `android/key.properties` (entrambi **gitignored**).  
+Salva backup del keystore e delle password in un vault — Play Console userà questo certificato upload.
+
+Template: `android/key.properties.example`
+
+### 2. Build AAB
+
+```bash
+./scripts/build-android-release.sh
+```
+
+Default: `VELVET_WEB_BASE_URL=https://www.saloniluxury.it`. Output:
+
+`build/app/outputs/bundle/release/app-release.aab`
+
+### 3. Upload
+
+Play Console → app `it.saloniluxury.velvet_app` → carica l’AAB.  
+Allinea Data safety e URL privacy a `/privacy/clienti` e `/privacy/elimina-account` sul sito live.
+
+Note reviewer: `../docs/APP_STORE_REVIEW_NOTES.md`

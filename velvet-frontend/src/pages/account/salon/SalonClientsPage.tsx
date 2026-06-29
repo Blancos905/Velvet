@@ -97,9 +97,9 @@ export default function SalonClientsPage() {
   if (isSalonStaff) {
     if (staffSalon.isPending) {
       return (
-        <main className="velvet-page-main velvet-clients-dash velvet-clients-dash--base44">
-          <div className="velvet-clients-dash__shell">
-            <p className="velvet-text-muted" style={{ marginTop: "1.5rem" }}>
+        <main className="luxury-page-main luxury-clients-dash luxury-clients-dash--base44">
+          <div className="luxury-clients-dash__shell">
+            <p className="luxury-text-muted" style={{ marginTop: "1.5rem" }}>
               Caricamento…
             </p>
           </div>
@@ -119,34 +119,34 @@ export default function SalonClientsPage() {
     isSalonTitolare && !slug && !primaryLocationId && !meSalon.isPending;
 
   return (
-    <main className="velvet-page-main velvet-clients-dash velvet-clients-dash--base44">
-      <div className="velvet-clients-dash__shell">
-        <header className="velvet-clients-dash__header velvet-clients-dash__header--hero">
-          <div className="velvet-clients-dash__hero-glow" aria-hidden />
-          <div className="velvet-clients-dash__title-row">
-            <h1 className="velvet-clients-dash__headline">
-              <span className="velvet-clients-dash__headline-pre">
+    <main className="luxury-page-main luxury-clients-dash luxury-clients-dash--base44">
+      <div className="luxury-clients-dash__shell">
+        <header className="luxury-clients-dash__header luxury-clients-dash__header--hero">
+          <div className="luxury-clients-dash__hero-glow" aria-hidden />
+          <div className="luxury-clients-dash__title-row">
+            <h1 className="luxury-clients-dash__headline">
+              <span className="luxury-clients-dash__headline-pre">
                 {isSalonStaff ? "I " : "I tuoi "}
               </span>
-              <span className="velvet-clients-dash__headline-accent">clienti</span>
+              <span className="luxury-clients-dash__headline-accent">clienti</span>
               {isSalonStaff ? (
-                <span className="velvet-clients-dash__headline-pre"> della sede</span>
+                <span className="luxury-clients-dash__headline-pre"> della sede</span>
               ) : null}
             </h1>
             {resolvedLocationId && clientsQ.isSuccess && Array.isArray(clientsQ.data) ? (
               <p
-                className="velvet-clients-dash__total-pill"
+                className="luxury-clients-dash__total-pill"
                 aria-label={`Totale ${clientsQ.data.length} ${clientsQ.data.length === 1 ? "cliente" : "clienti"}`}
               >
-                <span className="velvet-clients-dash__total-pill__n" aria-hidden>
+                <span className="luxury-clients-dash__total-pill__n" aria-hidden>
                   {clientsQ.data.length}
                 </span>
-                <span className="velvet-clients-dash__total-pill__label">
+                <span className="luxury-clients-dash__total-pill__label">
                   {clientsQ.data.length === 1 ? "cliente" : "clienti"}
                 </span>
               </p>
             ) : resolvedLocationId && clientsQ.isLoading ? (
-              <p className="velvet-clients-dash__total-pill velvet-clients-dash__total-pill--loading" aria-hidden>
+              <p className="luxury-clients-dash__total-pill luxury-clients-dash__total-pill--loading" aria-hidden>
                 …
               </p>
             ) : null}
@@ -154,48 +154,48 @@ export default function SalonClientsPage() {
         </header>
 
         {showTitolareSlugWarning ? (
-          <p className="velvet-alert velvet-alert--error" role="alert" style={{ marginTop: "0.5rem" }}>
+          <p className="luxury-alert luxury-alert--error" role="alert" style={{ marginTop: "0.5rem" }}>
             Non risulta uno slug sede nel profilo salone. Completa la posizione o i dati sede in account, poi riprova.
           </p>
         ) : null}
 
-        {isSalonTitolare && (orgLoading || meSalon.isPending) ? <p className="velvet-text-muted">Caricamento…</p> : null}
+        {isSalonTitolare && (orgLoading || meSalon.isPending) ? <p className="luxury-text-muted">Caricamento…</p> : null}
         {isSalonTitolare && !primaryLocationId && orgFallbackQ.error ? (
-          <p className="velvet-alert velvet-alert--error" role="alert">
+          <p className="luxury-alert luxury-alert--error" role="alert">
             {orgFallbackQ.error instanceof Error ? orgFallbackQ.error.message : "Impossibile caricare la sede."}
           </p>
         ) : null}
 
-        {clientsQ.isLoading && resolvedLocationId ? <p className="velvet-text-muted">Caricamento elenco clienti…</p> : null}
+        {clientsQ.isLoading && resolvedLocationId ? <p className="luxury-text-muted">Caricamento elenco clienti…</p> : null}
         {clientsQ.error ? (
-          <p className="velvet-alert velvet-alert--error" role="alert">
+          <p className="luxury-alert luxury-alert--error" role="alert">
             {clientsQ.error instanceof Error ? clientsQ.error.message : "Elenco non disponibile."}
           </p>
         ) : null}
 
         {clientsQ.data && clientsQ.data.length === 0 ? (
           <div
-            className="velvet-clients-dash__empty"
+            className="luxury-clients-dash__empty"
             role="status"
             aria-label="Nessun cliente collegato a questa sede."
           >
-            <div className="velvet-clients-dash__empty-glow" aria-hidden />
-            <div className="velvet-clients-dash__empty-frame" aria-hidden />
-            <p className="velvet-clients-dash__empty-title">
-              <span className="velvet-clients-dash__empty-title-pre">Nessun</span>
-              <span className="velvet-clients-dash__empty-title-accent"> cliente</span>
+            <div className="luxury-clients-dash__empty-glow" aria-hidden />
+            <div className="luxury-clients-dash__empty-frame" aria-hidden />
+            <p className="luxury-clients-dash__empty-title">
+              <span className="luxury-clients-dash__empty-title-pre">Nessun</span>
+              <span className="luxury-clients-dash__empty-title-accent"> cliente</span>
             </p>
           </div>
         ) : null}
 
         {clientsQ.data && clientsQ.data.length > 0 ? (
-          <div className="velvet-clients-dash__toolbar">
-            <label className="velvet-clients-dash__search" htmlFor="velvet-salon-clients-search">
-              <span className="velvet-clients-dash__search-label">Cerca cliente</span>
+          <div className="luxury-clients-dash__toolbar">
+            <label className="luxury-clients-dash__search" htmlFor="luxury-salon-clients-search">
+              <span className="luxury-clients-dash__search-label">Cerca cliente</span>
               <input
-                id="velvet-salon-clients-search"
+                id="luxury-salon-clients-search"
                 type="search"
-                className="velvet-clients-dash__search-input"
+                className="luxury-clients-dash__search-input"
                 value={clientSearch}
                 onChange={(e) => setClientSearch(e.target.value)}
                 placeholder="Nome, email o telefono…"
@@ -204,7 +204,7 @@ export default function SalonClientsPage() {
               />
             </label>
             {clientSearch.trim() ? (
-              <p className="velvet-clients-dash__search-meta" aria-live="polite">
+              <p className="luxury-clients-dash__search-meta" aria-live="polite">
                 {filteredClients.length === 0
                   ? "Nessun cliente corrisponde alla ricerca."
                   : `${filteredClients.length} ${filteredClients.length === 1 ? "risultato" : "risultati"}`}
@@ -214,19 +214,19 @@ export default function SalonClientsPage() {
         ) : null}
 
         {clientsQ.data && clientsQ.data.length > 0 && filteredClients.length > 0 ? (
-          <div className="velvet-clients-grid" aria-label="Elenco clienti della sede">
+          <div className="luxury-clients-grid" aria-label="Elenco clienti della sede">
             {filteredClients.map((c) => (
-              <article key={c.id} className="velvet-client-card">
-                <div className="velvet-client-card__top">
-                  <div className="velvet-client-card__avatar" aria-hidden>
+              <article key={c.id} className="luxury-client-card">
+                <div className="luxury-client-card__top">
+                  <div className="luxury-client-card__avatar" aria-hidden>
                     {clientInitials(c.displayName || "Cliente")}
                   </div>
-                  <h2 className="velvet-card-title velvet-client-card__name">{c.displayName?.trim() || "Cliente"}</h2>
+                  <h2 className="luxury-card-title luxury-client-card__name">{c.displayName?.trim() || "Cliente"}</h2>
                 </div>
-                <div className="velvet-client-card__body">
-                  <div className="velvet-client-card__row">
-                    <span className="velvet-client-card__label">Email</span>
-                    <span className="velvet-client-card__value">
+                <div className="luxury-client-card__body">
+                  <div className="luxury-client-card__row">
+                    <span className="luxury-client-card__label">Email</span>
+                    <span className="luxury-client-card__value">
                       {c.email?.trim() ? (
                         <a href={`mailto:${encodeURIComponent(c.email.trim())}`}>{c.email.trim()}</a>
                       ) : (
@@ -234,15 +234,15 @@ export default function SalonClientsPage() {
                       )}
                     </span>
                   </div>
-                  <div className="velvet-client-card__row">
-                    <span className="velvet-client-card__label">Telefono</span>
-                    <span className="velvet-client-card__value">{c.phone?.trim() ? c.phone.trim() : "—"}</span>
+                  <div className="luxury-client-card__row">
+                    <span className="luxury-client-card__label">Telefono</span>
+                    <span className="luxury-client-card__value">{c.phone?.trim() ? c.phone.trim() : "—"}</span>
                   </div>
                 </div>
-                <div className="velvet-client-card__actions">
+                <div className="luxury-client-card__actions">
                   <Link
                     to={`/account/chat?salonClientId=${encodeURIComponent(c.id)}`}
-                    className="velvet-client-card__chat"
+                    className="luxury-client-card__chat"
                   >
                     Apri chat
                   </Link>

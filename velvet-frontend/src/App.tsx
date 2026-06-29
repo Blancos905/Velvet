@@ -19,6 +19,7 @@ import {
   AccountSalonHomePage,
   AdminAssistenzaPage,
   AdminDashboardPage,
+  AdminFiscalInvoicesPage,
   AdminLayout,
   AdminRegisterSuperAdminPage,
   AdminSuperAdminProfilePage,
@@ -55,7 +56,7 @@ import {
   SalonStaffPage,
   SalonStandardToolsPage,
   SalonStatisticsPage,
-  SalonVelvetChatPage,
+  SalonLuxuryChatPage,
   SearchPage,
   StaffMemberHomePage,
   SupportPage,
@@ -65,7 +66,7 @@ import {
 } from "./routes/lazyPages";
 
 import { AccountLayout } from "./pages/account/AccountLayout";
-import "./styles/velvet-route-loading.css";
+import "./styles/luxury-route-loading.css";
 
 /** Super admin: niente hub `/account` — solo pannello `/admin`. */
 function AccountAreaLayout() {
@@ -111,6 +112,7 @@ export default function App() {
               <Route path="dashboard" element={<AdminDashboardPage />} />
               <Route path="assistenza" element={<AdminAssistenzaPage />} />
               <Route path="messaggi" element={<AdminAssistenzaPage />} />
+              <Route path="fatture" element={<AdminFiscalInvoicesPage />} />
               <Route path="profilo" element={<AdminSuperAdminProfilePage />} />
             </Route>
             <Route path="/auth/callback" element={<OidcCallbackPage />} />
@@ -173,7 +175,7 @@ export default function App() {
               <Route path="saloni-di-fiducia" element={<TrustedSalonsPage />} />
               <Route path="assistenza" element={<SupportPage />} />
               <Route path="info-privacy" element={<AccountInfoPrivacyPage />} />
-              <Route path="chat" element={<SalonVelvetChatPage />} />
+              <Route path="chat" element={<SalonLuxuryChatPage />} />
               <Route path="feedback-velvet" element={<VelvetFeedbackPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

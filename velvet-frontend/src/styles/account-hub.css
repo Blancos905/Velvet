@@ -3,10 +3,10 @@
  * Obiettivo: gerarchia chiara, molto respiro, tipografia grande (card upgrade è in salon-free-welcome.css).
  */
 
-.velvet-account-hub {
-  --velvet-hub-pad-x: clamp(1.25rem, 4.5vw, 3.25rem);
-  --velvet-hub-pad-y: clamp(1.5rem, 4vh, 3.25rem);
-  --velvet-hub-gap: clamp(1.35rem, 3.5vh, 2.85rem);
+.luxury-account-hub {
+  --luxury-hub-pad-x: clamp(1.25rem, 4.5vw, 3.25rem);
+  --luxury-hub-pad-y: clamp(1.5rem, 4vh, 3.25rem);
+  --luxury-hub-gap: clamp(1.35rem, 3.5vh, 2.85rem);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -14,18 +14,18 @@
   max-width: min(1320px, 100%);
   width: 100%;
   margin: 0 auto;
-  padding: var(--velvet-hub-pad-y) var(--velvet-hub-pad-x) clamp(2.75rem, 6vh, 4.5rem);
-  font-family: var(--velvet-font, system-ui, sans-serif);
+  padding: var(--luxury-hub-pad-y) var(--luxury-hub-pad-x) clamp(2.75rem, 6vh, 4.5rem);
+  font-family: var(--luxury-font, system-ui, sans-serif);
   font-size: clamp(1.05rem, 1.45vw, 1.18rem);
   color: rgba(255, 251, 235, 0.92);
-  gap: var(--velvet-hub-gap);
-  background: var(--velvet-body-gradient);
+  gap: var(--luxury-hub-gap);
+  background: var(--luxury-body-gradient);
   background-attachment: fixed;
 }
 
 /* --- Blocco 1: piano + logo + saluto (ordine visivo unico) --- */
 
-.velvet-account-hub__masthead {
+.luxury-account-hub__masthead {
   position: relative;
   border-radius: clamp(20px, 3.5vw, 32px);
   padding: 2px;
@@ -42,7 +42,7 @@
     0 0 60px rgba(249, 115, 22, 0.08);
 }
 
-.velvet-account-hub__masthead::before {
+.luxury-account-hub__masthead::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -52,7 +52,7 @@
   z-index: 0;
 }
 
-.velvet-account-hub__masthead-inner {
+.luxury-account-hub__masthead-inner {
   position: relative;
   z-index: 1;
   border-radius: inherit;
@@ -65,13 +65,13 @@
   gap: clamp(1.1rem, 2.8vh, 1.85rem);
 }
 
-.velvet-account-hub__top {
+.luxury-account-hub__top {
   display: flex;
   align-items: center;
   justify-content: flex-start;
 }
 
-.velvet-account-hub__plan {
+.luxury-account-hub__plan {
   display: inline-flex;
   align-items: center;
   padding: 0.55rem 1.35rem;
@@ -88,11 +88,11 @@
     0 10px 32px rgba(45, 16, 6, 0.4);
 }
 
-.velvet-account-hub__plan--client {
+.luxury-account-hub__plan--client {
   background: linear-gradient(135deg, rgba(255, 247, 237, 0.98) 0%, rgba(254, 215, 170, 0.9) 100%);
 }
 
-.velvet-account-hub__plan--staff {
+.luxury-account-hub__plan--staff {
   text-transform: none;
   letter-spacing: 0.08em;
   font-size: clamp(0.78rem, 1.5vw, 0.92rem);
@@ -104,7 +104,7 @@
     0 10px 28px rgba(6, 40, 36, 0.45);
 }
 
-.velvet-account-hub__plan--admin {
+.luxury-account-hub__plan--admin {
   text-transform: none;
   letter-spacing: 0.06em;
   font-size: clamp(0.8rem, 1.45vw, 0.95rem);
@@ -116,7 +116,7 @@
     0 10px 32px rgba(45, 16, 6, 0.45);
 }
 
-.velvet-account-hub__super-admin-lead {
+.luxury-account-hub__super-admin-lead {
   margin: 0.35rem 0 0;
   max-width: 42rem;
   font-size: clamp(0.95rem, 1.9vw, 1.05rem);
@@ -125,12 +125,12 @@
   color: rgba(255, 251, 235, 0.82);
 }
 
-.velvet-account-hub__super-admin-lead strong {
+.luxury-account-hub__super-admin-lead strong {
   font-weight: 700;
   color: rgba(255, 251, 235, 0.95);
 }
 
-.velvet-account-hub__welcome {
+.luxury-account-hub__welcome {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -141,32 +141,32 @@
   border-bottom: none;
 }
 
-.velvet-account-hub__mark-wrap {
+.luxury-account-hub__mark-wrap {
   flex-shrink: 0;
 }
 
-.velvet-account-hub__mark-wrap .saloni-velvet-mark {
+.luxury-account-hub__mark-wrap .saloni-luxury-mark {
   margin: 0;
 }
 
-.velvet-account-hub__mark-wrap .saloni-velvet-mark__logo {
+.luxury-account-hub__mark-wrap .saloni-luxury-mark__logo {
   width: clamp(96px, 20vw, 168px);
   height: clamp(96px, 20vw, 168px);
 }
 
-.velvet-account-hub__mark-wrap .saloni-velvet-mark__text {
+.luxury-account-hub__mark-wrap .saloni-luxury-mark__text {
   padding: clamp(9px, 1.3vw, 14px) clamp(16px, 2.2vw, 26px) clamp(11px, 1.5vw, 16px);
 }
 
-.velvet-account-hub__mark-wrap .saloni-velvet-mark__saloni {
+.luxury-account-hub__mark-wrap .saloni-luxury-mark__saloni {
   font-size: clamp(0.82rem, 1.75vw, 1rem);
 }
 
-.velvet-account-hub__mark-wrap .saloni-velvet-mark__velvet {
+.luxury-account-hub__mark-wrap .saloni-luxury-mark__velvet {
   font-size: clamp(1.75rem, 5.8vw, 3.15rem);
 }
 
-.velvet-account-hub__welcome-copy {
+.luxury-account-hub__welcome-copy {
   flex: 1;
   min-width: min(100%, 280px);
   display: flex;
@@ -174,7 +174,7 @@
   gap: clamp(0.35rem, 1.2vh, 0.65rem);
 }
 
-.velvet-account-hub__welcome-line {
+.luxury-account-hub__welcome-line {
   margin: 0;
   font-size: clamp(1.2rem, 3.2vw, 1.75rem);
   font-weight: 600;
@@ -182,7 +182,7 @@
   color: rgba(255, 251, 235, 0.9);
 }
 
-.velvet-account-hub__reg {
+.luxury-account-hub__reg {
   margin: 0;
   font-size: clamp(0.82rem, 1.65vw, 0.98rem);
   font-weight: 700;
@@ -191,7 +191,7 @@
   color: rgba(253, 186, 116, 0.88);
 }
 
-.velvet-account-hub__greeting {
+.luxury-account-hub__greeting {
   margin: 0;
   font-size: clamp(2.05rem, 6.2vw, 3.55rem);
   font-weight: 800;
@@ -203,7 +203,7 @@
     0 0 40px rgba(249, 115, 22, 0.12);
 }
 
-.velvet-account-hub__salon-name {
+.luxury-account-hub__salon-name {
   margin: 0.2rem 0 0;
   font-size: clamp(1.02rem, 2.1vw, 1.15rem);
   font-style: italic;
@@ -212,14 +212,14 @@
   color: rgba(253, 186, 116, 0.95);
 }
 
-.velvet-account-hub__salon-name strong {
+.luxury-account-hub__salon-name strong {
   font-weight: 700;
   color: inherit;
 }
 
 /* --- Blocco 2: azioni (pulsanti ben distanziati) --- */
 
-.velvet-account-hub__nav {
+.luxury-account-hub__nav {
   position: relative;
   isolation: isolate;
   display: flex;
@@ -238,8 +238,8 @@
 }
 
 /** Riga unica di pulsanti: in fila con scroll orizzontale su viewport stretti. */
-.velvet-account-hub__nav-scroll {
-  --velvet-nav-scroll-pad-x: clamp(0.35rem, 1.2vw, 0.65rem);
+.luxury-account-hub__nav-scroll {
+  --luxury-nav-scroll-pad-x: clamp(0.35rem, 1.2vw, 0.65rem);
   position: relative;
   display: flex;
   flex-wrap: nowrap;
@@ -248,7 +248,7 @@
   overflow-x: auto;
   width: 100%;
   min-height: 3.15rem;
-  padding: 0.45rem var(--velvet-nav-scroll-pad-x) 0.55rem;
+  padding: 0.45rem var(--luxury-nav-scroll-pad-x) 0.55rem;
   margin: 0;
   border-radius: clamp(12px, 2vw, 18px);
   border: 1px solid rgba(255, 237, 213, 0.1);
@@ -267,38 +267,38 @@
   scrollbar-color: rgba(253, 186, 116, 0.55) rgba(12, 4, 2, 0.5);
 }
 
-.velvet-account-hub__nav-scroll:focus-visible {
+.luxury-account-hub__nav-scroll:focus-visible {
   outline: 2px solid rgba(56, 189, 248, 0.55);
   outline-offset: 2px;
 }
 
-.velvet-account-hub__nav-scroll::-webkit-scrollbar {
+.luxury-account-hub__nav-scroll::-webkit-scrollbar {
   height: 7px;
 }
 
-.velvet-account-hub__nav-scroll::-webkit-scrollbar-track {
+.luxury-account-hub__nav-scroll::-webkit-scrollbar-track {
   margin-inline: 0.35rem;
   background: rgba(12, 4, 2, 0.5);
   border-radius: 999px;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
-.velvet-account-hub__nav-scroll::-webkit-scrollbar-thumb {
+.luxury-account-hub__nav-scroll::-webkit-scrollbar-thumb {
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(234, 88, 12, 0.75), rgba(253, 186, 116, 0.55), rgba(249, 115, 22, 0.65));
   box-shadow: 0 0 8px rgba(249, 115, 22, 0.25);
 }
 
-.velvet-account-hub__nav-scroll::-webkit-scrollbar-thumb:hover {
+.luxury-account-hub__nav-scroll::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(90deg, rgba(251, 146, 60, 0.9), rgba(254, 215, 170, 0.65));
 }
 
-.velvet-account-hub__nav-scroll .velvet-account-hub__btn {
+.luxury-account-hub__nav-scroll .luxury-account-hub__btn {
   flex: 0 0 auto;
   scroll-snap-align: start;
 }
 
-.velvet-account-hub__nav-scroll--consumer-grid {
+.luxury-account-hub__nav-scroll--consumer-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: stretch;
@@ -308,11 +308,11 @@
   scrollbar-width: none;
 }
 
-.velvet-account-hub__nav-scroll--consumer-grid::-webkit-scrollbar {
+.luxury-account-hub__nav-scroll--consumer-grid::-webkit-scrollbar {
   display: none;
 }
 
-.velvet-account-hub__nav-scroll--consumer-grid .velvet-account-hub__btn {
+.luxury-account-hub__nav-scroll--consumer-grid .luxury-account-hub__btn {
   flex: initial;
   width: 100%;
   min-width: 0;
@@ -321,26 +321,26 @@
 }
 
 /** Pulsanti nella strip: leggero rilievo e focus coerente con tastiera. */
-.velvet-account-hub__nav-scroll .velvet-account-hub__btn:focus-visible {
+.luxury-account-hub__nav-scroll .luxury-account-hub__btn:focus-visible {
   outline: 2px solid rgba(253, 186, 116, 0.85);
   outline-offset: 3px;
   z-index: 2;
 }
 
-.velvet-account-hub__nav-scroll .velvet-account-hub__btn--sky:focus-visible {
+.luxury-account-hub__nav-scroll .luxury-account-hub__btn--sky:focus-visible {
   outline-color: rgba(56, 189, 248, 0.85);
 }
 
-.velvet-account-hub__nav-scroll .velvet-account-hub__btn--admin:focus-visible {
+.luxury-account-hub__nav-scroll .luxury-account-hub__btn--admin:focus-visible {
   outline-color: rgba(254, 215, 170, 0.9);
 }
 
-.velvet-account-hub__nav-scroll .velvet-account-hub__btn--salon-statistiche:focus-visible {
+.luxury-account-hub__nav-scroll .luxury-account-hub__btn--salon-statistiche:focus-visible {
   outline-color: rgba(165, 180, 252, 0.95);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .velvet-account-hub__nav-scroll:hover {
+  .luxury-account-hub__nav-scroll:hover {
     border-color: rgba(255, 237, 213, 0.16);
     background:
       linear-gradient(165deg, rgba(36, 12, 5, 0.42) 0%, rgba(18, 6, 2, 0.28) 100%);
@@ -348,18 +348,18 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .velvet-account-hub__nav-scroll {
+  .luxury-account-hub__nav-scroll {
     scroll-behavior: auto;
   }
 }
 
 @media (max-width: 760px) {
-  .velvet-account-hub__nav-scroll--consumer-grid {
+  .luxury-account-hub__nav-scroll--consumer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.velvet-account-hub__nav::before {
+.luxury-account-hub__nav::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -371,16 +371,16 @@
     radial-gradient(ellipse 60% 45% at 92% 8%, rgba(56, 189, 248, 0.12), transparent 58%);
 }
 
-.velvet-account-hub__nav > * {
+.luxury-account-hub__nav > * {
   position: relative;
   z-index: 1;
 }
 
-.velvet-account-hub__nav--deck {
+.luxury-account-hub__nav--deck {
   gap: clamp(0.75rem, 2vh, 1.1rem);
 }
 
-.velvet-account-hub__nav-label {
+.luxury-account-hub__nav-label {
   width: 100%;
   margin: clamp(0.45rem, 1vh, 0.75rem) 0 0.2rem;
   padding-top: clamp(0.45rem, 1vh, 0.6rem);
@@ -393,13 +393,13 @@
   text-shadow: 0 1px 10px rgba(12, 4, 2, 0.35);
 }
 
-.velvet-account-hub__nav-label:first-child {
+.luxury-account-hub__nav-label:first-child {
   margin-top: 0;
   padding-top: 0;
   border-top: 0;
 }
 
-.velvet-account-hub__btn {
+.luxury-account-hub__btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -425,7 +425,7 @@
     box-shadow 0.2s ease;
 }
 
-.velvet-account-hub__btn:hover {
+.luxury-account-hub__btn:hover {
   background: linear-gradient(160deg, rgba(124, 45, 18, 0.62) 0%, rgba(69, 24, 10, 0.72) 100%);
   border-color: rgba(253, 186, 116, 0.5);
   color: #fffbeb;
@@ -435,7 +435,7 @@
     inset 0 1px 0 rgba(255, 247, 237, 0.1);
 }
 
-.velvet-account-hub__btn--active {
+.luxury-account-hub__btn--active {
   background: linear-gradient(160deg, rgba(255, 247, 237, 0.24) 0%, rgba(253, 186, 116, 0.2) 100%);
   border-color: rgba(253, 186, 116, 0.65);
   color: #fffbeb;
@@ -445,7 +445,7 @@
     0 8px 24px rgba(45, 16, 6, 0.26);
 }
 
-.velvet-account-hub__btn--sky.velvet-account-hub__btn--active {
+.luxury-account-hub__btn--sky.luxury-account-hub__btn--active {
   background: linear-gradient(160deg, rgba(14, 116, 144, 0.55) 0%, rgba(12, 74, 110, 0.68) 100%);
   border-color: rgba(56, 189, 248, 0.65);
   box-shadow:
@@ -453,21 +453,21 @@
     0 10px 28px rgba(8, 47, 73, 0.35);
 }
 
-.velvet-account-hub__btn--sky:hover {
+.luxury-account-hub__btn--sky:hover {
   border-color: rgba(56, 189, 248, 0.58);
   box-shadow:
     0 14px 32px rgba(8, 47, 73, 0.32),
     inset 0 1px 0 rgba(186, 230, 253, 0.12);
 }
 
-.velvet-account-hub__btn--ghost {
+.luxury-account-hub__btn--ghost {
   border-style: dashed;
   opacity: 0.96;
   font-size: clamp(0.92rem, 1.7vw, 1.05rem);
 }
 
 /** Voce «Statistiche» nel menu titolare: variante “dati / report”, distinta dai pulsanti operativi. */
-.velvet-account-hub__btn--salon-statistiche {
+.luxury-account-hub__btn--salon-statistiche {
   border-color: rgba(165, 180, 252, 0.48);
   background: linear-gradient(160deg, rgba(55, 48, 163, 0.52) 0%, rgba(30, 27, 75, 0.68) 100%);
   color: rgba(238, 242, 255, 0.95);
@@ -476,7 +476,7 @@
     inset 0 1px 0 rgba(199, 210, 254, 0.1);
 }
 
-.velvet-account-hub__btn--salon-statistiche:hover {
+.luxury-account-hub__btn--salon-statistiche:hover {
   background: linear-gradient(160deg, rgba(79, 70, 229, 0.58) 0%, rgba(49, 46, 129, 0.75) 100%);
   border-color: rgba(199, 210, 254, 0.55);
   color: #f5f3ff;
@@ -485,7 +485,7 @@
     inset 0 1px 0 rgba(224, 231, 255, 0.14);
 }
 
-.velvet-account-hub__btn--salon-statistiche.velvet-account-hub__btn--active {
+.luxury-account-hub__btn--salon-statistiche.luxury-account-hub__btn--active {
   background: linear-gradient(160deg, rgba(199, 210, 254, 0.22) 0%, rgba(129, 140, 248, 0.28) 100%);
   border-color: rgba(165, 180, 252, 0.72);
   color: #f5f3ff;
@@ -495,7 +495,7 @@
     0 10px 28px rgba(30, 27, 75, 0.3);
 }
 
-.velvet-account-hub__btn--admin {
+.luxury-account-hub__btn--admin {
   border-color: rgba(253, 186, 116, 0.55);
   background: linear-gradient(160deg, rgba(234, 88, 12, 0.55) 0%, rgba(154, 52, 18, 0.72) 100%);
   font-weight: 700;
@@ -504,12 +504,12 @@
     inset 0 1px 0 rgba(255, 247, 237, 0.12);
 }
 
-.velvet-account-hub__btn--admin:hover {
+.luxury-account-hub__btn--admin:hover {
   background: linear-gradient(160deg, rgba(249, 115, 22, 0.62) 0%, rgba(180, 52, 10, 0.78) 100%);
   border-color: rgba(254, 215, 170, 0.75);
 }
 
-.velvet-account-hub__btn--admin.velvet-account-hub__btn--active {
+.luxury-account-hub__btn--admin.luxury-account-hub__btn--active {
   background: linear-gradient(160deg, rgba(255, 247, 237, 0.22) 0%, rgba(253, 186, 116, 0.35) 100%);
   border-color: rgba(254, 215, 170, 0.85);
   color: #fffbeb;
@@ -517,7 +517,7 @@
 
 /* --- Blocco 3: contenuto route --- */
 
-.velvet-account-hub__body {
+.luxury-account-hub__body {
   position: relative;
   flex: 1;
   display: flex;
@@ -536,7 +536,7 @@
 }
 
 /* Account titolare, staff e cliente: palette super admin (nero + arancio) e bottoni arancio/nero. */
-.velvet-account-hub--velvet-plans {
+.luxury-account-hub--luxury-plans {
   --hub-plans-ease: cubic-bezier(0.34, 1.46, 0.64, 1);
   --hub-plans-orange: #fb923c;
   --hub-plans-orange-hot: #f97316;
@@ -556,7 +556,7 @@
   background-attachment: initial;
 }
 
-.velvet-account-hub--velvet-plans::before {
+.luxury-account-hub--luxury-plans::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -570,7 +570,7 @@
     linear-gradient(180deg, #fb923c 0%, #f97316 22%, #ea580c 48%, #c2410c 78%, #9a3412 100%);
 }
 
-.velvet-account-hub--velvet-plans::after {
+.luxury-account-hub--luxury-plans::after {
   content: "";
   position: fixed;
   inset: 0;
@@ -580,7 +580,7 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__masthead {
+.luxury-account-hub--luxury-plans .luxury-account-hub__masthead {
   padding: 1px;
   background: linear-gradient(145deg, rgba(253, 186, 116, 0.55) 0%, rgba(249, 115, 22, 0.35) 52%, rgba(234, 88, 12, 0.28) 100%);
   box-shadow:
@@ -589,11 +589,11 @@
     0 0 60px rgba(249, 115, 22, 0.14);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__masthead::before {
+.luxury-account-hub--luxury-plans .luxury-account-hub__masthead::before {
   background: radial-gradient(ellipse 75% 48% at 12% 20%, rgba(249, 115, 22, 0.22), transparent 55%);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__masthead-inner {
+.luxury-account-hub--luxury-plans .luxury-account-hub__masthead-inner {
   border: 1px solid var(--hub-plans-edge);
   background:
     linear-gradient(150deg, rgba(255, 255, 255, 0.035) 0%, transparent 38%),
@@ -607,7 +607,7 @@
   backdrop-filter: none;
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__plan {
+.luxury-account-hub--luxury-plans .luxury-account-hub__plan {
   color: #fff7ed;
   background: linear-gradient(180deg, rgba(12, 12, 12, 0.95) 0%, #000000 100%);
   border: 1px solid var(--hub-plans-edge);
@@ -616,26 +616,26 @@
     0 0 0 1px rgba(0, 0, 0, 0.5) inset;
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__welcome {
+.luxury-account-hub--luxury-plans .luxury-account-hub__welcome {
   border-top-color: rgba(249, 115, 22, 0.28);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__welcome-line {
+.luxury-account-hub--luxury-plans .luxury-account-hub__welcome-line {
   color: rgba(255, 251, 235, 0.92);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__reg {
+.luxury-account-hub--luxury-plans .luxury-account-hub__reg {
   color: rgba(253, 186, 116, 0.95);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__greeting {
+.luxury-account-hub--luxury-plans .luxury-account-hub__greeting {
   color: #fffbeb;
   text-shadow:
     0 1px 0 rgba(0, 0, 0, 0.85),
     0 0 28px rgba(249, 115, 22, 0.35);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__nav {
+.luxury-account-hub--luxury-plans .luxury-account-hub__nav {
   border: 1px solid var(--hub-plans-edge);
   background:
     linear-gradient(155deg, rgba(255, 255, 255, 0.03) 0%, transparent 36%),
@@ -647,19 +647,19 @@
     0 0 36px rgba(249, 115, 22, 0.1);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__nav::before {
+.luxury-account-hub--luxury-plans .luxury-account-hub__nav::before {
   background:
     radial-gradient(ellipse 70% 50% at 8% 0%, rgba(249, 115, 22, 0.16), transparent 62%),
     radial-gradient(ellipse 60% 45% at 92% 8%, rgba(253, 186, 116, 0.1), transparent 58%);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__nav-label {
+.luxury-account-hub--luxury-plans .luxury-account-hub__nav-label {
   color: rgba(253, 186, 116, 0.82);
   border-top-color: rgba(249, 115, 22, 0.22);
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__nav-scroll {
+.luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll {
   border: 1px solid rgba(249, 115, 22, 0.28);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(0, 0, 0, 0.45) 100%);
   box-shadow:
@@ -668,18 +668,18 @@
   scrollbar-color: rgba(253, 186, 116, 0.55) rgba(0, 0, 0, 0.55);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__nav-scroll::-webkit-scrollbar-track {
+.luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.55);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .velvet-account-hub--velvet-plans .velvet-account-hub__nav-scroll:hover {
+  .luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll:hover {
     border-color: rgba(253, 186, 116, 0.45);
     background: linear-gradient(180deg, rgba(249, 115, 22, 0.12) 0%, rgba(0, 0, 0, 0.55) 100%);
   }
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn {
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn {
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -704,7 +704,7 @@
     color 0.2s ease;
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn::before {
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn::before {
   content: "";
   position: absolute;
   inset: -60% -30% auto -30%;
@@ -716,7 +716,7 @@
   pointer-events: none;
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn::after {
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn::after {
   content: "";
   position: absolute;
   inset: auto 12% 0 12%;
@@ -727,13 +727,13 @@
   pointer-events: none;
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn > * {
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn > * {
   position: relative;
   z-index: 1;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .velvet-account-hub--velvet-plans .velvet-account-hub__btn:hover {
+  .luxury-account-hub--luxury-plans .luxury-account-hub__btn:hover {
     transform: translateY(-3px);
     border-color: var(--hub-plans-btn-ink-strong);
     background:
@@ -747,13 +747,13 @@
       0 0 36px rgba(249, 115, 22, 0.22);
   }
 
-  .velvet-account-hub--velvet-plans .velvet-account-hub__btn:hover::before {
+  .luxury-account-hub--luxury-plans .luxury-account-hub__btn:hover::before {
     transform: translateX(110%);
     opacity: 0.7;
   }
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn:active {
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn:active {
   transform: translateY(1px);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.42) inset,
@@ -761,7 +761,7 @@
     0 8px 18px rgba(0, 0, 0, 0.3);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__nav-scroll .velvet-account-hub__btn:focus-visible {
+.luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll .luxury-account-hub__btn:focus-visible {
   outline: none;
   box-shadow:
     0 0 0 2px var(--hub-plans-btn-ink-strong),
@@ -770,7 +770,7 @@
     0 18px 36px rgba(249, 115, 22, 0.28);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn--active {
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn--active {
   background:
     radial-gradient(95% 70% at 50% 0%, rgba(255, 251, 235, 0.65) 0%, transparent 52%),
     var(--hub-plans-btn-fill-active);
@@ -784,10 +784,10 @@
     0 0 48px rgba(249, 115, 22, 0.28);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn--sky,
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn--salon-statistiche,
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn--ghost,
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn--admin {
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn--sky,
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn--salon-statistiche,
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn--ghost,
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn--admin {
   border-color: var(--hub-plans-btn-rim);
   background:
     radial-gradient(120% 80% at 50% 0%, rgba(255, 255, 255, 0.42) 0%, transparent 58%),
@@ -802,10 +802,10 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .velvet-account-hub--velvet-plans .velvet-account-hub__btn--sky:hover,
-  .velvet-account-hub--velvet-plans .velvet-account-hub__btn--salon-statistiche:hover,
-  .velvet-account-hub--velvet-plans .velvet-account-hub__btn--ghost:hover,
-  .velvet-account-hub--velvet-plans .velvet-account-hub__btn--admin:hover {
+  .luxury-account-hub--luxury-plans .luxury-account-hub__btn--sky:hover,
+  .luxury-account-hub--luxury-plans .luxury-account-hub__btn--salon-statistiche:hover,
+  .luxury-account-hub--luxury-plans .luxury-account-hub__btn--ghost:hover,
+  .luxury-account-hub--luxury-plans .luxury-account-hub__btn--admin:hover {
     border-color: var(--hub-plans-btn-ink-strong);
     background:
       radial-gradient(115% 75% at 50% 0%, rgba(255, 255, 255, 0.5) 0%, transparent 55%),
@@ -819,10 +819,10 @@
   }
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn--sky.velvet-account-hub__btn--active,
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn--salon-statistiche.velvet-account-hub__btn--active,
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn--ghost.velvet-account-hub__btn--active,
-.velvet-account-hub--velvet-plans .velvet-account-hub__btn--admin.velvet-account-hub__btn--active {
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn--sky.luxury-account-hub__btn--active,
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn--salon-statistiche.luxury-account-hub__btn--active,
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn--ghost.luxury-account-hub__btn--active,
+.luxury-account-hub--luxury-plans .luxury-account-hub__btn--admin.luxury-account-hub__btn--active {
   background:
     radial-gradient(95% 70% at 50% 0%, rgba(255, 251, 235, 0.65) 0%, transparent 52%),
     var(--hub-plans-btn-fill-active);
@@ -836,7 +836,7 @@
     0 0 48px rgba(249, 115, 22, 0.28);
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__notif-pill {
+.luxury-account-hub--luxury-plans .luxury-account-hub__notif-pill {
   color: var(--hub-plans-btn-ink-strong);
   background: linear-gradient(145deg, #fff7ed 0%, #fde68a 48%, #fbbf24 100%);
   border: 1px solid rgba(0, 0, 0, 0.72);
@@ -847,18 +847,18 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .velvet-account-hub--velvet-plans .velvet-account-hub__btn,
-  .velvet-account-hub--velvet-plans .velvet-account-hub__btn::before {
+  .luxury-account-hub--luxury-plans .luxury-account-hub__btn,
+  .luxury-account-hub--luxury-plans .luxury-account-hub__btn::before {
     transition: none;
   }
 
-  .velvet-account-hub--velvet-plans .velvet-account-hub__btn::before {
+  .luxury-account-hub--luxury-plans .luxury-account-hub__btn::before {
     transform: none;
     opacity: 0.35;
   }
 }
 
-.velvet-account-hub--velvet-plans .velvet-account-hub__body {
+.luxury-account-hub--luxury-plans .luxury-account-hub__body {
   border: 1px solid var(--hub-plans-edge);
   background:
     linear-gradient(155deg, rgba(255, 255, 255, 0.03) 0%, transparent 36%),
@@ -870,7 +870,7 @@
     0 0 36px rgba(249, 115, 22, 0.1);
 }
 
-.velvet-account-salone-free-intro {
+.luxury-account-salone-free-intro {
   margin: 0;
   max-width: 56rem;
   font-size: clamp(1.08rem, 2.5vw, 1.32rem);
@@ -878,7 +878,7 @@
   color: rgba(255, 251, 235, 0.82);
 }
 
-.velvet-account-salone-free-intro--hero {
+.luxury-account-salone-free-intro--hero {
   position: relative;
   padding: clamp(1.35rem, 3vw, 2.15rem) clamp(1.25rem, 3vw, 2.25rem);
   border-radius: clamp(14px, 2.5vw, 22px);
@@ -890,7 +890,7 @@
   box-shadow: 0 16px 40px rgba(45, 16, 6, 0.22);
 }
 
-.velvet-account-salone-free-intro--hero::before {
+.luxury-account-salone-free-intro--hero::before {
   content: "";
   position: absolute;
   left: 0;
@@ -902,23 +902,23 @@
   opacity: 0.85;
 }
 
-.velvet-consumer-home {
+.luxury-consumer-home {
   position: relative;
 }
 
-.velvet-consumer-home__confirm {
+.luxury-consumer-home__confirm {
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
   margin: 0.25rem 0 1rem;
 }
 
-.velvet-consumer-home__appointments-title {
+.luxury-consumer-home__appointments-title {
   margin-top: 0.4rem;
   margin-bottom: 0.8rem;
 }
 
-.velvet-consumer-home__appointments-list {
+.luxury-consumer-home__appointments-list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -926,7 +926,7 @@
   gap: 0.7rem;
 }
 
-.velvet-consumer-home__appointment-item {
+.luxury-consumer-home__appointment-item {
   margin: 0;
   border: 1px solid rgba(255, 237, 213, 0.16);
   background:
@@ -936,46 +936,46 @@
     inset 0 1px 0 rgba(255, 247, 237, 0.06);
 }
 
-.velvet-consumer-home__appointment-title {
+.luxury-consumer-home__appointment-title {
   font-weight: 700;
   font-size: clamp(1rem, 1.9vw, 1.06rem);
 }
 
-.velvet-consumer-home__appointment-meta {
+.luxury-consumer-home__appointment-meta {
   margin: 0.42rem 0 0;
   font-size: 0.92rem;
   line-height: 1.5;
   color: rgba(255, 251, 235, 0.74);
 }
 
-.velvet-consumer-home__empty {
+.luxury-consumer-home__empty {
   border: 1px solid rgba(255, 237, 213, 0.16);
   background: rgba(24, 8, 3, 0.26);
 }
 
-.velvet-consumer-home__empty-text {
+.luxury-consumer-home__empty-text {
   margin: 0;
   line-height: 1.55;
   color: rgba(255, 251, 235, 0.88);
 }
 
-.velvet-consumer-home__all-link-wrap {
+.luxury-consumer-home__all-link-wrap {
   margin-top: 0.95rem;
 }
 
 @media (max-width: 520px) {
-  .velvet-account-salone-free-intro--hero {
+  .luxury-account-salone-free-intro--hero {
     padding-left: clamp(1rem, 4vw, 1.35rem);
   }
 
-  .velvet-account-salone-free-intro--hero::before {
+  .luxury-account-salone-free-intro--hero::before {
     width: 3px;
   }
 }
 
 /* --- Agenda titolare (settimana, tabella per giorno) --- */
 
-@keyframes velvet-salon-agenda-detail-in {
+@keyframes luxury-salon-agenda-detail-in {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -986,7 +986,7 @@
   }
 }
 
-@keyframes velvet-salon-agenda-row-in {
+@keyframes luxury-salon-agenda-row-in {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -997,7 +997,7 @@
   }
 }
 
-@keyframes velvet-salon-agenda-status-pulse {
+@keyframes luxury-salon-agenda-status-pulse {
   0%,
   100% {
     box-shadow:
@@ -1011,7 +1011,7 @@
   }
 }
 
-@keyframes velvet-salon-agenda-loading-pulse {
+@keyframes luxury-salon-agenda-loading-pulse {
   0%,
   100% {
     opacity: 0.35;
@@ -1023,12 +1023,12 @@
   }
 }
 
-.velvet-salon-agenda {
+.luxury-salon-agenda {
   position: relative;
   isolation: isolate;
 }
 
-.velvet-salon-agenda__ambient {
+.luxury-salon-agenda__ambient {
   pointer-events: none;
   position: absolute;
   inset: -1.25rem -0.75rem auto -0.75rem;
@@ -1040,7 +1040,7 @@
   opacity: 0.95;
 }
 
-.velvet-salon-agenda__panel {
+.luxury-salon-agenda__panel {
   position: relative;
   /* Sopra al corpo agenda (stesso z-index 1) così il popover “Dal / al” non resta sotto al calendario */
   z-index: 3;
@@ -1056,7 +1056,7 @@
   overflow: visible;
 }
 
-.velvet-salon-agenda__panel::before {
+.luxury-salon-agenda__panel::before {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
@@ -1065,7 +1065,7 @@
   opacity: 0.85;
 }
 
-.velvet-salon-agenda__toolbar {
+.luxury-salon-agenda__toolbar {
   position: relative;
   display: flex;
   flex-wrap: wrap;
@@ -1074,7 +1074,7 @@
   margin: 0;
 }
 
-.velvet-salon-agenda__range-filter {
+.luxury-salon-agenda__range-filter {
   position: relative;
   z-index: 4;
   margin-top: 0.85rem;
@@ -1086,7 +1086,7 @@
   gap: 0.45rem;
 }
 
-.velvet-salon-agenda__range-filter-label {
+.luxury-salon-agenda__range-filter-label {
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -1095,7 +1095,7 @@
   flex-shrink: 0;
 }
 
-.velvet-salon-agenda__range-filter-trigger {
+.luxury-salon-agenda__range-filter-trigger {
   width: 100%;
   cursor: pointer;
   text-align: left;
@@ -1117,17 +1117,17 @@
     box-shadow 0.18s ease;
 }
 
-.velvet-salon-agenda__range-filter-trigger:hover {
+.luxury-salon-agenda__range-filter-trigger:hover {
   border-color: rgba(253, 186, 116, 0.55);
   background: rgba(24, 8, 3, 0.55);
 }
 
-.velvet-salon-agenda__range-filter-trigger:focus-visible {
+.luxury-salon-agenda__range-filter-trigger:focus-visible {
   outline: 2px solid rgba(249, 115, 22, 0.65);
   outline-offset: 2px;
 }
 
-.velvet-salon-agenda__range-popover {
+.luxury-salon-agenda__range-popover {
   position: absolute;
   left: 0;
   right: 0;
@@ -1142,26 +1142,26 @@
     inset 0 1px 0 rgba(255, 247, 237, 0.08);
 }
 
-.velvet-salon-agenda__range-popover-hint {
+.luxury-salon-agenda__range-popover-hint {
   margin: 0 0 0.75rem;
   font-size: 0.82rem;
   line-height: 1.45;
   color: rgba(255, 251, 235, 0.62);
 }
 
-.velvet-salon-agenda__range-popover-field {
+.luxury-salon-agenda__range-popover-field {
   display: grid;
   gap: 0.35rem;
   margin: 0 0 0.65rem;
 }
 
-.velvet-salon-agenda__range-popover-field-label {
+.luxury-salon-agenda__range-popover-field-label {
   font-size: 0.78rem;
   font-weight: 700;
   color: rgba(254, 243, 199, 0.88);
 }
 
-.velvet-salon-agenda__range-date-input {
+.luxury-salon-agenda__range-date-input {
   width: 100%;
   max-width: 16rem;
   padding: 0.5rem 0.65rem;
@@ -1173,17 +1173,17 @@
   font-size: 0.95rem;
 }
 
-.velvet-salon-agenda__range-date-input:focus {
+.luxury-salon-agenda__range-date-input:focus {
   outline: none;
   border-color: rgba(249, 115, 22, 0.55);
   box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15);
 }
 
-.velvet-salon-agenda__range-popover-close {
+.luxury-salon-agenda__range-popover-close {
   margin: 0;
 }
 
-.velvet-salon-agenda__range {
+.luxury-salon-agenda__range {
   flex: 1 1 12rem;
   text-align: center;
   font-weight: 700;
@@ -1198,7 +1198,7 @@
   background: rgba(12, 4, 2, 0.35);
 }
 
-.velvet-salon-agenda__loading {
+.luxury-salon-agenda__loading {
   position: relative;
   z-index: 1;
   display: flex;
@@ -1211,24 +1211,24 @@
   background: rgba(24, 8, 3, 0.25);
 }
 
-.velvet-salon-agenda__loading-dot {
+.luxury-salon-agenda__loading-dot {
   display: inline-block;
   width: 0.55rem;
   height: 0.55rem;
   border-radius: 50%;
   background: linear-gradient(180deg, #fdba74, #ea580c);
-  animation: velvet-salon-agenda-loading-pulse 1.1s ease-in-out infinite;
+  animation: luxury-salon-agenda-loading-pulse 1.1s ease-in-out infinite;
   box-shadow: 0 0 12px rgba(249, 115, 22, 0.55);
 }
 
-.velvet-salon-agenda__error {
+.luxury-salon-agenda__error {
   position: relative;
   z-index: 1;
   margin-bottom: 1rem;
   border-radius: 12px;
 }
 
-.velvet-salon-agenda__body {
+.luxury-salon-agenda__body {
   position: relative;
   z-index: 1;
   display: flex;
@@ -1236,7 +1236,7 @@
   gap: 1.15rem;
 }
 
-.velvet-salon-agenda__week-shell {
+.luxury-salon-agenda__week-shell {
   border-radius: 16px;
   border: 1px solid rgba(255, 237, 213, 0.14);
   background:
@@ -1247,7 +1247,7 @@
   padding: 0.85rem 0.85rem 1rem;
 }
 
-.velvet-salon-agenda__week-head {
+.luxury-salon-agenda__week-head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -1257,7 +1257,7 @@
   padding: 0 0.15rem;
 }
 
-.velvet-salon-agenda__week-kicker {
+.luxury-salon-agenda__week-kicker {
   margin: 0;
   font-size: 0.7rem;
   font-weight: 800;
@@ -1266,25 +1266,25 @@
   color: rgba(254, 215, 170, 0.88);
 }
 
-.velvet-salon-agenda__week-sub {
+.luxury-salon-agenda__week-sub {
   margin: 0;
   font-size: 0.78rem;
   color: rgba(255, 251, 235, 0.45);
   font-weight: 500;
 }
 
-.velvet-salon-agenda__week {
+.luxury-salon-agenda__week {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 0.5rem;
 }
 
 @media (max-width: 720px) {
-  .velvet-salon-agenda__week-shell {
+  .luxury-salon-agenda__week-shell {
     padding-inline: 0.65rem;
   }
 
-  .velvet-salon-agenda__week {
+  .luxury-salon-agenda__week {
     grid-template-columns: repeat(7, minmax(2.85rem, 1fr));
     overflow-x: auto;
     padding-bottom: 0.35rem;
@@ -1294,22 +1294,22 @@
     scrollbar-gutter: stable;
   }
 
-  .velvet-salon-agenda__week::-webkit-scrollbar {
+  .luxury-salon-agenda__week::-webkit-scrollbar {
     height: 5px;
   }
 
-  .velvet-salon-agenda__week::-webkit-scrollbar-track {
+  .luxury-salon-agenda__week::-webkit-scrollbar-track {
     background: rgba(12, 4, 2, 0.45);
     border-radius: 999px;
   }
 
-  .velvet-salon-agenda__week::-webkit-scrollbar-thumb {
+  .luxury-salon-agenda__week::-webkit-scrollbar-thumb {
     background: linear-gradient(90deg, rgba(234, 88, 12, 0.5), rgba(253, 186, 116, 0.45));
     border-radius: 999px;
   }
 }
 
-.velvet-salon-agenda__day-cell {
+.luxury-salon-agenda__day-cell {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -1336,7 +1336,7 @@
     transform 0.18s ease;
 }
 
-.velvet-salon-agenda__day-cell::after {
+.luxury-salon-agenda__day-cell::after {
   content: "";
   position: absolute;
   inset: auto 18% 6px 18%;
@@ -1347,7 +1347,7 @@
   transition: opacity 0.2s ease;
 }
 
-.velvet-salon-agenda__day-cell:hover {
+.luxury-salon-agenda__day-cell:hover {
   border-color: rgba(253, 186, 116, 0.42);
   box-shadow:
     0 8px 22px rgba(45, 16, 6, 0.28),
@@ -1356,36 +1356,36 @@
   transform: translateY(-3px);
 }
 
-.velvet-salon-agenda__day-cell:hover::after {
+.luxury-salon-agenda__day-cell:hover::after {
   opacity: 1;
 }
 
-.velvet-salon-agenda__day-cell:active {
+.luxury-salon-agenda__day-cell:active {
   transform: translateY(0);
 }
 
-.velvet-salon-agenda__day-cell:focus {
+.luxury-salon-agenda__day-cell:focus {
   outline: none;
 }
 
-.velvet-salon-agenda__day-cell:focus-visible {
+.luxury-salon-agenda__day-cell:focus-visible {
   outline: 2px solid rgba(253, 186, 116, 0.9);
   outline-offset: 3px;
 }
 
-.velvet-salon-agenda__day-cell--today {
+.luxury-salon-agenda__day-cell--today {
   border-color: rgba(253, 186, 116, 0.42);
   box-shadow:
     0 0 0 1px rgba(249, 115, 22, 0.22),
     0 6px 20px rgba(234, 88, 12, 0.15);
 }
 
-.velvet-salon-agenda__day-cell--today .velvet-salon-agenda__day-cell-dom {
+.luxury-salon-agenda__day-cell--today .luxury-salon-agenda__day-cell-dom {
   color: #fff7ed;
   text-shadow: 0 0 18px rgba(253, 186, 116, 0.35);
 }
 
-.velvet-salon-agenda__day-cell--selected {
+.luxury-salon-agenda__day-cell--selected {
   border-color: rgba(253, 186, 116, 0.58);
   background:
     linear-gradient(155deg, rgba(249, 115, 22, 0.35) 0%, rgba(99, 38, 14, 0.55) 42%, rgba(24, 8, 3, 0.7) 100%);
@@ -1396,12 +1396,12 @@
   transform: translateY(-2px);
 }
 
-.velvet-salon-agenda__day-cell--selected::after {
+.luxury-salon-agenda__day-cell--selected::after {
   opacity: 1;
   background: linear-gradient(90deg, transparent, rgba(255, 251, 235, 0.45), transparent);
 }
 
-.velvet-salon-agenda__day-cell-dow {
+.luxury-salon-agenda__day-cell-dow {
   font-size: 0.66rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -1409,11 +1409,11 @@
   color: rgba(255, 251, 235, 0.42);
 }
 
-.velvet-salon-agenda__day-cell--selected .velvet-salon-agenda__day-cell-dow {
+.luxury-salon-agenda__day-cell--selected .luxury-salon-agenda__day-cell-dow {
   color: rgba(255, 251, 235, 0.78);
 }
 
-.velvet-salon-agenda__day-cell-dom {
+.luxury-salon-agenda__day-cell-dom {
   font-size: 1.28rem;
   font-weight: 800;
   line-height: 1;
@@ -1421,7 +1421,7 @@
   color: #ffedd5;
 }
 
-.velvet-salon-agenda__day-cell-count {
+.luxury-salon-agenda__day-cell-count {
   font-size: 0.7rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
@@ -1433,24 +1433,24 @@
   border: 1px solid rgba(255, 237, 213, 0.08);
 }
 
-.velvet-salon-agenda__day-cell-count--zero {
+.luxury-salon-agenda__day-cell-count--zero {
   font-weight: 600;
   color: rgba(255, 251, 235, 0.32);
   background: transparent;
   border-color: transparent;
 }
 
-.velvet-salon-agenda__day-cell--selected .velvet-salon-agenda__day-cell-count:not(.velvet-salon-agenda__day-cell-count--zero) {
+.luxury-salon-agenda__day-cell--selected .luxury-salon-agenda__day-cell-count:not(.luxury-salon-agenda__day-cell-count--zero) {
   background: rgba(12, 4, 2, 0.45);
   border-color: rgba(253, 186, 116, 0.25);
   color: #fffbeb;
 }
 
-.velvet-salon-agenda__detail {
-  animation: velvet-salon-agenda-detail-in 0.38s ease-out both;
+.luxury-salon-agenda__detail {
+  animation: luxury-salon-agenda-detail-in 0.38s ease-out both;
 }
 
-.velvet-salon-agenda__day-block {
+.luxury-salon-agenda__day-block {
   border-radius: 16px;
   border: 1px solid rgba(255, 237, 213, 0.18);
   background:
@@ -1461,7 +1461,7 @@
     inset 0 1px 0 rgba(255, 247, 237, 0.05);
 }
 
-.velvet-salon-agenda__dayhead {
+.luxury-salon-agenda__dayhead {
   position: relative;
   display: flex;
   flex-wrap: wrap;
@@ -1473,7 +1473,7 @@
   background: rgba(67, 20, 7, 0.28);
 }
 
-.velvet-salon-agenda__dayhead-accent {
+.luxury-salon-agenda__dayhead-accent {
   position: absolute;
   left: 0;
   top: 0;
@@ -1483,19 +1483,19 @@
   box-shadow: 2px 0 14px rgba(249, 115, 22, 0.25);
 }
 
-.velvet-salon-agenda__dayhead--today .velvet-salon-agenda__dayhead-accent {
+.luxury-salon-agenda__dayhead--today .luxury-salon-agenda__dayhead-accent {
   background: linear-gradient(180deg, #fff7ed 0%, #fb923c 45%, #c2410c 100%);
   box-shadow: 2px 0 18px rgba(253, 186, 116, 0.35);
 }
 
-.velvet-salon-agenda__dayhead--today {
+.luxury-salon-agenda__dayhead--today {
   border-bottom-color: rgba(253, 186, 116, 0.32);
   background:
     linear-gradient(100deg, rgba(249, 115, 22, 0.22) 0%, rgba(67, 20, 7, 0.32) 52%, rgba(24, 8, 3, 0.35) 100%);
   box-shadow: inset 0 -1px 0 rgba(253, 186, 116, 0.15);
 }
 
-.velvet-salon-agenda__dayhead-main {
+.luxury-salon-agenda__dayhead-main {
   position: relative;
   display: flex;
   flex-wrap: wrap;
@@ -1503,7 +1503,7 @@
   gap: 0.35rem 0.65rem;
 }
 
-.velvet-salon-agenda__dow {
+.luxury-salon-agenda__dow {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -1511,7 +1511,7 @@
   color: rgba(255, 251, 235, 0.48);
 }
 
-.velvet-salon-agenda__dom {
+.luxury-salon-agenda__dom {
   font-size: 1.45rem;
   font-weight: 800;
   line-height: 1;
@@ -1520,14 +1520,14 @@
   text-shadow: 0 2px 16px rgba(45, 16, 6, 0.35);
 }
 
-.velvet-salon-agenda__date-long {
+.luxury-salon-agenda__date-long {
   font-size: 0.92rem;
   font-weight: 500;
   color: rgba(255, 251, 235, 0.76);
   text-transform: capitalize;
 }
 
-.velvet-salon-agenda__day-count {
+.luxury-salon-agenda__day-count {
   font-size: 0.8rem;
   font-weight: 700;
   color: rgba(254, 243, 199, 0.95);
@@ -1539,29 +1539,29 @@
   box-shadow: inset 0 1px 0 rgba(255, 247, 237, 0.08);
 }
 
-.velvet-salon-agenda__table-wrap {
+.luxury-salon-agenda__table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0.15rem 0.25rem 0.35rem;
   background: linear-gradient(180deg, transparent, rgba(12, 4, 2, 0.25));
 }
 
-.velvet-salon-agenda__table-wrap::-webkit-scrollbar {
+.luxury-salon-agenda__table-wrap::-webkit-scrollbar {
   height: 7px;
 }
 
-.velvet-salon-agenda__table-wrap::-webkit-scrollbar-track {
+.luxury-salon-agenda__table-wrap::-webkit-scrollbar-track {
   background: rgba(12, 4, 2, 0.4);
   border-radius: 999px;
   margin: 0 0.5rem;
 }
 
-.velvet-salon-agenda__table-wrap::-webkit-scrollbar-thumb {
+.luxury-salon-agenda__table-wrap::-webkit-scrollbar-thumb {
   background: linear-gradient(90deg, rgba(194, 65, 12, 0.65), rgba(253, 186, 116, 0.5));
   border-radius: 999px;
 }
 
-.velvet-salon-agenda__table {
+.luxury-salon-agenda__table {
   width: 100%;
   min-width: 52rem;
   border-collapse: separate;
@@ -1570,7 +1570,7 @@
   color: rgba(255, 251, 235, 0.9);
 }
 
-.velvet-salon-agenda__caption {
+.luxury-salon-agenda__caption {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -1582,11 +1582,11 @@
   border: 0;
 }
 
-.velvet-salon-agenda__table thead {
+.luxury-salon-agenda__table thead {
   background: linear-gradient(180deg, rgba(18, 6, 2, 0.92) 0%, rgba(12, 4, 2, 0.88) 100%);
 }
 
-.velvet-salon-agenda__table th {
+.luxury-salon-agenda__table th {
   text-align: left;
   font-weight: 800;
   font-size: 0.68rem;
@@ -1598,92 +1598,92 @@
   white-space: nowrap;
 }
 
-.velvet-salon-agenda__table th:first-child {
+.luxury-salon-agenda__table th:first-child {
   border-radius: 10px 0 0 0;
 }
 
-.velvet-salon-agenda__table th:last-child {
+.luxury-salon-agenda__table th:last-child {
   border-radius: 0 10px 0 0;
 }
 
-.velvet-salon-agenda__th-action {
+.luxury-salon-agenda__th-action {
   text-align: right;
 }
 
-.velvet-salon-agenda__table td {
+.luxury-salon-agenda__table td {
   padding: 0.68rem 0.8rem;
   border-bottom: 1px solid rgba(255, 237, 213, 0.06);
   vertical-align: middle;
 }
 
-.velvet-salon-agenda__table tbody tr:last-child td {
+.luxury-salon-agenda__table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row {
   transition:
     background 0.24s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.24s ease;
-  animation: velvet-salon-agenda-row-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: luxury-salon-agenda-row-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row:nth-child(1) {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row:nth-child(1) {
   animation-delay: 0.03s;
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row:nth-child(2) {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row:nth-child(2) {
   animation-delay: 0.07s;
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row:nth-child(3) {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row:nth-child(3) {
   animation-delay: 0.11s;
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row:nth-child(4) {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row:nth-child(4) {
   animation-delay: 0.15s;
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row:nth-child(5) {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row:nth-child(5) {
   animation-delay: 0.19s;
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row:nth-child(6) {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row:nth-child(6) {
   animation-delay: 0.23s;
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row:nth-child(7) {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row:nth-child(7) {
   animation-delay: 0.27s;
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row:nth-child(8) {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row:nth-child(8) {
   animation-delay: 0.31s;
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row:nth-child(even) {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row:nth-child(even) {
   background: rgba(255, 247, 237, 0.028);
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row:hover {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row:hover {
   background: rgba(249, 115, 22, 0.12);
   box-shadow: inset 3px 0 0 rgba(253, 186, 116, 0.65);
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row--openable {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row--openable {
   cursor: pointer;
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row--openable:hover {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row--openable:hover {
   background: rgba(249, 115, 22, 0.16);
   box-shadow:
     inset 4px 0 0 rgba(253, 186, 116, 0.95),
     0 0 32px rgba(249, 115, 22, 0.08);
 }
 
-.velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row--openable:active {
+.luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row--openable:active {
   background: rgba(249, 115, 22, 0.19);
 }
 
-.velvet-salon-agenda__table-empty {
+.luxury-salon-agenda__table-empty {
   text-align: center;
   color: rgba(255, 251, 235, 0.48);
   font-style: italic;
@@ -1692,13 +1692,13 @@
   line-height: 1.55;
 }
 
-.velvet-salon-agenda__cell-time {
+.luxury-salon-agenda__cell-time {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   width: 1%;
 }
 
-.velvet-salon-agenda__time-range {
+.luxury-salon-agenda__time-range {
   display: inline-block;
   font-weight: 800;
   color: #ffedd5;
@@ -1714,7 +1714,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .velvet-salon-agenda__data-row--openable:hover .velvet-salon-agenda__time-range {
+  .luxury-salon-agenda__data-row--openable:hover .luxury-salon-agenda__time-range {
     transform: scale(1.05);
     border-color: rgba(253, 186, 116, 0.48);
     background: rgba(249, 115, 22, 0.2);
@@ -1722,33 +1722,33 @@
   }
 }
 
-.velvet-salon-agenda__cell-strong {
+.luxury-salon-agenda__cell-strong {
   font-weight: 700;
   color: #fffbeb;
   max-width: 14rem;
   line-height: 1.35;
 }
 
-.velvet-salon-agenda__cell-muted {
+.luxury-salon-agenda__cell-muted {
   color: rgba(255, 251, 235, 0.52);
   font-size: 0.84rem;
   max-width: 12rem;
   line-height: 1.35;
 }
 
-.velvet-salon-agenda__cell-num {
+.luxury-salon-agenda__cell-num {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   font-weight: 700;
   color: rgba(254, 243, 199, 0.92);
 }
 
-.velvet-salon-agenda__cell-action {
+.luxury-salon-agenda__cell-action {
   text-align: right;
   width: 1%;
 }
 
-.velvet-salon-agenda__status {
+.luxury-salon-agenda__status {
   display: inline-block;
   max-width: 100%;
   padding: 0.3rem 0.55rem;
@@ -1769,22 +1769,22 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .velvet-salon-agenda__data-row:hover .velvet-salon-agenda__status {
+  .luxury-salon-agenda__data-row:hover .luxury-salon-agenda__status {
     transform: translateY(-1px);
   }
 }
 
-.velvet-salon-agenda__status[data-agenda-status="confirmed"] {
+.luxury-salon-agenda__status[data-agenda-status="confirmed"] {
   color: #ecfdf5;
   border-color: rgba(52, 211, 153, 0.45);
   background: linear-gradient(145deg, rgba(16, 185, 129, 0.35) 0%, rgba(6, 78, 59, 0.55) 100%);
   box-shadow:
     inset 0 1px 0 rgba(167, 243, 208, 0.2),
     0 2px 12px rgba(6, 95, 70, 0.35);
-  animation: velvet-salon-agenda-status-pulse 3.2s ease-in-out infinite;
+  animation: luxury-salon-agenda-status-pulse 3.2s ease-in-out infinite;
 }
 
-.velvet-salon-agenda__status[data-agenda-status="cancelled"] {
+.luxury-salon-agenda__status[data-agenda-status="cancelled"] {
   color: #fef2f2;
   border-color: rgba(248, 113, 113, 0.5);
   background: linear-gradient(145deg, rgba(239, 68, 68, 0.38) 0%, rgba(127, 29, 29, 0.55) 100%);
@@ -1793,7 +1793,7 @@
     0 2px 12px rgba(127, 29, 29, 0.3);
 }
 
-.velvet-salon-agenda__status[data-agenda-status="pending"] {
+.luxury-salon-agenda__status[data-agenda-status="pending"] {
   color: #fffbeb;
   border-color: rgba(251, 191, 36, 0.55);
   background: linear-gradient(145deg, rgba(245, 158, 11, 0.42) 0%, rgba(120, 53, 15, 0.55) 100%);
@@ -1802,14 +1802,14 @@
     0 2px 12px rgba(120, 53, 15, 0.28);
 }
 
-.velvet-salon-agenda__status[data-agenda-status="completed"] {
+.luxury-salon-agenda__status[data-agenda-status="completed"] {
   color: rgba(226, 232, 240, 0.95);
   border-color: rgba(148, 163, 184, 0.45);
   background: linear-gradient(145deg, rgba(71, 85, 105, 0.45) 0%, rgba(15, 23, 42, 0.65) 100%);
   box-shadow: inset 0 1px 0 rgba(226, 232, 240, 0.08);
 }
 
-.velvet-salon-agenda__row-link {
+.luxury-salon-agenda__row-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1833,7 +1833,7 @@
     box-shadow 0.2s ease;
 }
 
-.velvet-salon-agenda__row-link::after {
+.luxury-salon-agenda__row-link::after {
   content: "→";
   font-weight: 900;
   font-size: 0.82em;
@@ -1841,7 +1841,7 @@
   transition: transform 0.22s ease;
 }
 
-.velvet-salon-agenda__row-link:focus-visible {
+.luxury-salon-agenda__row-link:focus-visible {
   outline: none;
   border-color: rgba(253, 186, 116, 0.65);
   box-shadow:
@@ -1851,7 +1851,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .velvet-salon-agenda__row-link:hover {
+  .luxury-salon-agenda__row-link:hover {
     background: linear-gradient(165deg, rgba(251, 146, 60, 0.52) 0%, rgba(194, 65, 12, 0.55) 100%);
     border-color: rgba(253, 186, 116, 0.75);
     color: #fff;
@@ -1861,16 +1861,16 @@
       inset 0 1px 0 rgba(255, 247, 237, 0.22);
   }
 
-  .velvet-salon-agenda__row-link:hover::after {
+  .luxury-salon-agenda__row-link:hover::after {
     transform: translateX(5px);
   }
 }
 
-.velvet-salon-agenda__row-link:active {
+.luxury-salon-agenda__row-link:active {
   transform: translateY(0) scale(1.02);
 }
 
-.velvet-salon-agenda__hint-wrap {
+.luxury-salon-agenda__hint-wrap {
   position: relative;
   z-index: 1;
   margin-top: 1.35rem;
@@ -1881,7 +1881,7 @@
   box-shadow: inset 0 1px 0 rgba(255, 247, 237, 0.04);
 }
 
-.velvet-salon-agenda__hint {
+.luxury-salon-agenda__hint {
   margin: 0;
   font-size: 0.88rem;
   line-height: 1.55;
@@ -1889,114 +1889,114 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .velvet-salon-agenda__detail,
-  .velvet-salon-agenda__loading-dot,
-  .velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row,
-  .velvet-salon-agenda__status[data-agenda-status="confirmed"] {
+  .luxury-salon-agenda__detail,
+  .luxury-salon-agenda__loading-dot,
+  .luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row,
+  .luxury-salon-agenda__status[data-agenda-status="confirmed"] {
     animation: none;
   }
 
-  .velvet-salon-agenda__detail {
+  .luxury-salon-agenda__detail {
     opacity: 1;
     transform: none;
   }
 
-  .velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row {
+  .luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row {
     opacity: 1;
     transform: none;
   }
 
-  .velvet-salon-agenda__day-cell,
-  .velvet-salon-agenda__row-link,
-  .velvet-salon-agenda__row-link::after,
-  .velvet-salon-agenda__time-range,
-  .velvet-salon-agenda__status,
-  .velvet-salon-agenda__table tbody tr.velvet-salon-agenda__data-row {
+  .luxury-salon-agenda__day-cell,
+  .luxury-salon-agenda__row-link,
+  .luxury-salon-agenda__row-link::after,
+  .luxury-salon-agenda__time-range,
+  .luxury-salon-agenda__status,
+  .luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row {
     transition: none;
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .velvet-salon-agenda__row-link:hover,
-    .velvet-salon-agenda__row-link:hover::after,
-    .velvet-salon-agenda__data-row:hover .velvet-salon-agenda__status,
-    .velvet-salon-agenda__data-row--openable:hover .velvet-salon-agenda__time-range {
+    .luxury-salon-agenda__row-link:hover,
+    .luxury-salon-agenda__row-link:hover::after,
+    .luxury-salon-agenda__data-row:hover .luxury-salon-agenda__status,
+    .luxury-salon-agenda__data-row--openable:hover .luxury-salon-agenda__time-range {
       transform: none;
     }
   }
 }
 
 /* Agenda titolare: variante più ampia (dopo scelta operatore o senza operatori in elenco). */
-.velvet-salon-agenda--large .velvet-salon-agenda__panel {
+.luxury-salon-agenda--large .luxury-salon-agenda__panel {
   padding: 1.15rem 1.25rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__week-shell {
+.luxury-salon-agenda--large .luxury-salon-agenda__week-shell {
   padding: 1rem 1rem 1.15rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__week {
+.luxury-salon-agenda--large .luxury-salon-agenda__week {
   gap: 0.65rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__day-cell {
+.luxury-salon-agenda--large .luxury-salon-agenda__day-cell {
   min-height: 5.85rem;
   padding: 0.62rem 0.42rem;
   border-radius: 16px;
   gap: 0.28rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__day-cell-dow {
+.luxury-salon-agenda--large .luxury-salon-agenda__day-cell-dow {
   font-size: 0.74rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__day-cell-dom {
+.luxury-salon-agenda--large .luxury-salon-agenda__day-cell-dom {
   font-size: 1.38rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__day-cell-count {
+.luxury-salon-agenda--large .luxury-salon-agenda__day-cell-count {
   font-size: 0.84rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__week-kicker {
+.luxury-salon-agenda--large .luxury-salon-agenda__week-kicker {
   font-size: 0.76rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__week-sub {
+.luxury-salon-agenda--large .luxury-salon-agenda__week-sub {
   font-size: 0.85rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__table {
+.luxury-salon-agenda--large .luxury-salon-agenda__table {
   font-size: 0.98rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__table th,
-.velvet-salon-agenda--large .velvet-salon-agenda__table td {
+.luxury-salon-agenda--large .luxury-salon-agenda__table th,
+.luxury-salon-agenda--large .luxury-salon-agenda__table td {
   padding: 0.68rem 0.88rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__dow {
+.luxury-salon-agenda--large .luxury-salon-agenda__dow {
   font-size: 0.78rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__dom {
+.luxury-salon-agenda--large .luxury-salon-agenda__dom {
   font-size: 1.42rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__date-long {
+.luxury-salon-agenda--large .luxury-salon-agenda__date-long {
   font-size: 0.95rem;
 }
 
-.velvet-salon-agenda--large .velvet-salon-agenda__day-count {
+.luxury-salon-agenda--large .luxury-salon-agenda__day-count {
   font-size: 0.86rem;
 }
 
 /* --- Agenda cliente (lista prenotazioni) --- */
 
-.velvet-consumer-agenda {
+.luxury-consumer-agenda {
   position: relative;
 }
 
-.velvet-consumer-agenda__filters {
+.luxury-consumer-agenda__filters {
   display: inline-flex;
   gap: 0.55rem;
   margin: 0 0 1.25rem;
@@ -2006,7 +2006,7 @@
   background: rgba(24, 8, 3, 0.4);
 }
 
-.velvet-consumer-agenda__tab {
+.luxury-consumer-agenda__tab {
   border: 1px solid transparent;
   background: transparent;
   color: rgba(255, 251, 235, 0.75);
@@ -2022,12 +2022,12 @@
     transform 0.14s ease;
 }
 
-.velvet-consumer-agenda__tab:hover {
+.luxury-consumer-agenda__tab:hover {
   color: #fffbeb;
   border-color: rgba(253, 186, 116, 0.35);
 }
 
-.velvet-consumer-agenda__tab.is-active {
+.luxury-consumer-agenda__tab.is-active {
   color: #fff;
   border-color: rgba(253, 186, 116, 0.55);
   background: linear-gradient(165deg, rgba(249, 115, 22, 0.65) 0%, rgba(194, 65, 12, 0.85) 100%);
@@ -2036,15 +2036,15 @@
     inset 0 1px 0 rgba(255, 247, 237, 0.18);
 }
 
-.velvet-consumer-agenda__tab:active {
+.luxury-consumer-agenda__tab:active {
   transform: translateY(1px);
 }
 
-.velvet-consumer-agenda__empty {
+.luxury-consumer-agenda__empty {
   color: rgba(255, 251, 235, 0.6);
 }
 
-.velvet-consumer-agenda__list {
+.luxury-consumer-agenda__list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -2052,7 +2052,7 @@
   gap: 0.8rem;
 }
 
-.velvet-consumer-agenda__item {
+.luxury-consumer-agenda__item {
   position: relative;
   display: grid;
   grid-template-columns: auto 1fr;
@@ -2067,7 +2067,7 @@
     inset 0 1px 0 rgba(255, 247, 237, 0.04);
 }
 
-.velvet-consumer-agenda__item::before {
+.luxury-consumer-agenda__item::before {
   content: "";
   position: absolute;
   left: 4.2rem;
@@ -2077,7 +2077,7 @@
   background: linear-gradient(180deg, rgba(253, 186, 116, 0.18), rgba(253, 186, 116, 0.45), rgba(253, 186, 116, 0.18));
 }
 
-.velvet-consumer-agenda__date {
+.luxury-consumer-agenda__date {
   position: relative;
   z-index: 1;
   display: inline-flex;
@@ -2092,7 +2092,7 @@
   background: linear-gradient(170deg, rgba(249, 115, 22, 0.24) 0%, rgba(45, 16, 6, 0.55) 100%);
 }
 
-.velvet-consumer-agenda__day {
+.luxury-consumer-agenda__day {
   line-height: 1;
   font-size: 1.2rem;
   font-weight: 800;
@@ -2100,7 +2100,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.velvet-consumer-agenda__month {
+.luxury-consumer-agenda__month {
   text-transform: uppercase;
   font-size: 0.66rem;
   letter-spacing: 0.08em;
@@ -2108,11 +2108,11 @@
   color: rgba(255, 251, 235, 0.78);
 }
 
-.velvet-consumer-agenda__content {
+.luxury-consumer-agenda__content {
   min-width: 0;
 }
 
-.velvet-consumer-agenda__meta {
+.luxury-consumer-agenda__meta {
   margin: 0;
   display: flex;
   flex-wrap: wrap;
@@ -2123,7 +2123,7 @@
   text-transform: capitalize;
 }
 
-.velvet-consumer-agenda__status {
+.luxury-consumer-agenda__status {
   display: inline-flex;
   align-items: center;
   padding: 0.2rem 0.55rem;
@@ -2135,26 +2135,26 @@
   border: 1px solid rgba(255, 237, 213, 0.25);
 }
 
-.velvet-consumer-agenda__status--booked,
-.velvet-consumer-agenda__status--confirmed {
+.luxury-consumer-agenda__status--booked,
+.luxury-consumer-agenda__status--confirmed {
   color: #fde68a;
   background: rgba(146, 64, 14, 0.35);
   border-color: rgba(253, 186, 116, 0.38);
 }
 
-.velvet-consumer-agenda__status--completed {
+.luxury-consumer-agenda__status--completed {
   color: #bbf7d0;
   background: rgba(20, 83, 45, 0.35);
   border-color: rgba(74, 222, 128, 0.38);
 }
 
-.velvet-consumer-agenda__status--cancelled {
+.luxury-consumer-agenda__status--cancelled {
   color: #fecaca;
   background: rgba(127, 29, 29, 0.35);
   border-color: rgba(252, 165, 165, 0.42);
 }
 
-.velvet-consumer-agenda__title {
+.luxury-consumer-agenda__title {
   display: inline-block;
   margin-top: 0.25rem;
   color: #ffedd5;
@@ -2163,29 +2163,29 @@
   font-weight: 700;
 }
 
-.velvet-consumer-agenda__title:hover {
+.luxury-consumer-agenda__title:hover {
   color: #fff7ed;
   text-decoration: underline;
   text-decoration-color: rgba(253, 186, 116, 0.55);
 }
 
-.velvet-consumer-agenda__desc {
+.luxury-consumer-agenda__desc {
   margin: 0.38rem 0 0;
   color: rgba(255, 251, 235, 0.74);
   font-size: 0.92rem;
 }
 
-.velvet-consumer-agenda__full-date {
+.luxury-consumer-agenda__full-date {
   margin: 0.35rem 0 0;
   color: rgba(255, 251, 235, 0.5);
   font-size: 0.82rem;
 }
 
-.velvet-consumer-agenda__actions {
+.luxury-consumer-agenda__actions {
   margin: 0.65rem 0 0;
 }
 
-.velvet-consumer-agenda__manage-link {
+.luxury-consumer-agenda__manage-link {
   display: inline-flex;
   align-items: center;
   padding: 0.38rem 0.75rem;
@@ -2199,44 +2199,44 @@
   box-shadow: 0 4px 12px rgba(45, 16, 6, 0.22);
 }
 
-.velvet-consumer-agenda__manage-link:hover {
+.luxury-consumer-agenda__manage-link:hover {
   color: #fff;
   border-color: rgba(253, 186, 116, 0.65);
 }
 
-.velvet-consumer-agenda__policy-hint {
+.luxury-consumer-agenda__policy-hint {
   margin: 0.55rem 0 0;
   font-size: 0.8rem;
   line-height: 1.45;
   color: rgba(255, 251, 235, 0.58);
 }
 
-.velvet-consumer-home__appointment-manage {
+.luxury-consumer-home__appointment-manage {
   margin: 0.45rem 0 0;
   font-size: 0.88rem;
 }
 
 @media (max-width: 640px) {
-  .velvet-consumer-agenda__filters {
+  .luxury-consumer-agenda__filters {
     width: 100%;
     justify-content: space-between;
   }
 
-  .velvet-consumer-agenda__tab {
+  .luxury-consumer-agenda__tab {
     flex: 1;
     text-align: center;
   }
 
-  .velvet-consumer-agenda__item {
+  .luxury-consumer-agenda__item {
     grid-template-columns: 1fr;
     gap: 0.65rem;
   }
 
-  .velvet-consumer-agenda__item::before {
+  .luxury-consumer-agenda__item::before {
     display: none;
   }
 
-  .velvet-consumer-agenda__date {
+  .luxury-consumer-agenda__date {
     flex-direction: row;
     justify-content: flex-start;
     width: fit-content;

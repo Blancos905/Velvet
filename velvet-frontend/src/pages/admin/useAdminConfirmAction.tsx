@@ -87,7 +87,7 @@ export function useAdminConfirmAction() {
 
   const actionBanner: ReactNode = feedback ? (
     <p
-      className={`velvet-alert velvet-admin-action-banner ${feedback.kind === "success" ? "velvet-alert--success" : "velvet-alert--error"}`}
+      className={`luxury-alert luxury-admin-action-banner ${feedback.kind === "success" ? "luxury-alert--success" : "luxury-alert--error"}`}
       role={feedback.kind === "success" ? "status" : "alert"}
     >
       {feedback.message}

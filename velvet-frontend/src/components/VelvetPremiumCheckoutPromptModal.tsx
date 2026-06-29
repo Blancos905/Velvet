@@ -1,6 +1,6 @@
 import { useId } from "react";
-import { SALON_PREMIUM_TRIAL_DAYS } from "../data/salonPlans";
-import "../styles/velvet-premium-checkout-prompt-modal.css";
+import { premiumTrialGrantedPhrase } from "../data/salonPlans";
+import "../styles/luxury-premium-checkout-prompt-modal.css";
 
 type VelvetPremiumCheckoutPromptModalProps = {
   open: boolean;
@@ -21,16 +21,16 @@ export function VelvetPremiumCheckoutPromptModal({
   if (!open) return null;
 
   return (
-    <div className="velvet-plans-modal-root velvet-premium-checkout-prompt-root" role="presentation">
+    <div className="luxury-plans-modal-root luxury-premium-checkout-prompt-root" role="presentation">
       <div
-        className="velvet-plans-modal velvet-premium-checkout-prompt"
+        className="luxury-plans-modal luxury-premium-checkout-prompt"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
       >
-        <div className="velvet-premium-checkout-prompt__hero" aria-hidden>
-          <span className="velvet-premium-checkout-prompt__icon-ring">
-            <svg className="velvet-premium-checkout-prompt__icon" viewBox="0 0 24 24" fill="none">
+        <div className="luxury-premium-checkout-prompt__hero" aria-hidden>
+          <span className="luxury-premium-checkout-prompt__icon-ring">
+            <svg className="luxury-premium-checkout-prompt__icon" viewBox="0 0 24 24" fill="none">
               <path
                 d="M12 2l2.4 6.8H22l-5.8 4.2 2.2 6.8L12 15.6 5.6 19.8l2.2-6.8L2 8.8h7.6L12 2z"
                 stroke="currentColor"
@@ -41,32 +41,31 @@ export function VelvetPremiumCheckoutPromptModal({
           </span>
         </div>
 
-        <p className="velvet-premium-checkout-prompt__kicker">Email confermata</p>
-        <h2 id={titleId} className="velvet-plans-modal__title velvet-premium-checkout-prompt__title">
+        <p className="luxury-premium-checkout-prompt__kicker">Email confermata</p>
+        <h2 id={titleId} className="luxury-plans-modal__title luxury-premium-checkout-prompt__title">
           Attiva il tuo salone Premium
         </h2>
-        <p className="velvet-plans-modal__intro velvet-premium-checkout-prompt__lead">
+        <p className="luxury-plans-modal__intro luxury-premium-checkout-prompt__lead">
           Il tuo account è attivo e i dati inseriti in registrazione sono già salvati. Prosegui con il pagamento
-          sicuro su Stripe per sbloccare brand, vetrina e statistiche ({SALON_PREMIUM_TRIAL_DAYS} giorni di prova
-          gratuita).
+          sicuro su Stripe per sbloccare brand, vetrina e statistiche ({premiumTrialGrantedPhrase()}).
         </p>
 
         {error ? (
-          <p className="velvet-alert velvet-alert--error velvet-premium-checkout-prompt__error" role="alert">
+          <p className="luxury-alert luxury-alert--error luxury-premium-checkout-prompt__error" role="alert">
             {error}
           </p>
         ) : null}
 
-        <ul className="velvet-premium-checkout-prompt__perks">
+        <ul className="luxury-premium-checkout-prompt__perks">
           <li>Brand e layout vetrina personalizzati</li>
           <li>Statistiche e strumenti avanzati</li>
           <li>Chat clienti e gestione team</li>
         </ul>
 
-        <div className="velvet-plans-modal__actions velvet-premium-checkout-prompt__actions">
+        <div className="luxury-plans-modal__actions luxury-premium-checkout-prompt__actions">
           <button
             type="button"
-            className="velvet-plan-cta velvet-premium-checkout-prompt__cta"
+            className="luxury-plan-cta luxury-premium-checkout-prompt__cta"
             onClick={onContinue}
             disabled={busy}
           >

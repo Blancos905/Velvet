@@ -1,6 +1,6 @@
 /** Persistenza vetrina in IndexedDB (quota molto più ampia di `localStorage`). */
 
-const DB_NAME = "velvet-salon-showcase";
+const DB_NAME = "luxury-salon-showcase";
 const DB_VERSION = 1;
 const STORE = "showcase";
 

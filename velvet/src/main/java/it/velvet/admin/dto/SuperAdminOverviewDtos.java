@@ -44,7 +44,13 @@ public final class SuperAdminOverviewDtos {
 			/** Saloni non provider: unici che possono generare ricavi da abbonamento. */
 			long studioGroupsPaying,
 			long studioGroupsPayingPremium,
-			long studioGroupsPayingBase) {
+			long studioGroupsPayingBase,
+			/** Abbonamento Stripe attivo a pagamento (non provider, non in prova, non disdetta). */
+			long studioGroupsSubscribedPaying,
+			/** Abbonamento Stripe in periodo di prova. */
+			long studioGroupsSubscribedTrial,
+			/** Disdetta registrata o abbonamento terminato. */
+			long studioGroupsSubscribedCancelled) {
 	}
 
 	public record SuperAdminRecentUserRow(
@@ -67,7 +73,12 @@ public final class SuperAdminOverviewDtos {
 			String primaryLocationCity,
 			Instant createdAt,
 			boolean provider,
-			List<SuperAdminSalonStaffRow> staff) {
+			List<SuperAdminSalonStaffRow> staff,
+			String subscriptionStatus,
+			Boolean cancelAtPeriodEnd,
+			Instant subscriptionCurrentPeriodEnd,
+			/** {@code PAYING}, {@code TRIAL}, {@code CANCELLED} o null se nessun abbonamento Stripe. */
+			String subscriptionBillingCategory) {
 	}
 
 	/** Operatori staff (tutte le sedi) per un salone; usato dal pannello super admin. */

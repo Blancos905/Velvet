@@ -48,6 +48,7 @@ export const SUBSCRIPTION_GUARDS_SNAPSHOT = {
       "/account/salone/servizi",
     ],
     blockedPathPrefixes: [
+      "/account/billing",
       "/account/salone/staff",
       "/account/feedback-velvet",
       "/account/salone/statistiche",
@@ -189,7 +190,10 @@ export function isFeatureEnabled(
       if (!context.provisioned) return true;
       return isPremium;
     case "owner.web.freeRegistration":
-      return context.surface === "nativeApp" || isPremium;
+      if (context.surface === "nativeApp") {
+        return tier === "BASE";
+      }
+      return isPremium;
     case "owner.free.serviziPhotoUpload":
       return isPremium || context.surface === "web";
     default:

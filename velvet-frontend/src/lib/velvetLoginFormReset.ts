@@ -1,7 +1,7 @@
 /** Segnala al form «Accedi» di svuotare i campi (logout, scadenza sessione, logout WebView nativa). */
 export const VELVET_CLEAR_LOGIN_FORM_KEY = "velvet_clear_login_on_next_login_form";
 
-export const VELVET_SESSION_ENDED_EVENT = "velvet-session-ended";
+export const VELVET_SESSION_ENDED_EVENT = "luxury-session-ended";
 
 export function markVelvetLoginFormForReset(): void {
   try {

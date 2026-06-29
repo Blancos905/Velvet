@@ -33,9 +33,9 @@ import {
 import { usePublicOrganizationDetail } from "../lib/publicOrganizationDetail";
 import { salonShowcaseFullQueryKey } from "../lib/prefetchSalonPublicPage";
 import { emptySalonShowcase, readSalonShowcaseAsync } from "../lib/salonShowcaseStorage";
-import "../styles/velvet-salon-showcase.css";
-import "../styles/velvet-salon-page.css";
-import "../styles/velvet-salon-booking-native-app.css";
+import "../styles/luxury-salon-showcase.css";
+import "../styles/luxury-salon-page.css";
+import "../styles/luxury-salon-booking-native-app.css";
 
 /** Ruolo come in anagrafica staff (es. Parrucchiere); assente se non impostato in DB. */
 function trimmedPublicOperatorRole(op: OperatorPublic): string | undefined {
@@ -61,9 +61,9 @@ function publicOperatorStaffReviewMeta(op: OperatorPublic): {
 function OperatorStaffReviewStarsRow({ filledStars }: { filledStars: number }) {
   const f = Math.max(0, Math.min(5, filledStars));
   return (
-    <span className="velvet-booking-operator-stars" aria-hidden>
+    <span className="luxury-booking-operator-stars" aria-hidden>
       {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} className={i < f ? "velvet-booking-operator-stars__on" : "velvet-booking-operator-stars__off"}>
+        <span key={i} className={i < f ? "luxury-booking-operator-stars__on" : "luxury-booking-operator-stars__off"}>
           ★
         </span>
       ))}
@@ -384,7 +384,7 @@ export default function SalonPage() {
     setShowBookingAgenda(true);
     setBookingMonth(calendarCurrentMonthStart());
     window.requestAnimationFrame(() => {
-      document.getElementById("velvet-salon-booking")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("luxury-salon-booking")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     const params = new URLSearchParams(window.location.search);
     params.delete("prenota");
@@ -447,7 +447,7 @@ export default function SalonPage() {
     setShowBookingAgenda(true);
     setBookingMonth(calendarCurrentMonthStart());
     window.requestAnimationFrame(() => {
-      const bookingSection = document.getElementById("velvet-salon-booking");
+      const bookingSection = document.getElementById("luxury-salon-booking");
       if (!bookingSection) return;
       bookingSection.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -618,7 +618,7 @@ export default function SalonPage() {
     if (!userPickedAvailabilityDayRef.current) return;
     userPickedAvailabilityDayRef.current = false;
     requestAnimationFrame(() => {
-      document.getElementById("velvet-booking-slots")?.scrollIntoView({
+      document.getElementById("luxury-booking-slots")?.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
@@ -714,7 +714,7 @@ export default function SalonPage() {
   }, [detail?.id, membershipsQ.data]);
 
   /** Stesso id usato da `GET/POST .../salon-clients/chat/messages` (vedi TrustedSalonsPage, SalonClientsPage). */
-  const salonVelvetChatMembershipId = useMemo(() => {
+  const salonLuxuryChatMembershipId = useMemo(() => {
     if (!detail?.id) return null;
     return (membershipsQ.data ?? []).find((item) => item.organizationId === detail.id)?.id ?? null;
   }, [detail?.id, membershipsQ.data]);
@@ -739,18 +739,18 @@ export default function SalonPage() {
     calendarMonthStart(bookingMonth).getTime() === calendarCurrentMonthStart().getTime();
 
   return (
-    <main className="velvet-page-main velvet-page-main--salon-showcase-immersive velvet-salon-public-page">
-      <div className="velvet-salon-public-page__topbar">
-        <Link to="/" className="velvet-header-cta-pill">
-          <span className="velvet-header-cta-pill__glyph" aria-hidden="true">
+    <main className="luxury-page-main luxury-page-main--salon-showcase-immersive luxury-salon-public-page">
+      <div className="luxury-salon-public-page__topbar">
+        <Link to="/" className="luxury-header-cta-pill">
+          <span className="luxury-header-cta-pill__glyph" aria-hidden="true">
             ←
           </span>
-          <span className="velvet-header-partner-label">Cerca saloni</span>
+          <span className="luxury-header-partner-label">Cerca saloni</span>
         </Link>
       </div>
 
       {detailQ.error && !detail ? (
-        <p className="velvet-salon-public-page__status velvet-alert velvet-alert--error" role="alert">
+        <p className="luxury-salon-public-page__status luxury-alert luxury-alert--error" role="alert">
           {detailQ.error instanceof Error ? detailQ.error.message : "Sede non trovata"}
         </p>
       ) : null}
@@ -775,24 +775,24 @@ export default function SalonPage() {
             detachedPublicLayout
             serviceListVariant="cards"
             onBookService={showConsumerBookingFlow ? onBookServiceFromShowcase : undefined}
-            themeClass="velvet-salon-showcase--t-brand-hero"
+            themeClass="luxury-salon-showcase--t-brand-hero"
             siteFullscreenBleed
             allowEmptyPreview
             embedHeading
           />
 
-          <div className="velvet-salon-public-page__content">
-            <section className="velvet-salon-public-meta" aria-label="Informazioni salone">
-            <div className="velvet-salon-public-meta__grid">
+          <div className="luxury-salon-public-page__content">
+            <section className="luxury-salon-public-meta" aria-label="Informazioni salone">
+            <div className="luxury-salon-public-meta__grid">
               <Link
                 to={`/s/${encodeURIComponent(detail.slug)}/esplora`}
-                className="velvet-salon-public-meta__card velvet-salon-public-meta__card--wide velvet-salon-public-meta__card--clickable velvet-salon-public-meta__card--description velvet-salon-public-meta__card--explore-cta velvet-salon-public-meta__card--explore-warm"
+                className="luxury-salon-public-meta__card luxury-salon-public-meta__card--wide luxury-salon-public-meta__card--clickable luxury-salon-public-meta__card--description luxury-salon-public-meta__card--explore-cta luxury-salon-public-meta__card--explore-warm"
               >
-                <div className="velvet-salon-public-meta__explore-inner">
-                  <div className="velvet-salon-public-meta__explore-aside">
+                <div className="luxury-salon-public-meta__explore-inner">
+                  <div className="luxury-salon-public-meta__explore-aside">
                     {showcase.logoDataUrl ? (
                       <img
-                        className="velvet-salon-public-meta__explore-logo"
+                        className="luxury-salon-public-meta__explore-logo"
                         src={showcase.logoDataUrl}
                         alt=""
                         width={104}
@@ -801,20 +801,20 @@ export default function SalonPage() {
                         loading="lazy"
                       />
                     ) : (
-                      <span className="velvet-salon-public-meta__explore-logo-fallback" aria-hidden="true">
+                      <span className="luxury-salon-public-meta__explore-logo-fallback" aria-hidden="true">
                         {exploreCardBrandInitial}
                       </span>
                     )}
                   </div>
-                  <div className="velvet-salon-public-meta__explore-main">
-                    <div className="velvet-salon-public-meta__explore-head">
-                      <h2 className="velvet-salon-public-meta__title velvet-salon-public-meta__title--explore">
+                  <div className="luxury-salon-public-meta__explore-main">
+                    <div className="luxury-salon-public-meta__explore-head">
+                      <h2 className="luxury-salon-public-meta__title luxury-salon-public-meta__title--explore">
                         Esplora il nostro salone
                       </h2>
                     </div>
-                    <span className="velvet-salon-public-meta__explore-pill">
+                    <span className="luxury-salon-public-meta__explore-pill">
                       Apri la vetrina
-                      <span className="velvet-salon-public-meta__explore-pill-arrow" aria-hidden="true">
+                      <span className="luxury-salon-public-meta__explore-pill-arrow" aria-hidden="true">
                         →
                       </span>
                     </span>
@@ -823,35 +823,35 @@ export default function SalonPage() {
               </Link>
 
               <div
-                className="velvet-salon-public-meta__card velvet-salon-public-meta__card--wide velvet-salon-public-meta__card--reviews-cta velvet-salon-public-meta__card--reviews-band velvet-salon-public-meta__card--reviews-warm"
+                className="luxury-salon-public-meta__card luxury-salon-public-meta__card--wide luxury-salon-public-meta__card--reviews-cta luxury-salon-public-meta__card--reviews-band luxury-salon-public-meta__card--reviews-warm"
                 aria-label="Recensioni"
               >
-                <div className="velvet-salon-public-meta__reviews-inner">
-                  <div className="velvet-salon-public-meta__reviews-aside">
-                    <div className="velvet-salon-public-meta__reviews-aside-stack" aria-hidden="true">
-                      <div className="velvet-salon-public-meta__reviews-aside-stars">
+                <div className="luxury-salon-public-meta__reviews-inner">
+                  <div className="luxury-salon-public-meta__reviews-aside">
+                    <div className="luxury-salon-public-meta__reviews-aside-stack" aria-hidden="true">
+                      <div className="luxury-salon-public-meta__reviews-aside-stars">
                         {Array.from({ length: 5 }, (_, index) => (
-                          <span key={index} className="velvet-salon-public-meta__reviews-star">
+                          <span key={index} className="luxury-salon-public-meta__reviews-star">
                             ★
                           </span>
                         ))}
                       </div>
                       {publicReviewAvgLabel != null ? (
-                        <span className="velvet-salon-public-meta__reviews-aside-avg">{publicReviewAvgLabel}</span>
+                        <span className="luxury-salon-public-meta__reviews-aside-avg">{publicReviewAvgLabel}</span>
                       ) : reviewsQ.isLoading ? (
-                        <span className="velvet-salon-public-meta__reviews-aside-avg velvet-salon-public-meta__reviews-aside-avg--muted">
+                        <span className="luxury-salon-public-meta__reviews-aside-avg luxury-salon-public-meta__reviews-aside-avg--muted">
                           …
                         </span>
                       ) : (
-                        <span className="velvet-salon-public-meta__reviews-aside-avg velvet-salon-public-meta__reviews-aside-avg--muted">
+                        <span className="luxury-salon-public-meta__reviews-aside-avg luxury-salon-public-meta__reviews-aside-avg--muted">
                           —
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="velvet-salon-public-meta__reviews-main">
-                    <div className="velvet-salon-public-meta__reviews-head">
-                      <h2 className="velvet-salon-public-meta__title velvet-salon-public-meta__title--reviews">Recensioni</h2>
+                  <div className="luxury-salon-public-meta__reviews-main">
+                    <div className="luxury-salon-public-meta__reviews-head">
+                      <h2 className="luxury-salon-public-meta__title luxury-salon-public-meta__title--reviews">Recensioni</h2>
                     </div>
                     <SalonPublicReviewsBlock
                       isLoading={reviewsQ.isLoading}
@@ -862,7 +862,7 @@ export default function SalonPage() {
                 </div>
               </div>
 
-              <div className="velvet-salon-public-meta__card velvet-salon-public-meta__card--wide velvet-salon-public-meta__card--location velvet-salon-public-meta__card--map-warm">
+              <div className="luxury-salon-public-meta__card luxury-salon-public-meta__card--wide luxury-salon-public-meta__card--location luxury-salon-public-meta__card--map-warm">
                 <SalonLocationMapCard
                   meSalon={
                     {
@@ -884,44 +884,44 @@ export default function SalonPage() {
                 />
               </div>
 
-              <div className="velvet-salon-public-meta__card velvet-salon-public-meta__card--wide velvet-salon-public-meta__card--contacts velvet-salon-public-meta__card--contacts-warm">
-                <div className="velvet-salon-public-meta__contacts-head">
-                  <p className="velvet-salon-public-meta__eyebrow">Contatti</p>
-                  <h2 className="velvet-salon-public-meta__title">Parla con noi</h2>
+              <div className="luxury-salon-public-meta__card luxury-salon-public-meta__card--wide luxury-salon-public-meta__card--contacts luxury-salon-public-meta__card--contacts-warm">
+                <div className="luxury-salon-public-meta__contacts-head">
+                  <p className="luxury-salon-public-meta__eyebrow">Contatti</p>
+                  <h2 className="luxury-salon-public-meta__title">Parla con noi</h2>
                 </div>
-                <div className="velvet-salon-public-meta__contact-lines" aria-label="Contatti del salone">
+                <div className="luxury-salon-public-meta__contact-lines" aria-label="Contatti del salone">
                   {detail.contactEmail?.trim() && contactEmailHref ? (
-                    <p className="velvet-salon-public-meta__contact-line velvet-salon-public-meta__contact-line--with-icon">
-                      <span className="velvet-salon-public-meta__contact-icon-wrap" aria-hidden>
-                        <MetaContactIconEmail className="velvet-salon-public-meta__contact-icon" />
+                    <p className="luxury-salon-public-meta__contact-line luxury-salon-public-meta__contact-line--with-icon">
+                      <span className="luxury-salon-public-meta__contact-icon-wrap" aria-hidden>
+                        <MetaContactIconEmail className="luxury-salon-public-meta__contact-icon" />
                       </span>
-                      <span className="velvet-salon-public-meta__contact-line-body">
-                        <span className="velvet-salon-public-meta__contact-label">Email</span>
+                      <span className="luxury-salon-public-meta__contact-line-body">
+                        <span className="luxury-salon-public-meta__contact-label">Email</span>
                         <a href={contactEmailHref}>{detail.contactEmail.trim()}</a>
                       </span>
                     </p>
                   ) : null}
                   {telForDisplay && telHref ? (
-                    <p className="velvet-salon-public-meta__contact-line velvet-salon-public-meta__contact-line--with-icon">
-                      <span className="velvet-salon-public-meta__contact-icon-wrap" aria-hidden>
-                        <MetaContactIconPhone className="velvet-salon-public-meta__contact-icon" />
+                    <p className="luxury-salon-public-meta__contact-line luxury-salon-public-meta__contact-line--with-icon">
+                      <span className="luxury-salon-public-meta__contact-icon-wrap" aria-hidden>
+                        <MetaContactIconPhone className="luxury-salon-public-meta__contact-icon" />
                       </span>
-                      <span className="velvet-salon-public-meta__contact-line-body">
-                        <span className="velvet-salon-public-meta__contact-label">Telefono</span>
+                      <span className="luxury-salon-public-meta__contact-line-body">
+                        <span className="luxury-salon-public-meta__contact-label">Telefono</span>
                         <a href={telHref}>{telForDisplay}</a>
                       </span>
                     </p>
                   ) : null}
                   {waDigits.length > 0 ? (
-                    <p className="velvet-salon-public-meta__contact-line velvet-salon-public-meta__contact-line--with-icon">
+                    <p className="luxury-salon-public-meta__contact-line luxury-salon-public-meta__contact-line--with-icon">
                       <span
-                        className="velvet-salon-public-meta__contact-icon-wrap velvet-salon-public-meta__contact-icon-wrap--whatsapp"
+                        className="luxury-salon-public-meta__contact-icon-wrap luxury-salon-public-meta__contact-icon-wrap--whatsapp"
                         aria-hidden
                       >
-                        <MetaContactIconWhatsapp className="velvet-salon-public-meta__contact-icon velvet-salon-public-meta__contact-icon--whatsapp" />
+                        <MetaContactIconWhatsapp className="luxury-salon-public-meta__contact-icon luxury-salon-public-meta__contact-icon--whatsapp" />
                       </span>
-                      <span className="velvet-salon-public-meta__contact-line-body">
-                        <span className="velvet-salon-public-meta__contact-label">WhatsApp</span>
+                      <span className="luxury-salon-public-meta__contact-line-body">
+                        <span className="luxury-salon-public-meta__contact-label">WhatsApp</span>
                         <a href={`https://wa.me/${waDigits}`} target="_blank" rel="noreferrer">
                           Apri chat WhatsApp
                         </a>
@@ -930,54 +930,54 @@ export default function SalonPage() {
                   ) : null}
                 </div>
                 {!detail.contactEmail?.trim() && !telForDisplay && waDigits.length === 0 ? (
-                  <p className="velvet-salon-public-meta__hint">
+                  <p className="luxury-salon-public-meta__hint">
                     Contatti non ancora impostati dal salone. Torna più tardi o usa la mappa qui sopra.
                   </p>
                 ) : null}
-                <div className="velvet-salon-public-meta__actions" aria-label="Azioni rapide">
+                <div className="luxury-salon-public-meta__actions" aria-label="Azioni rapide">
                   {telForDisplay && telHref ? (
-                    <a className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--call" href={telHref}>
-                      <MetaContactIconPhone className="velvet-salon-public-meta__btn-icon" />
+                    <a className="luxury-salon-public-meta__btn luxury-salon-public-meta__btn--call" href={telHref}>
+                      <MetaContactIconPhone className="luxury-salon-public-meta__btn-icon" />
                       <span>Chiama</span>
                     </a>
                   ) : null}
                   {waDigits.length > 0 ? (
                     <a
-                      className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--whatsapp"
+                      className="luxury-salon-public-meta__btn luxury-salon-public-meta__btn--whatsapp"
                       href={`https://wa.me/${waDigits}`}
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <MetaContactIconWhatsapp className="velvet-salon-public-meta__btn-icon velvet-salon-public-meta__btn-icon--whatsapp" />
+                      <MetaContactIconWhatsapp className="luxury-salon-public-meta__btn-icon luxury-salon-public-meta__btn-icon--whatsapp" />
                       <span>WhatsApp</span>
                     </a>
                   ) : null}
-                  {salonVelvetChatMembershipId ? (
+                  {salonLuxuryChatMembershipId ? (
                     <Link
-                      className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--chat"
-                      to={`/account/chat?salonClientId=${encodeURIComponent(salonVelvetChatMembershipId)}`}
+                      className="luxury-salon-public-meta__btn luxury-salon-public-meta__btn--chat"
+                      to={`/account/chat?salonClientId=${encodeURIComponent(salonLuxuryChatMembershipId)}`}
                     >
-                      <MetaContactIconChat className="velvet-salon-public-meta__btn-icon" />
+                      <MetaContactIconChat className="luxury-salon-public-meta__btn-icon" />
                       <span>Chat salone</span>
                     </Link>
                   ) : isAuthenticated ? (
                     <Link
-                      className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--chat"
+                      className="luxury-salon-public-meta__btn luxury-salon-public-meta__btn--chat"
                       to="/account/chat"
                       title="Diventa cliente di questo salone (sezione sotto) per aprire la chat con il titolare."
                     >
-                      <MetaContactIconChat className="velvet-salon-public-meta__btn-icon" />
+                      <MetaContactIconChat className="luxury-salon-public-meta__btn-icon" />
                       <span>Chat salone</span>
                     </Link>
                   ) : (
                     <Link
-                      className="velvet-salon-public-meta__btn velvet-salon-public-meta__btn--chat"
+                      className="luxury-salon-public-meta__btn luxury-salon-public-meta__btn--chat"
                       to="/account"
                       onClick={() =>
                         setPostLoginReturnPath(`${window.location.pathname}${window.location.search}`)
                       }
                     >
-                      <MetaContactIconChat className="velvet-salon-public-meta__btn-icon" />
+                      <MetaContactIconChat className="luxury-salon-public-meta__btn-icon" />
                       <span>Chat salone</span>
                     </Link>
                   )}
@@ -986,35 +986,35 @@ export default function SalonPage() {
             </div>
             </section>
 
-            <div id="velvet-salon-booking" className="velvet-salon-public-page__booking">
+            <div id="luxury-salon-booking" className="luxury-salon-public-page__booking">
             {!showConsumerBookingFlow ? (
-              <div className="velvet-salon-booking-warm-card">
-                <p className="velvet-salon-booking-warm-card__text" role="status">
+              <div className="luxury-salon-booking-warm-card">
+                <p className="luxury-salon-booking-warm-card__text" role="status">
                   Sei connesso con un account salone: la prenotazione online è riservata ai clienti registrati. Per fissare
                   un appuntamento usa l&apos;agenda in area account oppure registrati come cliente con un&apos;altra email.
                 </p>
-                <div className="velvet-salon-public-meta__actions" style={{ marginTop: 12 }}>
-                  <Link to="/account/prenotazioni" className="velvet-salon-public-meta__btn">
+                <div className="luxury-salon-public-meta__actions" style={{ marginTop: 12 }}>
+                  <Link to="/account/prenotazioni" className="luxury-salon-public-meta__btn">
                     Vai all&apos;agenda salone
                   </Link>
                 </div>
               </div>
             ) : showBookingAgenda ? (
-              <div className="velvet-booking-agenda-full velvet-booking-agenda-full--warm">
+              <div className="luxury-booking-agenda-full luxury-booking-agenda-full--warm">
                 {bookingFlowStep === "operators" ? (
-                  <div className="velvet-booking-operator-step velvet-booking-operator-step--warm">
-                    <div className="velvet-booking-operator-step__head">
-                      <h2 className="velvet-booking-operator-step__title">Scegli l&apos;operatore</h2>
+                  <div className="luxury-booking-operator-step luxury-booking-operator-step--warm">
+                    <div className="luxury-booking-operator-step__head">
+                      <h2 className="luxury-booking-operator-step__title">Scegli l&apos;operatore</h2>
                     </div>
                     {operatorsQ.isLoading ? (
-                      <p className="velvet-text-muted">Carico gli operatori…</p>
+                      <p className="luxury-text-muted">Carico gli operatori…</p>
                     ) : (operatorsQ.data ?? []).length === 0 ? (
-                      <p className="velvet-text-muted">
+                      <p className="luxury-text-muted">
                         Nessun operatore disponibile per questo servizio. Il salone deve associare lo staff al servizio dal
                         listino in account.
                       </p>
                     ) : (
-                      <ul className="velvet-radio-row velvet-radio-row--operators" aria-label="Elenco operatori">
+                      <ul className="luxury-radio-row luxury-radio-row--operators" aria-label="Elenco operatori">
                         {(operatorsQ.data ?? []).map((op) => {
                           const roleLabel = trimmedPublicOperatorRole(op);
                           const staffRev = publicOperatorStaffReviewMeta(op);
@@ -1036,18 +1036,18 @@ export default function SalonPage() {
                                     setBookingFlowStep("slots");
                                   }}
                                 />
-                                <span className="velvet-booking-operator-label">
-                                  <span className="velvet-booking-operator-label__name">{op.displayName}</span>
+                                <span className="luxury-booking-operator-label">
+                                  <span className="luxury-booking-operator-label__name">{op.displayName}</span>
                                   {roleLabel ? (
-                                    <span className="velvet-booking-operator-label__role">{roleLabel}</span>
+                                    <span className="luxury-booking-operator-label__role">{roleLabel}</span>
                                   ) : null}
                                   {staffRev ? (
                                     <span
-                                      className="velvet-booking-operator-label__rating"
+                                      className="luxury-booking-operator-label__rating"
                                       title="Calcolata sulle recensioni post-visita che includono un voto verso l'operatore."
                                     >
                                       <OperatorStaffReviewStarsRow filledStars={staffRev.filledStars} />
-                                      <span className="velvet-booking-operator-label__rating-text">
+                                      <span className="luxury-booking-operator-label__rating-text">
                                         Media {staffRev.avgLabel}/5 · {staffRev.countBlurb}
                                       </span>
                                     </span>
@@ -1063,26 +1063,26 @@ export default function SalonPage() {
                 ) : (
                   <>
                     {hasStaffOperators ? (
-                      <div className="velvet-booking-agenda-full__operator-bar">
-                        <p className="velvet-text-muted" style={{ margin: "0 0 0.5rem" }}>
+                      <div className="luxury-booking-agenda-full__operator-bar">
+                        <p className="luxury-text-muted" style={{ margin: "0 0 0.5rem" }}>
                           Operatore:{" "}
-                          <strong className="velvet-booking-operator-label velvet-booking-operator-label--compact">
+                          <strong className="luxury-booking-operator-label luxury-booking-operator-label--compact">
                             {selectedOperator ? (
                               <>
-                                <span className="velvet-booking-operator-label__name">
+                                <span className="luxury-booking-operator-label__name">
                                   {selectedOperator.displayName}
                                 </span>
                                 {selectedOperatorRoleLabel ? (
-                                  <span className="velvet-booking-operator-label__role">
+                                  <span className="luxury-booking-operator-label__role">
                                     {selectedOperatorRoleLabel}
                                   </span>
                                 ) : null}
                                 {selectedOperatorStaffReviewMeta ? (
-                                  <span className="velvet-booking-operator-label__rating velvet-booking-operator-label__rating--inline">
+                                  <span className="luxury-booking-operator-label__rating luxury-booking-operator-label__rating--inline">
                                     <OperatorStaffReviewStarsRow
                                       filledStars={selectedOperatorStaffReviewMeta.filledStars}
                                     />
-                                    <span className="velvet-booking-operator-label__rating-text">
+                                    <span className="luxury-booking-operator-label__rating-text">
                                       Media {selectedOperatorStaffReviewMeta.avgLabel}/5 ·{" "}
                                       {selectedOperatorStaffReviewMeta.countBlurb}
                                     </span>
@@ -1096,7 +1096,7 @@ export default function SalonPage() {
                         </p>
                         <button
                           type="button"
-                          className="velvet-btn velvet-btn--secondary"
+                          className="luxury-btn luxury-btn--secondary"
                           onClick={() => {
                             setBookingFlowStep("operators");
                             setOperatorId("");
@@ -1107,25 +1107,25 @@ export default function SalonPage() {
                         </button>
                       </div>
                     ) : (
-                      <p className="velvet-text-muted" style={{ margin: "0 0 1rem" }}>
+                      <p className="luxury-text-muted" style={{ margin: "0 0 1rem" }}>
                         Nessun operatore configurato: la prenotazione verrà assegnata automaticamente.
                       </p>
                     )}
 
-                    <div className="velvet-booking-agenda-full__schedule-header">
-                      <div className="velvet-booking-agenda-full__schedule-head">
-                        <h2 className="velvet-booking-agenda-full__schedule-title">Agenda disponibile</h2>
+                    <div className="luxury-booking-agenda-full__schedule-header">
+                      <div className="luxury-booking-agenda-full__schedule-head">
+                        <h2 className="luxury-booking-agenda-full__schedule-title">Agenda disponibile</h2>
                       </div>
                       {bookingHoursLabel ? (
-                        <div className="velvet-booking-agenda-full__schedule-meta">
-                          <span className="velvet-booking-agenda-full__schedule-meta-label">
+                        <div className="luxury-booking-agenda-full__schedule-meta">
+                          <span className="luxury-booking-agenda-full__schedule-meta-label">
                             Orari prenotazione
                           </span>
-                          <span className="velvet-booking-agenda-full__schedule-meta-hours">
+                          <span className="luxury-booking-agenda-full__schedule-meta-hours">
                             {bookingHoursLabel}
                           </span>
                           {selectedService?.durationMinutes ? (
-                            <span className="velvet-booking-agenda-full__schedule-meta-duration">
+                            <span className="luxury-booking-agenda-full__schedule-meta-duration">
                               durata {selectedService.durationMinutes} min
                             </span>
                           ) : null}
@@ -1133,17 +1133,17 @@ export default function SalonPage() {
                       ) : null}
                     </div>
                 {availabilityQ.isLoading ? (
-                  <p className="velvet-text-muted">Carico agenda…</p>
+                  <p className="luxury-text-muted">Carico agenda…</p>
                 ) : availabilityQ.error ? (
-                  <p className="velvet-alert velvet-alert--error" role="alert">
+                  <p className="luxury-alert luxury-alert--error" role="alert">
                     {availabilityQ.error instanceof Error ? availabilityQ.error.message : "Errore slot"}
                   </p>
                 ) : (
                   <>
-                    <div className="velvet-booking-agenda-full__monthbar">
+                    <div className="luxury-booking-agenda-full__monthbar">
                       <button
                         type="button"
-                        className="velvet-btn velvet-btn--secondary"
+                        className="luxury-btn luxury-btn--secondary"
                         disabled={atEarliestBookingMonth}
                         title={atEarliestBookingMonth ? "Non è possibile prenotare nei mesi passati" : undefined}
                         onClick={() =>
@@ -1161,7 +1161,7 @@ export default function SalonPage() {
                       </strong>
                       <button
                         type="button"
-                        className="velvet-btn velvet-btn--secondary"
+                        className="luxury-btn luxury-btn--secondary"
                         onClick={() =>
                           setBookingMonth((m) => new Date(m.getFullYear(), m.getMonth() + 1, 1))
                         }
@@ -1170,7 +1170,7 @@ export default function SalonPage() {
                       </button>
                     </div>
 
-                    <div className="velvet-booking-agenda-full__weekdays">
+                    <div className="luxury-booking-agenda-full__weekdays">
                       <span>Lun</span>
                       <span>Mar</span>
                       <span>Mer</span>
@@ -1179,7 +1179,7 @@ export default function SalonPage() {
                       <span>Sab</span>
                       <span>Dom</span>
                     </div>
-                    <div className="velvet-booking-agenda-full__grid">
+                    <div className="luxury-booking-agenda-full__grid">
                       {monthGridDays.map((cell) => {
                         const info = availabilityByDate.get(cell.ymd);
                         const free = info?.free ?? 0;
@@ -1209,7 +1209,7 @@ export default function SalonPage() {
                             key={cell.ymd}
                             type="button"
                             className={
-                              `velvet-booking-agenda-full__day${cell.inMonth ? "" : " is-outside"}` +
+                              `luxury-booking-agenda-full__day${cell.inMonth ? "" : " is-outside"}` +
                               `${canInteract && free > 0 ? " has-slots" : ""}` +
                               `${fillLevel}` +
                               `${isActive ? " is-active" : ""}`
@@ -1236,20 +1236,20 @@ export default function SalonPage() {
                       selectedDayAvailInfo &&
                       selectedDayAvailInfo.free === 0 &&
                       selectedDayAvailInfo.total > 0 ? (
-                      <p className="velvet-text-muted">Non ci sono orari liberi in questo giorno per l&apos;operatore scelto.</p>
+                      <p className="luxury-text-muted">Non ci sono orari liberi in questo giorno per l&apos;operatore scelto.</p>
                     ) : selectedDaySlots.length === 0 ? (
-                      <p className="velvet-text-muted">Clicca un giorno disponibile per vedere gli orari.</p>
+                      <p className="luxury-text-muted">Clicca un giorno disponibile per vedere gli orari.</p>
                     ) : (
-                      <div id="velvet-booking-slots" className="velvet-booking-agenda-full__slots">
-                        <p className="velvet-text-muted" style={{ marginBottom: 8 }}>
+                      <div id="luxury-booking-slots" className="luxury-booking-agenda-full__slots">
+                        <p className="luxury-text-muted" style={{ marginBottom: 8 }}>
                           Orari disponibili per {formatAvailabilityDayLabel(selectedAvailabilityDate)}
                         </p>
-                        <ul className="velvet-slot-grid">
+                        <ul className="luxury-slot-grid">
                           {selectedDaySlots.map((slot) => (
                             <li key={slot}>
                               <button
                                 type="button"
-                                className="velvet-slot-btn"
+                                className="luxury-slot-btn"
                                 disabled={isAuthenticated && !canBookAsClient}
                                 onClick={() => requestPickSlot(slot)}
                               >
@@ -1269,7 +1269,7 @@ export default function SalonPage() {
 
             {bookingMsg && showConsumerBookingFlow && !bookingMsg.includes("confermata") && (
               <p
-                className="velvet-alert velvet-alert--error"
+                className="luxury-alert luxury-alert--error"
                 style={{ marginTop: 16 }}
                 role="alert"
               >
@@ -1280,23 +1280,23 @@ export default function SalonPage() {
 
           {isAuthenticated && accessToken && canBookAsClient && (
             <div
-              className="velvet-salon-public-meta__card velvet-salon-public-meta__card--wide velvet-salon-public-meta__card--contacts-warm velvet-salon-public-meta__card--salon-membership"
+              className="luxury-salon-public-meta__card luxury-salon-public-meta__card--wide luxury-salon-public-meta__card--contacts-warm luxury-salon-public-meta__card--salon-membership"
               aria-label="Legame cliente con il salone"
             >
-              <p className="velvet-salon-public-meta__eyebrow">Il tuo account</p>
-              <h2 className="velvet-salon-public-meta__title">Cliente di questo salone</h2>
+              <p className="luxury-salon-public-meta__eyebrow">Il tuo account</p>
+              <h2 className="luxury-salon-public-meta__title">Cliente di questo salone</h2>
               {!alreadySalonClient ? (
-                <p className="velvet-salon-public-meta__hint">
+                <p className="luxury-salon-public-meta__hint">
                   Collega il tuo account come cliente per semplificare prenotazioni e messaggi con il salone.
                 </p>
               ) : null}
-              <div className="velvet-salon-public-meta__actions">
+              <div className="luxury-salon-public-meta__actions">
                 <button
                   type="button"
                   className={
                     alreadySalonClient
-                      ? "velvet-salon-public-meta__btn velvet-salon-public-meta__btn--ghost"
-                      : "velvet-salon-public-meta__btn"
+                      ? "luxury-salon-public-meta__btn luxury-salon-public-meta__btn--ghost"
+                      : "luxury-salon-public-meta__btn"
                   }
                   disabled={
                     !detail?.id ||
@@ -1328,7 +1328,7 @@ export default function SalonPage() {
               </div>
               {salonClientFeedback ? (
                 <p
-                  className={`velvet-salon-public-meta__membership-feedback ${salonClientFeedbackIsError ? "velvet-salon-public-meta__membership-feedback--err" : "velvet-salon-public-meta__membership-feedback--ok"}`}
+                  className={`luxury-salon-public-meta__membership-feedback ${salonClientFeedbackIsError ? "luxury-salon-public-meta__membership-feedback--err" : "luxury-salon-public-meta__membership-feedback--ok"}`}
                   role={salonClientFeedbackIsError ? "alert" : "status"}
                 >
                   {salonClientFeedback}
@@ -1343,52 +1343,52 @@ export default function SalonPage() {
       {bookingConfirmSlot &&
         createPortal(
           <div
-            className="velvet-booking-slots-modal__backdrop velvet-booking-confirm-modal__backdrop"
+            className="luxury-booking-slots-modal__backdrop luxury-booking-confirm-modal__backdrop"
             role="presentation"
             onClick={() => setBookingConfirmSlot(null)}
           >
             <div
-              className="velvet-booking-slots-modal__dialog velvet-booking-login-modal__dialog velvet-booking-confirm-modal__dialog"
+              className="luxury-booking-slots-modal__dialog luxury-booking-login-modal__dialog luxury-booking-confirm-modal__dialog"
               role="dialog"
               aria-modal="true"
               aria-labelledby={bookingConfirmModalTitleId}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="velvet-booking-slots-modal__glow" aria-hidden="true" />
-              <div className="velvet-booking-slots-modal__head">
+              <div className="luxury-booking-slots-modal__glow" aria-hidden="true" />
+              <div className="luxury-booking-slots-modal__head">
                 <button
                   type="button"
-                  className="velvet-booking-slots-modal__close"
+                  className="luxury-booking-slots-modal__close"
                   onClick={() => setBookingConfirmSlot(null)}
                   aria-label="Chiudi"
                 >
-                  <span className="velvet-booking-slots-modal__close-icon" aria-hidden="true">
+                  <span className="luxury-booking-slots-modal__close-icon" aria-hidden="true">
                     ×
                   </span>
                 </button>
-                <p className="velvet-booking-slots-modal__eyebrow">Conferma</p>
-                <h2 id={bookingConfirmModalTitleId} className="velvet-booking-confirm-modal__title">
+                <p className="luxury-booking-slots-modal__eyebrow">Conferma</p>
+                <h2 id={bookingConfirmModalTitleId} className="luxury-booking-confirm-modal__title">
                   Confermi questo orario?
                 </h2>
               </div>
-              <div className="velvet-booking-confirm-modal__panel">
-                <p className="velvet-booking-confirm-modal__slot-label">
+              <div className="luxury-booking-confirm-modal__panel">
+                <p className="luxury-booking-confirm-modal__slot-label">
                   {formatAvailabilitySlotInTimeZone(bookingConfirmSlot, salonTimeZone)}
                 </p>
-                <p className="velvet-booking-confirm-modal__hint">
+                <p className="luxury-booking-confirm-modal__hint">
                   Sei sicuro di voler prenotare questo orario?
                 </p>
-                <div className="velvet-booking-confirm-modal__actions">
+                <div className="luxury-booking-confirm-modal__actions">
                   <button
                     type="button"
-                    className="velvet-booking-confirm-modal__btn velvet-booking-confirm-modal__btn--cancel"
+                    className="luxury-booking-confirm-modal__btn luxury-booking-confirm-modal__btn--cancel"
                     onClick={() => setBookingConfirmSlot(null)}
                   >
                     Annulla
                   </button>
                   <button
                     type="button"
-                    className="velvet-header-cta-pill velvet-header-btn-primary velvet-booking-confirm-modal__btn velvet-booking-confirm-modal__btn--confirm"
+                    className="luxury-header-cta-pill luxury-header-btn-primary luxury-booking-confirm-modal__btn luxury-booking-confirm-modal__btn--confirm"
                     onClick={() => {
                       const startIso = bookingConfirmSlot;
                       setBookingConfirmSlot(null);
@@ -1420,39 +1420,39 @@ export default function SalonPage() {
       {bookingLoginModalOpen &&
         createPortal(
           <div
-            className="velvet-booking-slots-modal__backdrop"
+            className="luxury-booking-slots-modal__backdrop"
             role="presentation"
             onClick={() => setBookingLoginModalOpen(false)}
           >
             <div
-              className="velvet-booking-slots-modal__dialog velvet-booking-login-modal__dialog"
+              className="luxury-booking-slots-modal__dialog luxury-booking-login-modal__dialog"
               role="dialog"
               aria-modal="true"
               aria-labelledby={bookingLoginModalTitleId}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="velvet-booking-slots-modal__glow" aria-hidden="true" />
-              <div className="velvet-booking-slots-modal__handle" aria-hidden="true" />
-              <div className="velvet-booking-slots-modal__head">
+              <div className="luxury-booking-slots-modal__glow" aria-hidden="true" />
+              <div className="luxury-booking-slots-modal__handle" aria-hidden="true" />
+              <div className="luxury-booking-slots-modal__head">
                 <button
                   type="button"
-                  className="velvet-booking-slots-modal__close"
+                  className="luxury-booking-slots-modal__close"
                   onClick={() => setBookingLoginModalOpen(false)}
                   aria-label="Chiudi"
                 >
-                  <span className="velvet-booking-slots-modal__close-icon" aria-hidden="true">
+                  <span className="luxury-booking-slots-modal__close-icon" aria-hidden="true">
                     ×
                   </span>
                 </button>
-                <p className="velvet-booking-slots-modal__eyebrow">Prenotazione</p>
-                <h2 id={bookingLoginModalTitleId} className="velvet-booking-login-modal__title">
+                <p className="luxury-booking-slots-modal__eyebrow">Prenotazione</p>
+                <h2 id={bookingLoginModalTitleId} className="luxury-booking-login-modal__title">
                   accedi per prenotare
                 </h2>
               </div>
-              <div className="velvet-booking-login-modal__panel">
+              <div className="luxury-booking-login-modal__panel">
                 <Link
                   to="/account"
-                  className="velvet-header-cta-pill velvet-header-btn-primary velvet-booking-login-modal__cta"
+                  className="luxury-header-cta-pill luxury-header-btn-primary luxury-booking-login-modal__cta"
                   onClick={() => {
                     setPostLoginReturnPath(buildSalonBookingLoginReturnPath());
                     setBookingLoginModalOpen(false);
@@ -1470,58 +1470,58 @@ export default function SalonPage() {
         selectedAvailabilityDate &&
         createPortal(
           <div
-            className="velvet-booking-slots-modal__backdrop"
+            className="luxury-booking-slots-modal__backdrop"
             role="presentation"
             onClick={() => setBookingSlotsModalOpen(false)}
           >
             <div
-              className="velvet-booking-slots-modal__dialog"
+              className="luxury-booking-slots-modal__dialog"
               role="dialog"
               aria-modal="true"
               aria-labelledby={bookingSlotsModalTitleId}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="velvet-booking-slots-modal__glow" aria-hidden="true" />
-              <div className="velvet-booking-slots-modal__handle" aria-hidden="true" />
-              <div className="velvet-booking-slots-modal__head">
+              <div className="luxury-booking-slots-modal__glow" aria-hidden="true" />
+              <div className="luxury-booking-slots-modal__handle" aria-hidden="true" />
+              <div className="luxury-booking-slots-modal__head">
                 <button
                   type="button"
-                  className="velvet-booking-slots-modal__close"
+                  className="luxury-booking-slots-modal__close"
                   onClick={() => setBookingSlotsModalOpen(false)}
                   aria-label="Chiudi"
                 >
-                  <span className="velvet-booking-slots-modal__close-icon" aria-hidden="true">
+                  <span className="luxury-booking-slots-modal__close-icon" aria-hidden="true">
                     ×
                   </span>
                 </button>
-                <p className="velvet-booking-slots-modal__eyebrow">Scegli l&apos;orario</p>
-                <h2 id={bookingSlotsModalTitleId} className="velvet-booking-slots-modal__title">
+                <p className="luxury-booking-slots-modal__eyebrow">Scegli l&apos;orario</p>
+                <h2 id={bookingSlotsModalTitleId} className="luxury-booking-slots-modal__title">
                   Orari per {formatAvailabilityDayLabel(selectedAvailabilityDate)}
                 </h2>
                 {selectedDaySlots.length > 0 ? (
-                  <p className="velvet-booking-slots-modal__meta">
-                    <span className="velvet-booking-slots-modal__meta-count">{selectedDaySlots.length}</span>
+                  <p className="luxury-booking-slots-modal__meta">
+                    <span className="luxury-booking-slots-modal__meta-count">{selectedDaySlots.length}</span>
                     {selectedDaySlots.length === 1 ? " slot libero" : " slot liberi"}
                   </p>
                 ) : null}
               </div>
-              <div className="velvet-booking-slots-modal__panel">
+              <div className="luxury-booking-slots-modal__panel">
                 {selectedDaySlots.length === 0 ? (
-                  <p className="velvet-booking-slots-modal__empty">
+                  <p className="luxury-booking-slots-modal__empty">
                     Non ci sono orari liberi in questo giorno per l&apos;operatore scelto.
                   </p>
                 ) : (
-                  <ul className="velvet-booking-slots-modal__grid">
+                  <ul className="luxury-booking-slots-modal__grid">
                     {selectedDaySlots.map((slot) => (
                       <li key={slot}>
                         <button
                           type="button"
-                          className="velvet-booking-slots-modal__slot"
+                          className="luxury-booking-slots-modal__slot"
                           disabled={isAuthenticated && !canBookAsClient}
                           onClick={() => requestPickSlot(slot)}
                         >
-                          <span className="velvet-booking-slots-modal__slot-face" aria-hidden="true" />
-                          <span className="velvet-booking-slots-modal__slot-time">
+                          <span className="luxury-booking-slots-modal__slot-face" aria-hidden="true" />
+                          <span className="luxury-booking-slots-modal__slot-time">
                             {formatAvailabilitySlotTimeOnly(slot, salonTimeZone)}
                           </span>
                         </button>
@@ -1534,7 +1534,7 @@ export default function SalonPage() {
           </div>,
           document.body,
         )}
-      <LegalSiteFootnote className="velvet-legal-site-footnote--salon-page" />
+      <LegalSiteFootnote className="luxury-legal-site-footnote--salon-page" />
     </main>
   );
 }
