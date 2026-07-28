@@ -1,0 +1,221 @@
+/**
+ * Notifiche lato salone/operatore (`/account/notifiche`) — stessa struttura delle
+ * notifiche cliente (hero + card + lista), ma con accento AZZURRO al posto del viola.
+ * Le regole sono agganciate a `--salon-side`, quindi la versione cliente resta viola.
+ * Importato DOPO `luxury-notifications-client.css` per vincere i pareggi di specificità.
+ */
+
+/* Variabili hero: azzurro come accento secondario (l'ambra resta come primario). */
+.luxury-consumer-bookings-dash.luxury-salon-notif-page--salon-side {
+  --luxury-ip-accent: #f59e0b;
+  --luxury-ip-accent-soft: #fbbf24;
+  --luxury-ip-accent-glow: rgba(245, 158, 11, 0.22);
+  --luxury-ip-secondary: #38bdf8;
+  --luxury-ip-secondary-glow: rgba(56, 189, 248, 0.18);
+}
+
+/* --- Hero (`ClientAccountHeroHeader`): converte i viola hardcoded in azzurro. --- */
+.luxury-salon-notif-page--salon-side .luxury-info-privacy-hero__aurora {
+  background:
+    radial-gradient(ellipse 75% 48% at 15% 18%, rgba(56, 189, 248, 0.28), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(245, 158, 11, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 50% 100%, rgba(251, 191, 36, 0.12), transparent 45%);
+}
+
+.luxury-salon-notif-page--salon-side .luxury-info-privacy-hero__badge--muted {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: linear-gradient(160deg, rgba(3, 105, 161, 0.55), rgba(8, 20, 28, 0.5));
+  color: #e0f2fe;
+}
+
+.luxury-salon-notif-page--salon-side .luxury-info-privacy-hero__subtitle-card {
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(10, 16, 24, 0.88) 0%, rgba(0, 0, 0, 0.94) 55%, rgba(6, 10, 14, 0.96) 100%);
+  box-shadow:
+    0 4px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.14) inset,
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 28px var(--luxury-ip-secondary-glow);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-notif-page--salon-side .luxury-info-privacy-hero__subtitle-card:hover {
+    border-color: rgba(56, 189, 248, 0.35);
+  }
+}
+
+.luxury-salon-notif-page--salon-side .luxury-info-privacy-hero__subtitle-chip {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(3, 105, 161, 0.35);
+  color: #e0f2fe;
+}
+
+.luxury-salon-notif-page--salon-side .luxury-info-privacy-hero__subtitle em {
+  color: #7dd3fc;
+}
+
+.luxury-salon-notif-page--salon-side .luxury-info-privacy-hero__subtitle strong {
+  color: #7dd3fc;
+}
+
+.luxury-salon-notif-page--salon-side .luxury-consumer-bookings-dash__headline-accent {
+  background: linear-gradient(105deg, #7dd3fc 0%, #38bdf8 42%, #f59e0b 100%);
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(56, 189, 248, 0.3));
+}
+
+.luxury-salon-notif-page--salon-side .luxury-consumer-bookings-dash__headline::after {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.95) 0%, rgba(245, 158, 11, 0.6) 55%, transparent 100%);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+}
+
+.luxury-salon-notif-page--salon-side .luxury-info-privacy-hero__subtitle-foot {
+  border-top-color: rgba(56, 189, 248, 0.18);
+}
+
+/* --- Card contenuto (`ClientAccountContentCard`): accenti viola → azzurro. --- */
+.luxury-salon-notif-page--salon-side .luxury-feedback-client-page__card::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #38bdf8 22%,
+    #f59e0b 50%,
+    #fbbf24 72%,
+    transparent
+  );
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.22);
+}
+
+.luxury-salon-notif-page--salon-side .luxury-feedback-client-page__card-glow {
+  background: radial-gradient(ellipse 55% 42% at 50% 0%, rgba(56, 189, 248, 0.14) 0%, transparent 64%);
+}
+
+.luxury-salon-notif-page--salon-side .luxury-feedback-client-page__card-title::after {
+  background: linear-gradient(90deg, #38bdf8 0%, #f59e0b 55%, transparent 100%);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.22);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-notif-page--salon-side .luxury-feedback-client-page__card:hover {
+    box-shadow:
+      0 22px 48px rgba(0, 0, 0, 0.42),
+      0 0 0 1px rgba(56, 189, 248, 0.18);
+  }
+}
+
+/* --- Lista notifiche, righe e dettaglio: viola → azzurro. --- */
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-list {
+  background:
+    radial-gradient(120% 80% at 12% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 55%),
+    radial-gradient(90% 55% at 100% 25%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(6, 18, 26, 0.98) 0%, rgba(0, 0, 0, 0.99) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.12) inset,
+    0 16px 36px rgba(0, 0, 0, 0.38);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-list::before {
+  background: linear-gradient(
+    135deg,
+    rgba(56, 189, 248, 0.06) 0%,
+    transparent 42%,
+    rgba(249, 115, 22, 0.04) 100%
+  );
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-row {
+  background: linear-gradient(165deg, rgba(12, 38, 52, 0.72) 0%, rgba(18, 18, 21, 0.92) 100%);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-row--expanded::after {
+  border-color: rgba(56, 189, 248, 0.9);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-row--interactive:hover {
+  background: linear-gradient(165deg, rgba(11, 66, 92, 0.55) 0%, rgba(24, 24, 27, 0.95) 100%);
+  box-shadow:
+    0 2px 0 #000,
+    0 12px 28px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(56, 189, 248, 0.2);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-row--interactive:focus-visible {
+  box-shadow:
+    0 2px 0 #000,
+    0 0 0 3px rgba(56, 189, 248, 0.28);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-row--expanded {
+  background: linear-gradient(165deg, rgba(11, 66, 92, 0.62) 0%, rgba(30, 30, 33, 0.96) 100%);
+  box-shadow:
+    0 2px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.22) inset;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-detail {
+  border-top: 1px solid rgba(56, 189, 248, 0.22);
+  background:
+    radial-gradient(85% 70% at 100% 0%, rgba(249, 115, 22, 0.07) 0%, transparent 52%),
+    radial-gradient(90% 60% at 0% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(9, 26, 36, 0.98) 0%, rgba(10, 10, 12, 0.99) 100%);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-detail::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(251, 191, 36, 0.45) 35%,
+    rgba(56, 189, 248, 0.5) 65%,
+    transparent 100%
+  );
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-detail__toolbar {
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 52%),
+    linear-gradient(165deg, rgba(24, 24, 27, 0.92) 0%, rgba(12, 12, 14, 0.98) 100%);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-detail__toolbar::before {
+  color: rgba(125, 211, 252, 0.88);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-detail__list {
+  scrollbar-color: rgba(56, 189, 248, 0.45) rgba(24, 24, 27, 0.5);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-detail__list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.65) 0%, rgba(249, 115, 22, 0.55) 100%);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-detail__open:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(56, 189, 248, 0.35);
+}
+
+/* Dettaglio messaggio: barra accento, hover e pill «Apri» — viola → celeste. */
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-detail__line::before {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.95) 0%, rgba(249, 115, 22, 0.9) 100%);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-detail__line--interactive:hover {
+  box-shadow:
+    0 2px 0 #000,
+    0 10px 22px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(56, 189, 248, 0.18);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-detail__open::after {
+  color: rgba(224, 242, 254, 0.95);
+  background: rgba(11, 66, 92, 0.55);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--salon-side .luxury-salon-notif-detail__status .luxury-link-back {
+  color: rgba(125, 211, 252, 0.95);
+}

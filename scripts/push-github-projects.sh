@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Push velvet, velvet-frontend e velvet-app su GitHub (repo separati).
+# Push luxury, luxury-frontend e luxury-app su GitHub (repo separati).
 # Richiede: gh auth login (oppure GH_TOKEN / GITHUB_TOKEN in ambiente).
 set -euo pipefail
 
@@ -42,9 +42,9 @@ push_project() {
   echo "✓ https://github.com/${OWNER}/${repo}"
 }
 
-push_project velvet velvet "Velvet — backend Spring Boot (API saloni)"
-push_project velvet-frontend velvet-frontend "Velvet — frontend React/Vite (web + SEO)"
-push_project velvet-app velvet-app "Velvet — app Flutter (WebView iOS/Android)"
+push_project luxury luxury "Luxury — backend Spring Boot (API saloni)"
+push_project luxury-frontend luxury-frontend "Luxury — frontend React/Vite (web + SEO)"
+push_project luxury-app luxury-app "Luxury — app Flutter (WebView iOS/Android)"
 
 echo ""
 echo "Fatto. Tre repository aggiornati su GitHub."

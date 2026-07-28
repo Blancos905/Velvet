@@ -1,0 +1,311 @@
+/**
+ * Titolare → Agenda → «Chi sei?» (`/account/prenotazioni`) — stessa struttura delle altre
+ * pagine account (hero `ClientAccountHeroHeader` + shell), con accento AZZURRO al posto
+ * dell'arancio. Agganciato a `--salon-side`. La chip ambra delle card resta come accento
+ * secondario (stesso linguaggio blu + ambra della chat).
+ * Importato DOPO `luxury-salon-staff-pick-page.css` per vincere i pareggi di specificità.
+ */
+
+.luxury-consumer-bookings-dash.luxury-salon-staff-pick-page--salon-side {
+  --luxury-ip-accent: #f59e0b;
+  --luxury-ip-accent-soft: #fbbf24;
+  --luxury-ip-accent-glow: rgba(245, 158, 11, 0.22);
+  --luxury-ip-secondary: #38bdf8;
+  --luxury-ip-secondary-glow: rgba(56, 189, 248, 0.18);
+}
+
+/* Il wrapper non deve più vincolare la larghezza: la gestisce la shell interna. */
+.luxury-salon-staff-pick-page--salon-side {
+  max-width: none;
+  margin: 0;
+}
+
+.luxury-salon-staff-pick-page--salon-side.luxury-consumer-bookings-dash .luxury-consumer-bookings-dash__shell {
+  max-width: min(44rem, 100%);
+}
+
+.luxury-salon-staff-pick-page--salon-side > .luxury-consumer-bookings-dash__shell > .luxury-link-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+}
+
+/* --- Hero (`ClientAccountHeroHeader`): viola/arancio hardcoded → azzurro. --- */
+.luxury-salon-staff-pick-page--salon-side .luxury-info-privacy-hero__aurora {
+  background:
+    radial-gradient(ellipse 75% 48% at 15% 18%, rgba(56, 189, 248, 0.28), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(245, 158, 11, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 50% 100%, rgba(251, 191, 36, 0.12), transparent 45%);
+}
+
+.luxury-salon-staff-pick-page--salon-side .luxury-info-privacy-hero__badge--muted {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: linear-gradient(160deg, rgba(3, 105, 161, 0.55), rgba(8, 20, 28, 0.5));
+  color: #e0f2fe;
+}
+
+.luxury-salon-staff-pick-page--salon-side .luxury-info-privacy-hero__subtitle-card {
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(10, 16, 24, 0.88) 0%, rgba(0, 0, 0, 0.94) 55%, rgba(6, 10, 14, 0.96) 100%);
+  box-shadow:
+    0 4px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.14) inset,
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 28px var(--luxury-ip-secondary-glow);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-staff-pick-page--salon-side .luxury-info-privacy-hero__subtitle-card:hover {
+    border-color: rgba(56, 189, 248, 0.35);
+  }
+}
+
+.luxury-salon-staff-pick-page--salon-side .luxury-info-privacy-hero__subtitle-chip {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(3, 105, 161, 0.35);
+  color: #e0f2fe;
+}
+
+.luxury-salon-staff-pick-page--salon-side .luxury-info-privacy-hero__subtitle em,
+.luxury-salon-staff-pick-page--salon-side .luxury-info-privacy-hero__subtitle strong {
+  color: #7dd3fc;
+}
+
+.luxury-salon-staff-pick-page--salon-side .luxury-info-privacy-hero__subtitle-foot {
+  border-top-color: rgba(56, 189, 248, 0.18);
+}
+
+/* Link "Gestisci elenco staff" → accento azzurro. */
+.luxury-salon-staff-pick-page--salon-side .luxury-salon-staff-pick-page__manage-link {
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-staff-pick-page--salon-side .luxury-salon-staff-pick-page__manage-link:hover {
+    border-color: rgba(56, 189, 248, 0.5);
+    box-shadow:
+      0 8px 22px rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(56, 189, 248, 0.14);
+  }
+
+  .luxury-salon-staff-pick-page--salon-side > .luxury-consumer-bookings-dash__shell > .luxury-link-back:hover {
+    text-shadow: 0 0 18px rgba(56, 189, 248, 0.28);
+  }
+}
+
+/* --- Card operatore (button): accenti arancio → azzurro (chip ambra resta). --- */
+.luxury-salon-staff-pick-page--salon-side
+  button.luxury-salon-staff-pick-item.luxury-salon-staff-pick-card::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(56, 189, 248, 0.85) 45%,
+    rgba(245, 158, 11, 0.6) 70%,
+    transparent
+  );
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.28);
+}
+
+.luxury-salon-staff-pick-page--salon-side
+  button.luxury-salon-staff-pick-item.luxury-salon-staff-pick-card::after {
+  background: radial-gradient(ellipse 70% 55% at 15% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 55%);
+}
+
+.luxury-salon-staff-pick-page--salon-side
+  button.luxury-salon-staff-pick-item.luxury-salon-staff-pick-card:focus-visible {
+  box-shadow:
+    0 0 0 3px rgba(56, 189, 248, 0.15),
+    0 22px 48px rgba(0, 0, 0, 0.42);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-staff-pick-page--salon-side
+    button.luxury-salon-staff-pick-item.luxury-salon-staff-pick-card:hover {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 26px 52px rgba(0, 0, 0, 0.45),
+      0 0 28px rgba(56, 189, 248, 0.12);
+  }
+
+  .luxury-salon-staff-pick-page--salon-side
+    button.luxury-salon-staff-pick-item.luxury-salon-staff-pick-card:hover
+    .luxury-salon-staff-item__avatar {
+    border-color: rgba(56, 189, 248, 0.45);
+    box-shadow:
+      0 12px 28px rgba(0, 0, 0, 0.45),
+      0 0 24px rgba(56, 189, 248, 0.18);
+  }
+}
+
+/* ===================== Card "Agenda completa studio" (anchor Link) =====================
+ * Gli stili ricchi base sono su `button.luxury-salon-staff-pick-card`: il Link non li eredita.
+ * Qui ricostruiamo l'intera superficie con identità "studio" azzurra (chip azzurra invece
+ * dell'ambra operatori, per distinguere l'agenda collettiva). */
+.luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 1.1rem 1.2rem 1.15rem;
+  border-radius: 18px;
+  border: 2px solid #000000;
+  text-decoration: none;
+  background:
+    radial-gradient(130% 140% at 100% 0%, rgba(56, 189, 248, 0.16) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.08) 0%, transparent 52%),
+    linear-gradient(165deg, rgba(8, 26, 38, 0.98) 0%, rgba(6, 15, 22, 0.99) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 18px 40px rgba(0, 0, 0, 0.4),
+    0 0 26px rgba(56, 189, 248, 0.1);
+  transition:
+    border-color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.22s ease;
+}
+
+/* Barra d'accento superiore blu → ambra. */
+.luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 3px;
+  border-radius: 0 0 10px 10px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(56, 189, 248, 0.9) 45%,
+    rgba(245, 158, 11, 0.6) 70%,
+    transparent
+  );
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.3);
+  z-index: 1;
+}
+
+/* Alone d'angolo. */
+.luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse 70% 55% at 15% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 55%);
+  opacity: 0.8;
+  transition: opacity 0.28s ease;
+}
+
+.luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio .luxury-salon-staff-item__body {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 0.3rem;
+  text-align: left;
+}
+
+.luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio .luxury-salon-staff-item__name {
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #e0f2fe;
+  transition: color 0.2s ease, transform 0.24s ease;
+}
+
+.luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio .luxury-salon-staff-item__role {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: none;
+  color: rgba(186, 230, 253, 0.8);
+}
+
+/* Chip "Apri agenda collettiva": pill azzurra (distinta dall'ambra operatori). */
+.luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio .luxury-salon-staff-item__chip {
+  justify-self: start;
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.95rem 0.42rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #04121c;
+  border: 1px solid rgba(125, 211, 252, 0.5);
+  border-radius: 999px;
+  background: linear-gradient(145deg, #bae6fd 0%, #38bdf8 55%, #0284c7 100%);
+  box-shadow:
+    0 6px 16px rgba(2, 132, 199, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.22s ease, filter 0.2s ease, box-shadow 0.22s ease;
+}
+
+.luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio .luxury-salon-staff-item__chip::after {
+  content: "→";
+  margin-left: 0.35rem;
+  font-weight: 900;
+  transition: transform 0.22s ease;
+}
+
+.luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio:focus-visible {
+  outline: none;
+  border-color: #000000;
+  box-shadow:
+    0 0 0 3px rgba(56, 189, 248, 0.2),
+    0 22px 48px rgba(0, 0, 0, 0.42);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio:hover {
+    border-color: #000000;
+    transform: translateY(-4px) scale(1.01);
+    filter: brightness(1.04);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 26px 52px rgba(0, 0, 0, 0.46),
+      0 0 30px rgba(56, 189, 248, 0.16);
+  }
+
+  .luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio:hover::after {
+    opacity: 1;
+  }
+
+  .luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio:hover .luxury-salon-staff-item__name {
+    color: #f0f9ff;
+    transform: translateX(2px);
+  }
+
+  .luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio:hover .luxury-salon-staff-item__chip {
+    transform: translateX(3px);
+    filter: brightness(1.06);
+    box-shadow:
+      0 8px 22px rgba(2, 132, 199, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  .luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio:hover .luxury-salon-staff-item__chip::after {
+    transform: translateX(4px);
+  }
+
+  .luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio:active {
+    transform: translateY(-1px) scale(1.005);
+    transition-duration: 0.1s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio,
+  .luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio .luxury-salon-staff-item__name,
+  .luxury-salon-staff-pick-page--salon-side a.luxury-salon-staff-pick-card--studio .luxury-salon-staff-item__chip {
+    transition: none;
+  }
+}

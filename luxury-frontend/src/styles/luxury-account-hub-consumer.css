@@ -1,0 +1,572 @@
+/**
+ * Hub account CLIENTE B2C — masthead benvenuto: stesso trattamento ricco
+ * dell'hub operatore/titolare ma in tema VIOLA + arancione (sfondo sfumato).
+ * Scoped a `.luxury-account-hub--consumer-client`.
+ */
+
+/* =========================================================================
+ * Tema viola + arancione cliente: nav, bottoni (Prenotazioni, Chat, Profilo…), body.
+ * Sfondo animato con blend caldo arancio ↔ viola.
+ * ========================================================================= */
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans {
+  --hub-plans-orange: #a78bfa;
+  --hub-plans-orange-hot: #8b5cf6;
+  --hub-plans-edge: rgba(167, 139, 250, 0.72);
+  --hub-plans-edge-soft: rgba(196, 181, 253, 0.38);
+  --hub-plans-btn-ink: #1e0a3c;
+  --hub-plans-btn-ink-strong: #000000;
+  --hub-plans-btn-fill: linear-gradient(180deg, #ede9fe 0%, #c4b5fd 16%, #a78bfa 50%, #8b5cf6 100%);
+  --hub-plans-btn-fill-hover: linear-gradient(180deg, #f5f3ff 0%, #c4b5fd 18%, #a78bfa 56%, #7c3aed 100%);
+  --hub-plans-btn-fill-active: linear-gradient(165deg, #f5f3ff 0%, #a78bfa 32%, #7c3aed 100%);
+  --hub-plans-btn-rim: rgba(0, 0, 0, 0.88);
+  --hub-plans-btn-shadow: #4c1d95;
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans::before {
+  background:
+    radial-gradient(ellipse 130% 90% at 50% -18%, rgba(255, 247, 237, 0.32), transparent 52%),
+    radial-gradient(ellipse 95% 70% at 100% 35%, rgba(196, 181, 253, 0.45), transparent 48%),
+    radial-gradient(ellipse 85% 65% at 0% 75%, rgba(249, 115, 22, 0.42), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(76, 29, 149, 0.5), transparent 55%),
+    radial-gradient(ellipse 55% 42% at 18% 38%, rgba(251, 146, 60, 0.28), transparent 52%),
+    linear-gradient(
+      125deg,
+      #a78bfa 0%,
+      #8b5cf6 18%,
+      #fb923c 42%,
+      #f97316 58%,
+      #7c3aed 82%,
+      #4c1d95 100%
+    );
+  background-size:
+    120% 120%,
+    150% 150%,
+    150% 150%,
+    130% 130%,
+    140% 140%,
+    320% 320%;
+  background-position:
+    50% -18%,
+    100% 35%,
+    0% 75%,
+    50% 100%,
+    18% 38%,
+    0% 50%;
+  animation: luxury-hub-consumer-bg-drift 22s ease-in-out infinite alternate;
+  will-change: background-position;
+}
+
+@keyframes luxury-hub-consumer-bg-drift {
+  0% {
+    background-position:
+      50% -18%,
+      108% 28%,
+      -8% 80%,
+      50% 104%,
+      12% 32%,
+      0% 42%;
+  }
+
+  50% {
+    background-position:
+      50% -8%,
+      86% 46%,
+      14% 62%,
+      54% 90%,
+      30% 48%,
+      52% 58%;
+  }
+
+  100% {
+    background-position:
+      50% -24%,
+      114% 36%,
+      6% 84%,
+      46% 110%,
+      22% 28%,
+      100% 44%;
+  }
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__masthead::before {
+  background:
+    radial-gradient(ellipse 75% 48% at 12% 20%, rgba(249, 115, 22, 0.2), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(167, 139, 250, 0.22), transparent 52%);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__welcome {
+  border-top-color: rgba(167, 139, 250, 0.28);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__reg {
+  color: rgba(196, 181, 253, 0.95);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__greeting {
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.85),
+    0 0 28px rgba(167, 139, 250, 0.35);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__nav {
+  box-shadow:
+    0 0 0 1px #000 inset,
+    0 5px 0 #000,
+    0 24px 52px rgba(0, 0, 0, 0.65),
+    0 0 36px rgba(167, 139, 250, 0.1);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__nav::before {
+  background:
+    radial-gradient(ellipse 70% 50% at 8% 0%, rgba(167, 139, 250, 0.16), transparent 62%),
+    radial-gradient(ellipse 60% 45% at 92% 8%, rgba(196, 181, 253, 0.1), transparent 58%);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__nav-label {
+  color: rgba(196, 181, 253, 0.82);
+  border-top-color: rgba(167, 139, 250, 0.22);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll {
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  scrollbar-color: rgba(196, 181, 253, 0.55) rgba(0, 0, 0, 0.55);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll:hover {
+    border-color: rgba(196, 181, 253, 0.45);
+    background: linear-gradient(180deg, rgba(167, 139, 250, 0.12) 0%, rgba(0, 0, 0, 0.55) 100%);
+  }
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__btn {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.48) inset,
+    0 4px 0 var(--hub-plans-btn-shadow),
+    0 14px 28px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(196, 181, 253, 0.24);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__btn:hover {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 7px 0 var(--hub-plans-btn-shadow),
+      0 20px 40px rgba(124, 58, 237, 0.38),
+      0 0 36px rgba(167, 139, 250, 0.22);
+  }
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll .luxury-account-hub__btn:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--hub-plans-btn-ink-strong),
+    0 0 0 4px #ede9fe,
+    0 4px 0 var(--hub-plans-btn-shadow),
+    0 18px 36px rgba(167, 139, 250, 0.28);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__btn--active {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.72) inset,
+    0 5px 0 #4c1d95,
+    0 0 0 2px rgba(196, 181, 253, 0.65),
+    0 18px 42px rgba(124, 58, 237, 0.42),
+    0 0 48px rgba(167, 139, 250, 0.28);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__btn--sky,
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__btn--ghost,
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__btn--admin {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.48) inset,
+    0 4px 0 var(--hub-plans-btn-shadow),
+    0 14px 28px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(196, 181, 253, 0.24);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__btn--sky:hover,
+  .luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__btn--ghost:hover,
+  .luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__btn--admin:hover {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 7px 0 var(--hub-plans-btn-shadow),
+      0 20px 40px rgba(124, 58, 237, 0.38),
+      0 0 36px rgba(167, 139, 250, 0.22);
+  }
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__btn--sky.luxury-account-hub__btn--active,
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__btn--ghost.luxury-account-hub__btn--active,
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__btn--admin.luxury-account-hub__btn--active {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.72) inset,
+    0 5px 0 #4c1d95,
+    0 0 0 2px rgba(196, 181, 253, 0.65),
+    0 18px 42px rgba(124, 58, 237, 0.42),
+    0 0 48px rgba(167, 139, 250, 0.28);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__notif-pill {
+  background: linear-gradient(145deg, #f5f3ff 0%, #ddd6fe 48%, #a78bfa 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    0 6px 14px rgba(0, 0, 0, 0.28),
+    0 0 12px rgba(167, 139, 250, 0.22);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__body {
+  box-shadow:
+    0 0 0 1px #000 inset,
+    0 5px 0 #000,
+    0 24px 52px rgba(0, 0, 0, 0.65),
+    0 0 36px rgba(167, 139, 250, 0.1);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__masthead {
+  padding: 2px;
+  background: linear-gradient(
+    145deg,
+    rgba(196, 181, 253, 0.75) 0%,
+    rgba(167, 139, 250, 0.55) 42%,
+    rgba(139, 92, 246, 0.35) 100%
+  );
+  box-shadow:
+    0 0 0 1px #000 inset,
+    0 7px 0 #000,
+    0 32px 64px rgba(0, 0, 0, 0.62),
+    0 0 48px rgba(167, 139, 250, 0.18);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__masthead-inner {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(95% 70% at 0% 0%, rgba(167, 139, 250, 0.16) 0%, transparent 55%),
+    radial-gradient(80% 60% at 100% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 52%),
+    linear-gradient(168deg, #0c0814 0%, #000000 54%, #06040a 100%);
+  box-shadow:
+    inset 5px 0 0 #8b5cf6,
+    inset 0 1px 0 rgba(237, 233, 254, 0.06),
+    0 0 0 1px #000 inset,
+    0 6px 0 #000,
+    0 28px 60px rgba(0, 0, 0, 0.72);
+}
+
+.luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans .luxury-account-hub__masthead-inner::after {
+  content: "";
+  position: absolute;
+  right: -8%;
+  bottom: -35%;
+  width: min(42%, 16rem);
+  height: min(70%, 12rem);
+  border-radius: 999px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.14) 0%, transparent 68%);
+  z-index: 0;
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__top {
+  position: relative;
+  z-index: 1;
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__plan--client {
+  color: #1e0a3c;
+  border: 2px solid #000000;
+  background: linear-gradient(180deg, #f5f3ff 0%, #c4b5fd 48%, #a78bfa 100%);
+  box-shadow:
+    0 2px 0 #000,
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 0 20px rgba(167, 139, 250, 0.22);
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-account-hub--consumer-client .luxury-account-hub__plan--client:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 3px 0 #000,
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 0 24px rgba(167, 139, 250, 0.32);
+  }
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__welcome {
+  position: relative;
+  z-index: 1;
+  align-items: center;
+  padding-top: clamp(0.95rem, 2.2vw, 1.25rem);
+  border-top: 1px solid rgba(167, 139, 250, 0.38);
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__welcome::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: min(12rem, 45%);
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #a78bfa 0%, #8b5cf6 55%, transparent 100%);
+  pointer-events: none;
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__mark-wrap {
+  position: relative;
+  z-index: 1;
+  padding: 0.55rem 0.65rem;
+  border-radius: 16px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(167, 139, 250, 0.12) 0%, transparent 60%),
+    #0a0a0a;
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(167, 139, 250, 0.12) inset;
+  transition:
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.26s ease;
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__mark-wrap::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.45), rgba(139, 92, 246, 0.28));
+  z-index: -1;
+  opacity: 0.55;
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__welcome-copy {
+  position: relative;
+  z-index: 1;
+  gap: 0.65rem;
+  padding: clamp(0.85rem, 2vw, 1.1rem) clamp(0.95rem, 2.2vw, 1.2rem);
+  border-radius: 16px;
+  border: 2px solid #000000;
+  background:
+    linear-gradient(165deg, rgba(16, 10, 24, 0.92) 0%, rgba(6, 4, 10, 0.98) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    inset 0 1px 0 rgba(237, 233, 254, 0.05);
+  animation: luxury-hub-consumer-welcome-in 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes luxury-hub-consumer-welcome-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__welcome-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(167, 139, 250, 0.55);
+  background: rgba(0, 0, 0, 0.78);
+  font-size: clamp(0.68rem, 1.5vw, 0.78rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ede9fe;
+  box-shadow: 0 2px 0 #000;
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__welcome-line::before {
+  content: "";
+  flex-shrink: 0;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #a78bfa;
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.65);
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__greeting {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.7rem;
+  margin: 0.25rem 0 0;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(0.85rem, 2.2vw, 1.15rem);
+  border-radius: 14px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(95% 80% at 0% 0%, rgba(139, 92, 246, 0.14) 0%, transparent 58%),
+    radial-gradient(80% 70% at 100% 100%, rgba(167, 139, 250, 0.1) 0%, transparent 55%),
+    linear-gradient(165deg, rgba(12, 8, 20, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    inset 0 1px 0 rgba(237, 233, 254, 0.07);
+  font-size: 1rem;
+  line-height: 1.1;
+  overflow: hidden;
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__greeting::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(167, 139, 250, 0.55) 40%, rgba(139, 92, 246, 0.45) 70%, transparent 100%);
+  pointer-events: none;
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__greeting::after {
+  content: "";
+  position: absolute;
+  left: clamp(0.85rem, 2.2vw, 1.15rem);
+  bottom: 0.55rem;
+  width: min(10rem, 48%);
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8b5cf6 0%, #c4b5fd 50%, rgba(167, 139, 250, 0.7) 100%);
+  box-shadow: 0 1px 0 #000;
+  pointer-events: none;
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__greeting-hi {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font-size: clamp(2.2rem, 6.5vw, 3.5rem);
+  font-weight: 800;
+  font-style: normal;
+  letter-spacing: -0.03em;
+  text-transform: none;
+  line-height: 1.02;
+  color: #f5f3ff;
+  text-shadow:
+    0 2px 0 #000,
+    0 4px 14px rgba(0, 0, 0, 0.65);
+}
+
+.luxury-account-hub--consumer-client .luxury-account-hub__greeting-name {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0.5rem 1.05rem 0.58rem;
+  border-radius: 999px;
+  font-size: clamp(2rem, 5vw, 2.85rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: #c4b5fd;
+  -webkit-text-fill-color: #c4b5fd;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.72) 0%, rgba(20, 8, 36, 0.82) 100%);
+  border: 2px solid #000000;
+  border-bottom: 3px solid #8b5cf6;
+  box-shadow:
+    0 2px 0 #000,
+    inset 0 1px 0 rgba(237, 233, 254, 0.1),
+    0 0 18px rgba(139, 92, 246, 0.18);
+  text-shadow: 0 1px 0 #000;
+  transition:
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.24s ease,
+    color 0.2s ease;
+}
+
+@media (min-width: 560px) {
+  .luxury-account-hub--consumer-client .luxury-account-hub__greeting {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.65rem 0.85rem;
+    padding-bottom: clamp(1rem, 2.4vw, 1.2rem);
+  }
+
+  .luxury-account-hub--consumer-client .luxury-account-hub__greeting-hi {
+    font-size: clamp(2.45rem, 5.8vw, 3.65rem);
+  }
+
+  .luxury-account-hub--consumer-client .luxury-account-hub__greeting-name {
+    font-size: clamp(2.15rem, 4.2vw, 3.05rem);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-account-hub--consumer-client .luxury-account-hub__greeting:hover .luxury-account-hub__greeting-name {
+    transform: translateY(-2px);
+    color: #ede9fe;
+    -webkit-text-fill-color: #ede9fe;
+    box-shadow:
+      0 4px 0 #000,
+      inset 0 1px 0 rgba(237, 233, 254, 0.16),
+      0 0 32px rgba(139, 92, 246, 0.32);
+  }
+}
+
+@media (min-width: 720px) {
+  .luxury-account-hub--consumer-client .luxury-account-hub__welcome {
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .luxury-account-hub--consumer-client .luxury-account-hub__welcome-copy {
+    flex: 1.15;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-account-hub--consumer-client .luxury-account-hub__masthead:hover .luxury-account-hub__mark-wrap {
+    transform: scale(1.02);
+    box-shadow:
+      0 3px 0 #000,
+      0 0 22px rgba(167, 139, 250, 0.28),
+      0 0 0 1px rgba(167, 139, 250, 0.18) inset;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-account-hub--consumer-client.luxury-account-hub--luxury-plans::before {
+    animation: none;
+    will-change: auto;
+  }
+
+  .luxury-account-hub--consumer-client .luxury-account-hub__welcome-copy {
+    animation: none;
+  }
+
+  .luxury-account-hub--consumer-client .luxury-account-hub__mark-wrap,
+  .luxury-account-hub--consumer-client .luxury-account-hub__plan--client,
+  .luxury-account-hub--consumer-client .luxury-account-hub__greeting-name {
+    transition: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .luxury-account-hub--consumer-client .luxury-account-hub__masthead:hover .luxury-account-hub__mark-wrap,
+    .luxury-account-hub--consumer-client .luxury-account-hub__plan--client:hover,
+    .luxury-account-hub--consumer-client .luxury-account-hub__greeting:hover .luxury-account-hub__greeting-name {
+      transform: none;
+    }
+  }
+}

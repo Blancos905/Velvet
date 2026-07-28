@@ -1,0 +1,26 @@
+-- Fatture elettroniche FatturaPA generate da pagamenti Stripe (Hibernate ddl-auto=update di solito crea già la tabella).
+CREATE TABLE IF NOT EXISTS luxury_fiscal_invoices (
+    id UUID PRIMARY KEY,
+    stripe_invoice_id VARCHAR(64) NOT NULL,
+    studio_group_id UUID,
+    fiscal_year INT NOT NULL,
+    progressive INT NOT NULL,
+    progressive_invio VARCHAR(5) NOT NULL,
+    invoice_number VARCHAR(32) NOT NULL,
+    invoice_date DATE NOT NULL,
+    amount_cents BIGINT NOT NULL,
+    currency VARCHAR(3) NOT NULL,
+    recipient_legal_name VARCHAR(200),
+    recipient_vat VARCHAR(16),
+    recipient_fiscal_code VARCHAR(16),
+    recipient_sdi_code VARCHAR(7),
+    recipient_pec_email VARCHAR(320),
+    status VARCHAR(40) NOT NULL,
+    skip_reason VARCHAR(500),
+    xml_content TEXT,
+    xml_filename VARCHAR(32),
+    stripe_paid_at TIMESTAMPTZ,
+    admin_notified_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL,
+    CONSTRAINT uk_luxury_fiscal_invoice_stripe UNIQUE (stripe_invoice_id)
+);

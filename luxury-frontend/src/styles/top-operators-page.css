@@ -1,0 +1,104 @@
+.luxury-top-operators-kind-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 0 0 1.25rem;
+}
+
+.luxury-top-operators-kind-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 237, 213, 0.35);
+  background: rgba(12, 6, 4, 0.55);
+  color: #fff7ed;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.luxury-top-operators-kind-btn:hover {
+  border-color: rgba(253, 186, 116, 0.65);
+  transform: translateY(-1px);
+}
+
+.luxury-top-operators-kind-btn--active {
+  border-color: #fb923c;
+  background: linear-gradient(145deg, rgba(234, 88, 12, 0.95) 0%, rgba(154, 52, 18, 0.92) 100%);
+  box-shadow: 0 8px 22px rgba(249, 115, 22, 0.28);
+}
+
+.luxury-top-operators-picker-hint {
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+  color: rgba(255, 251, 235, 0.72);
+}
+
+.luxury-top-operators-lead {
+  margin: 0.75rem 0 0;
+  max-width: 42rem;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: rgba(255, 251, 235, 0.78);
+}
+
+.luxury-top-operator-avatar {
+  flex-shrink: 0;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #fff7ed;
+  background: linear-gradient(145deg, #ea580c 0%, #9a3412 100%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.luxury-top-operator-role {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(254, 215, 170, 0.85);
+}
+
+.luxury-top-operator-salon {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 251, 235, 0.72);
+}
+
+.luxury-trending-featured {
+  margin-top: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.luxury-trend-card--operators.luxury-trend-card--photo {
+  background-position: center 35%;
+}
+
+.luxury-trend-card-sublabel {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: rgba(255, 251, 235, 0.82);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+}
+
+@media (min-width: 900px) {
+  .luxury-trend-card-sublabel {
+    font-size: 0.82rem;
+  }
+}

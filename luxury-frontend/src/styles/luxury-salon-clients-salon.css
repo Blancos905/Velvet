@@ -1,0 +1,131 @@
+/**
+ * Clienti salone (`/account/salone/clienti`) — stessa struttura delle altre pagine account
+ * (hero `ClientAccountHeroHeader` + shell), con accento AZZURRO al posto dell'arancio.
+ * Agganciato a `--salon-side` così eventuali altre viste clienti restano invariate.
+ * Importato DOPO `salon-clients-page.css` per vincere i pareggi di specificità.
+ */
+
+.luxury-consumer-bookings-dash.luxury-clients-dash--salon-side {
+  --luxury-ip-accent: #f59e0b;
+  --luxury-ip-accent-soft: #fbbf24;
+  --luxury-ip-accent-glow: rgba(245, 158, 11, 0.22);
+  --luxury-ip-secondary: #38bdf8;
+  --luxury-ip-secondary-glow: rgba(56, 189, 248, 0.18);
+}
+
+/* --- Hero (`ClientAccountHeroHeader`): viola/arancio hardcoded → azzurro. --- */
+.luxury-clients-dash--salon-side .luxury-consumer-bookings-dash__headline-accent {
+  background: linear-gradient(105deg, #7dd3fc 0%, #38bdf8 42%, #f59e0b 100%);
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(56, 189, 248, 0.3));
+}
+
+.luxury-clients-dash--salon-side .luxury-info-privacy-hero__aurora {
+  background:
+    radial-gradient(ellipse 75% 48% at 15% 18%, rgba(56, 189, 248, 0.28), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(245, 158, 11, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 50% 100%, rgba(251, 191, 36, 0.12), transparent 45%);
+}
+
+.luxury-clients-dash--salon-side .luxury-info-privacy-hero__badge--muted {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: linear-gradient(160deg, rgba(3, 105, 161, 0.55), rgba(8, 20, 28, 0.5));
+  color: #e0f2fe;
+}
+
+.luxury-clients-dash--salon-side .luxury-info-privacy-hero__subtitle-card {
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(10, 16, 24, 0.88) 0%, rgba(0, 0, 0, 0.94) 55%, rgba(6, 10, 14, 0.96) 100%);
+  box-shadow:
+    0 4px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.14) inset,
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 28px rgba(56, 189, 248, 0.18);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-clients-dash--salon-side .luxury-info-privacy-hero__subtitle-card:hover {
+    border-color: rgba(56, 189, 248, 0.35);
+  }
+}
+
+.luxury-clients-dash--salon-side .luxury-info-privacy-hero__subtitle-chip {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(3, 105, 161, 0.35);
+  color: #e0f2fe;
+}
+
+.luxury-clients-dash--salon-side .luxury-info-privacy-hero__subtitle em,
+.luxury-clients-dash--salon-side .luxury-info-privacy-hero__subtitle strong {
+  color: #7dd3fc;
+}
+
+.luxury-clients-dash--salon-side .luxury-info-privacy-hero__subtitle-foot {
+  border-top-color: rgba(56, 189, 248, 0.18);
+}
+
+/* ===================== Contenuto: arancio → azzurro ===================== */
+
+.luxury-clients-dash--salon-side .luxury-clients-dash__search-input:focus {
+  border-color: rgba(56, 189, 248, 0.55);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.14);
+}
+
+.luxury-clients-dash--salon-side .luxury-client-card:hover {
+  border-color: rgba(56, 189, 248, 0.42);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(56, 189, 248, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Avatar: azzurro pieno come prima, ma sfumato verso il giallo/ambra. */
+.luxury-clients-dash--salon-side .luxury-client-card__avatar {
+  color: #fffbeb;
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.95) 0%, rgba(14, 165, 233, 0.9) 45%, rgba(245, 158, 11, 0.9) 100%);
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.luxury-clients-dash--salon-side .luxury-client-card__name {
+  color: #e0f2fe;
+}
+
+.luxury-clients-dash--salon-side .luxury-client-card__value a {
+  color: rgba(125, 211, 252, 0.95);
+}
+
+/* Pulsante chat: azzurro sfumato verso l'ambra. */
+.luxury-clients-dash--salon-side .luxury-client-card__chat {
+  color: #fffbeb;
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.35) 0%, rgba(14, 165, 233, 0.24) 50%, rgba(245, 158, 11, 0.28) 100%);
+  border-color: rgba(251, 191, 36, 0.42);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-clients-dash--salon-side .luxury-client-card__chat:hover {
+    border-color: rgba(253, 224, 71, 0.6);
+    background: linear-gradient(145deg, rgba(56, 189, 248, 0.48) 0%, rgba(14, 165, 233, 0.34) 50%, rgba(245, 158, 11, 0.4) 100%);
+  }
+}
+
+.luxury-clients-dash--salon-side .luxury-clients-dash__empty {
+  border-color: rgba(56, 189, 248, 0.28);
+  background:
+    radial-gradient(90% 70% at 50% -10%, rgba(56, 189, 248, 0.18) 0%, transparent 58%),
+    radial-gradient(80% 55% at 100% 100%, rgba(245, 158, 11, 0.06) 0%, transparent 50%),
+    linear-gradient(165deg, rgba(39, 39, 42, 0.72) 0%, rgba(24, 24, 27, 0.92) 100%);
+}
+
+.luxury-clients-dash--salon-side .luxury-clients-dash__empty-glow {
+  background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(56, 189, 248, 0.22) 0%, transparent 68%);
+}
+
+.luxury-clients-dash--salon-side .luxury-clients-dash__empty-title-accent {
+  background: linear-gradient(105deg, #7dd3fc 0%, #38bdf8 35%, #f59e0b 70%, #0284c7 100%);
+  filter: drop-shadow(0 2px 12px rgba(56, 189, 248, 0.35));
+}

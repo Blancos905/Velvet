@@ -1,0 +1,554 @@
+/**
+ * Header hero + card con switch — condiviso tra cliente B2C e operatore staff.
+ */
+
+.luxury-info-privacy-hero-page {
+  --luxury-ip-accent: #f59e0b;
+  --luxury-ip-accent-soft: #fbbf24;
+  --luxury-ip-accent-glow: rgba(245, 158, 11, 0.22);
+  --luxury-ip-secondary: #a78bfa;
+  --luxury-ip-secondary-glow: rgba(167, 139, 250, 0.18);
+  --luxury-ip-header-bg-end: #08060a;
+  /* Solo scroll verticale: niente swipe/moto orizzontale nel box. */
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+
+.luxury-info-privacy-hero-page .luxury-consumer-bookings-dash__shell {
+  max-width: min(56rem, 100%);
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-hero__header {
+  animation: luxury-info-privacy-hero-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.luxury-info-privacy-hero__header {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  border-radius: 1rem;
+  border: 2px solid #000000;
+  background: linear-gradient(168deg, #030303 0%, #000000 48%, var(--luxury-ip-header-bg-end) 100%);
+  padding: clamp(1.15rem, 3.6vw, 1.85rem) clamp(0.9rem, 2.2vw, 1.35rem) clamp(1.25rem, 3.2vw, 1.75rem);
+  margin-bottom: 1rem;
+  box-shadow:
+    0 0 0 1px #000 inset,
+    0 6px 0 #000,
+    0 24px 48px rgba(0, 0, 0, 0.45),
+    0 0 72px var(--luxury-ip-accent-glow),
+    0 0 48px var(--luxury-ip-secondary-glow);
+}
+
+.luxury-info-privacy-hero__header::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  border-radius: 0 0 8px 8px;
+  margin: 0 auto;
+  width: min(68%, 13rem);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--luxury-ip-secondary) 18%,
+    var(--luxury-ip-accent) 50%,
+    var(--luxury-ip-accent-soft) 72%,
+    transparent
+  );
+  box-shadow: 0 0 18px var(--luxury-ip-accent-glow);
+  z-index: 2;
+}
+
+.luxury-info-privacy-hero__aurora {
+  position: absolute;
+  inset: -40% -20%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 75% 48% at 15% 18%, rgba(167, 139, 250, 0.28), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(245, 158, 11, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 50% 100%, rgba(251, 191, 36, 0.12), transparent 45%);
+  filter: blur(2px);
+  opacity: 0.9;
+  animation: luxury-info-privacy-hero-aurora 16s ease-in-out infinite alternate;
+}
+
+.luxury-info-privacy-hero__shine {
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 55%;
+  height: 160%;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 45%,
+    rgba(237, 233, 254, 0.1) 50%,
+    rgba(255, 255, 255, 0.03) 55%,
+    transparent 100%
+  );
+  transform: skewX(-18deg);
+  animation: luxury-info-privacy-hero-shine 8s ease-in-out infinite;
+}
+
+.luxury-info-privacy-hero__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1rem;
+}
+
+.luxury-info-privacy-hero__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.luxury-info-privacy-hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.34rem 0.68rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 247, 237, 0.4);
+  background: linear-gradient(140deg, #fef3c7, #fbbf24);
+  color: rgba(24, 8, 3, 0.92);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.luxury-info-privacy-hero__badge--muted {
+  border-color: rgba(167, 139, 250, 0.4);
+  background: linear-gradient(160deg, rgba(46, 16, 101, 0.55), rgba(24, 8, 3, 0.5));
+  color: #ede9fe;
+}
+
+.luxury-info-privacy-hero__badge-dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.85;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.luxury-info-privacy-hero-page .luxury-consumer-bookings-dash__headline {
+  animation: luxury-info-privacy-hero-enter 0.48s cubic-bezier(0.22, 1, 0.36, 1) 0.04s both;
+}
+
+.luxury-info-privacy-hero__subtitle-card {
+  position: relative;
+  width: 100%;
+  max-width: 44rem;
+  padding: 0.95rem 1.05rem 1rem;
+  border-radius: 16px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(167, 139, 250, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(18, 10, 28, 0.88) 0%, rgba(0, 0, 0, 0.94) 55%, rgba(8, 6, 12, 0.96) 100%);
+  box-shadow:
+    0 4px 0 #000,
+    0 0 0 1px rgba(167, 139, 250, 0.14) inset,
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 28px var(--luxury-ip-secondary-glow);
+  animation: luxury-info-privacy-hero-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+  transition:
+    border-color 0.26s ease,
+    box-shadow 0.28s ease,
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-hero__subtitle-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(167, 139, 250, 0.35);
+    box-shadow:
+      0 6px 0 #000,
+      0 0 0 1px rgba(245, 158, 11, 0.2) inset,
+      0 18px 36px rgba(0, 0, 0, 0.36),
+      0 0 36px var(--luxury-ip-accent-glow);
+  }
+}
+
+.luxury-info-privacy-hero__subtitle-card::before {
+  content: "";
+  display: block;
+  width: min(9rem, 42%);
+  height: 3px;
+  margin-bottom: 0.65rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--luxury-ip-secondary) 0%, var(--luxury-ip-accent) 55%, transparent 100%);
+  box-shadow: 0 0 14px var(--luxury-ip-accent-glow);
+}
+
+.luxury-info-privacy-hero__subtitle-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.65rem;
+  margin: 0 0 0.55rem;
+}
+
+.luxury-info-privacy-hero__subtitle-label {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--luxury-ip-accent-soft);
+}
+
+.luxury-info-privacy-hero__subtitle-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  background: rgba(46, 16, 101, 0.35);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #ddd6fe;
+}
+
+.luxury-info-privacy-hero__subtitle {
+  margin: 0;
+  font-size: clamp(0.92rem, 2.2vw, 1.02rem);
+  line-height: 1.62;
+  letter-spacing: 0.01em;
+  color: rgba(255, 251, 235, 0.88);
+  text-wrap: pretty;
+}
+
+.luxury-info-privacy-hero__subtitle strong {
+  color: #fef3c7;
+  font-weight: 700;
+}
+
+.luxury-info-privacy-hero__subtitle em {
+  font-style: normal;
+  color: #c4b5fd;
+  font-weight: 650;
+}
+
+.luxury-info-privacy-hero__subtitle-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin: 0.75rem 0 0;
+  padding-top: 0.72rem;
+  border-top: 1px solid rgba(167, 139, 250, 0.18);
+}
+
+.luxury-info-privacy-hero__subtitle-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  font-weight: 650;
+  color: rgba(253, 230, 138, 0.78);
+}
+
+.luxury-info-privacy-hero__subtitle-meta svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-shrink: 0;
+  color: var(--luxury-ip-accent-soft);
+}
+
+.luxury-info-privacy-hero-page .luxury-link-back {
+  animation: luxury-info-privacy-hero-enter 0.44s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
+  margin-bottom: 0.85rem;
+}
+
+/* Card con switch */
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card {
+  animation: luxury-info-privacy-hero-enter 0.52s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--luxury-ip-secondary) 22%,
+    var(--luxury-ip-accent) 50%,
+    var(--luxury-ip-accent-soft) 72%,
+    transparent
+  );
+  box-shadow: 0 0 16px var(--luxury-ip-secondary-glow);
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card::after {
+  background:
+    radial-gradient(ellipse 80% 55% at 20% 0%, rgba(167, 139, 250, 0.1) 0%, transparent 52%),
+    radial-gradient(ellipse 60% 45% at 100% 100%, rgba(245, 158, 11, 0.06) 0%, transparent 55%);
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__glow {
+  background: radial-gradient(ellipse 55% 42% at 50% 0%, rgba(167, 139, 250, 0.16) 0%, transparent 64%);
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__headline::after {
+  background: linear-gradient(90deg, var(--luxury-ip-secondary) 0%, var(--luxury-ip-accent) 55%, transparent 100%);
+  box-shadow: 0 0 12px var(--luxury-ip-accent-glow);
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__toggle {
+  border-color: rgba(167, 139, 250, 0.35);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(167, 139, 250, 0.12) 0%, transparent 52%),
+    linear-gradient(155deg, rgba(30, 30, 33, 0.96) 0%, rgba(24, 24, 27, 0.98) 58%, rgba(20, 20, 22, 0.96) 100%);
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(167, 139, 250, 0.12);
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__toggle-btn {
+  color: rgba(196, 181, 253, 0.82);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__toggle-btn:hover:not(.luxury-info-privacy-consumer-card__toggle-btn--active) {
+    color: #ede9fe;
+    background: rgba(167, 139, 250, 0.12);
+  }
+
+  .luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card:hover {
+    box-shadow:
+      0 22px 48px rgba(0, 0, 0, 0.42),
+      0 0 0 1px rgba(167, 139, 250, 0.2);
+  }
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__toggle-btn--active {
+  background: linear-gradient(140deg, #c4b5fd 0%, #a78bfa 38%, #f59e0b 100%);
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.42),
+    0 6px 14px rgba(167, 139, 250, 0.22),
+    inset 0 1px 0 rgba(255, 247, 237, 0.35);
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy__body {
+  max-width: none;
+  padding: 0;
+  counter-reset: ip-hero-section;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy__section {
+  position: relative;
+  margin: 0;
+  padding: clamp(1rem, 2.2vw, 1.2rem) 0 clamp(1.05rem, 2.2vw, 1.25rem);
+  border-bottom: 1px solid rgba(255, 251, 235, 0.06);
+  animation: luxury-info-privacy-hero-section-enter 0.46s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: background 0.24s ease;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy__section:nth-child(1) {
+  animation-delay: 0.08s;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy__section:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy__section:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy__section:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy__section::after {
+  content: counter(ip-hero-section, decimal-leading-zero);
+  counter-increment: ip-hero-section;
+  position: absolute;
+  top: clamp(1rem, 2.2vw, 1.15rem);
+  right: 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: rgba(196, 181, 253, 0.55);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-hero-page .luxury-info-privacy__section:hover {
+    background: rgba(167, 139, 250, 0.04);
+  }
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy__section:last-child {
+  border-bottom: none;
+  padding-bottom: 0.15rem;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy__section-title::before {
+  background: linear-gradient(180deg, #c4b5fd 0%, #a78bfa 45%, #f59e0b 100%);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.35);
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy__text .luxury-link-inline {
+  color: #c4b5fd;
+  text-decoration-color: rgba(196, 181, 253, 0.45);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-hero-page .luxury-info-privacy__text .luxury-link-inline:hover {
+    color: #ede9fe;
+    text-decoration-color: rgba(237, 233, 254, 0.75);
+  }
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion {
+  border-color: rgba(167, 139, 250, 0.22);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(167, 139, 250, 0.1) 0%, transparent 52%),
+    linear-gradient(155deg, rgba(28, 28, 31, 0.92) 0%, rgba(20, 20, 22, 0.96) 58%, rgba(24, 24, 27, 0.94) 100%);
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(167, 139, 250, 0.1);
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion[open] {
+  border-color: rgba(167, 139, 250, 0.5);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(167, 139, 250, 0.12),
+    inset 0 1px 0 rgba(196, 181, 253, 0.14);
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion[open] .luxury-legal-public__accordion-title {
+  color: #c4b5fd;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion-body {
+  border-top-color: rgba(167, 139, 250, 0.18);
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__legal .luxury-legal-public__inline-link {
+  color: #c4b5fd;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__legal .luxury-legal-public__citations {
+  border-top-color: rgba(167, 139, 250, 0.2);
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card:focus-within {
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(167, 139, 250, 0.12);
+}
+
+.luxury-info-privacy-consumer-page.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__inner::after {
+  content: "Documenti ufficiali sul sito · diritti GDPR in area account";
+}
+
+.luxury-info-privacy-consumer-page.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__inner--gdpr::after {
+  content: "Informativa privacy clienti (B2C) · testo legalmente vincolante";
+}
+
+.luxury-info-privacy-staff-page.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__inner::after {
+  content: "Documenti ufficiali sul sito · diritti GDPR in area operatore";
+}
+
+.luxury-info-privacy-staff-page.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__inner--gdpr::after {
+  content: "Informativa privacy staff · testo legalmente vincolante";
+}
+
+@keyframes luxury-info-privacy-hero-section-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes luxury-info-privacy-hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes luxury-info-privacy-hero-aurora {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(-2%, 1%) scale(1.04);
+  }
+}
+
+@keyframes luxury-info-privacy-hero-shine {
+  0%,
+  40% {
+    left: -60%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  60%,
+  100% {
+    left: 120%;
+    opacity: 0;
+  }
+}
+
+/* Shine / aurora orizzontali: statici (niente scorrimento dx→sx sul box). */
+.luxury-info-privacy-hero__aurora,
+.luxury-info-privacy-hero__shine {
+  animation: none !important;
+  transform: none !important;
+}
+
+.luxury-info-privacy-hero__shine {
+  display: none;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy__body,
+.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__inner {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+.luxury-info-privacy-hero-page .luxury-info-privacy__section {
+  transition: background 0.24s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-info-privacy-hero__aurora,
+  .luxury-info-privacy-hero__shine {
+    animation: none;
+  }
+
+  .luxury-info-privacy-hero-page .luxury-info-privacy-hero__header,
+  .luxury-info-privacy-hero-page .luxury-consumer-bookings-dash__headline,
+  .luxury-info-privacy-hero__subtitle-card,
+  .luxury-info-privacy-hero-page .luxury-link-back,
+  .luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card,
+  .luxury-info-privacy-hero-page .luxury-info-privacy__section {
+    animation: none;
+    transition: none;
+  }
+}

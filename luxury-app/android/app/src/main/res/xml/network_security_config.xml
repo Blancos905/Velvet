@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android Network Security — TLS only in release; pinning opzionale via manifest -->
+<network-security-config>
+  <base-config cleartextTrafficPermitted="false">
+    <trust-anchors>
+      <certificates src="system" />
+    </trust-anchors>
+  </base-config>
+  <!-- Dev LAN: abilitare cleartext solo con build flag LUXURY_WEB_BASE_URL http://... -->
+  <domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="true">10.0.2.2</domain>
+    <domain includeSubdomains="true">localhost</domain>
+    <domain includeSubdomains="true">127.0.0.1</domain>
+  </domain-config>
+  <!-- Certificate pinning produzione: sostituire SHA-256 del certificato pubblico -->
+  <!--
+  <domain-config>
+    <domain includeSubdomains="true">saloniluxury.it</domain>
+    <pin-set expiration="2027-01-01">
+      <pin digest="SHA-256">BASE64_PIN_HERE=</pin>
+    </pin-set>
+  </domain-config>
+  -->
+</network-security-config>

@@ -1,0 +1,673 @@
+/**
+ * Notifiche operatore staff (`/account/notifiche`) — stessa struttura del titolare
+ * (`luxury-notifications-salon.css`) ma con accento GIALLO al posto dell'azzurro.
+ * Scoped a `.luxury-salon-notif-page--staff-side`.
+ * Importato DOPO `luxury-notifications-salon.css`.
+ */
+
+/* Variabili hero: giallo come accento secondario (l'ambra resta come primario). */
+.luxury-consumer-bookings-dash.luxury-salon-notif-page--staff-side {
+  --luxury-ip-accent: #f59e0b;
+  --luxury-ip-accent-soft: #fbbf24;
+  --luxury-ip-accent-glow: rgba(245, 158, 11, 0.22);
+  --luxury-ip-secondary: #fbbf24;
+  --luxury-ip-secondary-glow: rgba(251, 191, 36, 0.18);
+}
+
+/* --- Hero (`ClientAccountHeroHeader`): converte i viola hardcoded in giallo. --- */
+.luxury-salon-notif-page--staff-side .luxury-info-privacy-hero__aurora {
+  background:
+    radial-gradient(ellipse 75% 48% at 15% 18%, rgba(251, 191, 36, 0.28), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(245, 158, 11, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 50% 100%, rgba(251, 191, 36, 0.12), transparent 45%);
+}
+
+.luxury-salon-notif-page--staff-side .luxury-info-privacy-hero__badge--muted {
+  border-color: rgba(251, 191, 36, 0.4);
+  background: linear-gradient(160deg, rgba(120, 53, 15, 0.55), rgba(28, 18, 4, 0.5));
+  color: #fffbeb;
+}
+
+.luxury-salon-notif-page--staff-side .luxury-info-privacy-hero__subtitle-card {
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(251, 191, 36, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(24, 16, 4, 0.88) 0%, rgba(0, 0, 0, 0.94) 55%, rgba(18, 12, 4, 0.96) 100%);
+  box-shadow:
+    0 4px 0 #000,
+    0 0 0 1px rgba(251, 191, 36, 0.14) inset,
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 28px var(--luxury-ip-secondary-glow);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-notif-page--staff-side .luxury-info-privacy-hero__subtitle-card:hover {
+    border-color: rgba(251, 191, 36, 0.35);
+  }
+}
+
+.luxury-salon-notif-page--staff-side .luxury-info-privacy-hero__subtitle-chip {
+  border-color: rgba(251, 191, 36, 0.35);
+  background: rgba(120, 53, 15, 0.35);
+  color: #fffbeb;
+}
+
+.luxury-salon-notif-page--staff-side .luxury-info-privacy-hero__subtitle em {
+  color: #fde68a;
+}
+
+.luxury-salon-notif-page--staff-side .luxury-info-privacy-hero__subtitle strong {
+  color: #fde68a;
+}
+
+.luxury-salon-notif-page--staff-side .luxury-consumer-bookings-dash__headline-accent {
+  background: linear-gradient(105deg, #fde68a 0%, #fbbf24 42%, #f59e0b 100%);
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(251, 191, 36, 0.3));
+}
+
+.luxury-salon-notif-page--staff-side .luxury-consumer-bookings-dash__headline::after {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.95) 0%, rgba(245, 158, 11, 0.6) 55%, transparent 100%);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.35);
+}
+
+.luxury-salon-notif-page--staff-side .luxury-info-privacy-hero__subtitle-foot {
+  border-top-color: rgba(251, 191, 36, 0.18);
+}
+
+/* --- Card contenuto (`ClientAccountContentCard`): accenti viola → giallo. --- */
+.luxury-salon-notif-page--staff-side .luxury-feedback-client-page__card::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #fbbf24 22%,
+    #f59e0b 50%,
+    #fbbf24 72%,
+    transparent
+  );
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.22);
+}
+
+.luxury-salon-notif-page--staff-side .luxury-feedback-client-page__card-glow {
+  background: radial-gradient(ellipse 55% 42% at 50% 0%, rgba(251, 191, 36, 0.14) 0%, transparent 64%);
+}
+
+.luxury-salon-notif-page--staff-side .luxury-feedback-client-page__card-title::after {
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 55%, transparent 100%);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.22);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-notif-page--staff-side .luxury-feedback-client-page__card:hover {
+    box-shadow:
+      0 22px 48px rgba(0, 0, 0, 0.42),
+      0 0 0 1px rgba(251, 191, 36, 0.18);
+  }
+}
+
+
+/* --- Lista, righe, dettaglio: base completa (da client B2C) in giallo operatore. --- */
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-feedback-client-page__card-body {
+  padding-top: 0.35rem;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-list {
+  position: relative;
+  isolation: isolate;
+  gap: 0.75rem;
+  margin: 0;
+  padding: clamp(0.85rem, 2vw, 1.05rem);
+  border-radius: 16px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(120% 80% at 12% 0%, rgba(251, 191, 36, 0.1) 0%, transparent 55%),
+    radial-gradient(90% 55% at 100% 25%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(28, 18, 6, 0.98) 0%, rgba(0, 0, 0, 0.99) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(251, 191, 36, 0.12) inset,
+    0 16px 36px rgba(0, 0, 0, 0.38);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-list::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(251, 191, 36, 0.06) 0%,
+    transparent 42%,
+    rgba(245, 158, 11, 0.04) 100%
+  );
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-item {
+  position: relative;
+  z-index: 1;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-row {
+  position: relative;
+  gap: 0.75rem 1.1rem;
+  padding: 0.95rem 1.05rem 0.95rem 1.15rem;
+  border-radius: 14px;
+  border: 2px solid #000000;
+  background:
+    linear-gradient(165deg, rgba(38, 28, 8, 0.72) 0%, rgba(18, 18, 21, 0.92) 100%);
+  box-shadow:
+    0 2px 0 #000,
+    0 8px 20px rgba(0, 0, 0, 0.24);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-row--interactive::after {
+  content: "";
+  flex-shrink: 0;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-left: auto;
+  border-right: 2px solid rgba(251, 191, 36, 0.85);
+  border-bottom: 2px solid rgba(251, 191, 36, 0.85);
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 0.22s ease, border-color 0.22s ease;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-row--expanded::after {
+  transform: rotate(225deg) translateY(2px);
+  border-color: rgba(251, 191, 36, 0.9);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-row__label {
+  margin: 0;
+  flex: 1 1 10rem;
+  font-size: 0.95rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: rgba(250, 250, 250, 0.96);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-row__counts {
+  gap: 0.5rem;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-row--interactive:hover {
+  border-color: #000000;
+  background:
+    linear-gradient(165deg, rgba(92, 58, 12, 0.55) 0%, rgba(24, 24, 27, 0.95) 100%);
+  box-shadow:
+    0 2px 0 #000,
+    0 12px 28px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(251, 191, 36, 0.2);
+  transform: translateY(-1px);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-row--interactive:focus-visible {
+  outline: none;
+  box-shadow:
+    0 2px 0 #000,
+    0 0 0 3px rgba(251, 191, 36, 0.28);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-row--expanded {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background:
+    linear-gradient(165deg, rgba(92, 58, 12, 0.62) 0%, rgba(30, 30, 33, 0.96) 100%);
+  box-shadow:
+    0 2px 0 #000,
+    0 0 0 1px rgba(245, 158, 11, 0.22) inset;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-badge {
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.55rem;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-badge--sent {
+  color: rgba(250, 250, 250, 0.94);
+  background: linear-gradient(145deg, rgba(63, 63, 70, 0.95) 0%, rgba(39, 39, 42, 0.98) 100%);
+  border: 1px solid rgba(82, 82, 91, 0.85);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-badge--pending {
+  background: linear-gradient(145deg, rgba(245, 158, 11, 0.98) 0%, rgba(194, 65, 12, 0.95) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow:
+    0 2px 0 rgba(120, 53, 15, 0.45),
+    0 0 12px rgba(245, 158, 11, 0.25);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-badge--zero {
+  opacity: 0.55;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 0.95rem 1rem 1.1rem;
+  border-radius: 0 0 14px 14px;
+  border: 2px solid #000000;
+  border-top: 1px solid rgba(251, 191, 36, 0.22);
+  background:
+    radial-gradient(85% 70% at 100% 0%, rgba(245, 158, 11, 0.07) 0%, transparent 52%),
+    radial-gradient(90% 60% at 0% 0%, rgba(251, 191, 36, 0.1) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(24, 18, 36, 0.98) 0%, rgba(10, 10, 12, 0.99) 100%);
+  box-shadow:
+    0 4px 0 #000 inset,
+    0 12px 28px rgba(0, 0, 0, 0.28);
+  animation: luxury-salon-notif-detail-open 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes luxury-salon-notif-detail-open {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  right: 1rem;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(251, 191, 36, 0.45) 35%,
+    rgba(251, 191, 36, 0.5) 65%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__status {
+  margin: 0;
+  padding: 0.85rem 0.75rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(113, 113, 122, 0.45);
+  background: rgba(24, 24, 27, 0.55);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  text-align: center;
+  color: rgba(212, 212, 216, 0.92);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__status .luxury-link-back {
+  color: rgba(251, 191, 36, 0.95);
+  text-decoration: underline;
+  text-underline-offset: 0.14em;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 0.85rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 14px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(251, 191, 36, 0.08) 0%, transparent 52%),
+    linear-gradient(165deg, rgba(24, 24, 27, 0.92) 0%, rgba(12, 12, 14, 0.98) 100%);
+  box-shadow: 0 2px 0 #000;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__toolbar::before {
+  content: "Messaggi in questa categoria";
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(253, 224, 71, 0.88);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete-all {
+  flex-shrink: 0;
+  padding: 0.42rem 0.8rem;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  background: linear-gradient(165deg, rgba(248, 113, 113, 0.28) 0%, rgba(127, 29, 29, 0.42) 100%);
+  box-shadow: 0 2px 0 #000;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.03em;
+  color: #ffe4e6;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease,
+    color 0.2s ease;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete-all:focus-visible {
+  box-shadow:
+    0 2px 0 #000,
+    0 0 0 3px rgba(248, 113, 113, 0.45);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete-all:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #000;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete-all:hover:not(:disabled) {
+    background: linear-gradient(165deg, rgba(252, 165, 165, 0.35) 0%, rgba(185, 28, 28, 0.5) 100%);
+    color: #fff1f2;
+  }
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__list {
+  gap: 0.65rem;
+  max-height: min(22rem, 52vh);
+  overflow-y: auto;
+  padding-right: 0.15rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 191, 36, 0.45) rgba(24, 24, 27, 0.5);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.65) 0%, rgba(245, 158, 11, 0.55) 100%);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__line {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  min-height: 3.35rem;
+  border-radius: 12px;
+  border: 2px solid #000000;
+  background:
+    linear-gradient(165deg, rgba(39, 39, 42, 0.88) 0%, rgba(24, 24, 27, 0.95) 100%);
+  box-shadow: 0 2px 0 #000;
+  overflow: hidden;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__line::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.95) 0%, rgba(245, 158, 11, 0.9) 100%);
+  pointer-events: none;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__line--interactive:hover {
+  transform: translateY(-1px);
+  border-color: #000000;
+  box-shadow:
+    0 2px 0 #000,
+    0 10px 22px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(251, 191, 36, 0.18);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__line--interactive:hover .luxury-salon-notif-detail__text {
+  color: #fff;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__open {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.75rem 0.65rem 0.75rem 0.95rem;
+  border: none;
+  background: transparent;
+  color: rgba(244, 244, 245, 0.96);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__open::after {
+  content: "Apri";
+  position: absolute;
+  right: 3.25rem;
+  top: 50%;
+  transform: translateY(-50%) translateX(4px);
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(250, 250, 250, 0.92);
+  background: rgba(92, 58, 12, 0.55);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__line--interactive:hover .luxury-salon-notif-detail__open::after,
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__open:focus-visible::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__open:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(251, 191, 36, 0.35);
+  border-radius: 10px;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__text {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 550;
+  line-height: 1.5;
+  color: rgba(244, 244, 245, 0.96);
+  -webkit-text-fill-color: currentColor;
+  word-break: break-word;
+  transition: color 0.2s ease;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(228, 228, 231, 0.9);
+  background: rgba(39, 39, 42, 0.9);
+  border: 1px solid rgba(82, 82, 91, 0.75);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__meta[data-status="PENDING"] {
+  color: #fffbeb;
+  background: linear-gradient(145deg, rgba(245, 158, 11, 0.92) 0%, rgba(194, 65, 12, 0.88) 100%);
+  border-color: rgba(251, 191, 36, 0.35);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.22);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__meta[data-status="SENT"]::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: rgba(74, 222, 128, 0.95);
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.45);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: center;
+  margin: 0.32rem 0.38rem 0.32rem 0;
+  padding: 0;
+  width: 1.72rem;
+  height: 1.72rem;
+  min-width: 1.72rem;
+  max-width: 1.72rem;
+  border: 2px solid #000000;
+  border-radius: 9px;
+  background:
+    linear-gradient(165deg, #f87171 0%, #dc2626 48%, #991b1b 100%);
+  box-shadow:
+    0 2px 0 #000,
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+  font: inherit;
+  color: #ffffff;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.92rem;
+  height: 0.92rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.35));
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete:focus-visible {
+  outline: none;
+  box-shadow:
+    0 2px 0 #000,
+    0 0 0 3px rgba(248, 113, 113, 0.55);
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete:hover:not(:disabled) {
+    background:
+      linear-gradient(165deg, #fca5a5 0%, #ef4444 45%, #b91c1c 100%);
+    transform: scale(1.06);
+    box-shadow:
+      0 2px 0 #000,
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      0 0 12px rgba(248, 113, 113, 0.35);
+  }
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-hint {
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  background: rgba(120, 53, 15, 0.22);
+  color: rgba(254, 243, 199, 0.92);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-list[aria-busy="true"] .luxury-salon-notif-row {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-row,
+  .luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-row--interactive::after,
+  .luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail {
+    animation: none;
+    transition: none;
+  }
+
+  .luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__line,
+  .luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__open::after,
+  .luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete-all {
+    transition: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-row--interactive:hover {
+      transform: none;
+    }
+
+    .luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__line--interactive:hover {
+      transform: none;
+    }
+
+    .luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete:hover:not(:disabled),
+    .luxury-client-account-page.luxury-salon-notif-page--staff-side .luxury-salon-notif-detail__delete-all:hover:not(:disabled) {
+      transform: none;
+    }
+  }
+}
+
+/* Badge conteggi e indicatore «in arrivo»: giallo operatore. */
+.luxury-salon-notif-page--staff-side .luxury-salon-notif-badge--incoming,
+.luxury-salon-notif-page--staff-side .luxury-salon-notif-badge--pending {
+  color: #1c0a00;
+  background: linear-gradient(145deg, #fef08a 0%, #fbbf24 100%);
+}
+
+.luxury-salon-notif-page--staff-side .luxury-salon-notif-row__incoming-dot {
+  background: linear-gradient(145deg, #fde68a 0%, #fbbf24 100%);
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.45);
+}

@@ -2,7 +2,7 @@
 # Inoltra webhook Stripe test → backend locale. Richiede spring-dev.local.env con STRIPE_SECRET_KEY.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-ENV_FILE="$ROOT/velvet/spring-dev.local.env"
+ENV_FILE="$ROOT/luxury/spring-dev.local.env"
 STRIPE_BIN="${STRIPE_BIN:-/tmp/stripe}"
 
 if [[ -f "$ENV_FILE" ]]; then
@@ -13,7 +13,7 @@ if [[ -f "$ENV_FILE" ]]; then
 fi
 
 if [[ -z "${STRIPE_SECRET_KEY:-}" ]]; then
-  echo "→ STRIPE_SECRET_KEY assente: configura velvet/spring-dev.local.env"
+  echo "→ STRIPE_SECRET_KEY assente: configura luxury/spring-dev.local.env"
   exit 1
 fi
 

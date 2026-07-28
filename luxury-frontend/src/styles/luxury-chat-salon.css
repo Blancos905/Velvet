@@ -1,0 +1,390 @@
+/**
+ * Chat lato salone Premium (titolare/staff) — `/account/chat`.
+ * Stile IDENTICO alla chat cliente (`luxury-chat-client.css`): stesso accento
+ * viola/ambra, stesse bolle. Cambia solo il selettore (doppia classe
+ * `.luxury-salon-chat-account--salon-side`) per superare la specificità di
+ * `salon-luxury-chat-page.css`.
+ */
+
+/* Variabili accento dell'hero (`ClientAccountHeroHeader`): definite sulla shell
+ * cliente (`.luxury-info-privacy-hero-page`), qui replicate perché il lato
+ * salone usa lo shell `luxury-clients-dash` e non le eredita. */
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side {
+  --luxury-ip-accent: #f59e0b;
+  --luxury-ip-accent-soft: #fbbf24;
+  --luxury-ip-accent-glow: rgba(245, 158, 11, 0.22);
+  --luxury-ip-secondary: #38bdf8;
+  --luxury-ip-secondary-glow: rgba(56, 189, 248, 0.18);
+  --luxury-ip-header-bg-end: #08060a;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__shell {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 0;
+  border-radius: 16px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(120% 80% at 12% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 55%),
+    radial-gradient(90% 55% at 100% 25%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(18, 10, 28, 0.98) 0%, rgba(0, 0, 0, 0.99) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.12) inset,
+    0 16px 36px rgba(0, 0, 0, 0.38);
+  transition:
+    border-color 0.24s ease,
+    box-shadow 0.28s ease;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__shell::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  z-index: 2;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #38bdf8 22%,
+    #f59e0b 50%,
+    #fbbf24 72%,
+    transparent
+  );
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.2);
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__shell:focus-within {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(245, 158, 11, 0.16) inset,
+    0 18px 40px rgba(0, 0, 0, 0.42),
+    0 0 24px rgba(56, 189, 248, 0.12);
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__sidebar {
+  background:
+    radial-gradient(120% 130% at 0% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(12, 8, 20, 0.98) 0%, rgba(0, 0, 0, 0.99) 100%);
+  padding: 0.55rem 0.5rem 0.7rem;
+  scrollbar-color: rgba(56, 189, 248, 0.55) rgba(0, 0, 0, 0.85);
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__sidebar-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.35rem 0.55rem 0.65rem;
+  padding: 0.38rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: linear-gradient(140deg, rgba(56, 189, 248, 0.22), rgba(245, 158, 11, 0.14));
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fef3c7;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.12);
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  width: 100%;
+  text-align: left;
+  border-radius: 14px;
+  border: 2px solid rgba(39, 39, 42, 0.9);
+  padding: 0.72rem 0.78rem;
+  margin-bottom: 0.42rem;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(56, 189, 248, 0.06) 0%, transparent 52%),
+    linear-gradient(165deg, rgba(24, 24, 27, 0.96) 0%, rgba(0, 0, 0, 0.92) 100%);
+  color: #fffbeb;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition:
+    background 0.24s ease,
+    border-color 0.24s ease,
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.26s ease;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-avatar {
+  flex-shrink: 0;
+  width: 2.65rem;
+  height: 2.65rem;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #06232f;
+  border: 2px solid #000000;
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.62) 0%, rgba(245, 158, 11, 0.85) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 14px rgba(56, 189, 248, 0.18);
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-content {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-btn:hover {
+    border-color: rgba(56, 189, 248, 0.38);
+    transform: translateY(-1px);
+    box-shadow:
+      0 2px 0 #000,
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 10px 22px rgba(0, 0, 0, 0.28);
+  }
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-btn--active {
+  border-color: #000000;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(56, 189, 248, 0.22) 0%, transparent 52%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.16) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(2, 132, 199, 0.35) 0%, rgba(0, 0, 0, 0.95) 55%, rgba(124, 45, 18, 0.32) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(245, 158, 11, 0.16) inset,
+    0 0 20px rgba(56, 189, 248, 0.14);
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-name {
+  color: #fef3c7;
+  font-weight: 750;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-meta {
+  display: inline-flex;
+  margin-top: 0.28rem;
+  padding: 0.14rem 0.48rem;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  background: rgba(24, 24, 27, 0.72);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+  opacity: 1;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-preview {
+  color: rgba(228, 228, 231, 0.78);
+  margin-top: 0.38rem;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-unread {
+  color: #0a0a0a;
+  background: linear-gradient(145deg, #7dd3fc 0%, #fbbf24 100%);
+  border: 2px solid #000000;
+  box-shadow: 0 2px 0 #000;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-time {
+  color: rgba(253, 186, 116, 0.88);
+  font-weight: 650;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__panel {
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(245, 158, 11, 0.06) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(8, 6, 12, 0.98) 0%, rgba(0, 0, 0, 0.99) 100%);
+}
+
+@media (min-width: 768px) {
+  .luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__sidebar {
+    border-right: 2px solid rgba(56, 189, 248, 0.22);
+  }
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__panel-head {
+  border-bottom: 2px solid rgba(56, 189, 248, 0.22);
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 52%),
+    rgba(0, 0, 0, 0.92);
+  padding: 0.75rem 1rem;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__panel-avatar {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 12px;
+  color: #fffbeb;
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.55) 0%, rgba(245, 158, 11, 0.85) 100%);
+  border: 2px solid #000000;
+  box-shadow:
+    0 3px 0 #000,
+    0 0 16px rgba(56, 189, 248, 0.2);
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__panel-title {
+  color: #fef3c7;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-picker-btn {
+  border: 2px solid rgba(63, 63, 70, 0.75);
+  border-radius: 12px;
+  background: rgba(24, 24, 27, 0.72);
+  color: rgba(228, 228, 231, 0.88);
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease,
+    transform 0.22s ease;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-picker-btn--active {
+  border-color: #000000;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(56, 189, 248, 0.24) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(3, 105, 161, 0.45) 0%, rgba(24, 24, 27, 0.98) 100%);
+  color: #fffbeb;
+  box-shadow: 0 2px 0 #000;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__stream {
+  background: transparent;
+  padding: 1rem 1.05rem 1.1rem;
+  scrollbar-color: rgba(56, 189, 248, 0.45) rgba(0, 0, 0, 0.85);
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__bubble {
+  border-radius: 16px;
+  border: 2px solid #000000;
+  box-shadow: 0 3px 0 #000;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__bubble--client {
+  background: linear-gradient(145deg, #7dd3fc 0%, #38bdf8 55%, #0ea5e9 100%);
+  color: #082f49;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__bubble--owner {
+  background: linear-gradient(145deg, #fdba74 0%, #f97316 55%, #ea580c 100%);
+  color: #1c0a00;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__composer {
+  border-top: 2px solid rgba(56, 189, 248, 0.22);
+  background: rgba(0, 0, 0, 0.88);
+  padding: 0.65rem 0.85rem 0.75rem;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__textarea {
+  border-radius: 14px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 52%),
+    linear-gradient(165deg, rgba(39, 39, 42, 0.95) 0%, rgba(0, 0, 0, 0.92) 100%);
+  color: #fffbeb;
+  caret-color: #fbbf24;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__textarea::placeholder {
+  color: rgba(161, 161, 170, 0.88);
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__textarea:focus {
+  box-shadow:
+    0 0 0 2px rgba(56, 189, 248, 0.35),
+    0 0 0 4px rgba(245, 158, 11, 0.12);
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__send {
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.92) 0%, rgba(245, 158, 11, 0.95) 100%);
+  color: #06232f;
+  border: 2px solid #000000;
+  box-shadow: 0 3px 0 #000;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__send:hover:not(:disabled) {
+    transform: translateY(-1px) scale(1.04);
+    filter: none;
+    box-shadow:
+      0 4px 0 #000,
+      0 0 18px rgba(56, 189, 248, 0.28);
+  }
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__empty {
+  margin: 1.25rem;
+  padding: 1.35rem 1.1rem;
+  border-radius: 14px;
+  border: 2px dashed rgba(56, 189, 248, 0.35);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(18, 10, 28, 0.78) 0%, rgba(0, 0, 0, 0.88) 100%);
+  color: rgba(255, 251, 235, 0.78);
+  text-align: center;
+  line-height: 1.55;
+}
+
+.luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__receipt--seen {
+  color: #7dd3fc;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__thread-btn,
+  .luxury-salon-chat-account.luxury-salon-chat-account--salon-side .luxury-salon-chat__send {
+    transition: none;
+  }
+}
+
+/* --- Hero (`ClientAccountHeroHeader`) lato salone: converte i viola hardcoded
+ * di `luxury-info-privacy-hero.css` in azzurro. Solo per `--salon-side`, così
+ * la stessa hero resta viola per il cliente. --- */
+.luxury-salon-chat-account--salon-side .luxury-info-privacy-hero__aurora {
+  background:
+    radial-gradient(ellipse 75% 48% at 15% 18%, rgba(56, 189, 248, 0.28), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(245, 158, 11, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 50% 100%, rgba(251, 191, 36, 0.12), transparent 45%);
+}
+
+.luxury-salon-chat-account--salon-side .luxury-info-privacy-hero__badge--muted {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: linear-gradient(160deg, rgba(3, 105, 161, 0.55), rgba(8, 20, 28, 0.5));
+  color: #e0f2fe;
+}
+
+.luxury-salon-chat-account--salon-side .luxury-info-privacy-hero__subtitle-card {
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(10, 16, 24, 0.88) 0%, rgba(0, 0, 0, 0.94) 55%, rgba(6, 10, 14, 0.96) 100%);
+  box-shadow:
+    0 4px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.14) inset,
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 28px var(--luxury-ip-secondary-glow);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-chat-account--salon-side .luxury-info-privacy-hero__subtitle-card:hover {
+    border-color: rgba(56, 189, 248, 0.35);
+  }
+}
+
+.luxury-salon-chat-account--salon-side .luxury-info-privacy-hero__subtitle-chip {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(3, 105, 161, 0.35);
+  color: #e0f2fe;
+}
+
+.luxury-salon-chat-account--salon-side .luxury-info-privacy-hero__subtitle em {
+  color: #7dd3fc;
+}
+
+.luxury-salon-chat-account--salon-side .luxury-info-privacy-hero__subtitle-foot {
+  border-top-color: rgba(56, 189, 248, 0.18);
+}

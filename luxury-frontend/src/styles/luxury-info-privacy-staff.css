@@ -1,0 +1,175 @@
+/**
+ * Info e privacy operatore staff (`/account/info-privacy`) — stessa struttura
+ * del titolare (`luxury-info-privacy-salon.css`) ma con accento GIALLO al posto
+ * dell'azzurro. Scoped a `.luxury-info-privacy-staff-side`.
+ * Importato DOPO `luxury-info-privacy-salon.css`.
+ */
+
+.luxury-consumer-bookings-dash.luxury-info-privacy-staff-side {
+  --luxury-ip-accent: #f59e0b;
+  --luxury-ip-accent-soft: #fbbf24;
+  --luxury-ip-accent-glow: rgba(245, 158, 11, 0.22);
+  --luxury-ip-secondary: #fbbf24;
+  --luxury-ip-secondary-glow: rgba(251, 191, 36, 0.18);
+  --luxury-ip-header-bg-end: #0a0804;
+}
+
+/* --- Hero (`InfoPrivacyAccountHeroHeader`): viola hardcoded → giallo. --- */
+.luxury-info-privacy-staff-side .luxury-consumer-bookings-dash__headline-accent {
+  background: linear-gradient(105deg, #fde68a 0%, #fbbf24 42%, #f59e0b 100%);
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(251, 191, 36, 0.3));
+}
+
+.luxury-info-privacy-staff-side .luxury-info-privacy-hero__aurora {
+  background:
+    radial-gradient(ellipse 75% 48% at 15% 18%, rgba(251, 191, 36, 0.28), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(245, 158, 11, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 50% 100%, rgba(251, 191, 36, 0.12), transparent 45%);
+}
+
+.luxury-info-privacy-staff-side .luxury-info-privacy-hero__badge--muted {
+  border-color: rgba(251, 191, 36, 0.4);
+  background: linear-gradient(160deg, rgba(120, 53, 15, 0.55), rgba(28, 18, 4, 0.5));
+  color: #fffbeb;
+}
+
+.luxury-info-privacy-staff-side .luxury-info-privacy-hero__subtitle-card {
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(251, 191, 36, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(24, 16, 4, 0.88) 0%, rgba(0, 0, 0, 0.94) 55%, rgba(18, 12, 4, 0.96) 100%);
+  box-shadow:
+    0 4px 0 #000,
+    0 0 0 1px rgba(251, 191, 36, 0.14) inset,
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 28px var(--luxury-ip-secondary-glow);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-staff-side .luxury-info-privacy-hero__subtitle-card:hover {
+    border-color: rgba(251, 191, 36, 0.35);
+  }
+}
+
+.luxury-info-privacy-staff-side .luxury-info-privacy-hero__subtitle-chip {
+  border-color: rgba(251, 191, 36, 0.35);
+  background: rgba(120, 53, 15, 0.35);
+  color: #fffbeb;
+}
+
+.luxury-info-privacy-staff-side .luxury-info-privacy-hero__subtitle em,
+.luxury-info-privacy-staff-side .luxury-info-privacy-hero__subtitle strong {
+  color: #fde68a;
+}
+
+.luxury-info-privacy-staff-side .luxury-info-privacy-hero__subtitle-foot {
+  border-top-color: rgba(251, 191, 36, 0.18);
+}
+
+/* Card con switch (staff + eventuale riuso): viola → giallo. */
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card::after {
+  background:
+    radial-gradient(ellipse 80% 55% at 20% 0%, rgba(251, 191, 36, 0.1) 0%, transparent 52%),
+    radial-gradient(ellipse 60% 45% at 100% 100%, rgba(245, 158, 11, 0.06) 0%, transparent 55%);
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__glow {
+  background: radial-gradient(ellipse 55% 42% at 50% 0%, rgba(251, 191, 36, 0.16) 0%, transparent 64%);
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__toggle {
+  border-color: rgba(251, 191, 36, 0.35);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(251, 191, 36, 0.12) 0%, transparent 52%),
+    linear-gradient(155deg, rgba(30, 30, 33, 0.96) 0%, rgba(24, 24, 27, 0.98) 58%, rgba(20, 20, 22, 0.96) 100%);
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(251, 191, 36, 0.12);
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__toggle-btn {
+  color: rgba(253, 224, 71, 0.82);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-staff-side.luxury-info-privacy-hero-page
+    .luxury-info-privacy-consumer-card__toggle-btn:hover:not(.luxury-info-privacy-consumer-card__toggle-btn--active) {
+    color: #fffbeb;
+    background: rgba(251, 191, 36, 0.12);
+  }
+
+  .luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card:hover {
+    box-shadow:
+      0 22px 48px rgba(0, 0, 0, 0.42),
+      0 0 0 1px rgba(251, 191, 36, 0.2);
+  }
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__toggle-btn--active {
+  background: linear-gradient(140deg, #fde68a 0%, #fbbf24 38%, #f59e0b 100%);
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.42),
+    0 6px 14px rgba(251, 191, 36, 0.22),
+    inset 0 1px 0 rgba(255, 247, 237, 0.35);
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy__section-title::before {
+  background: linear-gradient(180deg, #fde68a 0%, #fbbf24 55%, #f59e0b 100%);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.28);
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy__text .luxury-link-inline {
+  color: #fde68a;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy__text .luxury-link-inline:hover {
+    color: #fffbeb;
+  }
+}
+
+/* Tab GDPR: accordion legale viola default → giallo operatore. */
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion {
+  border-color: rgba(251, 191, 36, 0.28);
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion[open] {
+  border-color: rgba(251, 191, 36, 0.45);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(251, 191, 36, 0.12),
+    inset 0 1px 0 rgba(253, 224, 71, 0.14);
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page
+  .luxury-info-privacy-consumer-card__legal
+  .luxury-legal-public__accordion[open]
+  .luxury-legal-public__accordion-title {
+  color: #fde68a;
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion-body {
+  border-top-color: rgba(251, 191, 36, 0.18);
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__legal .luxury-legal-public__inline-link {
+  color: #fde68a;
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__legal .luxury-legal-public__citations {
+  border-top-color: rgba(251, 191, 36, 0.2);
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card:focus-within {
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(251, 191, 36, 0.12);
+}
+
+.luxury-info-privacy-staff-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__inline-action {
+  color: #fde68a;
+}

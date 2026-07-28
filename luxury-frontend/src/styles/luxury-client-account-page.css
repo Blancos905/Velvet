@@ -1,0 +1,419 @@
+/**
+ * Pagine account cliente B2C — hero Info/privacy + card contenuto condivisa.
+ */
+
+.luxury-client-account-page.luxury-consumer-bookings-dash {
+  max-width: none;
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.luxury-client-account-page .luxury-consumer-bookings-dash__shell {
+  max-width: min(56rem, 100%);
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__filters {
+  margin: 0 0 1.15rem;
+}
+
+.luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__filters {
+  display: inline-flex;
+  gap: 0.42rem;
+  width: 100%;
+  max-width: 26rem;
+  padding: 0.42rem;
+  border-radius: 16px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(167, 139, 250, 0.12) 0%, transparent 52%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.08) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(18, 10, 28, 0.88) 0%, rgba(0, 0, 0, 0.92) 58%, rgba(8, 6, 12, 0.94) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(167, 139, 250, 0.12) inset,
+    0 12px 28px rgba(0, 0, 0, 0.32);
+  transition:
+    border-color 0.24s ease,
+    box-shadow 0.26s ease;
+}
+
+.luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__filters:focus-within {
+  border-color: rgba(167, 139, 250, 0.45);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(245, 158, 11, 0.16) inset,
+    0 14px 32px rgba(0, 0, 0, 0.36),
+    0 0 22px rgba(167, 139, 250, 0.14);
+}
+
+.luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__tab {
+  flex: 1 1 0;
+  justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.55rem;
+  padding: 0.52rem 0.95rem 0.56rem;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  font-size: clamp(0.82rem, 2.1vw, 0.9rem);
+  font-weight: 780;
+  letter-spacing: 0.03em;
+  color: rgba(228, 228, 231, 0.82);
+  background: rgba(24, 24, 27, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  transition:
+    background 0.24s ease,
+    border-color 0.24s ease,
+    color 0.2s ease,
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.26s ease;
+}
+
+.luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__tab::before {
+  content: "";
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  background: linear-gradient(145deg, #c4b5fd 0%, #fbbf24 100%);
+  opacity: 0.72;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  transition: opacity 0.22s ease, transform 0.24s ease;
+}
+
+.luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__tab:first-child::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Crect x='4' y='6' width='16' height='14' rx='2' stroke='black' stroke-width='2'/%3E%3Cpath d='M8 4v4M16 4v4M4 11h16' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Crect x='4' y='6' width='16' height='14' rx='2' stroke='black' stroke-width='2'/%3E%3Cpath d='M8 4v4M16 4v4M4 11h16' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__tab:last-child::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='7' stroke='black' stroke-width='2'/%3E%3Cpath d='M12 8v4l3 2' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='7' stroke='black' stroke-width='2'/%3E%3Cpath d='M12 8v4l3 2' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__tab:hover {
+    color: #fffbeb;
+    border-color: rgba(167, 139, 250, 0.35);
+    background:
+      radial-gradient(120% 140% at 100% 0%, rgba(167, 139, 250, 0.14) 0%, transparent 52%),
+      rgba(39, 39, 42, 0.72);
+    transform: translateY(-1px);
+    box-shadow:
+      0 2px 0 #000,
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__tab:hover::before {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+.luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__tab.is-active {
+  color: #fffbeb;
+  border-color: #000000;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(167, 139, 250, 0.28) 0%, transparent 52%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.22) 0%, transparent 52%),
+    linear-gradient(
+      158deg,
+      rgba(91, 33, 182, 0.52) 0%,
+      rgba(24, 24, 27, 0.98) 48%,
+      rgba(154, 52, 18, 0.45) 100%
+    );
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(245, 158, 11, 0.18) inset,
+    0 10px 24px rgba(0, 0, 0, 0.34),
+    0 0 20px rgba(167, 139, 250, 0.16);
+}
+
+.luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__tab.is-active::before {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px rgba(196, 181, 253, 0.4));
+}
+
+.luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__tab:focus-visible {
+  outline: none;
+  border-color: rgba(251, 191, 36, 0.65);
+  box-shadow:
+    0 0 0 3px rgba(167, 139, 250, 0.35),
+    0 0 0 5px rgba(245, 158, 11, 0.18);
+}
+
+.luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__tab:active {
+  transform: translateY(1px);
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__empty,
+.luxury-client-account-page .luxury-trusted-salons-empty.luxury-consumer-bookings-dash__empty {
+  margin: 0;
+  padding: 0.85rem 0.95rem;
+  border-radius: 14px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(167, 139, 250, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(18, 10, 28, 0.78) 0%, rgba(0, 0, 0, 0.88) 58%, rgba(8, 6, 12, 0.9) 100%);
+  color: rgba(255, 251, 235, 0.78);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__list {
+  margin-top: 0;
+}
+
+.luxury-client-account-page .luxury-text-muted {
+  margin: 0 0 0.85rem;
+}
+
+.luxury-client-account-page .luxury-alert {
+  margin: 0 0 0.85rem;
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__actions {
+  margin-top: 0.9rem;
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__manage-link {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.52rem;
+  padding: 0.58rem 1.05rem 0.62rem;
+  border-radius: 13px;
+  font-size: clamp(0.8rem, 2vw, 0.86rem);
+  font-weight: 780;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  color: #fffbeb;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(167, 139, 250, 0.24) 0%, transparent 52%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.2) 0%, transparent 52%),
+    linear-gradient(
+      158deg,
+      rgba(91, 33, 182, 0.42) 0%,
+      rgba(24, 24, 27, 0.96) 48%,
+      rgba(154, 52, 18, 0.38) 100%
+    );
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(167, 139, 250, 0.16) inset,
+    0 10px 24px rgba(0, 0, 0, 0.34),
+    0 0 18px rgba(167, 139, 250, 0.1);
+  transition:
+    border-color 0.24s ease,
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.26s ease,
+    color 0.2s ease,
+    background 0.26s ease;
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__manage-link::before {
+  content: "";
+  flex-shrink: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  background: linear-gradient(145deg, #c4b5fd 0%, #fbbf24 100%);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Crect x='4' y='6' width='16' height='14' rx='2' stroke='black' stroke-width='2'/%3E%3Cpath d='M8 4v4M16 4v4M4 11h16M9 15h2M13 15h2' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Crect x='4' y='6' width='16' height='14' rx='2' stroke='black' stroke-width='2'/%3E%3Cpath d='M8 4v4M16 4v4M4 11h16M9 15h2M13 15h2' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  filter: drop-shadow(0 0 6px rgba(196, 181, 253, 0.35));
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__manage-link--chat::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M5 8a4 4 0 014-4h6a4 4 0 014 4v5a4 4 0 01-4 4H9l-4 3v-3.5A3.5 3.5 0 015 13V8z' stroke='black' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M5 8a4 4 0 014-4h6a4 4 0 014 4v5a4 4 0 01-4 4H9l-4 3v-3.5A3.5 3.5 0 015 13V8z' stroke='black' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__manage-link::after {
+  content: "→";
+  margin-left: 0.08rem;
+  font-size: 0.95em;
+  line-height: 1;
+  opacity: 0.72;
+  transform: translateX(0);
+  transition:
+    opacity 0.22s ease,
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-client-account-page .luxury-consumer-agenda__manage-link:hover {
+    color: #ffffff;
+    border-color: rgba(167, 139, 250, 0.45);
+    transform: translateY(-2px);
+    background:
+      radial-gradient(120% 140% at 100% 0%, rgba(167, 139, 250, 0.32) 0%, transparent 52%),
+      radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.28) 0%, transparent 52%),
+      linear-gradient(
+        158deg,
+        rgba(109, 40, 217, 0.52) 0%,
+        rgba(24, 24, 27, 0.98) 48%,
+        rgba(194, 65, 12, 0.48) 100%
+      );
+    box-shadow:
+      0 4px 0 #000,
+      0 0 0 1px rgba(245, 158, 11, 0.2) inset,
+      0 14px 30px rgba(0, 0, 0, 0.38),
+      0 0 26px rgba(167, 139, 250, 0.18);
+  }
+
+  .luxury-client-account-page .luxury-consumer-agenda__manage-link:hover::after {
+    opacity: 1;
+    transform: translateX(3px);
+  }
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__manage-link:focus-visible {
+  outline: none;
+  border-color: rgba(251, 191, 36, 0.65);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 3px rgba(167, 139, 250, 0.35),
+    0 0 0 5px rgba(245, 158, 11, 0.2),
+    0 12px 28px rgba(0, 0, 0, 0.36);
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__manage-link:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 1px 0 #000,
+    0 0 0 1px rgba(167, 139, 250, 0.12) inset,
+    0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+
+.luxury-client-account-page .luxury-support-page__grid {
+  margin: 0;
+  gap: 0;
+}
+
+.luxury-client-account-page .luxury-profile-grid {
+  margin-top: 0;
+}
+
+.luxury-client-account-page .luxury-profile-close {
+  margin-top: 1.25rem;
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__salon-logo {
+  flex-shrink: 0;
+  align-self: start;
+  transition:
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.26s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-client-account-page .luxury-consumer-agenda__item:hover .luxury-consumer-agenda__salon-logo {
+    transform: scale(1.04);
+    box-shadow:
+      0 4px 0 #000,
+      0 0 20px rgba(167, 139, 250, 0.22);
+  }
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__when {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.42rem;
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__when-weekday {
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(196, 181, 253, 0.92);
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__when-day {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.15rem;
+  padding: 0.2rem 0.55rem 0.24rem;
+  border-radius: 10px;
+  border: 2px solid #000000;
+  font-size: clamp(1.05rem, 2.8vw, 1.22rem);
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #fffbeb;
+  background: linear-gradient(145deg, rgba(167, 139, 250, 0.55) 0%, rgba(245, 158, 11, 0.88) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 14px rgba(167, 139, 250, 0.22),
+    inset 0 1px 0 rgba(255, 251, 235, 0.28);
+  text-shadow: 0 1px 10px rgba(46, 16, 101, 0.35);
+  transition:
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.24s ease;
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__when-month {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  color: #fde68a;
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__when-sep {
+  color: rgba(161, 161, 170, 0.75);
+  font-weight: 700;
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__when-time {
+  padding: 0.18rem 0.5rem 0.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(63, 63, 70, 0.65);
+  background: rgba(24, 24, 27, 0.72);
+  font-size: 0.8rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+  color: #fafafa;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-client-account-page .luxury-consumer-agenda__item:hover .luxury-consumer-agenda__when-day {
+    transform: translateY(-1px) scale(1.04);
+    box-shadow:
+      0 4px 0 #000,
+      0 0 20px rgba(245, 158, 11, 0.28),
+      inset 0 1px 0 rgba(255, 251, 235, 0.32);
+  }
+}
+
+.luxury-client-account-page .luxury-consumer-agenda__meta {
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-client-account-page .luxury-consumer-agenda__manage-link,
+  .luxury-client-account-page .luxury-consumer-agenda__manage-link::after,
+  .luxury-client-account-page .luxury-consumer-agenda__when-day,
+  .luxury-client-account-page .luxury-consumer-agenda__salon-logo,
+  .luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__tab,
+  .luxury-client-account-page.luxury-consumer-bookings-dash .luxury-consumer-agenda__tab::before {
+    transition: none;
+  }
+}

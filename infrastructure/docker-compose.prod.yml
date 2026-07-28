@@ -66,7 +66,7 @@ services:
   # ---------------------------------------------------------------------------
   api:
     build:
-      context: ../velvet
+      context: ../luxury
       dockerfile: Dockerfile
     <<: *hardening
     environment:
@@ -77,18 +77,18 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       # Segreti firma token/JWT (HS256).
-      VELVET_TOKEN_SECRET: ${JWT_SECRET}
-      VELVET_AUTH_JWT_SECRET: ${JWT_SECRET}
+      LUXURY_TOKEN_SECRET: ${JWT_SECRET}
+      LUXURY_AUTH_JWT_SECRET: ${JWT_SECRET}
       # URL pubblico del sito (link "Gestisci"/"Recensione", SEO).
-      VELVET_PUBLIC_FRONTEND_URL: ${SITE_BASE_URL}
-      # CORS: origini frontend autorizzate (mappa su velvet.cors.allowed-origins).
-      VELVET_CORS_ALLOWED_ORIGINS: ${CORS_ORIGINS}
+      LUXURY_PUBLIC_FRONTEND_URL: ${SITE_BASE_URL}
+      # CORS: origini frontend autorizzate (mappa su luxury.cors.allowed-origins).
+      LUXURY_CORS_ALLOWED_ORIGINS: ${CORS_ORIGINS}
       # Super admin: prima installazione via setup-token (UI). Opzionali.
-      VELVET_SUPER_ADMIN_USERNAME: ${VELVET_SUPER_ADMIN_USERNAME:-}
-      VELVET_SUPER_ADMIN_PASSWORD: ${VELVET_SUPER_ADMIN_PASSWORD:-}
-      VELVET_SUPER_ADMIN_SETUP_TOKEN: ${VELVET_SUPER_ADMIN_SETUP_TOKEN:-}
-      VELVET_MAIL_ENABLED: ${VELVET_MAIL_ENABLED:-false}
-      VELVET_MAIL_FROM: ${VELVET_MAIL_FROM:-noreply@saloniluxury.it}
+      LUXURY_SUPER_ADMIN_USERNAME: ${LUXURY_SUPER_ADMIN_USERNAME:-}
+      LUXURY_SUPER_ADMIN_PASSWORD: ${LUXURY_SUPER_ADMIN_PASSWORD:-}
+      LUXURY_SUPER_ADMIN_SETUP_TOKEN: ${LUXURY_SUPER_ADMIN_SETUP_TOKEN:-}
+      LUXURY_MAIL_ENABLED: ${LUXURY_MAIL_ENABLED:-false}
+      LUXURY_MAIL_FROM: ${LUXURY_MAIL_FROM:-noreply@saloniluxury.it}
       SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-}
       SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-465}
       SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-}
@@ -100,7 +100,7 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: "6379"
       SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD}
-      VELVET_BILLING_ENABLED: ${VELVET_BILLING_ENABLED:-false}
+      LUXURY_BILLING_ENABLED: ${LUXURY_BILLING_ENABLED:-false}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
       STRIPE_PREMIUM_PRICE_ID: ${STRIPE_PREMIUM_PRICE_ID:-}

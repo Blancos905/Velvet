@@ -155,10 +155,10 @@ def build_personal_page_payload(slug: str, salon_name: str) -> str:
 def upsert_content(db_url: str, slug: str, kind: str, payload: str, work_dir: str) -> None:
     row_id = str(uuid.uuid4())
     updated_at = datetime.now(timezone.utc).isoformat()
-    tag = f"velvet_payload_{kind.lower()}"
+    tag = f"luxury_payload_{kind.lower()}"
     sql_path = os.path.join(work_dir, f"{slug}-{kind}.sql")
     with open(sql_path, "w", encoding="utf-8") as fh:
-        fh.write("SET search_path TO c1velvet;\n")
+        fh.write("SET search_path TO c1luxury;\n")
         fh.write(
             f"INSERT INTO salon_site_content (id, slug, kind, payload, updated_at)\n"
             f"VALUES ('{row_id}', '{slug}', '{kind}', ${tag}${payload}${tag}$, '{updated_at}')\n"
@@ -183,7 +183,7 @@ def main() -> int:
         "--db-url",
         default=os.environ.get(
             "DATABASE_URL",
-            "postgresql://postgres:postgres@127.0.0.1:5432/c1velvet",
+            "postgresql://postgres:postgres@127.0.0.1:5432/c1luxury",
         ),
     )
     args = parser.parse_args()

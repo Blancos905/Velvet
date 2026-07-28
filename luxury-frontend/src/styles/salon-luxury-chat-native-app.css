@@ -1,0 +1,369 @@
+/**
+ * Chat in app mobile (WebView Flutter) — layout tipo WhatsApp, palette nero + arancione Luxury.
+ * Attivo solo con `html.luxury-native-app` (vedi useLuxuryNativeAppShell).
+ */
+
+/* Overlay account: chat a tutto schermo */
+.luxury-native-app .luxury-native-account-overlay:has(.luxury-salon-chat--native-app) .luxury-native-account-overlay__backdrop {
+  display: none;
+}
+
+.luxury-native-app .luxury-native-account-overlay:has(.luxury-salon-chat--native-app) .luxury-native-account-overlay__panel {
+  max-height: 100dvh;
+  height: 100dvh;
+  border-radius: 0;
+  border: 0;
+  background: #000000;
+  box-shadow: none;
+  animation: none;
+}
+
+/*
+ * Thread aperto: il pannello segue il visualViewport (tastiera) ma il composer
+ * resta nel flex layout — niente barra di scrittura staccata o body bloccato.
+ */
+html.luxury-native-chat-thread-active.luxury-native-app
+  .luxury-native-account-overlay:has(.luxury-salon-chat__layout--native-thread)
+  .luxury-native-account-overlay__panel {
+  position: fixed;
+  top: var(--luxury-vv-top, 0px);
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: var(--luxury-vv-height, 100dvh);
+  max-height: var(--luxury-vv-height, 100dvh);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+}
+
+html.luxury-native-chat-thread-active.luxury-native-app
+  .luxury-native-account-overlay:has(.luxury-salon-chat__layout--native-thread)
+  .luxury-native-account-overlay__body,
+html.luxury-native-chat-thread-active.luxury-native-app
+  .luxury-page-main.luxury-salon-chat--native-app {
+  height: 100%;
+  min-height: 0;
+}
+
+.luxury-native-app .luxury-native-account-overlay:has(.luxury-salon-chat--native-app) .luxury-native-account-overlay__bar {
+  background: #000000;
+  border-bottom: 2px solid rgba(249, 115, 22, 0.45);
+  padding-top: calc(0.65rem + env(safe-area-inset-top, 0px));
+}
+
+.luxury-native-app .luxury-native-account-overlay:has(.luxury-salon-chat--native-app) .luxury-native-account-overlay__back,
+.luxury-native-app .luxury-native-account-overlay:has(.luxury-salon-chat--native-app) .luxury-native-account-overlay__title {
+  color: #fb923c;
+}
+
+.luxury-native-app .luxury-native-account-overlay:has(.luxury-salon-chat--native-app) .luxury-native-account-overlay__close {
+  color: #fff7ed;
+  border-color: rgba(251, 146, 60, 0.45);
+  background: rgba(249, 115, 22, 0.15);
+}
+
+.luxury-native-app .luxury-native-account-overlay:has(.luxury-salon-chat__layout--native-thread) .luxury-native-account-overlay__bar {
+  display: none;
+}
+
+.luxury-native-app .luxury-native-account-overlay__body:has(.luxury-salon-chat--native-app) {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.luxury-native-app .luxury-page-main.luxury-salon-chat--native-app {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  max-width: none;
+  width: 100%;
+  background: #000000;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-clients-dash__shell,
+.luxury-native-app .luxury-salon-chat--native-app .luxury-consumer-bookings-dash__shell {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  max-width: none;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__shell {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: #000000;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__layout {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: none;
+  min-height: 0;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__sidebar {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  background: #000000;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__sidebar-title {
+  display: none;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__layout--native-thread .luxury-salon-chat__sidebar {
+  display: none;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__layout:not(.luxury-salon-chat__layout--native-thread) .luxury-salon-chat__panel {
+  display: none;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__layout--native-thread .luxury-salon-chat__panel {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+  background: #000000;
+}
+
+/* Lista conversazioni */
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__thread-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(249, 115, 22, 0.22);
+  margin: 0;
+  padding: 0.72rem 0.85rem;
+  background: #000000;
+  color: #fff7ed;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__thread-btn:hover,
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__thread-btn--active {
+  background: #1a1a1a;
+  border-color: rgba(251, 146, 60, 0.35);
+  box-shadow: inset 3px 0 0 #f97316;
+  transform: none;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__thread-avatar {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0a0a0a;
+  background: #fb923c;
+  border: 2px solid #000000;
+  box-shadow: 0 0 0 1px rgba(251, 146, 60, 0.45);
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__thread-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__thread-name {
+  color: #fff7ed;
+  font-size: 1rem;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__thread-preview {
+  color: rgba(253, 186, 116, 0.88);
+  margin-top: 0.15rem;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__thread-time {
+  color: rgba(251, 146, 60, 0.75);
+  font-size: 0.75rem;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__thread-unread {
+  background: #fb923c;
+  color: #000000;
+  border: 1px solid #000000;
+  box-shadow: none;
+  min-width: 1.25rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* Header conversazione */
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__panel-head {
+  background: #000000;
+  border-bottom: 2px solid rgba(249, 115, 22, 0.45);
+  padding: calc(0.5rem + env(safe-area-inset-top, 0px)) 0.65rem 0.5rem;
+  gap: 0.5rem;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__panel-back {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fb923c;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__panel-avatar {
+  width: 2.35rem;
+  height: 2.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0a0a0a;
+  background: #fb923c;
+  border: 2px solid #000000;
+  box-shadow: none;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__panel-title {
+  color: #fb923c;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Area messaggi */
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__stream {
+  background-color: #000000;
+  background-image: radial-gradient(circle at 20% 30%, rgba(249, 115, 22, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(251, 146, 60, 0.06) 0%, transparent 40%);
+  padding: 0.65rem 0.55rem 0.75rem;
+  gap: 0.2rem;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__bubble {
+  border: 2px solid #000000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  font-size: 0.9375rem;
+  padding: 0.45rem 0.65rem 0.5rem;
+  border-radius: 18px;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__bubble--client,
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__bubble--owner {
+  background: #1a1a1a;
+  color: #fff7ed;
+  border-color: rgba(251, 146, 60, 0.35);
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__bubble-row--mine .luxury-salon-chat__bubble,
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__bubble-row--mine .luxury-salon-chat__bubble--client,
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__bubble-row--mine .luxury-salon-chat__bubble--owner {
+  background: #fb923c;
+  color: #0a0a0a;
+  border-color: #000000;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__bubble a {
+  color: inherit;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__receipt {
+  color: rgba(253, 186, 116, 0.65);
+  font-size: 0.65rem;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__receipt--seen {
+  color: #ea580c;
+  font-weight: 600;
+}
+
+/* Composer */
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__composer {
+  flex-shrink: 0;
+  background: #000000;
+  border-top: 2px solid rgba(249, 115, 22, 0.45);
+  padding: 0.4rem 0.55rem calc(0.45rem + env(safe-area-inset-bottom, 0px));
+  gap: 0.45rem;
+}
+
+html.luxury-native-chat-keyboard-open.luxury-native-app
+  .luxury-salon-chat__layout--native-thread
+  .luxury-salon-chat__composer {
+  padding-bottom: 0.45rem;
+}
+
+html.luxury-native-chat-thread-active.luxury-native-app
+  .luxury-native-account-overlay__body:has(.luxury-salon-chat--native-app) {
+  overscroll-behavior: none;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__textarea {
+  background: #fb923c;
+  color: #0a0a0a;
+  caret-color: #0a0a0a;
+  border: 2px solid #000000;
+  border-radius: 24px;
+  padding: 0.55rem 1rem;
+  min-height: 2.5rem;
+  resize: none;
+  box-shadow: none;
+  font-weight: 500;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__textarea::placeholder {
+  color: rgba(10, 10, 10, 0.45);
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__textarea:focus {
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.55);
+  outline: none;
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__send {
+  width: 2.65rem;
+  height: 2.65rem;
+  background: #000000;
+  color: #fb923c;
+  border: 2px solid #000000;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__send:hover:not(:disabled) {
+  background: #171717;
+  color: #fdba74;
+  transform: none;
+  box-shadow: 0 2px 10px rgba(234, 88, 12, 0.35);
+}
+
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__empty {
+  color: rgba(253, 186, 116, 0.85);
+}

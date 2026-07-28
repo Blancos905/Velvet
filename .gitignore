@@ -2,18 +2,21 @@
 **/node_modules/
 **/dist/
 backend/target/
-velvet/target/
-velvet-app/build/
-velvet-app/.dart_tool/
+luxury/target/
+luxury-app/build/
+luxury-app/.dart_tool/
 **/*.tsbuildinfo
 
 # Segreti e artefatti deploy
 infrastructure/.env
 infrastructure/frontend-web-dist/
 infrastructure/nginx/certs/
+backups/
+**/*.sql.gz
+**/*.tar.gz
 **/.env.local
-velvet/spring-dev.local.env
-velvet/src/main/resources/application-local.properties
+luxury/spring-dev.local.env
+luxury/src/main/resources/application-local.properties
 
 # IDE / OS
 .DS_Store
@@ -23,4 +26,5 @@ velvet/src/main/resources/application-local.properties
 .cursor/
 scripts/.seed-tmp/
 .npm-cache-codegraph/
+.codegraph/
 

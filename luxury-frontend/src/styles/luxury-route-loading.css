@@ -1,0 +1,217 @@
+@keyframes luxury-route-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes luxury-route-loading-glow {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes luxury-route-loading-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes luxury-route-loading-shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+@keyframes luxury-route-loading-label {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.luxury-route-loading {
+  display: flex;
+  min-height: min(52vh, 420px);
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.25rem, 4vw, 2rem);
+}
+
+.luxury-route-loading__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  width: min(100%, 19rem);
+  padding: clamp(1.35rem, 4vw, 1.85rem) clamp(1.2rem, 3.5vw, 1.65rem);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(253, 186, 116, 0.38);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(253, 186, 116, 0.22) 0%, transparent 42%),
+    radial-gradient(circle at 82% 88%, rgba(249, 115, 22, 0.16) 0%, transparent 46%),
+    linear-gradient(165deg, rgba(10, 10, 10, 0.94) 0%, rgba(28, 10, 6, 0.92) 52%, rgba(12, 8, 6, 0.96) 100%);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.55),
+    0 22px 52px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(251, 146, 60, 0.14),
+    inset 0 1px 0 rgba(255, 247, 237, 0.08);
+  overflow: hidden;
+}
+
+.luxury-route-loading__glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(28px);
+  animation: luxury-route-loading-glow 2.8s ease-in-out infinite;
+}
+
+.luxury-route-loading__glow--a {
+  top: -18%;
+  left: -8%;
+  width: 9rem;
+  height: 9rem;
+  background: rgba(249, 115, 22, 0.34);
+}
+
+.luxury-route-loading__glow--b {
+  right: -10%;
+  bottom: -22%;
+  width: 8rem;
+  height: 8rem;
+  background: rgba(253, 186, 116, 0.22);
+  animation-delay: 0.9s;
+}
+
+.luxury-route-loading__logo-wrap {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 5.4rem;
+  height: 5.4rem;
+}
+
+.luxury-route-loading__ring {
+  position: absolute;
+  inset: -0.35rem;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: rgba(253, 186, 116, 0.95);
+  border-right-color: rgba(249, 115, 22, 0.35);
+  animation: luxury-route-loading-ring 1.05s linear infinite;
+}
+
+.luxury-route-loading__logo {
+  position: relative;
+  z-index: 1;
+  width: 4.75rem;
+  height: 4.75rem;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.45));
+}
+
+.luxury-route-loading__brand {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.luxury-route-loading__brand-saloni {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 247, 237, 0.82);
+}
+
+.luxury-route-loading__brand-luxury {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fdba74;
+  text-shadow: 0 0 24px rgba(249, 115, 22, 0.35);
+}
+
+.luxury-route-loading__label {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 251, 235, 0.92);
+  animation: luxury-route-loading-label 1.35s ease-in-out infinite;
+}
+
+.luxury-route-loading__progress {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 10.5rem);
+  height: 0.28rem;
+  border-radius: 999px;
+  background: rgba(255, 247, 237, 0.12);
+  overflow: hidden;
+}
+
+.luxury-route-loading__progress-fill {
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, #f97316, #fdba74, transparent);
+  animation: luxury-route-loading-shimmer 1.15s ease-in-out infinite;
+}
+
+/* WebView Flutter: overlay a tutto schermo durante code-split / navigazione */
+html.luxury-native-app .luxury-route-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  min-height: 100dvh;
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 1.25rem)
+    1.25rem
+    calc(env(safe-area-inset-bottom, 0px) + 1.25rem);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(253, 186, 116, 0.14) 0%, transparent 42%),
+    linear-gradient(168deg, #431407 0%, #7c2d12 38%, #1c0a06 100%);
+}
+
+html.luxury-native-app .luxury-route-loading__panel {
+  width: min(100%, 20.5rem);
+  padding: clamp(1.5rem, 5vw, 2rem) clamp(1.35rem, 4vw, 1.75rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-route-loading__ring,
+  .luxury-route-loading__glow,
+  .luxury-route-loading__label,
+  .luxury-route-loading__progress-fill {
+    animation: none;
+  }
+
+  .luxury-route-loading__progress-fill {
+    width: 100%;
+    background: linear-gradient(90deg, #ea580c, #fdba74);
+  }
+}

@@ -3,4 +3,4 @@
 # Usa questo al posto di `flutter run --dart-define=...` a mano.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-exec "$ROOT/velvet-app/scripts/run-dev-ios.sh" "$@"
+exec "$ROOT/luxury-app/scripts/run-dev-ios.sh" "$@"

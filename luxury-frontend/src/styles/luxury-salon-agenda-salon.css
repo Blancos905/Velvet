@@ -1,0 +1,402 @@
+/**
+ * Agenda salone (titolare) — `/account/prenotazioni/studio/agenda` e agenda per operatore.
+ * Stessa struttura delle altre pagine account (hero `ClientAccountHeroHeader` + shell),
+ * con accento AZZURRO al posto dell'arancio. Agganciato a `--salon-side` così eventuali
+ * altre viste dell'agenda restano invariate. La board (`.luxury-salon-agenda`) viene
+ * ricolorata da arancio → azzurro; gli stati semantici (confermato/annullato/in attesa)
+ * restano invariati perché veicolano significato.
+ * Importato DOPO gli stili base dell'agenda per vincere i pareggi di specificità.
+ */
+
+/* Variabili hero: azzurro come accento secondario (l'ambra resta come primario). */
+.luxury-consumer-bookings-dash.luxury-salon-staff-agenda-page--salon-side {
+  --luxury-ip-accent: #f59e0b;
+  --luxury-ip-accent-soft: #fbbf24;
+  --luxury-ip-accent-glow: rgba(245, 158, 11, 0.22);
+  --luxury-ip-secondary: #38bdf8;
+  --luxury-ip-secondary-glow: rgba(56, 189, 248, 0.18);
+}
+
+/* La board dell'agenda ha bisogno di più larghezza rispetto alle card testuali. */
+.luxury-salon-staff-agenda-page--salon-side.luxury-consumer-bookings-dash .luxury-consumer-bookings-dash__shell {
+  max-width: min(72rem, 100%);
+}
+
+.luxury-salon-staff-agenda-page--salon-side > .luxury-consumer-bookings-dash__shell > .luxury-link-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  padding: 0.44rem 0.9rem 0.46rem 0.72rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(56, 189, 248, 0.18) 0%, transparent 52%),
+    linear-gradient(155deg, rgba(8, 26, 38, 0.95) 0%, rgba(4, 12, 18, 0.97) 100%);
+  color: #7dd3fc;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.4),
+    0 0 18px rgba(56, 189, 248, 0.12);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.18s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+.luxury-salon-staff-agenda-page--salon-side
+  > .luxury-consumer-bookings-dash__shell
+  > .luxury-link-back:focus-visible {
+  outline: none;
+  border-color: rgba(125, 211, 252, 0.9);
+  box-shadow:
+    0 0 0 3px rgba(56, 189, 248, 0.22),
+    0 4px 0 rgba(0, 0, 0, 0.42);
+}
+
+/* --- Hero (`ClientAccountHeroHeader`): viola/arancio hardcoded → azzurro. --- */
+.luxury-salon-staff-agenda-page--salon-side .luxury-info-privacy-hero__aurora {
+  background:
+    radial-gradient(ellipse 75% 48% at 15% 18%, rgba(56, 189, 248, 0.28), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(245, 158, 11, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 50% 100%, rgba(251, 191, 36, 0.12), transparent 45%);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-info-privacy-hero__badge--muted {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: linear-gradient(160deg, rgba(3, 105, 161, 0.55), rgba(8, 20, 28, 0.5));
+  color: #e0f2fe;
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-info-privacy-hero__subtitle-card {
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(10, 16, 24, 0.88) 0%, rgba(0, 0, 0, 0.94) 55%, rgba(6, 10, 14, 0.96) 100%);
+  box-shadow:
+    0 4px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.14) inset,
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 28px var(--luxury-ip-secondary-glow);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-staff-agenda-page--salon-side .luxury-info-privacy-hero__subtitle-card:hover {
+    border-color: rgba(56, 189, 248, 0.35);
+  }
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-info-privacy-hero__subtitle-chip {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(3, 105, 161, 0.35);
+  color: #e0f2fe;
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-info-privacy-hero__subtitle em,
+.luxury-salon-staff-agenda-page--salon-side .luxury-info-privacy-hero__subtitle strong {
+  color: #7dd3fc;
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-info-privacy-hero__subtitle-foot {
+  border-top-color: rgba(56, 189, 248, 0.18);
+}
+
+/* Link "Gestione staff" e back → accento azzurro. */
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-staff-agenda-page__manage-link {
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-staff-agenda-page--salon-side .luxury-salon-staff-agenda-page__manage-link:hover {
+    border-color: rgba(56, 189, 248, 0.5);
+    box-shadow:
+      0 8px 22px rgba(0, 0, 0, 0.3),
+      0 0 22px rgba(56, 189, 248, 0.14);
+  }
+
+  .luxury-salon-staff-agenda-page--salon-side > .luxury-consumer-bookings-dash__shell > .luxury-link-back:hover {
+    color: #e0f2fe;
+    border-color: rgba(125, 211, 252, 0.8);
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow:
+      0 4px 0 rgba(0, 0, 0, 0.48),
+      0 0 24px rgba(56, 189, 248, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* ===================== Board agenda: arancio → azzurro ===================== */
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__ambient {
+  background:
+    radial-gradient(ellipse 85% 70% at 18% 0%, rgba(56, 189, 248, 0.16), transparent 55%),
+    radial-gradient(ellipse 60% 55% at 92% 12%, rgba(125, 211, 252, 0.08), transparent 50%);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__panel {
+  border-color: rgba(224, 242, 254, 0.22);
+  background: linear-gradient(145deg, rgba(12, 46, 66, 0.42) 0%, rgba(3, 12, 20, 0.52) 48%, rgba(2, 8, 14, 0.38) 100%);
+  box-shadow:
+    0 14px 44px rgba(6, 24, 40, 0.32),
+    inset 0 1px 0 rgba(224, 242, 254, 0.06);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__panel::before {
+  background: linear-gradient(90deg, rgba(125, 211, 252, 0.15), rgba(56, 189, 248, 0.65), rgba(245, 158, 11, 0.35));
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__range-filter {
+  border-top-color: rgba(224, 242, 254, 0.18);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__range-filter-label {
+  color: rgba(224, 242, 254, 0.92);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__range-filter-trigger {
+  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(3, 12, 20, 0.72);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__range-filter-trigger:hover {
+  border-color: rgba(56, 189, 248, 0.6);
+  background: rgba(3, 12, 20, 0.55);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__range-filter-trigger:focus-visible {
+  outline-color: rgba(56, 189, 248, 0.7);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__range-popover {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: linear-gradient(165deg, rgba(9, 30, 44, 0.98) 0%, rgba(2, 8, 14, 0.99) 100%);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__range-date-input:focus {
+  border-color: rgba(56, 189, 248, 0.55);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__loading {
+  border-color: rgba(56, 189, 248, 0.28);
+  background: rgba(3, 12, 20, 0.25);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__loading-dot {
+  background: linear-gradient(180deg, #7dd3fc, #0284c7);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.55);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__week-shell {
+  border-color: rgba(224, 242, 254, 0.14);
+  background: linear-gradient(180deg, rgba(9, 30, 44, 0.55) 0%, rgba(2, 8, 14, 0.42) 100%);
+  box-shadow:
+    0 10px 32px rgba(6, 24, 40, 0.22),
+    inset 0 1px 0 rgba(224, 242, 254, 0.04);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__week-kicker {
+  color: rgba(125, 211, 252, 0.9);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__week::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, rgba(2, 132, 199, 0.55), rgba(125, 211, 252, 0.5));
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__day-cell {
+  border-color: rgba(224, 242, 254, 0.12);
+  background: linear-gradient(165deg, rgba(9, 34, 50, 0.5) 0%, rgba(2, 8, 14, 0.65) 100%);
+  box-shadow:
+    0 4px 16px rgba(6, 24, 40, 0.18),
+    inset 0 1px 0 rgba(224, 242, 254, 0.04);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__day-cell::after {
+  background: linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.35), transparent);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__day-cell:hover {
+  border-color: rgba(56, 189, 248, 0.42);
+  box-shadow:
+    0 8px 22px rgba(6, 24, 40, 0.28),
+    0 0 22px rgba(56, 189, 248, 0.14),
+    inset 0 1px 0 rgba(224, 242, 254, 0.07);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__day-cell:focus-visible {
+  outline-color: rgba(125, 211, 252, 0.9);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__day-cell--today {
+  border-color: rgba(56, 189, 248, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.22),
+    0 6px 20px rgba(2, 132, 199, 0.18);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__day-cell--today .luxury-salon-agenda__day-cell-dom {
+  color: #e0f2fe;
+  text-shadow: 0 0 18px rgba(125, 211, 252, 0.35);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__day-cell--selected {
+  border-color: rgba(125, 211, 252, 0.58);
+  background: linear-gradient(155deg, rgba(56, 189, 248, 0.35) 0%, rgba(12, 74, 110, 0.55) 42%, rgba(3, 12, 20, 0.7) 100%);
+  box-shadow:
+    0 12px 28px rgba(6, 24, 40, 0.35),
+    inset 0 1px 0 rgba(224, 242, 254, 0.12),
+    inset 0 -1px 0 rgba(2, 8, 14, 0.35);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__day-cell-dom {
+  color: #e0f2fe;
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__day-cell-count {
+  color: rgba(186, 230, 253, 0.95);
+  border-color: rgba(224, 242, 254, 0.08);
+  background: rgba(2, 8, 14, 0.35);
+}
+
+.luxury-salon-staff-agenda-page--salon-side
+  .luxury-salon-agenda__day-cell--selected
+  .luxury-salon-agenda__day-cell-count:not(.luxury-salon-agenda__day-cell-count--zero) {
+  background: rgba(2, 8, 14, 0.45);
+  border-color: rgba(125, 211, 252, 0.25);
+  color: #e0f2fe;
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__day-block {
+  border-color: rgba(224, 242, 254, 0.18);
+  background: linear-gradient(180deg, rgba(7, 28, 42, 0.72) 0%, rgba(2, 8, 14, 0.55) 100%);
+  box-shadow:
+    0 14px 40px rgba(6, 24, 40, 0.28),
+    inset 0 1px 0 rgba(224, 242, 254, 0.05);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__dayhead {
+  background: rgba(7, 40, 58, 0.28);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__dayhead-accent {
+  background: linear-gradient(180deg, #7dd3fc 0%, #0284c7 55%, rgba(3, 105, 161, 0.9) 100%);
+  box-shadow: 2px 0 14px rgba(56, 189, 248, 0.25);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__dayhead--today .luxury-salon-agenda__dayhead-accent {
+  background: linear-gradient(180deg, #e0f2fe 0%, #38bdf8 45%, #0369a1 100%);
+  box-shadow: 2px 0 18px rgba(125, 211, 252, 0.35);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__dayhead--today {
+  border-bottom-color: rgba(125, 211, 252, 0.32);
+  background: linear-gradient(100deg, rgba(56, 189, 248, 0.22) 0%, rgba(7, 40, 58, 0.32) 52%, rgba(3, 12, 20, 0.35) 100%);
+  box-shadow: inset 0 -1px 0 rgba(125, 211, 252, 0.15);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__dom {
+  color: #e0f2fe;
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__day-count {
+  color: rgba(224, 242, 254, 0.95);
+  border-color: rgba(56, 189, 248, 0.28);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.22) 0%, rgba(3, 12, 20, 0.5) 100%);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__table-wrap::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, rgba(2, 132, 199, 0.65), rgba(125, 211, 252, 0.5));
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__table thead {
+  background: linear-gradient(180deg, rgba(4, 14, 22, 0.92) 0%, rgba(2, 8, 14, 0.88) 100%);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__table th {
+  color: rgba(125, 211, 252, 0.8);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__table tbody tr.luxury-salon-agenda__data-row:hover {
+  background: rgba(56, 189, 248, 0.12);
+  box-shadow: inset 3px 0 0 rgba(125, 211, 252, 0.65);
+}
+
+.luxury-salon-staff-agenda-page--salon-side
+  .luxury-salon-agenda__table
+  tbody
+  tr.luxury-salon-agenda__data-row--openable:hover {
+  background: rgba(56, 189, 248, 0.16);
+  box-shadow:
+    inset 4px 0 0 rgba(125, 211, 252, 0.95),
+    0 0 32px rgba(56, 189, 248, 0.08);
+}
+
+.luxury-salon-staff-agenda-page--salon-side
+  .luxury-salon-agenda__table
+  tbody
+  tr.luxury-salon-agenda__data-row--openable:active {
+  background: rgba(56, 189, 248, 0.19);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__time-range {
+  color: #e0f2fe;
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(125, 211, 252, 0.2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-staff-agenda-page--salon-side
+    .luxury-salon-agenda__data-row--openable:hover
+    .luxury-salon-agenda__time-range {
+    border-color: rgba(125, 211, 252, 0.48);
+    background: rgba(56, 189, 248, 0.2);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.18);
+  }
+}
+
+/* Link "Apri/Gestisci" della riga → azzurro (le CTA distruttive/di stato restano semantiche). */
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__row-link {
+  border-color: rgba(125, 211, 252, 0.45);
+  background: linear-gradient(165deg, rgba(56, 189, 248, 0.4) 0%, rgba(3, 105, 161, 0.42) 100%);
+  box-shadow:
+    0 4px 14px rgba(6, 24, 40, 0.3),
+    inset 0 1px 0 rgba(224, 242, 254, 0.14);
+}
+
+.luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__row-link:focus-visible {
+  border-color: rgba(125, 211, 252, 0.65);
+  box-shadow:
+    0 0 0 3px rgba(56, 189, 248, 0.18),
+    0 6px 20px rgba(2, 132, 199, 0.3),
+    inset 0 1px 0 rgba(224, 242, 254, 0.18);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-staff-agenda-page--salon-side .luxury-salon-agenda__row-link:hover {
+    background: linear-gradient(165deg, rgba(125, 211, 252, 0.52) 0%, rgba(2, 132, 199, 0.55) 100%);
+    border-color: rgba(125, 211, 252, 0.75);
+    box-shadow:
+      0 10px 26px rgba(2, 132, 199, 0.32),
+      inset 0 1px 0 rgba(224, 242, 254, 0.22);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-staff-agenda-page--salon-side > .luxury-consumer-bookings-dash__shell > .luxury-link-back {
+    transition: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .luxury-salon-staff-agenda-page--salon-side
+      > .luxury-consumer-bookings-dash__shell
+      > .luxury-link-back:hover {
+      transform: none;
+    }
+  }
+}

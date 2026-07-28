@@ -1,0 +1,313 @@
+/**
+ * Panoramica salone Premium (`/account/salone`) — hero `ClientAccountHeroHeader` +
+ * `SalonPremiumPanorama` con accento AZZURRO al posto dell'arancio full-bleed.
+ * Scoped a `.salon-premium-panorama--salon-side`; `/partner` resta arancio.
+ * Importato DOPO `salon-premium-panorama.css`.
+ */
+
+.luxury-consumer-bookings-dash.luxury-salon-panorama-account-shell--salon-side {
+  --luxury-ip-accent: #f59e0b;
+  --luxury-ip-accent-soft: #fbbf24;
+  --luxury-ip-accent-glow: rgba(245, 158, 11, 0.22);
+  --luxury-ip-secondary: #38bdf8;
+  --luxury-ip-secondary-glow: rgba(56, 189, 248, 0.18);
+}
+
+/* --- Hero --- */
+.luxury-salon-panorama-account-shell--salon-side .luxury-consumer-bookings-dash__headline-accent {
+  background: linear-gradient(105deg, #7dd3fc 0%, #38bdf8 42%, #f59e0b 100%);
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(56, 189, 248, 0.3));
+}
+
+.luxury-salon-panorama-account-shell--salon-side .luxury-info-privacy-hero__aurora {
+  background:
+    radial-gradient(ellipse 75% 48% at 15% 18%, rgba(56, 189, 248, 0.28), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(245, 158, 11, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 50% 100%, rgba(251, 191, 36, 0.12), transparent 45%);
+}
+
+.luxury-salon-panorama-account-shell--salon-side .luxury-info-privacy-hero__badge--muted {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: linear-gradient(160deg, rgba(3, 105, 161, 0.55), rgba(8, 20, 28, 0.5));
+  color: #e0f2fe;
+}
+
+.luxury-salon-panorama-account-shell--salon-side .luxury-info-privacy-hero__subtitle-card {
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(10, 16, 24, 0.88) 0%, rgba(0, 0, 0, 0.94) 55%, rgba(6, 10, 14, 0.96) 100%);
+  box-shadow:
+    0 4px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.14) inset,
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 28px rgba(56, 189, 248, 0.18);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-panorama-account-shell--salon-side .luxury-info-privacy-hero__subtitle-card:hover {
+    border-color: rgba(56, 189, 248, 0.35);
+  }
+}
+
+.luxury-salon-panorama-account-shell--salon-side .luxury-info-privacy-hero__subtitle-chip {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(3, 105, 161, 0.35);
+  color: #e0f2fe;
+}
+
+.luxury-salon-panorama-account-shell--salon-side .luxury-info-privacy-hero__subtitle em,
+.luxury-salon-panorama-account-shell--salon-side .luxury-info-privacy-hero__subtitle strong {
+  color: #7dd3fc;
+}
+
+.luxury-salon-panorama-account-shell--salon-side .luxury-info-privacy-hero__subtitle-foot {
+  border-top-color: rgba(56, 189, 248, 0.18);
+}
+
+/* --- Panoramica Premium: reset shell arancio + token azzurro. --- */
+.salon-premium-panorama--salon-side {
+  --spp-orange: #38bdf8;
+  --spp-orange-deep: #0369a1;
+  --spp-orange-glow: rgba(56, 189, 248, 0.45);
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100%;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__shell::before {
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 55%);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__card-glow {
+  background-image: linear-gradient(
+    125deg,
+    rgba(56, 189, 248, 0.55),
+    rgba(125, 211, 252, 0.35),
+    rgba(2, 132, 199, 0.5),
+    rgba(245, 158, 11, 0.22),
+    rgba(56, 189, 248, 0.48)
+  );
+  box-shadow:
+    0 20px 50px -14px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(56, 189, 248, 0.14),
+    0 0 40px -8px rgba(56, 189, 248, 0.22);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__card-glow::before {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(56, 189, 248, 0.12) 12%,
+    rgba(245, 158, 11, 0.16) 28%,
+    rgba(56, 189, 248, 0.2) 42%,
+    transparent 58%
+  );
+}
+
+@media (hover: hover) {
+  .salon-premium-panorama--salon-side .salon-premium-panorama__card-glow:hover {
+    box-shadow:
+      0 28px 60px -12px rgba(0, 0, 0, 0.62),
+      0 0 0 1px rgba(125, 211, 252, 0.35),
+      0 0 56px -6px rgba(56, 189, 248, 0.38),
+      0 0 100px -24px rgba(56, 189, 248, 0.22);
+  }
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__card-glow:focus-within {
+  box-shadow:
+    0 0 0 2px rgba(10, 10, 10, 0.85),
+    0 0 0 4px rgba(125, 211, 252, 0.75),
+    0 24px 56px -12px rgba(0, 0, 0, 0.55),
+    0 0 48px -8px rgba(56, 189, 248, 0.32);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__card--rich::after {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.09) 0%, transparent 38%, transparent 62%, rgba(56, 189, 248, 0.08) 100%);
+}
+
+@media (hover: hover) {
+  .salon-premium-panorama--salon-side .salon-premium-panorama__card-glow:hover .salon-premium-panorama__card--rich {
+    border-color: rgba(125, 211, 252, 0.22);
+    box-shadow:
+      0 22px 50px -14px rgba(0, 0, 0, 0.58),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+      0 0 72px -20px rgba(56, 189, 248, 0.18);
+  }
+
+  .salon-premium-panorama--salon-side .salon-premium-panorama__card-glow:hover .salon-premium-panorama__well {
+    box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.08);
+  }
+
+  .salon-premium-panorama--salon-side .salon-premium-panorama__card-glow:hover .salon-premium-panorama__feature-list {
+    box-shadow: 0 0 24px -8px rgba(56, 189, 248, 0.12);
+  }
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__plan-badge {
+  border-color: rgba(56, 189, 248, 0.45);
+  background: rgba(56, 189, 248, 0.18);
+  color: #e0f2fe;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__plan-badge:hover {
+  background: rgba(56, 189, 248, 0.28);
+  border-color: rgba(125, 211, 252, 0.65);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__plan-icon {
+  background: linear-gradient(145deg, #0284c7, #38bdf8);
+  box-shadow: 0 8px 22px rgba(56, 189, 248, 0.28);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__well:hover .salon-premium-panorama__plan-icon {
+  box-shadow: 0 10px 28px rgba(56, 189, 248, 0.32);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__well:hover {
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.08);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__cta {
+  border-color: rgba(56, 189, 248, 0.55);
+  background: rgba(56, 189, 248, 0.16);
+  color: #e0f2fe;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__cta:hover {
+  background: rgba(56, 189, 248, 0.28);
+  border-color: rgba(125, 211, 252, 0.75);
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.32);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__cta:focus-visible {
+  outline-color: #7dd3fc;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__chip {
+  color: rgba(186, 230, 253, 0.95);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__feature:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(56, 189, 248, 0.55);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__feature--open,
+.salon-premium-panorama--salon-side .salon-premium-panorama__feature--open:hover {
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__feature-icon {
+  background: rgba(56, 189, 248, 0.2);
+  color: #7dd3fc;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__feature:hover .salon-premium-panorama__feature-icon {
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.22);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__feature--open .salon-premium-panorama__feature-icon {
+  background: rgba(56, 189, 248, 0.32);
+  color: #e0f2fe;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__feature--open .salon-premium-panorama__feature-chevron {
+  color: rgba(125, 211, 252, 0.85);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__feature-detail {
+  color: rgba(186, 230, 253, 0.82);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__progress-fill {
+  background: linear-gradient(90deg, #0369a1, #38bdf8, #f59e0b);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__check:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__check:focus-visible {
+  outline-color: #38bdf8;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__check--done {
+  border-color: rgba(56, 189, 248, 0.55);
+  background: rgba(56, 189, 248, 0.16);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.18);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__check-icon--done {
+  color: #38bdf8;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__step-link {
+  color: #7dd3fc;
+  text-decoration-color: rgba(56, 189, 248, 0.45);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__step-link:hover {
+  color: #e0f2fe;
+  text-decoration-color: rgba(125, 211, 252, 0.85);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__step-link:focus-visible {
+  outline-color: #7dd3fc;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__toast {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(3, 105, 161, 0.32));
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__toast-icon {
+  color: #bae6fd;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__toast-text {
+  color: #e0f2fe;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__qlink:hover .salon-premium-panorama__qlink-card {
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.35),
+    0 0 40px -8px rgba(56, 189, 248, 0.32);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__qlink:focus-visible .salon-premium-panorama__qlink-card {
+  outline-color: #7dd3fc;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__qlink-icon {
+  background: rgba(56, 189, 248, 0.2);
+  color: #7dd3fc;
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__qlink:hover .salon-premium-panorama__qlink-icon {
+  background: rgba(56, 189, 248, 0.32);
+}
+
+.salon-premium-panorama--salon-side .salon-premium-panorama__qlink-cta {
+  color: rgba(125, 211, 252, 0.78);
+}
+
+/* Piano Free: card upgrade nella stessa panoramica. */
+.luxury-salon-panorama-account--salon-side.luxury-salon-services-page {
+  --luxury-svc-accent: rgba(56, 189, 248, 0.55);
+  --luxury-svc-accent-soft: rgba(56, 189, 248, 0.22);
+  max-width: none;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.luxury-salon-panorama-account--salon-side.luxury-salon-services-page::before {
+  display: none;
+}

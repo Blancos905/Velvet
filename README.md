@@ -33,7 +33,7 @@ curl -sf http://127.0.0.1:8080/api/v1/public/health
 curl -sf http://127.0.0.1:5173/
 ```
 
-**Note:** non avviare due `./mvnw spring-boot:run` insieme; se la porta 8080 è libera ma Maven è già in compilazione, `wait-for-backend.sh` attende invece di duplicare il processo. Per test completi: `cd velvet && ./mvnw test`.
+**Note:** non avviare due `./mvnw spring-boot:run` insieme; se la porta 8080 è libera ma Maven è già in compilazione, `wait-for-backend.sh` attende invece di duplicare il processo. Per test completi: `cd luxury && ./mvnw test`.
 
 ## Sviluppo frontend-web
 
@@ -66,7 +66,7 @@ Quando il software è finito e stai per andare in produzione / sugli store:
 ./go-live-status.sh             # cosa è fatto / cosa resta da fare
 ./go-live-check.sh              # scan placeholder legali, segreti dev, .env + checklist
 ./go-live-check.sh --reminder   # solo checklist
-./velvet-audit.sh && ./go-live-status.sh && ./go-live-check.sh
+./luxury-audit.sh && ./go-live-status.sh && ./go-live-check.sh
 ```
 
 Dettaglio: [docs/GO_LIVE.md](docs/GO_LIVE.md)

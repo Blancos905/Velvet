@@ -1,0 +1,11 @@
+{
+  "name": "luxury-whatsapp-bridge",
+  "private": true,
+  "description": "Riceve POST da Luxury e invia messaggi WhatsApp (Meta o Twilio)",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}

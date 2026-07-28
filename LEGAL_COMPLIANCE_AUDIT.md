@@ -1,4 +1,4 @@
-# Audit conformità UE — Saloni Luxury / Velvet
+# Audit conformità UE — Saloni Luxury / Luxury
 
 **Data:** 10 giugno 2026  
 **Ambito:** GDPR, ePrivacy, trasparenza recensioni (DSA-lite), requisiti store (privacy manifest / permessi), coerenza codice ↔ informative.  
@@ -20,11 +20,11 @@ Rischio residuo principale: **documenti organizzativi** (DPA firmati con saloni,
 
 | Azione | File |
 |--------|------|
-| Gate Google Maps iframe su `SalonExplorePage` (placeholder + link Scelte privacy) | `velvet-frontend/src/pages/SalonExplorePage.tsx` |
-| Gate geocodifica Nominatim (`locateByPlace`, CAP non-IT, reverse geocode, GPS) dietro consenso «Mappe e geocodifica» | `velvet-frontend/src/pages/HomePage.tsx` |
-| CAP italiano risolto localmente senza API quando manca consenso maps | `velvet-frontend/src/data/searchLocations.ts` (`resolveItalianCityForCap`) |
-| Aggiornata cookie policy (revoca immediata, geocodifica gated) | `velvet-frontend/src/pages/legal/CookiePolicyPage.tsx` |
-| Registro server-side scelte cookie (`cookie_consent_events`, API pubblica) | `velvet/.../PublicCookieConsentController.java`, `velvet-frontend/src/lib/cookieConsent.ts` |
+| Gate Google Maps iframe su `SalonExplorePage` (placeholder + link Scelte privacy) | `luxury-frontend/src/pages/SalonExplorePage.tsx` |
+| Gate geocodifica Nominatim (`locateByPlace`, CAP non-IT, reverse geocode, GPS) dietro consenso «Mappe e geocodifica» | `luxury-frontend/src/pages/HomePage.tsx` |
+| CAP italiano risolto localmente senza API quando manca consenso maps | `luxury-frontend/src/data/searchLocations.ts` (`resolveItalianCityForCap`) |
+| Aggiornata cookie policy (revoca immediata, geocodifica gated) | `luxury-frontend/src/pages/legal/CookiePolicyPage.tsx` |
+| Registro server-side scelte cookie (`cookie_consent_events`, API pubblica) | `luxury/.../PublicCookieConsentController.java`, `luxury-frontend/src/lib/cookieConsent.ts` |
 
 **Già presenti (verificati):** Unsplash gated su HomePage, `SalonLocationMapCard`, banner cookie v2, font self-hosted.
 
@@ -33,8 +33,8 @@ Rischio residuo principale: **documenti organizzativi** (DPA firmati con saloni,
 | Azione | File |
 |--------|------|
 | Sezioni privacy B2C/B2B/Staff su push, token FCM, Firebase, disattivazione | `PrivacyPolicy*LayeredContent.tsx`, `legalSharedCopy.ts` |
-| Richiesta permesso Android 13+ via `requestPermission` | `velvet-app/lib/push/velvet_fcm_service.dart` |
-| `PrivacyInfo.xcprivacy`: categoria Device ID (token push) | `velvet-app/ios/Runner/PrivacyInfo.xcprivacy` |
+| Richiesta permesso Android 13+ via `requestPermission` | `luxury-app/lib/push/luxury_fcm_service.dart` |
+| `PrivacyInfo.xcprivacy`: categoria Device ID (token push) | `luxury-app/ios/Runner/PrivacyInfo.xcprivacy` |
 | Export include `pushDevices` | `MePersonalDataExportService.java` |
 
 ### 3. Account deletion
@@ -74,7 +74,7 @@ Rischio residuo principale: **documenti organizzativi** (DPA firmati con saloni,
 
 ### 8. Log retention
 
-**Verificato (nessuna modifica necessaria):** `SecurityAuditRetentionJob` esegue purge su `velvet.logging.retention-days` (default 180). Copy allineato in privacy B2B (`logRetentionDays`).
+**Verificato (nessuna modifica necessaria):** `SecurityAuditRetentionJob` esegue purge su `luxury.logging.retention-days` (default 180). Copy allineato in privacy B2B (`logRetentionDays`).
 
 ### 9. Geolocalizzazione
 
@@ -84,7 +84,7 @@ Rischio residuo principale: **documenti organizzativi** (DPA firmati con saloni,
 
 ## File modificati (elenco)
 
-### Backend (`velvet/`)
+### Backend (`luxury/`)
 - `consumer/service/ConsumerAccountService.java`
 - `consumer/service/MePersonalDataExportService.java`
 - `legal/cookie/**`, `publicapi/api/PublicCookieConsentController.java`
@@ -93,7 +93,7 @@ Rischio residuo principale: **documenti organizzativi** (DPA firmati con saloni,
 - `review/service/ReviewShowcaseService.java`
 - `test/.../MeDataExportControllerTest.java`
 
-### Frontend (`velvet-frontend/`)
+### Frontend (`luxury-frontend/`)
 - `src/pages/HomePage.tsx`
 - `src/pages/SalonExplorePage.tsx`
 - `src/pages/ClientSignupPage.tsx`
@@ -103,8 +103,8 @@ Rischio residuo principale: **documenti organizzativi** (DPA firmati con saloni,
 - `src/pages/legal/*` (Cookie, ToS, Privacy B2B/B2C/Staff)
 - `src/components/salon/SalonPublicReviewsBlock.tsx`
 
-### Mobile (`velvet-app/`)
-- `lib/push/velvet_fcm_service.dart`
+### Mobile (`luxury-app/`)
+- `lib/push/luxury_fcm_service.dart`
 - `ios/Runner/PrivacyInfo.xcprivacy`
 
 ### Documentazione
@@ -151,8 +151,8 @@ Rischio residuo principale: **documenti organizzativi** (DPA firmati con saloni,
 
 | Check | Esito |
 |-------|-------|
-| `npm run test` (velvet-frontend) | 38 test PASS |
-| `npm run build` (velvet-frontend) | PASS (dopo fix import) |
+| `npm run test` (luxury-frontend) | 38 test PASS |
+| `npm run build` (luxury-frontend) | PASS (dopo fix import) |
 | `./mvnw test -Dtest=MeAccountControllerTest,MeDataExportControllerTest,PublicCookieConsentControllerTest` | PASS |
 | `./go-live-check.sh` | 0 FAIL (WARN attesi infra/env) |
 

@@ -1,0 +1,1881 @@
+/**
+ * Salone → Piano standard → Notifiche (header con «← Panoramica salone»).
+ * Card hub e righe allineate alla pagina Clienti (zinc + accento arancio).
+ */
+
+.luxury-salon-notif-page {
+  max-width: min(44rem, 100%);
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 1.25rem;
+}
+
+.luxury-salon-notif-page > .luxury-link-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+  padding: 0.28rem 0.05rem 0.28rem 0;
+  border-radius: 8px;
+  transition:
+    color 0.2s ease,
+    transform 0.22s cubic-bezier(0.34, 1.45, 0.64, 1),
+    text-shadow 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-notif-page > .luxury-link-back:hover {
+    color: #fffbeb;
+    transform: translateX(-3px);
+    text-shadow: 0 0 18px rgba(251, 191, 36, 0.28);
+  }
+}
+
+/* Stesso trattamento hero della pagina Clienti (salon-clients-page). */
+.luxury-salon-notif-page__hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 22px 22px;
+  margin-left: clamp(-0.5rem, -1vw, 0);
+  margin-right: clamp(-0.5rem, -1vw, 0);
+  margin-bottom: 1.1rem;
+  padding: clamp(1.25rem, 4vw, 2rem) clamp(0.5rem, 2vw, 1rem) clamp(1.35rem, 3.5vw, 1.85rem);
+  border: 1px solid rgba(63, 63, 70, 0.5);
+  border-top: none;
+  background:
+    radial-gradient(120% 80% at 12% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 60% at 100% 25%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(18, 10, 28, 0.6) 0%, rgba(0, 0, 0, 0.25) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 0 0 1px rgba(56, 189, 248, 0.12) inset,
+    0 24px 48px rgba(0, 0, 0, 0.32);
+}
+
+.luxury-salon-notif-page__hero-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: -40% -20% auto -20%;
+  height: 120%;
+  background: radial-gradient(ellipse 55% 45% at 50% 0%, rgba(56, 189, 248, 0.2) 0%, transparent 65%);
+  opacity: 0.85;
+}
+
+.luxury-salon-notif-page__hero-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.luxury-salon-notif-page__headline {
+  position: relative;
+  margin: 0 0 0.45rem;
+  display: block;
+  font-size: clamp(2.15rem, 7vw, 3.75rem);
+  font-weight: 850;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.luxury-salon-notif-page__headline-pre {
+  display: inline;
+  color: #fafafa;
+  text-shadow:
+    0 0 40px rgba(250, 250, 250, 0.12),
+    0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.luxury-salon-notif-page__headline-accent {
+  display: inline;
+  background: linear-gradient(
+    105deg,
+    #7dd3fc 0%,
+    #38bdf8 26%,
+    #fbbf24 52%,
+    #f59e0b 78%,
+    #fdba74 100%
+  );
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 14px rgba(56, 189, 248, 0.35));
+  animation: luxury-salon-notif-page-headline-shimmer 10s ease-in-out infinite;
+}
+
+@keyframes luxury-salon-notif-page-headline-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.luxury-salon-notif-page__headline::after {
+  content: "";
+  display: block;
+  width: min(12rem, 55%);
+  height: 4px;
+  margin-top: 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.95) 0%, rgba(245, 158, 11, 0.6) 55%, transparent 100%);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+}
+
+.luxury-salon-notif-page .luxury-page-subtitle {
+  margin: 0;
+  max-width: 38rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(161, 161, 170, 0.96);
+}
+
+.luxury-salon-notif-page .luxury-salon-notif-hub-card {
+  margin-top: 0.15rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-notif-page__headline-accent {
+    animation: none;
+    background-position: 50% 50%;
+  }
+
+  .luxury-salon-notif-page > .luxury-link-back {
+    transition: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .luxury-salon-notif-page > .luxury-link-back:hover {
+      transform: none;
+    }
+  }
+}
+
+.luxury-salon-notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.luxury-salon-notif-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.luxury-salon-notif-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(56, 189, 248, 0.06) 0%, transparent 52%),
+    linear-gradient(165deg, rgba(24, 24, 27, 0.96) 0%, rgba(0, 0, 0, 0.92) 100%);
+  border: 2px solid rgba(39, 39, 42, 0.9);
+  box-shadow:
+    0 3px 0 #000,
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition:
+    background 0.24s ease,
+    border-color 0.24s ease,
+    box-shadow 0.26s ease,
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.luxury-salon-notif-row--interactive {
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.luxury-salon-notif-row--interactive:hover {
+  border-color: rgba(56, 189, 248, 0.38);
+  box-shadow:
+    0 2px 0 #000,
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 10px 22px rgba(0, 0, 0, 0.28);
+  transform: translateY(-1px);
+}
+
+.luxury-salon-notif-row--interactive:focus-visible {
+  outline: none;
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 3px rgba(56, 189, 248, 0.18);
+}
+
+.luxury-salon-notif-row--expanded {
+  border-color: #000000;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.luxury-salon-notif-detail {
+  padding: 0.75rem 1rem 1rem;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(165deg, rgba(24, 24, 27, 0.92) 0%, rgba(18, 18, 21, 0.96) 100%);
+  border: 2px solid #000000;
+  border-top: none;
+}
+
+.luxury-salon-notif-detail__status {
+  margin: 0;
+  font-size: 0.88rem;
+  color: rgba(228, 228, 231, 0.9);
+}
+
+.luxury-salon-notif-detail__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 0.65rem;
+}
+
+.luxury-salon-notif-detail__delete-all {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.35rem 0.72rem;
+  border: 1px solid rgba(248, 113, 113, 0.42);
+  border-radius: 999px;
+  background: rgba(127, 29, 29, 0.2);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 650;
+  line-height: 1.2;
+  color: #fecaca;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.luxury-salon-notif-detail__delete-all:hover:not(:disabled) {
+  background: rgba(153, 27, 27, 0.32);
+  border-color: rgba(252, 165, 165, 0.55);
+  color: #fff1f2;
+}
+
+.luxury-salon-notif-detail__delete-all:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.luxury-salon-notif-detail__delete-all:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.35);
+}
+
+.luxury-salon-notif-detail__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.luxury-salon-notif-detail__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  background: rgba(30, 30, 33, 0.65);
+  border: 1px solid rgba(63, 63, 70, 0.55);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.luxury-salon-notif-detail__open {
+  flex: 1 1 220px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.luxury-salon-notif-detail__open:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+  border-radius: 8px;
+}
+
+.luxury-salon-notif-detail__delete {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0.35rem 0.55rem;
+  min-width: 3.25rem;
+  border: 1px solid rgba(255, 237, 213, 0.35);
+  border-radius: 10px;
+  background: rgba(255, 247, 237, 0.08);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #fffbeb;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.luxury-salon-notif-detail__delete:hover:not(:disabled) {
+  background: rgba(255, 247, 237, 0.14);
+}
+
+.luxury-salon-notif-detail__delete:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.luxury-salon-notif-detail__delete-icon {
+  display: inline-flex;
+  width: 1rem;
+  height: 1rem;
+}
+
+.luxury-salon-notif-detail__delete-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.luxury-salon-notif-detail__delete-label {
+  text-align: center;
+}
+
+.luxury-salon-notif-detail__text {
+  flex: 1 1 220px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(228, 228, 231, 0.96);
+}
+
+.luxury-salon-notif-detail__meta {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(113, 113, 122, 0.98);
+}
+
+.luxury-salon-notif-row--head {
+  background: rgba(24, 24, 27, 0.45);
+  border-style: dashed;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(161, 161, 170, 0.95);
+  box-shadow: none;
+}
+
+.luxury-salon-notif-row__counts--head {
+  gap: 0.55rem;
+  font-weight: 800;
+}
+
+.luxury-salon-notif-row__incoming-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.luxury-salon-notif-row__incoming-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #7dd3fc 0%, #fbbf24 100%);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.45);
+}
+
+.luxury-salon-notif-row__label {
+  margin: 0;
+  flex: 1 1 200px;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  font-weight: 700;
+  color: #fef3c7;
+}
+
+.luxury-salon-notif-row__counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.luxury-salon-notif-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.85rem;
+  height: 1.85rem;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.luxury-salon-notif-badge--incoming {
+  color: #0a0a0a;
+  background: linear-gradient(145deg, #7dd3fc 0%, #fbbf24 100%);
+  border: 2px solid #000000;
+  box-shadow: 0 2px 0 #000;
+}
+
+.luxury-salon-notif-badge--sent {
+  color: rgba(228, 228, 231, 0.96);
+  background: rgba(39, 39, 42, 0.85);
+  border: 1px solid rgba(63, 63, 70, 0.75);
+}
+
+.luxury-salon-notif-badge--pending {
+  color: #0a0a0a;
+  background: linear-gradient(145deg, #7dd3fc 0%, #fbbf24 100%);
+  border: 2px solid #000000;
+  box-shadow: 0 2px 0 #000;
+}
+
+.luxury-salon-notif-badge--zero {
+  opacity: 0.72;
+  font-weight: 600;
+}
+
+.luxury-salon-notif-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.luxury-salon-notif-card-head .luxury-card-title {
+  margin: 0;
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.luxury-salon-notif-card-head__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.luxury-salon-notif-hint {
+  margin: 0 0 1rem;
+  max-width: 42rem;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: rgba(255, 251, 235, 0.72);
+}
+
+.luxury-account-hub__btn-notif {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+/* Attenzione centro notifiche: in coda + inviate ancora in evidenza (stessi numeri della pagina Notifiche).
+   In fila col testo (non absolute): la strip nav ha overflow-x:auto e tagliava i badge in angolo. */
+.luxury-account-hub__notif-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #0f172a;
+  background: linear-gradient(145deg, #fde68a, #fbbf24);
+  border: 1px solid rgba(251, 191, 36, 0.55);
+  box-shadow:
+    0 2px 8px rgba(45, 16, 6, 0.35),
+    0 0 0 1px rgba(120, 53, 15, 0.18);
+}
+
+/* ——— Card centro notifiche (salon + cliente): stessa superficie delle card in Clienti (.luxury-client-card). ——— */
+
+.luxury-salon-notif-hub-card.luxury-surface-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: 1rem;
+  padding: clamp(1.1rem, 2.2vw, 1.35rem) clamp(1.15rem, 2.2vw, 1.4rem);
+  border-radius: 18px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(120% 80% at 12% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 55%),
+    radial-gradient(90% 55% at 100% 25%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(18, 10, 28, 0.98) 0%, rgba(0, 0, 0, 0.99) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.12) inset,
+    0 16px 36px rgba(0, 0, 0, 0.38);
+  transition:
+    border-color 0.24s ease,
+    box-shadow 0.28s ease,
+    transform 0.2s ease;
+}
+
+.luxury-salon-notif-hub-card.luxury-surface-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  z-index: 2;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #38bdf8 22%,
+    #f59e0b 50%,
+    #fbbf24 72%,
+    transparent
+  );
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.2);
+}
+
+.luxury-salon-notif-hub-card.luxury-surface-card::after {
+  content: none;
+}
+
+.luxury-salon-notif-hub-card.luxury-surface-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-card-head .luxury-card-title {
+  margin-bottom: 0.35rem;
+  color: #fef3c7;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-notif-hub-card.luxury-surface-card:hover {
+    border-color: rgba(56, 189, 248, 0.4);
+    box-shadow:
+      0 3px 0 #000,
+      0 0 0 1px rgba(245, 158, 11, 0.16) inset,
+      0 22px 48px rgba(0, 0, 0, 0.42),
+      0 0 24px rgba(56, 189, 248, 0.12);
+    transform: translateY(-2px);
+  }
+}
+
+.luxury-salon-notif-hub-card.luxury-surface-card:focus-within {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(245, 158, 11, 0.16) inset,
+    0 18px 40px rgba(0, 0, 0, 0.35),
+    0 0 24px rgba(56, 189, 248, 0.12);
+}
+
+/* ============================================================
+   Centro notifiche titolare (SalonStandardToolsPage, `/account/salone/strumenti`).
+   Stessa struttura ricca delle notifiche cliente (`luxury-notifications-client.css`):
+   freccetta apri/chiudi, barra accento a sinistra, pill «Apri», meta di stato,
+   pulsante elimina rosso — ma in palette AZZURRO (#38bdf8) + ambra (#f59e0b),
+   come la chat lato salone. Scoped a `.luxury-salon-notif-hub-card`, quindi il
+   centro notifiche cliente/operatore in `/account/notifiche` resta invariato.
+   ============================================================ */
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-list {
+  gap: 0.75rem;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-item {
+  position: relative;
+  z-index: 1;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-row {
+  position: relative;
+  gap: 0.75rem 1.1rem;
+  padding: 0.95rem 1.05rem 0.95rem 1.15rem;
+  border-radius: 14px;
+  border: 2px solid #000000;
+  background: linear-gradient(165deg, rgba(12, 38, 52, 0.72) 0%, rgba(18, 18, 21, 0.92) 100%);
+  box-shadow:
+    0 2px 0 #000,
+    0 8px 20px rgba(0, 0, 0, 0.24);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-row--interactive::after {
+  content: "";
+  flex-shrink: 0;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-left: 0.15rem;
+  border-right: 2px solid rgba(251, 191, 36, 0.85);
+  border-bottom: 2px solid rgba(251, 191, 36, 0.85);
+  transform: rotate(45deg) translateY(-2px);
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-row--expanded::after {
+  transform: rotate(225deg) translateY(2px);
+  border-color: rgba(56, 189, 248, 0.9);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-row__label {
+  flex: 1 1 10rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: rgba(250, 250, 250, 0.96);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-row__counts {
+  gap: 0.5rem;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-row--interactive:hover {
+  border-color: #000000;
+  background: linear-gradient(165deg, rgba(11, 66, 92, 0.55) 0%, rgba(24, 24, 27, 0.95) 100%);
+  box-shadow:
+    0 2px 0 #000,
+    0 12px 28px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(56, 189, 248, 0.2);
+  transform: translateY(-1px);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-row--interactive:focus-visible {
+  outline: none;
+  border-color: #000000;
+  box-shadow:
+    0 2px 0 #000,
+    0 0 0 3px rgba(56, 189, 248, 0.28);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-row--expanded {
+  border-color: #000000;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background: linear-gradient(165deg, rgba(11, 66, 92, 0.62) 0%, rgba(30, 30, 33, 0.96) 100%);
+  box-shadow:
+    0 2px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.22) inset;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-badge {
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.55rem;
+  font-size: 0.8rem;
+}
+
+/* Dettaglio categoria */
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 0.95rem 1rem 1.1rem;
+  border-radius: 0 0 14px 14px;
+  border: 2px solid #000000;
+  border-top: 1px solid rgba(56, 189, 248, 0.22);
+  background:
+    radial-gradient(85% 70% at 100% 0%, rgba(249, 115, 22, 0.07) 0%, transparent 52%),
+    radial-gradient(90% 60% at 0% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(9, 26, 36, 0.98) 0%, rgba(10, 10, 12, 0.99) 100%);
+  box-shadow:
+    0 4px 0 #000 inset,
+    0 12px 28px rgba(0, 0, 0, 0.28);
+  animation: luxury-salon-notif-detail-open 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes luxury-salon-notif-detail-open {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  right: 1rem;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(251, 191, 36, 0.45) 35%,
+    rgba(56, 189, 248, 0.5) 65%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__status {
+  margin: 0;
+  padding: 0.85rem 0.75rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(113, 113, 122, 0.45);
+  background: rgba(24, 24, 27, 0.55);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  text-align: center;
+  color: rgba(212, 212, 216, 0.92);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__status .luxury-link-back {
+  color: rgba(125, 211, 252, 0.95);
+  text-decoration: underline;
+  text-underline-offset: 0.14em;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__list {
+  gap: 0.65rem;
+  max-height: min(22rem, 52vh);
+  overflow-y: auto;
+  padding-right: 0.15rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.45) rgba(24, 24, 27, 0.5);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.65) 0%, rgba(249, 115, 22, 0.55) 100%);
+}
+
+/* Riga messaggio */
+.luxury-salon-notif-detail__line--interactive {
+  cursor: default;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__line {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border-radius: 12px;
+  border: 2px solid #000000;
+  background: linear-gradient(165deg, rgba(39, 39, 42, 0.88) 0%, rgba(24, 24, 27, 0.95) 100%);
+  box-shadow: 0 2px 0 #000;
+  overflow: hidden;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__line::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.95) 0%, rgba(249, 115, 22, 0.9) 100%);
+  pointer-events: none;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__line--interactive:hover {
+  transform: translateY(-1px);
+  border-color: #000000;
+  background: linear-gradient(165deg, rgba(39, 39, 42, 0.88) 0%, rgba(24, 24, 27, 0.95) 100%);
+  box-shadow:
+    0 2px 0 #000,
+    0 10px 22px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(56, 189, 248, 0.18);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__line--interactive:hover .luxury-salon-notif-detail__text {
+  color: #fff;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__open {
+  flex: 1 1 auto;
+  align-items: flex-start;
+  gap: 0.45rem 0.75rem;
+  padding: 0.75rem 0.65rem 0.75rem 0.95rem;
+  min-width: 0;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__open::after {
+  content: "Apri";
+  flex-shrink: 0;
+  align-self: center;
+  margin-left: auto;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(224, 242, 254, 0.95);
+  background: rgba(11, 66, 92, 0.55);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  opacity: 0;
+  transform: translateX(4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__line--interactive:hover .luxury-salon-notif-detail__open::after,
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__open:focus-visible::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__open:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(56, 189, 248, 0.35);
+  border-radius: 10px;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__text {
+  flex: 1 1 100%;
+  font-size: 0.9rem;
+  font-weight: 550;
+  line-height: 1.5;
+  color: rgba(244, 244, 245, 0.96);
+  transition: color 0.2s ease;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(228, 228, 231, 0.9);
+  background: rgba(39, 39, 42, 0.9);
+  border: 1px solid rgba(82, 82, 91, 0.75);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__meta[data-status="PENDING"] {
+  color: #fffbeb;
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.92) 0%, rgba(194, 65, 12, 0.88) 100%);
+  border-color: rgba(251, 191, 36, 0.35);
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.22);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__meta[data-status="SENT"]::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.95);
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.45);
+}
+
+/* Pulsante elimina (icona rossa compatta) */
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__delete {
+  flex-direction: row;
+  align-self: center;
+  gap: 0;
+  margin: 0.32rem 0.38rem 0.32rem 0;
+  padding: 0;
+  width: 1.72rem;
+  height: 1.72rem;
+  min-width: 1.72rem;
+  max-width: 1.72rem;
+  border: 2px solid #000000;
+  border-radius: 9px;
+  background: linear-gradient(165deg, #f87171 0%, #dc2626 48%, #991b1b 100%);
+  box-shadow:
+    0 2px 0 #000,
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+  color: #ffffff;
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__delete:hover:not(:disabled) {
+  background: linear-gradient(165deg, #fca5a5 0%, #ef4444 45%, #b91c1c 100%);
+  transform: scale(1.06);
+  box-shadow:
+    0 2px 0 #000,
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 0 12px rgba(248, 113, 113, 0.35);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__delete:focus-visible {
+  outline: none;
+  box-shadow:
+    0 2px 0 #000,
+    0 0 0 3px rgba(248, 113, 113, 0.55);
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__delete-icon {
+  width: 0.92rem;
+  height: 0.92rem;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.35));
+}
+
+.luxury-salon-notif-hub-card .luxury-salon-notif-detail__delete-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-notif-hub-card .luxury-salon-notif-row--interactive::after,
+  .luxury-salon-notif-hub-card .luxury-salon-notif-detail,
+  .luxury-salon-notif-hub-card .luxury-salon-notif-detail__line,
+  .luxury-salon-notif-hub-card .luxury-salon-notif-detail__open::after {
+    animation: none;
+    transition: none;
+  }
+
+  .luxury-salon-notif-hub-card .luxury-salon-notif-detail__line--interactive:hover,
+  .luxury-salon-notif-hub-card .luxury-salon-notif-detail__delete:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+.luxury-notif-popup-root {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(0.75rem, 3vw, 1.25rem);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(249, 115, 22, 0.12) 0%, transparent 55%),
+    rgba(9, 9, 11, 0.82);
+  backdrop-filter: blur(10px);
+  animation: luxury-notif-popup-backdrop-in 0.28s ease-out;
+}
+
+@keyframes luxury-notif-popup-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes luxury-notif-popup-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.luxury-notif-popup {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 31rem);
+  max-height: min(88vh, 40rem);
+  overflow: auto;
+  border-radius: 22px;
+  border: 2px solid #000;
+  background: linear-gradient(165deg, rgba(34, 34, 38, 0.98) 0%, rgba(22, 22, 25, 0.99) 100%);
+  box-shadow:
+    0 28px 64px rgba(0, 0, 0, 0.52),
+    0 0 0 1px rgba(249, 115, 22, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: luxury-notif-popup-card-in 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.luxury-notif-popup__hero {
+  pointer-events: none;
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 7.5rem;
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+}
+
+.luxury-notif-popup__hero-glow {
+  position: absolute;
+  inset: -40% -15% auto -15%;
+  height: 140%;
+  background: radial-gradient(ellipse 60% 55% at 50% 0%, rgba(249, 115, 22, 0.28) 0%, transparent 68%);
+  opacity: 0.9;
+}
+
+.luxury-notif-popup__head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 1.15rem 1.15rem 0.75rem;
+}
+
+.luxury-notif-popup__head-main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.luxury-notif-popup__kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(251, 191, 36, 0.82);
+}
+
+.luxury-notif-popup__title {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1.05rem, 2.8vw, 1.28rem);
+  line-height: 1.32;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  color: #fffbeb;
+  text-wrap: balance;
+}
+
+.luxury-notif-popup__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.luxury-notif-popup__chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.55rem;
+  padding: 0.12rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.luxury-notif-popup__chip--type {
+  color: #fffbeb;
+  background: rgba(39, 39, 42, 0.92);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+}
+
+.luxury-notif-popup__chip--status-sent {
+  color: #ecfdf5;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.luxury-notif-popup__chip--status-pending {
+  color: #fffbeb;
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.92) 0%, rgba(194, 65, 12, 0.88) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.28);
+}
+
+.luxury-notif-popup__chip--status-other {
+  color: rgba(228, 228, 231, 0.95);
+  background: rgba(39, 39, 42, 0.88);
+  border: 1px solid rgba(113, 113, 122, 0.55);
+}
+
+.luxury-notif-popup__close {
+  flex-shrink: 0;
+  width: 2.15rem;
+  height: 2.15rem;
+  border: 1px solid rgba(63, 63, 70, 0.85);
+  border-radius: 999px;
+  background: rgba(24, 24, 27, 0.92);
+  color: #fafafa;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-notif-popup__close:hover {
+    background: rgba(39, 39, 42, 0.98);
+    border-color: rgba(249, 115, 22, 0.45);
+    transform: scale(1.04);
+  }
+}
+
+.luxury-notif-popup__close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+}
+
+.luxury-notif-popup__body {
+  position: relative;
+  z-index: 1;
+  padding: 0 1.15rem 0.85rem;
+}
+
+.luxury-notif-popup__message-card {
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(63, 63, 70, 0.75);
+  background: linear-gradient(165deg, rgba(30, 30, 33, 0.88) 0%, rgba(24, 24, 27, 0.94) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.luxury-notif-popup__message-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(161, 161, 170, 0.95);
+}
+
+.luxury-notif-popup__text {
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.58;
+  color: rgba(244, 244, 245, 0.96);
+  white-space: pre-wrap;
+}
+
+.luxury-notif-popup__meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.15rem 1.15rem 0.95rem;
+}
+
+.luxury-notif-popup__meta-row {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 34%) 1fr;
+  gap: 0.65rem;
+  align-items: baseline;
+  padding: 0.55rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(24, 24, 27, 0.72);
+  border: 1px solid rgba(63, 63, 70, 0.55);
+}
+
+.luxury-notif-popup__meta dt {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(161, 161, 170, 0.95);
+}
+
+.luxury-notif-popup__meta dd {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(228, 228, 231, 0.96);
+}
+
+.luxury-notif-popup__footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.15rem 1.1rem;
+  border-top: 1px solid rgba(63, 63, 70, 0.65);
+  background: linear-gradient(180deg, rgba(24, 24, 27, 0.35) 0%, rgba(18, 18, 21, 0.55) 100%);
+}
+
+.luxury-notif-popup__delete {
+  min-height: 2.35rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(248, 113, 113, 0.45);
+  background: rgba(127, 29, 29, 0.22);
+  color: #fecaca;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-notif-popup__delete:hover:not(:disabled) {
+    background: rgba(153, 27, 27, 0.34);
+    border-color: rgba(252, 165, 165, 0.55);
+    transform: translateY(-1px);
+  }
+}
+
+.luxury-notif-popup__delete:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.luxury-notif-popup__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.luxury-notif-popup__btn {
+  min-height: 2.35rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  border: none;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.luxury-notif-popup__btn--primary {
+  color: #0f172a;
+  background: linear-gradient(145deg, #fde68a 0%, #fbbf24 52%, #f59e0b 100%);
+  box-shadow:
+    0 2px 0 rgba(120, 53, 15, 0.35),
+    0 10px 24px rgba(245, 158, 11, 0.28);
+}
+
+.luxury-notif-popup__btn--secondary {
+  color: rgba(255, 251, 235, 0.94);
+  background: rgba(39, 39, 42, 0.92);
+  border: 1px solid rgba(161, 161, 170, 0.45);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-notif-popup__btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+  }
+}
+
+.luxury-notif-popup__btn:focus-visible,
+.luxury-notif-popup__delete:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+}
+
+.luxury-notif-popup__error {
+  margin: 0;
+  padding: 0 1.15rem 1rem;
+  font-size: 0.82rem;
+  color: #fecaca;
+}
+
+/* —— Alert urgente richiesta prenotazione (operatore / titolare) —— */
+
+.luxury-notif-popup-root--urgent {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(249, 115, 22, 0.22) 0%, transparent 55%),
+    rgba(9, 9, 11, 0.88);
+}
+
+.luxury-notif-popup--booking-request {
+  width: min(100%, 34rem);
+  border-color: rgba(249, 115, 22, 0.55);
+  box-shadow:
+    0 28px 64px rgba(0, 0, 0, 0.52),
+    0 0 0 1px rgba(249, 115, 22, 0.35),
+    0 0 48px rgba(249, 115, 22, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation:
+    luxury-notif-popup-card-in 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    luxury-notif-popup-urgent-glow 2.4s ease-in-out infinite;
+}
+
+@keyframes luxury-notif-popup-urgent-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 28px 64px rgba(0, 0, 0, 0.52),
+      0 0 0 1px rgba(249, 115, 22, 0.35),
+      0 0 32px rgba(249, 115, 22, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  50% {
+    box-shadow:
+      0 28px 64px rgba(0, 0, 0, 0.52),
+      0 0 0 2px rgba(251, 191, 36, 0.45),
+      0 0 56px rgba(249, 115, 22, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+}
+
+.luxury-notif-popup__urgent-banner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(249, 115, 22, 0.35);
+  background: linear-gradient(90deg, rgba(194, 65, 12, 0.55) 0%, rgba(249, 115, 22, 0.42) 50%, rgba(194, 65, 12, 0.55) 100%);
+  overflow: hidden;
+}
+
+.luxury-notif-popup__urgent-pulse {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.12) 45%, transparent 70%);
+  animation: luxury-notif-popup-shimmer 2.2s ease-in-out infinite;
+}
+
+@keyframes luxury-notif-popup-shimmer {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}
+
+.luxury-notif-popup__urgent-icon {
+  position: relative;
+  font-size: 1.05rem;
+  animation: luxury-notif-popup-bell 1.1s ease-in-out infinite;
+}
+
+@keyframes luxury-notif-popup-bell {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-14deg);
+  }
+  40% {
+    transform: rotate(14deg);
+  }
+  60% {
+    transform: rotate(-8deg);
+  }
+  80% {
+    transform: rotate(8deg);
+  }
+}
+
+.luxury-notif-popup__urgent-label {
+  position: relative;
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fffbeb;
+}
+
+.luxury-notif-popup__chip--action-hint {
+  color: rgba(255, 251, 235, 0.88);
+  background: rgba(24, 24, 27, 0.82);
+  border: 1px dashed rgba(251, 191, 36, 0.45);
+}
+
+/* —— Avvisi appuntamento informativi (conferma, disdetta, aggiornamento) —— */
+
+.luxury-notif-popup-root--appointment-alert {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(59, 130, 246, 0.12) 0%, transparent 55%),
+    rgba(9, 9, 11, 0.88);
+}
+
+.luxury-notif-popup-root--appointment-cancelled {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(239, 68, 68, 0.14) 0%, transparent 55%),
+    rgba(9, 9, 11, 0.88);
+}
+
+.luxury-notif-popup-root--appointment-confirmed {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(74, 222, 128, 0.14) 0%, transparent 55%),
+    rgba(9, 9, 11, 0.88);
+}
+
+.luxury-notif-popup--appointment-alert {
+  width: min(100%, 34rem);
+  border-color: rgba(96, 165, 250, 0.42);
+  box-shadow:
+    0 28px 64px rgba(0, 0, 0, 0.52),
+    0 0 0 1px rgba(96, 165, 250, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.luxury-notif-popup--appointment-alert--cancelled {
+  border-color: rgba(248, 113, 113, 0.48);
+  box-shadow:
+    0 28px 64px rgba(0, 0, 0, 0.52),
+    0 0 0 1px rgba(248, 113, 113, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.luxury-notif-popup--appointment-alert--confirmed {
+  border-color: rgba(74, 222, 128, 0.45);
+  box-shadow:
+    0 28px 64px rgba(0, 0, 0, 0.52),
+    0 0 0 1px rgba(74, 222, 128, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.luxury-notif-popup__urgent-banner--info {
+  border-bottom-color: rgba(96, 165, 250, 0.32);
+  background: linear-gradient(90deg, rgba(30, 64, 175, 0.48) 0%, rgba(59, 130, 246, 0.34) 50%, rgba(30, 64, 175, 0.48) 100%);
+}
+
+.luxury-notif-popup__urgent-banner--confirmed {
+  border-bottom-color: rgba(74, 222, 128, 0.38);
+  background: linear-gradient(90deg, rgba(20, 83, 45, 0.5) 0%, rgba(74, 222, 128, 0.38) 50%, rgba(20, 83, 45, 0.5) 100%);
+}
+
+.luxury-notif-popup__urgent-banner--cancelled {
+  border-bottom-color: rgba(248, 113, 113, 0.38);
+  background: linear-gradient(90deg, rgba(127, 29, 29, 0.58) 0%, rgba(220, 38, 38, 0.42) 50%, rgba(127, 29, 29, 0.58) 100%);
+}
+
+.luxury-notif-popup__urgent-icon--static {
+  animation: none;
+}
+
+.luxury-notif-popup--appointment-alert--cancelled .luxury-notif-popup__chip--type {
+  border-color: rgba(248, 113, 113, 0.42);
+}
+
+.luxury-notif-popup--appointment-alert--cancelled .luxury-notif-popup__chip--action-hint {
+  border-color: rgba(252, 165, 165, 0.42);
+  color: #fee2e2;
+}
+
+.luxury-notif-popup__quick-actions {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.65rem;
+  padding: 0 1.15rem 0.95rem;
+}
+
+.luxury-notif-popup__cta {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3.35rem;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.luxury-notif-popup__cta:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
+
+.luxury-notif-popup__cta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.luxury-notif-popup__cta-label {
+  font-size: 1rem;
+  font-weight: 850;
+  letter-spacing: -0.01em;
+}
+
+.luxury-notif-popup__cta-hint {
+  min-width: 1.75rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 8px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.luxury-notif-popup__cta--accept {
+  color: #0f172a;
+  background: linear-gradient(145deg, #fde68a 0%, #fbbf24 52%, #f59e0b 100%);
+  border-color: rgba(251, 191, 36, 0.65);
+  box-shadow:
+    0 2px 0 rgba(120, 53, 15, 0.35),
+    0 12px 28px rgba(245, 158, 11, 0.32);
+}
+
+.luxury-notif-popup__cta--accept .luxury-notif-popup__cta-icon {
+  background: rgba(255, 255, 255, 0.35);
+  color: #14532d;
+}
+
+.luxury-notif-popup__cta--accept .luxury-notif-popup__cta-hint {
+  color: rgba(15, 23, 42, 0.72);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.luxury-notif-popup__cta--reject {
+  color: #fff1f2;
+  background: linear-gradient(165deg, rgba(69, 10, 10, 0.82) 0%, rgba(127, 29, 29, 0.72) 100%);
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+.luxury-notif-popup__cta--reject .luxury-notif-popup__cta-icon {
+  background: rgba(254, 202, 202, 0.14);
+  color: #fecaca;
+}
+
+.luxury-notif-popup__cta--reject .luxury-notif-popup__cta-hint {
+  color: #fecaca;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.luxury-notif-popup__cta--danger {
+  color: #fff1f2;
+  background: linear-gradient(165deg, rgba(127, 29, 29, 0.95) 0%, rgba(185, 28, 28, 0.88) 100%);
+  border-color: rgba(252, 165, 165, 0.45);
+}
+
+.luxury-notif-popup__cta--ghost {
+  color: rgba(244, 244, 245, 0.94);
+  background: rgba(39, 39, 42, 0.88);
+  border-color: rgba(113, 113, 122, 0.55);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-notif-popup__cta:hover:not(:disabled) {
+    transform: translateY(-2px);
+    filter: brightness(1.04);
+  }
+}
+
+.luxury-notif-popup__reject-confirm {
+  padding: 0.95rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(248, 113, 113, 0.42);
+  background: rgba(69, 10, 10, 0.35);
+}
+
+.luxury-notif-popup__reschedule-compare {
+  position: relative;
+  z-index: 1;
+  margin: 0 1.15rem 1rem;
+  padding: 1rem 1.05rem;
+  border-radius: 16px;
+  border: 1px solid rgba(249, 115, 22, 0.42);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(249, 115, 22, 0.14) 0%, transparent 52%),
+    rgba(24, 24, 27, 0.82);
+  box-shadow: inset 0 1px 0 rgba(251, 146, 60, 0.12);
+}
+
+.luxury-notif-popup__reschedule-client {
+  margin: 0 0 0.85rem;
+  font-size: 0.88rem;
+  color: rgba(244, 244, 245, 0.88);
+}
+
+.luxury-notif-popup__reschedule-client strong {
+  color: #fffbeb;
+  font-weight: 800;
+}
+
+.luxury-notif-popup__reschedule-grid {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.luxury-notif-popup__reschedule-slot {
+  display: grid;
+  gap: 0.28rem;
+  padding: 0.78rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(113, 113, 122, 0.45);
+  background: rgba(9, 9, 11, 0.72);
+}
+
+.luxury-notif-popup__reschedule-slot--previous {
+  border-color: rgba(161, 161, 170, 0.42);
+}
+
+.luxury-notif-popup__reschedule-slot--new {
+  border-color: rgba(249, 115, 22, 0.5);
+  background: rgba(67, 20, 7, 0.35);
+  box-shadow: inset 0 1px 0 rgba(251, 146, 60, 0.16);
+}
+
+.luxury-notif-popup__reschedule-slot-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(161, 161, 170, 0.95);
+}
+
+.luxury-notif-popup__reschedule-slot--new .luxury-notif-popup__reschedule-slot-label {
+  color: rgba(253, 186, 116, 0.95);
+}
+
+.luxury-notif-popup__reschedule-slot-when {
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #fafafa;
+}
+
+.luxury-notif-popup__reschedule-slot--new .luxury-notif-popup__reschedule-slot-when {
+  color: #ffedd5;
+}
+
+.luxury-notif-popup__reschedule-slot-detail {
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: rgba(212, 212, 216, 0.92);
+}
+
+.luxury-notif-popup__reschedule-arrow {
+  align-self: center;
+  justify-self: center;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(249, 115, 22, 0.45);
+  background: rgba(67, 20, 7, 0.55);
+  color: #fb923c;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.luxury-notif-popup__reschedule-fallback {
+  margin: 0.75rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(161, 161, 170, 0.95);
+}
+
+@media (min-width: 520px) {
+  .luxury-notif-popup__reschedule-grid {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .luxury-notif-popup__reschedule-arrow {
+    align-self: center;
+  }
+}
+
+.luxury-notif-popup__reject-confirm-text {
+  margin: 0 0 0.85rem;
+  font-size: 0.94rem;
+  line-height: 1.5;
+  color: rgba(254, 226, 226, 0.96);
+}
+
+.luxury-notif-popup__reject-confirm-actions {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.luxury-notif-popup__meta-row--highlight {
+  border-color: rgba(249, 115, 22, 0.35);
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.luxury-notif-popup__meta-row--highlight dd {
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #fffbeb;
+}
+
+.luxury-notif-popup__success {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin: 0.5rem 1.15rem 1.15rem;
+  padding: 1rem 1.05rem;
+  border-radius: 16px;
+  animation: luxury-notif-popup-success-in 0.35s ease-out;
+}
+
+@keyframes luxury-notif-popup-success-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.luxury-notif-popup__success--confirm {
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  background: rgba(6, 78, 59, 0.35);
+}
+
+.luxury-notif-popup__success--reject {
+  border: 1px solid rgba(248, 113, 113, 0.42);
+  background: rgba(69, 10, 10, 0.35);
+}
+
+.luxury-notif-popup__success-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  font-size: 1.1rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.luxury-notif-popup__success--confirm .luxury-notif-popup__success-icon {
+  background: rgba(16, 185, 129, 0.22);
+  color: #6ee7b7;
+}
+
+.luxury-notif-popup__success--reject .luxury-notif-popup__success-icon {
+  background: rgba(248, 113, 113, 0.18);
+  color: #fecaca;
+}
+
+.luxury-notif-popup__success-text {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.52;
+  color: rgba(244, 244, 245, 0.96);
+}
+
+.luxury-notif-popup__footer--success {
+  margin-top: 0;
+  padding-top: 0.35rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-notif-popup-root,
+  .luxury-notif-popup {
+    animation: none;
+  }
+
+  .luxury-notif-popup--booking-request {
+    animation: none;
+  }
+
+  .luxury-notif-popup__urgent-pulse,
+  .luxury-notif-popup__urgent-icon,
+  .luxury-notif-popup__success {
+    animation: none;
+  }
+
+  .luxury-notif-popup__close:hover,
+  .luxury-notif-popup__delete:hover:not(:disabled),
+  .luxury-notif-popup__btn:hover,
+  .luxury-notif-popup__cta:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-salon-notif-hub-card.luxury-surface-card {
+    transition: none;
+  }
+
+  .luxury-salon-notif-hub-card.luxury-surface-card:hover,
+  .luxury-salon-notif-hub-card.luxury-surface-card:active,
+  .luxury-salon-notif-hub-card.luxury-surface-card:focus-within {
+    transform: none;
+  }
+
+  .luxury-salon-notif-row--interactive:hover,
+  .luxury-salon-notif-row--interactive:active {
+    transform: none;
+  }
+
+  .luxury-salon-notif-detail__line:hover {
+    transform: none;
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["ZJSFDL6PV6.it.saloniluxury.luxuryApp"],
+        "paths": [
+          "/conferma-email",
+          "/conferma-email/*",
+          "/reimposta-password",
+          "/reimposta-password/*"
+        ]
+      }
+    ]
+  }
+}

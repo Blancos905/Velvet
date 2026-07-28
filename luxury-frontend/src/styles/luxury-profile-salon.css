@@ -1,0 +1,502 @@
+/**
+ * Profilo lato salone (titolare/staff) — area account (`/account/profilo`).
+ * Riprende lo stesso stile del profilo cliente (`luxury-profile-client.css`),
+ * ma con accento primario AZZURRO al posto del viola (come la chat del salone
+ * Premium `luxury-chat-salon.css` e le altre pagine salone), mantenendo il
+ * secondario ambra/oro per le CTA.
+ */
+
+.luxury-profile-page--salon-side .luxury-profile-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  gap: 0.85rem;
+  border-radius: 16px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(120% 80% at 12% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 55%),
+    radial-gradient(90% 55% at 100% 25%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(16, 16, 18, 0.98) 0%, rgba(0, 0, 0, 0.99) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 16px 36px rgba(0, 0, 0, 0.38);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card::before {
+  left: 1rem;
+  right: 1rem;
+  height: 2px;
+  border-radius: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(56, 189, 248, 0.9) 0%,
+    rgba(14, 165, 233, 0.9) 52%,
+    rgba(56, 189, 248, 0.55) 100%
+  );
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.22);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card--salon::before {
+  background: linear-gradient(
+    90deg,
+    rgba(56, 189, 248, 0.85) 0%,
+    rgba(14, 165, 233, 0.9) 55%,
+    rgba(56, 189, 248, 0.5) 100%
+  );
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card__email {
+  color: rgba(245, 245, 245, 0.82);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card__email strong {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-insert-panel {
+  gap: 0.8rem;
+  border-radius: 14px;
+  border: 2px solid #000000;
+  background: linear-gradient(165deg, rgba(39, 39, 42, 0.55) 0%, rgba(24, 24, 27, 0.92) 100%);
+  box-shadow:
+    0 2px 0 #000,
+    0 8px 22px rgba(0, 0, 0, 0.24);
+  animation: none;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-insert-panel::before {
+  background: radial-gradient(ellipse 70% 55% at 12% 0%, rgba(56, 189, 248, 0.16) 0%, transparent 62%);
+  opacity: 0.75;
+  animation: none;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card__title {
+  color: rgba(254, 243, 199, 0.98);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card__title::after,
+.luxury-profile-page--salon-side .luxury-profile-insert-panel .luxury-profile-card__title::after {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.9) 0%, rgba(14, 165, 233, 0.75) 100%);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.22);
+  animation: none;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-insert-panel .luxury-form-label {
+  gap: 0.38rem;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(161, 161, 170, 0.95);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-insert-panel .luxury-soft-field {
+  border-radius: 12px;
+  border: 2px solid #000000;
+  background: rgba(12, 12, 14, 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  color: rgba(250, 250, 250, 0.96);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-insert-panel .luxury-soft-field:hover:not(:disabled):not(:focus) {
+  border-color: #000000;
+  background: rgba(18, 18, 21, 0.95);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(56, 189, 248, 0.22);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-insert-panel .luxury-soft-field:focus {
+  border-color: #000000;
+  background: rgba(24, 24, 27, 0.96);
+  box-shadow:
+    0 0 0 3px rgba(56, 189, 248, 0.32),
+    0 0 0 5px rgba(245, 158, 11, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-insert-panel .luxury-form-label:has(.luxury-soft-field:focus) {
+  color: rgba(224, 242, 254, 0.96);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-insert-panel .luxury-btn--primary,
+.luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-form__submit,
+.luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-salon-audience-panel__submit,
+.luxury-profile-page--salon-side .luxury-profile-form--password .luxury-btn--primary,
+.luxury-profile-page--salon-side .luxury-profile-close .luxury-btn--primary {
+  border: 2px solid #000000;
+  border-radius: 999px;
+  background: linear-gradient(145deg, rgba(125, 211, 252, 0.95) 0%, rgba(56, 189, 248, 0.95) 100%);
+  box-shadow: 0 2px 0 #000;
+  color: #06232f;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-insert-panel .luxury-btn--primary:hover:not(:disabled),
+  .luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-form__submit:hover:not(:disabled),
+  .luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-salon-audience-panel__submit:hover:not(:disabled),
+  .luxury-profile-page--salon-side .luxury-profile-form--password .luxury-btn--primary:hover:not(:disabled),
+  .luxury-profile-page--salon-side .luxury-profile-close .luxury-btn--primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: none;
+    background: linear-gradient(145deg, rgba(125, 211, 252, 1) 0%, rgba(56, 189, 248, 1) 100%);
+    color: #06232f;
+    box-shadow:
+      0 3px 0 #000,
+      0 0 18px rgba(56, 189, 248, 0.28);
+  }
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card > .luxury-alert {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  border: 2px solid #000000;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card > .luxury-alert--success {
+  background: rgba(20, 83, 45, 0.45);
+  border-color: rgba(74, 222, 128, 0.35);
+  color: rgba(220, 252, 231, 0.96);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-card > .luxury-alert--error {
+  background: rgba(127, 29, 29, 0.4);
+  border-color: rgba(248, 113, 113, 0.4);
+  color: rgba(254, 226, 226, 0.96);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-form--password {
+  position: relative;
+  isolation: isolate;
+  gap: 0.8rem;
+  border-radius: 14px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(85% 60% at 100% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 55%),
+    linear-gradient(165deg, rgba(30, 30, 33, 0.92) 0%, rgba(18, 18, 21, 0.98) 100%);
+  box-shadow: 0 2px 0 #000;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-password__title {
+  color: rgba(254, 243, 199, 0.96);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-password-recovery {
+  border: 1px dashed rgba(56, 189, 248, 0.4);
+  background: rgba(24, 24, 27, 0.55);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-password-recovery .luxury-link-inline {
+  color: rgba(125, 211, 252, 0.95);
+  font-weight: 650;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-form--password .luxury-form-label {
+  gap: 0.38rem;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(161, 161, 170, 0.95);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-password-field__wrap {
+  border-radius: 12px;
+  border: 2px solid #000000;
+  background: rgba(12, 12, 14, 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: box-shadow 0.2s ease;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-password-field__wrap:focus-within {
+  box-shadow:
+    0 0 0 3px rgba(56, 189, 248, 0.32),
+    0 0 0 5px rgba(245, 158, 11, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-form--password .luxury-form-label:has(.luxury-profile-password-field__wrap:focus-within) {
+  color: rgba(224, 242, 254, 0.96);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-password-input {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-password-toggle {
+  color: rgba(212, 212, 216, 0.9);
+  border-left: 1px solid rgba(63, 63, 70, 0.75);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-password-toggle:hover {
+  color: rgba(125, 211, 252, 0.95);
+  background: rgba(56, 189, 248, 0.14);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-salon-static-row {
+  border: 2px solid #000000;
+  border-radius: 12px;
+  background: rgba(12, 12, 14, 0.72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-insert-panel .luxury-profile-salon-static-row {
+  border-color: #000000;
+  background: rgba(12, 12, 14, 0.72);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-profile-page--salon-side .luxury-profile-insert-panel .luxury-profile-salon-static-row:hover {
+    border-color: rgba(56, 189, 248, 0.3);
+    background: rgba(24, 24, 27, 0.85);
+    box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.16);
+  }
+}
+
+.luxury-profile-page--salon-side .luxury-profile-salon-static-label {
+  color: rgba(161, 161, 170, 0.95);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-salon-static-value {
+  color: #fafafa;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-salon-audience-panel {
+  border: 2px solid #000000;
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 58%),
+    rgba(18, 18, 20, 0.82);
+  box-shadow:
+    0 2px 0 #000,
+    0 8px 22px rgba(0, 0, 0, 0.24);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-page__public-link {
+  color: rgba(125, 211, 252, 0.95);
+}
+
+.luxury-profile-page--salon-side .luxury-profile-page__public-link:hover {
+  color: #e0f2fe;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-close {
+  border-radius: 16px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(85% 60% at 100% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 55%),
+    linear-gradient(165deg, rgba(30, 30, 33, 0.9) 0%, rgba(18, 18, 21, 0.96) 100%);
+  box-shadow: 0 2px 0 #000;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-close .luxury-profile-card__title::after {
+  background: linear-gradient(90deg, rgba(248, 113, 113, 0.85), rgba(253, 186, 116, 0.25));
+}
+
+.luxury-profile-page--salon-side .luxury-profile-close__delete-intro {
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-insert-panel .luxury-btn--primary,
+  .luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-form__submit,
+  .luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-salon-audience-panel__submit,
+  .luxury-profile-page--salon-side .luxury-profile-form--password .luxury-btn--primary,
+  .luxury-profile-page--salon-side .luxury-profile-close .luxury-btn--primary {
+    transition: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-insert-panel .luxury-btn--primary:hover:not(:disabled),
+    .luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-form__submit:hover:not(:disabled),
+    .luxury-profile-page--salon-side .luxury-profile-card .luxury-profile-salon-audience-panel__submit:hover:not(:disabled),
+    .luxury-profile-page--salon-side .luxury-profile-form--password .luxury-btn--primary:hover:not(:disabled),
+    .luxury-profile-page--salon-side .luxury-profile-close .luxury-btn--primary:hover:not(:disabled) {
+      transform: none;
+    }
+  }
+}
+
+/* =========================================================================
+ * Hero `ClientAccountHeroHeader` lato salone: viola/arancio hardcoded → azzurro,
+ * come nelle altre pagine salone (agenda, notifiche, recensioni).
+ * ========================================================================= */
+
+.luxury-profile-page--salon-side .luxury-consumer-bookings-dash__headline-accent {
+  background: linear-gradient(105deg, #7dd3fc 0%, #38bdf8 42%, #0ea5e9 100%);
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(56, 189, 248, 0.3));
+}
+
+/* Accento secondario dell'hero (default viola) → azzurro salone: sistema la barretta
+ * del subtitle-card (`::before`), i glow e la label kicker che usano queste variabili. */
+.luxury-profile-page--salon-side {
+  --luxury-ip-secondary: #38bdf8;
+  --luxury-ip-secondary-glow: rgba(56, 189, 248, 0.18);
+}
+
+.luxury-profile-page--salon-side .luxury-info-privacy-hero__aurora {
+  background:
+    radial-gradient(ellipse 75% 48% at 15% 18%, rgba(56, 189, 248, 0.28), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(245, 158, 11, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 50% 100%, rgba(251, 191, 36, 0.12), transparent 45%);
+}
+
+.luxury-profile-page--salon-side .luxury-info-privacy-hero__badge--muted {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: linear-gradient(160deg, rgba(3, 105, 161, 0.55), rgba(8, 20, 28, 0.5));
+  color: #e0f2fe;
+}
+
+.luxury-profile-page--salon-side .luxury-info-privacy-hero__subtitle-card {
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(10, 16, 24, 0.88) 0%, rgba(0, 0, 0, 0.94) 55%, rgba(6, 10, 14, 0.96) 100%);
+  box-shadow:
+    0 4px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.14) inset,
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 28px rgba(56, 189, 248, 0.18);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-profile-page--salon-side .luxury-info-privacy-hero__subtitle-card:hover {
+    border-color: rgba(56, 189, 248, 0.35);
+  }
+}
+
+.luxury-profile-page--salon-side .luxury-info-privacy-hero__subtitle-chip {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(3, 105, 161, 0.35);
+  color: #e0f2fe;
+}
+
+.luxury-profile-page--salon-side .luxury-info-privacy-hero__subtitle em,
+.luxury-profile-page--salon-side .luxury-info-privacy-hero__subtitle strong {
+  color: #7dd3fc;
+}
+
+.luxury-profile-page--salon-side .luxury-info-privacy-hero__subtitle-foot {
+  border-top-color: rgba(56, 189, 248, 0.18);
+}
+
+/* Azioni rapide titolare (Privacy / Fatturazione) sotto l'hero. */
+.luxury-profile-page__salon-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin: 0 0 1.15rem;
+}
+
+.luxury-profile-page__salon-quick .luxury-profile-page__privacy-card {
+  margin-top: 0;
+  flex: 1 1 13rem;
+  box-shadow:
+    0 0 0 1px #000 inset,
+    0 4px 0 #000,
+    0 16px 30px rgba(0, 0, 0, 0.34),
+    0 0 48px rgba(56, 189, 248, 0.12);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-profile-page__salon-quick .luxury-profile-page__privacy-card:hover {
+    border-color: rgba(56, 189, 248, 0.55);
+    box-shadow:
+      0 0 0 1px #000 inset,
+      0 6px 0 #000,
+      0 20px 36px rgba(0, 0, 0, 0.38),
+      0 0 56px rgba(56, 189, 248, 0.18);
+  }
+}
+
+.luxury-profile-page__salon-quick .luxury-profile-page__privacy-card-label {
+  color: #7dd3fc;
+}
+
+/* ===================== Sezioni finali profilo: accento azzurro ===================== */
+
+/* «I tuoi dati» (export JSON): non è un'azione pericolosa → accento azzurro, non rosso. */
+.luxury-profile-page--salon-side .luxury-profile-close[aria-labelledby="luxury-profile-data-export-title"] {
+  border-color: rgba(56, 189, 248, 0.22);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 55%),
+    linear-gradient(165deg, rgba(8, 26, 38, 0.55) 0%, rgba(4, 12, 18, 0.6) 100%);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(224, 242, 254, 0.05);
+}
+
+.luxury-profile-page--salon-side
+  .luxury-profile-close[aria-labelledby="luxury-profile-data-export-title"]::before {
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.85) 42%, rgba(14, 165, 233, 0.5) 72%, transparent);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.3);
+}
+
+.luxury-profile-page--salon-side
+  .luxury-profile-close[aria-labelledby="luxury-profile-data-export-title"]
+  .luxury-profile-card__title::after {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.9), rgba(14, 165, 233, 0.4));
+}
+
+/* Rail verticale del titolo «I tuoi dati»: azzurro (non è un'area pericolosa). */
+.luxury-profile-page--salon-side
+  .luxury-profile-close[aria-labelledby="luxury-profile-data-export-title"]
+  .luxury-profile-card__title::before {
+  background: linear-gradient(180deg, rgba(125, 211, 252, 0.95) 0%, rgba(56, 189, 248, 0.72) 100%);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.32);
+}
+
+/* Alone d'angolo azzurro per «I tuoi dati». */
+.luxury-profile-page--salon-side
+  .luxury-profile-close[aria-labelledby="luxury-profile-data-export-title"]::after {
+  background:
+    radial-gradient(ellipse 55% 45% at 100% 0%, rgba(56, 189, 248, 0.1), transparent 55%),
+    radial-gradient(ellipse 50% 42% at 0% 100%, rgba(245, 158, 11, 0.05), transparent 58%);
+}
+
+.luxury-profile-page--salon-side
+  .luxury-profile-close[aria-labelledby="luxury-profile-data-export-title"]
+  .luxury-btn--secondary {
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #bae6fd;
+  background: linear-gradient(165deg, rgba(56, 189, 248, 0.14) 0%, rgba(2, 132, 199, 0.12) 100%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-profile-page--salon-side
+    .luxury-profile-close[aria-labelledby="luxury-profile-data-export-title"]
+    .luxury-btn--secondary:hover:not(:disabled) {
+    border-color: rgba(125, 211, 252, 0.8);
+    color: #e0f2fe;
+    box-shadow:
+      0 8px 22px rgba(0, 0, 0, 0.3),
+      0 0 18px rgba(56, 189, 248, 0.2);
+  }
+}
+
+/* «Disdici abbonamento»: azzurro invece dell'arancio base. */
+.luxury-profile-page--salon-side .luxury-profile-close__cancel-subscription-btn {
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #bae6fd;
+}
+
+.luxury-profile-page--salon-side .luxury-profile-close__cancel-subscription-btn:hover:not(:disabled) {
+  border-color: rgba(125, 211, 252, 0.75);
+  color: #e0f2fe;
+}

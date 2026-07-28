@@ -1,0 +1,378 @@
+/**
+ * Info e privacy lato salone (titolare Free/Premium + operatore staff) — stessa struttura
+ * delle altre pagine account (hero `InfoPrivacyAccountHeroHeader`), con accento AZZURRO
+ * al posto del viola (cliente B2C) o dell'arancio (contenuto Premium titolare prima dell'override).
+ * Agganciato a `--salon-side`; la versione cliente B2C resta viola.
+ * Importato DOPO `luxury-info-privacy-hero.css` e `luxury-info-privacy-premium.css`.
+ */
+
+.luxury-consumer-bookings-dash.luxury-info-privacy-salon-side {
+  --luxury-ip-accent: #f59e0b;
+  --luxury-ip-accent-soft: #fbbf24;
+  --luxury-ip-accent-glow: rgba(245, 158, 11, 0.22);
+  --luxury-ip-secondary: #38bdf8;
+  --luxury-ip-secondary-glow: rgba(56, 189, 248, 0.18);
+  --luxury-ip-header-bg-end: #060a10;
+}
+
+/* --- Hero (`InfoPrivacyAccountHeroHeader`): viola hardcoded → azzurro. --- */
+.luxury-info-privacy-salon-side .luxury-consumer-bookings-dash__headline-accent {
+  background: linear-gradient(105deg, #7dd3fc 0%, #38bdf8 42%, #f59e0b 100%);
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(56, 189, 248, 0.3));
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-hero__aurora {
+  background:
+    radial-gradient(ellipse 75% 48% at 15% 18%, rgba(56, 189, 248, 0.28), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(245, 158, 11, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 50% 100%, rgba(251, 191, 36, 0.12), transparent 45%);
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-hero__badge--muted {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: linear-gradient(160deg, rgba(3, 105, 161, 0.55), rgba(8, 20, 28, 0.5));
+  color: #e0f2fe;
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-hero__subtitle-card {
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(10, 16, 24, 0.88) 0%, rgba(0, 0, 0, 0.94) 55%, rgba(6, 10, 14, 0.96) 100%);
+  box-shadow:
+    0 4px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.14) inset,
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 28px var(--luxury-ip-secondary-glow);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-salon-side .luxury-info-privacy-hero__subtitle-card:hover {
+    border-color: rgba(56, 189, 248, 0.35);
+  }
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-hero__subtitle-chip {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(3, 105, 161, 0.35);
+  color: #e0f2fe;
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-hero__subtitle em,
+.luxury-info-privacy-salon-side .luxury-info-privacy-hero__subtitle strong {
+  color: #7dd3fc;
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-hero__subtitle-foot {
+  border-top-color: rgba(56, 189, 248, 0.18);
+}
+
+/* Card con switch (staff + eventuale riuso): viola → azzurro. */
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card::after {
+  background:
+    radial-gradient(ellipse 80% 55% at 20% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 52%),
+    radial-gradient(ellipse 60% 45% at 100% 100%, rgba(245, 158, 11, 0.06) 0%, transparent 55%);
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__glow {
+  background: radial-gradient(ellipse 55% 42% at 50% 0%, rgba(56, 189, 248, 0.16) 0%, transparent 64%);
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__toggle {
+  border-color: rgba(56, 189, 248, 0.35);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 52%),
+    linear-gradient(155deg, rgba(30, 30, 33, 0.96) 0%, rgba(24, 24, 27, 0.98) 58%, rgba(20, 20, 22, 0.96) 100%);
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(56, 189, 248, 0.12);
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__toggle-btn {
+  color: rgba(125, 211, 252, 0.82);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-salon-side.luxury-info-privacy-hero-page
+    .luxury-info-privacy-consumer-card__toggle-btn:hover:not(.luxury-info-privacy-consumer-card__toggle-btn--active) {
+    color: #e0f2fe;
+    background: rgba(56, 189, 248, 0.12);
+  }
+
+  .luxury-info-privacy-salon-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card:hover {
+    box-shadow:
+      0 22px 48px rgba(0, 0, 0, 0.42),
+      0 0 0 1px rgba(56, 189, 248, 0.2);
+  }
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card__toggle-btn--active {
+  background: linear-gradient(140deg, #7dd3fc 0%, #38bdf8 38%, #f59e0b 100%);
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.42),
+    0 6px 14px rgba(56, 189, 248, 0.22),
+    inset 0 1px 0 rgba(255, 247, 237, 0.35);
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page .luxury-info-privacy__section-title::before {
+  background: linear-gradient(180deg, #7dd3fc 0%, #38bdf8 55%, #f59e0b 100%);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.28);
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page .luxury-info-privacy__text .luxury-link-inline {
+  color: #7dd3fc;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-salon-side.luxury-info-privacy-hero-page .luxury-info-privacy__text .luxury-link-inline:hover {
+    color: #e0f2fe;
+  }
+}
+
+/* Numerazione sezioni + accordion GDPR: viola hero → azzurro. */
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page .luxury-info-privacy__section::after {
+  color: rgba(125, 211, 252, 0.55);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-salon-side.luxury-info-privacy-hero-page .luxury-info-privacy__section:hover {
+    background: rgba(56, 189, 248, 0.04);
+  }
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page
+  .luxury-info-privacy-consumer-card__legal
+  .luxury-legal-public__accordion {
+  border-color: rgba(56, 189, 248, 0.22);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 52%),
+    linear-gradient(155deg, rgba(28, 28, 31, 0.92) 0%, rgba(20, 20, 22, 0.96) 58%, rgba(24, 24, 27, 0.94) 100%);
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(56, 189, 248, 0.1);
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page
+  .luxury-info-privacy-consumer-card__legal
+  .luxury-legal-public__accordion[open] {
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(56, 189, 248, 0.12),
+    inset 0 1px 0 rgba(125, 211, 252, 0.14);
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page
+  .luxury-info-privacy-consumer-card__legal
+  .luxury-legal-public__accordion[open]
+  .luxury-legal-public__accordion-title {
+  color: #7dd3fc;
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page
+  .luxury-info-privacy-consumer-card__legal
+  .luxury-legal-public__accordion-body {
+  border-top-color: rgba(56, 189, 248, 0.18);
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page
+  .luxury-info-privacy-consumer-card__legal
+  .luxury-legal-public__inline-link {
+  color: #7dd3fc;
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page
+  .luxury-info-privacy-consumer-card__legal
+  .luxury-legal-public__citations {
+  border-top-color: rgba(56, 189, 248, 0.2);
+}
+
+.luxury-info-privacy-salon-side.luxury-info-privacy-hero-page .luxury-info-privacy-consumer-card:focus-within {
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(56, 189, 248, 0.12);
+}
+
+/* Badge Piano Free: stesso shell Premium ma etichetta Free (accento azzurro già da salon-side). */
+.luxury-info-privacy-free-owner-page .luxury-info-privacy-premium__badge:not(.luxury-info-privacy-premium__badge--muted) {
+  border-color: rgba(56, 189, 248, 0.45);
+  background: linear-gradient(160deg, rgba(3, 105, 161, 0.65), rgba(8, 20, 28, 0.5));
+  color: #e0f2fe;
+}
+
+/* ===================== Contenuto Premium titolare: arancio → azzurro ===================== */
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__shell {
+  box-shadow:
+    0 0 0 1px #000 inset,
+    0 6px 0 #000,
+    0 24px 48px rgba(0, 0, 0, 0.45),
+    0 0 80px rgba(56, 189, 248, 0.14);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-salon-side .luxury-info-privacy-premium__shell:hover {
+    box-shadow:
+      0 0 0 1px #000 inset,
+      0 9px 0 #000,
+      0 30px 56px rgba(0, 0, 0, 0.5),
+      0 0 96px rgba(56, 189, 248, 0.2);
+  }
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__aurora {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(56, 189, 248, 0.34), transparent 55%),
+    radial-gradient(ellipse 60% 45% at 85% 30%, rgba(2, 132, 199, 0.18), transparent 50%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(245, 158, 11, 0.14), transparent 45%);
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__header {
+  border-bottom-color: rgba(56, 189, 248, 0.22);
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__badge--muted {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: linear-gradient(160deg, rgba(3, 105, 161, 0.55), rgba(8, 20, 28, 0.42));
+  color: #e0f2fe;
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__progress-label {
+  color: #7dd3fc;
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__progress-track {
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__progress-fill {
+  background: linear-gradient(90deg, #7dd3fc, #38bdf8, #f59e0b);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__salon {
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #e0f2fe;
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__link {
+  color: #7dd3fc;
+  text-decoration-color: rgba(125, 211, 252, 0.45);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-salon-side .luxury-info-privacy-premium__link:hover {
+    color: #e0f2fe;
+    text-decoration-color: rgba(224, 242, 254, 0.75);
+  }
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__toolbar {
+  border-bottom-color: rgba(56, 189, 248, 0.18);
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__toolbar-btn {
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-salon-side .luxury-info-privacy-premium__toolbar-btn:hover {
+    border-color: rgba(125, 211, 252, 0.75);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28), 0 0 18px rgba(56, 189, 248, 0.14);
+  }
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__toolbar-btn:focus-visible {
+  outline-color: rgba(125, 211, 252, 0.85);
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__nav {
+  scrollbar-color: rgba(56, 189, 248, 0.45) transparent;
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__nav-chip {
+  border-color: rgba(56, 189, 248, 0.28);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-salon-side .luxury-info-privacy-premium__nav-chip:hover {
+    border-color: rgba(56, 189, 248, 0.55);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.12);
+  }
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__nav-chip.is-active {
+  border-color: rgba(125, 211, 252, 0.85);
+  background: linear-gradient(140deg, rgba(56, 189, 248, 0.95), rgba(2, 132, 199, 0.92));
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.65) inset,
+    0 0 22px rgba(56, 189, 248, 0.22);
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__panel.is-open {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.18) inset,
+    0 14px 30px rgba(0, 0, 0, 0.34),
+    0 0 28px rgba(56, 189, 248, 0.1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-salon-side .luxury-info-privacy-premium__panel:hover {
+    border-color: rgba(56, 189, 248, 0.28);
+  }
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__panel-trigger:focus-visible {
+  outline-color: rgba(125, 211, 252, 0.85);
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__panel-icon {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.16), rgba(2, 132, 199, 0.12));
+  color: #7dd3fc;
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__panel.is-open .luxury-info-privacy-premium__panel-icon {
+  border-color: rgba(125, 211, 252, 0.65);
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.28), rgba(2, 132, 199, 0.22));
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__panel-kicker {
+  color: rgba(125, 211, 252, 0.72);
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__chevron {
+  color: #7dd3fc;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-salon-side .luxury-info-privacy-premium__data-tile:hover {
+    border-color: rgba(56, 189, 248, 0.45);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24), 0 0 18px rgba(56, 189, 248, 0.1);
+  }
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__data-tile.is-active {
+  border-color: rgba(125, 211, 252, 0.75);
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.18) inset,
+    0 0 24px rgba(56, 189, 248, 0.16);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-salon-side .luxury-info-privacy-premium__action:hover {
+    border-color: rgba(56, 189, 248, 0.55);
+    box-shadow:
+      0 12px 24px rgba(0, 0, 0, 0.28),
+      0 0 24px rgba(56, 189, 248, 0.12);
+  }
+}
+
+.luxury-info-privacy-salon-side .luxury-info-privacy-premium__action-label {
+  color: #7dd3fc;
+}

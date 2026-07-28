@@ -1,0 +1,26 @@
+# Esempio / backup della configurazione «local».
+# Il file effettivo è application-local.properties — aggiorna host, utente, password lì.
+#
+# Attivo: PostgreSQL locale (schema c1luxury su localhost:5432).
+# Disattivato (commentato): MariaDB remota via tunnel SSH / phpMyAdmin — chiedi all'agente per ripristinarla.
+#
+# La password può essere:
+#   - scritta in application-local.properties (solo lab; evita commit su repo pubblico), oppure
+#   - passata con spring-dev.local.env o export SPRING_DATASOURCE_PASSWORD='...'
+#
+# Opzionale: nome e telefono sul consumer del super admin (riallineati a ogni avvio se non vuoti).
+# luxury.super-admin.profile-display-name=Mario Rossi
+# luxury.super-admin.profile-phone=+39...
+#
+# CORS dev: default in application.properties (profilo local). Override qui se serve.
+# luxury.cors.allowed-origins=http://localhost:5173,http://192.168.*.*:5173
+#
+# --- Notifiche transazionali ---
+# Le email NON vengono inviate fuori dalla piattaforma: messaggio sempre disponibile in inbox + log backend.
+# Recupero password: il link viene SOLO loggato sul backend.
+#
+# --- Push FCM (opzionale in locale) ---
+# 1) Firebase Console → Project Settings → Service accounts → Generate new private key
+# 2) ./scripts/setup-firebase-credentials.sh ~/Downloads/<file-scaricato>.json
+# In alternativa, path custom (non committare segreti):
+# luxury.firebase.service-account-path=/percorso/assoluto/firebase-service-account.json

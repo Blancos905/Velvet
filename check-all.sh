@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 #
-# check-all.sh — Verifica di coerenza dell'intero ecosistema Velvet.
+# check-all.sh — Verifica di coerenza dell'intero ecosistema Luxury.
 #
 # Esegue test, lint e type-check per ognuno dei tre moduli:
-#   - velvet           Backend Java 17 / Spring Boot (Maven)
-#   - velvet-frontend  Frontend TypeScript / Vite / React (Vitest)
-#   - velvet-app       Shell mobile Flutter / Dart (WebView)
+#   - luxury           Backend Java 17 / Spring Boot (Maven)
+#   - luxury-frontend  Frontend TypeScript / Vite / React (Vitest)
+#   - luxury-app       Shell mobile Flutter / Dart (WebView)
 #
 # Output colorato (verde = OK, rosso = FAIL). Termina con exit code != 0
 # se anche un solo step di un solo modulo fallisce.
 #
 # Uso:
 #   ./check-all.sh                 # esegue tutti i moduli
-#   ./check-all.sh velvet-frontend # esegue solo il modulo indicato
-#   ./check-all.sh velvet velvet-app
+#   ./check-all.sh luxury-frontend # esegue solo il modulo indicato
+#   ./check-all.sh luxury luxury-app
 #
 set -uo pipefail
 
@@ -88,9 +88,9 @@ require_tool() {
 # Moduli
 # ---------------------------------------------------------------------------
 
-check_velvet() {
-  print_header "velvet — Backend Java / Spring Boot (Maven)"
-  cd "$ROOT_DIR/velvet" || { OVERALL_STATUS=1; return 1; }
+check_luxury() {
+  print_header "luxury — Backend Java / Spring Boot (Maven)"
+  cd "$ROOT_DIR/luxury" || { OVERALL_STATUS=1; return 1; }
 
   local mvn_cmd
   if [[ -x "./mvnw" ]]; then
@@ -98,28 +98,28 @@ check_velvet() {
   elif command -v mvn >/dev/null 2>&1; then
     mvn_cmd="mvn"
   else
-    echo "${C_RED}✘ [velvet] né ./mvnw né mvn disponibili${C_RESET}"
-    SUMMARY+=("${C_RED}✘ FAIL${C_RESET}  velvet :: tool mancante (maven)")
+    echo "${C_RED}✘ [luxury] né ./mvnw né mvn disponibili${C_RESET}"
+    SUMMARY+=("${C_RED}✘ FAIL${C_RESET}  luxury :: tool mancante (maven)")
     OVERALL_STATUS=1
     return 1
   fi
 
   # Compilazione = type-check del backend Java (sorgenti + test).
-  run_step "velvet" "Type-check / compile" \
+  run_step "luxury" "Type-check / compile" \
     "$mvn_cmd" -q -B -DskipTests clean test-compile
   # Test unitari e di integrazione (surefire).
-  run_step "velvet" "Test (unit + integration)" \
+  run_step "luxury" "Test (unit + integration)" \
     "$mvn_cmd" -q -B test
 }
 
 check_frontend() {
-  print_header "velvet-frontend — TypeScript / Vite / React (Vitest)"
-  cd "$ROOT_DIR/velvet-frontend" || { OVERALL_STATUS=1; return 1; }
+  print_header "luxury-frontend — TypeScript / Vite / React (Vitest)"
+  cd "$ROOT_DIR/luxury-frontend" || { OVERALL_STATUS=1; return 1; }
 
-  require_tool "velvet-frontend" npm || return 1
+  require_tool "luxury-frontend" npm || return 1
 
   if [[ ! -d node_modules ]]; then
-    run_step "velvet-frontend" "Install dipendenze (npm ci)" npm ci
+    run_step "luxury-frontend" "Install dipendenze (npm ci)" npm ci
   fi
 
   # IMPORTANTE: si usa il binario locale, NON `npx tsc`.
@@ -128,39 +128,39 @@ check_frontend() {
   local tsc_bin="node_modules/.bin/tsc"
   if [[ -x "$tsc_bin" ]]; then
     # Type-check TypeScript (tsc -b, come nello script di build).
-    run_step "velvet-frontend" "Type-check (tsc)" "$tsc_bin" -b --pretty
+    run_step "luxury-frontend" "Type-check (tsc)" "$tsc_bin" -b --pretty
   else
-    echo "${C_RED}✘ [velvet-frontend] TypeScript non installata (${tsc_bin} assente)${C_RESET}"
-    SUMMARY+=("${C_RED}✘ FAIL${C_RESET}  velvet-frontend :: tool mancante (tsc)")
+    echo "${C_RED}✘ [luxury-frontend] TypeScript non installata (${tsc_bin} assente)${C_RESET}"
+    SUMMARY+=("${C_RED}✘ FAIL${C_RESET}  luxury-frontend :: tool mancante (tsc)")
     OVERALL_STATUS=1
   fi
   # Test unitari (Vitest in modalità run, non watch) tramite lo script npm.
-  run_step "velvet-frontend" "Test (vitest run)" npm run test --silent
+  run_step "luxury-frontend" "Test (vitest run)" npm run test --silent
 }
 
 check_app() {
-  print_header "velvet-app — Flutter / Dart (WebView shell)"
-  cd "$ROOT_DIR/velvet-app" || { OVERALL_STATUS=1; return 1; }
+  print_header "luxury-app — Flutter / Dart (WebView shell)"
+  cd "$ROOT_DIR/luxury-app" || { OVERALL_STATUS=1; return 1; }
 
-  require_tool "velvet-app" flutter || return 1
+  require_tool "luxury-app" flutter || return 1
 
   # Lint + analisi statica (anche type-check) tramite analysis_options.yaml.
-  run_step "velvet-app" "Lint + analyze (flutter analyze)" flutter analyze
+  run_step "luxury-app" "Lint + analyze (flutter analyze)" flutter analyze
   # Test (widget/unit).
-  run_step "velvet-app" "Test (flutter test)" flutter test
+  run_step "luxury-app" "Test (flutter test)" flutter test
 }
 
 # ---------------------------------------------------------------------------
 # Dispatch (compatibile con bash 3.2 di macOS: niente array associativi)
 # ---------------------------------------------------------------------------
-ORDER=(velvet velvet-frontend velvet-app)
+ORDER=(luxury luxury-frontend luxury-app)
 
 # Mappa nome modulo -> funzione.
 run_module() {
   case "$1" in
-    velvet)          check_velvet ;;
-    velvet-frontend) check_frontend ;;
-    velvet-app)      check_app ;;
+    luxury)          check_luxury ;;
+    luxury-frontend) check_frontend ;;
+    luxury-app)      check_app ;;
     *)
       echo "${C_RED}Modulo sconosciuto: '$1'${C_RESET}"
       echo "Moduli validi: ${ORDER[*]}"
@@ -185,7 +185,7 @@ else
   selected=("${ORDER[@]}")
 fi
 
-echo "${C_BOLD}Velvet — verifica di coerenza dell'ecosistema${C_RESET}"
+echo "${C_BOLD}Luxury — verifica di coerenza dell'ecosistema${C_RESET}"
 echo "Root: ${ROOT_DIR}"
 echo "Moduli da controllare: ${selected[*]}"
 

@@ -1,0 +1,554 @@
+/**
+ * Pagina /registrati — stesso box di registrazione salone (.luxury-salon-register-box).
+ */
+
+.luxury-client-signup-page .luxury-client-signup-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 0 0 2rem;
+}
+
+.luxury-client-signup-page .luxury-salon-register-box.luxury-email-confirm-box {
+  width: min(720px, calc(100vw - 1.5rem));
+  max-height: none;
+  margin: 0.5rem auto 0;
+  padding: 1.55rem 1.45rem 1.45rem;
+}
+
+.luxury-client-signup-page .luxury-salon-register-box .luxury-email-confirm-box__lead {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.luxury-client-signup-page .luxury-salon-register-box .luxury-plans-field:not(.luxury-eu-phone-field) .luxury-eu-contact-select {
+  width: 100%;
+}
+
+.luxury-client-signup-footnote {
+  margin: 1rem 0 0;
+  padding: 0 0.25rem;
+  text-align: center;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: rgba(253, 186, 116, 0.82);
+}
+
+.luxury-client-signup-footnote .luxury-link-inline {
+  color: #fdba74;
+}
+
+.luxury-client-signup-footnote .luxury-link-inline:hover {
+  color: #ffedd5;
+}
+
+.luxury-client-signup-legal-modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:
+    max(1rem, env(safe-area-inset-top))
+    max(1rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-left));
+  background:
+    radial-gradient(120% 90% at 50% 35%, rgba(249, 115, 22, 0.22) 0%, transparent 58%),
+    radial-gradient(90% 70% at 80% 80%, rgba(234, 88, 12, 0.12) 0%, transparent 52%),
+    rgba(0, 0, 0, 0.86);
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  animation: luxury-client-signup-legal-modal-root-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes luxury-client-signup-legal-modal-root-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.luxury-client-signup-legal-modal {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 36rem);
+  max-height: min(88dvh, calc(100% - 2rem));
+  overflow: hidden;
+  border: 2px solid #000000;
+  border-radius: 24px;
+  background:
+    radial-gradient(95% 100% at 100% 0%, rgba(249, 115, 22, 0.48), transparent 48%),
+    radial-gradient(72% 88% at 0% 100%, rgba(234, 88, 12, 0.38), transparent 44%),
+    linear-gradient(168deg, #0a0a0a 0%, #000000 58%, #050505 100%);
+  box-shadow:
+    0 22px 64px rgba(0, 0, 0, 0.68),
+    0 6px 32px rgba(154, 52, 18, 0.38),
+    0 0 0 1px #000000,
+    inset 0 1px 0 rgba(255, 247, 237, 0.22);
+  color: #fff7ed;
+  animation: luxury-client-signup-legal-modal-in 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes luxury-client-signup-legal-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.luxury-client-signup-legal-modal__glow {
+  position: absolute;
+  z-index: 0;
+  inset: -2rem -1rem auto;
+  height: 9rem;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 80% 70% at 50% 100%, rgba(253, 186, 116, 0.42), transparent 68%);
+  pointer-events: none;
+  filter: blur(10px);
+}
+
+.luxury-client-signup-legal-modal__shine {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: -55%;
+  width: 52%;
+  height: 150%;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 45%,
+    rgba(255, 247, 237, 0.1) 50%,
+    rgba(255, 255, 255, 0.03) 55%,
+    transparent 100%
+  );
+  transform: skewX(-18deg);
+  animation: luxury-client-signup-legal-modal-shine 7s ease-in-out infinite;
+}
+
+@keyframes luxury-client-signup-legal-modal-shine {
+  0%,
+  100% {
+    transform: skewX(-18deg) translateX(0);
+    opacity: 0.55;
+  }
+
+  50% {
+    transform: skewX(-18deg) translateX(125%);
+    opacity: 0.9;
+  }
+}
+
+.luxury-client-signup-legal-modal__head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 1.15rem 1.15rem 0.75rem;
+  border-bottom: 1px solid rgba(251, 146, 60, 0.22);
+}
+
+.luxury-client-signup-legal-modal__head::after {
+  content: "";
+  position: absolute;
+  left: 1.15rem;
+  right: 1.15rem;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(251, 146, 60, 0.65) 18%,
+    rgba(253, 186, 116, 0.95) 50%,
+    rgba(251, 146, 60, 0.65) 82%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.luxury-client-signup-legal-modal__head-copy {
+  min-width: 0;
+}
+
+.luxury-client-signup-legal-modal__eyebrow {
+  margin: 0 0 0.28rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fdba74;
+}
+
+.luxury-client-signup-legal-modal__title {
+  margin: 0;
+  font-size: clamp(1.15rem, 4.5vw, 1.45rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: #fff7ed;
+  text-wrap: balance;
+}
+
+.luxury-client-signup-legal-modal__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  margin: -0.1rem -0.1rem 0 0;
+  border: 2px solid #000000;
+  border-radius: 999px;
+  background: linear-gradient(160deg, rgba(24, 8, 3, 0.72), rgba(0, 0, 0, 0.9));
+  color: #ffedd5;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow:
+    0 0 0 1px rgba(253, 186, 116, 0.12) inset,
+    0 8px 18px rgba(0, 0, 0, 0.24);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-client-signup-legal-modal__close:hover {
+    transform: translateY(-1px);
+    border-color: rgba(253, 186, 116, 0.55);
+    color: #fff7ed;
+    box-shadow:
+      0 0 0 1px rgba(253, 186, 116, 0.22) inset,
+      0 10px 22px rgba(0, 0, 0, 0.32);
+  }
+}
+
+.luxury-client-signup-legal-modal__close:focus-visible {
+  outline: 2px solid rgba(251, 191, 36, 0.85);
+  outline-offset: 2px;
+}
+
+.luxury-client-signup-legal-modal__lead {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0.85rem 1.15rem 0.95rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(255, 237, 213, 0.84);
+}
+
+.luxury-client-signup-legal-modal__tabs-shell {
+  position: relative;
+  z-index: 1;
+  padding: 0 1.15rem 0.95rem;
+}
+
+.luxury-client-signup-legal-modal__tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  padding: 0.35rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(251, 146, 60, 0.35);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(249, 115, 22, 0.16) 0%, transparent 52%),
+    linear-gradient(155deg, rgba(10, 10, 10, 0.96) 0%, rgba(0, 0, 0, 0.98) 58%, rgba(8, 8, 8, 0.96) 100%);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(251, 146, 60, 0.16);
+}
+
+.luxury-client-signup-legal-modal__tab {
+  appearance: none;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  color: rgba(253, 186, 116, 0.82);
+  font-family: var(--luxury-font);
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.22s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-client-signup-legal-modal__tab:hover:not(.luxury-client-signup-legal-modal__tab--active) {
+    color: #ffedd5;
+    background: rgba(249, 115, 22, 0.12);
+  }
+}
+
+.luxury-client-signup-legal-modal__tab:focus-visible {
+  outline: 2px solid rgba(251, 191, 36, 0.85);
+  outline-offset: 2px;
+}
+
+.luxury-client-signup-legal-modal__tab--active {
+  border-color: #000000;
+  background: linear-gradient(140deg, #fdba74 0%, #f97316 48%, #fb923c 100%);
+  color: #000000;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.45),
+    0 8px 18px rgba(249, 115, 22, 0.28),
+    inset 0 1px 0 rgba(255, 247, 237, 0.35);
+}
+
+.luxury-client-signup-legal-modal__scroll {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 12rem;
+  max-height: min(52dvh, 28rem);
+  overflow: auto;
+  margin: 0 1.15rem 0.75rem;
+  padding: 0.85rem 0.75rem;
+  border-radius: 18px;
+  border: 1.5px solid rgba(251, 146, 60, 0.48);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(249, 115, 22, 0.14) 0%, transparent 52%),
+    radial-gradient(90% 120% at 0% 100%, rgba(234, 88, 12, 0.1) 0%, transparent 48%),
+    linear-gradient(155deg, rgba(10, 10, 10, 0.98) 0%, rgba(0, 0, 0, 0.99) 58%, rgba(8, 8, 8, 0.98) 100%);
+  box-shadow:
+    0 5px 0 rgba(0, 0, 0, 0.5),
+    0 14px 34px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(251, 146, 60, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.65);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 146, 60, 0.65) rgba(0, 0, 0, 0.35);
+}
+
+.luxury-client-signup-legal-modal__scroll::before {
+  content: "";
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: block;
+  height: 0.55rem;
+  margin: -0.85rem -0.75rem 0.45rem;
+  background: linear-gradient(180deg, rgba(8, 8, 8, 0.98) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.luxury-client-signup-legal-modal__scroll::-webkit-scrollbar {
+  width: 0.45rem;
+}
+
+.luxury-client-signup-legal-modal__scroll::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.luxury-client-signup-legal-modal__scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fdba74 0%, #f97316 100%);
+  border: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.luxury-client-signup-legal-modal__scroll .luxury-legal-public__layered {
+  gap: 0.65rem;
+}
+
+.luxury-client-signup-legal-modal__scroll .luxury-legal-public__accordion {
+  padding: 0.85rem 0.95rem;
+  border: 1.5px solid rgba(251, 146, 60, 0.22);
+  border-radius: 14px;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(249, 115, 22, 0.1) 0%, transparent 52%),
+    linear-gradient(155deg, rgba(20, 8, 4, 0.92) 0%, rgba(8, 4, 2, 0.96) 58%, rgba(12, 6, 3, 0.94) 100%);
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(251, 146, 60, 0.1);
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.22s ease;
+}
+
+.luxury-client-signup-legal-modal__scroll .luxury-legal-public__accordion[open] {
+  border-color: rgba(251, 146, 60, 0.55);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(251, 146, 60, 0.12),
+    inset 0 1px 0 rgba(253, 186, 116, 0.16);
+}
+
+.luxury-client-signup-legal-modal__scroll .luxury-legal-public__accordion-summary {
+  padding: 0.1rem 0;
+}
+
+.luxury-client-signup-legal-modal__scroll .luxury-legal-public__accordion-title {
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: #ffedd5;
+}
+
+.luxury-client-signup-legal-modal__scroll .luxury-legal-public__accordion[open] .luxury-legal-public__accordion-title {
+  color: #fdba74;
+}
+
+.luxury-client-signup-legal-modal__scroll .luxury-legal-public__accordion-body {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(251, 146, 60, 0.2);
+}
+
+.luxury-client-signup-legal-modal__scroll .luxury-legal-public__text,
+.luxury-client-signup-legal-modal__scroll .luxury-legal-public__list {
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: rgba(255, 237, 213, 0.8);
+}
+
+.luxury-client-signup-legal-modal__scroll .luxury-legal-public__inline-link {
+  color: #fdba74;
+}
+
+.luxury-client-signup-legal-modal__scroll .luxury-legal-public__citations {
+  margin-top: 0.65rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed rgba(251, 146, 60, 0.22);
+}
+
+.luxury-client-signup-legal-modal__footnote {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0.55rem 1.15rem 1rem;
+  border-top: 1px solid rgba(251, 146, 60, 0.14);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  text-align: center;
+  color: rgba(253, 186, 116, 0.72);
+}
+
+.luxury-plans-privacy-terms .luxury-link-inline {
+  appearance: none;
+  border: none;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.14em;
+}
+
+.luxury-plans-privacy-terms .luxury-link-inline:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.luxury-client-signup-page .luxury-plans-privacy-terms {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.15rem;
+}
+
+.luxury-client-signup-page .luxury-plans-privacy-open {
+  justify-self: center;
+  appearance: none;
+  border: 2px solid #000000;
+  border-radius: 999px;
+  padding: 0.5rem 1.15rem;
+  margin-top: 0.2rem;
+  background: linear-gradient(140deg, #fdba74 0%, #f97316 48%, #fb923c 100%);
+  color: #000000;
+  font-family: var(--luxury-font);
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 0, 0, 0.35) inset,
+    0 8px 18px rgba(249, 115, 22, 0.22);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-client-signup-page .luxury-plans-privacy-open:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: linear-gradient(140deg, #fed7aa 0%, #fb923c 50%, #f97316 100%);
+    box-shadow:
+      0 3px 0 rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(0, 0, 0, 0.4) inset,
+      0 12px 24px rgba(249, 115, 22, 0.28);
+  }
+}
+
+.luxury-client-signup-page .luxury-plans-privacy-open:focus-visible {
+  outline: 2px solid rgba(251, 191, 36, 0.85);
+  outline-offset: 2px;
+}
+
+.luxury-client-signup-page .luxury-plans-privacy-open:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .luxury-client-signup-page .luxury-salon-register-box.luxury-email-confirm-box {
+    width: min(480px, calc(100vw - 1.5rem));
+  }
+
+  .luxury-client-signup-legal-modal {
+    width: min(100%, calc(100vw - 1.25rem));
+    border-radius: 20px;
+  }
+
+  .luxury-client-signup-legal-modal__tabs {
+    grid-template-columns: 1fr;
+    border-radius: 18px;
+  }
+
+  .luxury-client-signup-legal-modal__tab {
+    font-size: 0.8rem;
+  }
+
+  .luxury-client-signup-legal-modal__scroll {
+    max-height: min(56dvh, 24rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-client-signup-legal-modal-root,
+  .luxury-client-signup-legal-modal,
+  .luxury-client-signup-legal-modal__shine,
+  .luxury-client-signup-legal-modal__scroll .luxury-legal-public__accordion {
+    animation: none;
+    transition: none;
+  }
+}

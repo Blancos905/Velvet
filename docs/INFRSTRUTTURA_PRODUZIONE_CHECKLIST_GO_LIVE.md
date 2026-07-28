@@ -1,6 +1,6 @@
 # Infrastruttura di Produzione & Checklist Go-Live
 
-**Progetto:** Salon Platform (Velvet) — monorepo `my-salon-platform`  
+**Progetto:** Salon Platform (Luxury) — monorepo `my-salon-platform`  
 **Data analisi:** 3 giugno 2026  
 **Ambiente target:** Ubuntu Linux + Docker Compose (`infrastructure/docker-compose.prod.yml`)  
 **Domini di riferimento nel repo:** `saloniluxury.it`, `www.saloniluxury.it`
@@ -12,16 +12,16 @@
 | Area | Stato nel codice oggi | Azione go-live |
 |------|----------------------|----------------|
 | Stack Docker prod | Definito (Nginx + API + PostGIS + Redis) | Build SPA, `.env` reale, TLS, `docker compose up` |
-| Email SMTP | Implementato (`TransactionalEmailDispatchService`) | `VELVET_MAIL_*` + `SPRING_MAIL_*` in `.env`; Aruba `noreply@saloniluxury.it` |
+| Email SMTP | Implementato (`TransactionalEmailDispatchService`) | `LUXURY_MAIL_*` + `SPRING_MAIL_*` in `.env`; Aruba `noreply@saloniluxury.it` |
 | Redis nel compose | Container presente | **Non usato** da Spring (refresh token su **PostgreSQL**) |
 | CORS | Opzionale se API e SPA stesso host | Valorizzare solo se origini diverse |
-| App Flutter | Shell WebView → sito | `VELVET_WEB_BASE_URL=https://saloniluxury.it`; firma release Android/iOS |
+| App Flutter | Shell WebView → sito | `LUXURY_WEB_BASE_URL=https://saloniluxury.it`; firma release Android/iOS |
 | Deploy alternativo | `application-prod` + MariaDB ISPConfig | Percorso parallelo, non Docker |
 
 **Percorsi di deploy supportati dal codice:**
 
 1. **Consigliato per Ubuntu “tutto in Docker”:** `infrastructure/docker-compose.prod.yml`
-2. **Legacy VM ISPConfig:** profilo `prod` + `velvet/deploy/velvet.env.example` + snippet Nginx su porta `8082`
+2. **Legacy VM ISPConfig:** profilo `prod` + `luxury/deploy/luxury.env.example` + snippet Nginx su porta `8082`
 
 ---
 
@@ -62,9 +62,9 @@
 |----------|----------|
 | Utente web / WebView app | `HTTPS → nginx → index.html` (React) o `proxy_pass → api:8080` per `/api/`, `/saloni/{slug}`, `/sitemap.xml`, `/robots.txt` |
 | API → DB | `jdbc:postgresql://postgres:5432/${DB_NAME}` (solo rete interna) |
-| Refresh token | Tabella Postgres `auth_refresh_token` (cookie `velvet_rt`, rotazione) — **non** Redis |
+| Refresh token | Tabella Postgres `auth_refresh_token` (cookie `luxury_rt`, rotazione) — **non** Redis |
 | Notifiche prenotazione | Coda `scheduled_notification` → processor → **log** + inbox in-app; opzionale **WhatsApp** via webhook HTTP |
-| Link “Gestisci” / recensione / reset password | Costruiti con `velvet.notifications.frontend-base-url` = `SITE_BASE_URL` / `VELVET_PUBLIC_FRONTEND_URL` |
+| Link “Gestisci” / recensione / reset password | Costruiti con `luxury.notifications.frontend-base-url` = `SITE_BASE_URL` / `LUXURY_PUBLIC_FRONTEND_URL` |
 
 **Porte esposte sull’host Ubuntu:**
 
@@ -123,7 +123,7 @@ sudo cp /etc/letsencrypt/live/saloniluxury.it/privkey.pem infrastructure/nginx/c
 
 ```bash
 # 1) Frontend produzione
-cd velvet-frontend
+cd luxury-frontend
 cp .env.example .env.production   # valorizzare VITE_* (vedi tabella §2)
 npm ci && npm run build
 
@@ -138,22 +138,41 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 **Verifica:** `curl -sf https://www.saloniluxury.it/actuator/health` non è esposto pubblicamente (solo rete interna); usare `https://www.saloniluxury.it/api/...` o health via `docker compose exec api wget -qO- http://localhost:8080/actuator/health`.
 
+### 1.3-bis Backup ricorrenti (Postgres + Redis)
+
+Script operativi aggiunti nel repo:
+
+```bash
+./luxury-database-maintenance.sh
+scripts/backup-postgres.sh
+scripts/backup-redis.sh
+scripts/backup-database-stack.sh
+scripts/install-database-backup-cron.sh
+```
+
+Linee guida:
+
+- eseguire `scripts/backup-database-stack.sh` da host Ubuntu, non dentro un container effimero;
+- schedulare con cron ogni 6 ore (default dello script install) o frequenza più stretta se RPO richiesto;
+- conservare i dump in `BACKUP_ROOT` fuori da git, con retention (`BACKUP_RETENTION_DAYS`, default 14);
+- verificare periodicamente il restore di un dump `.sql.gz` Postgres e dell'archivio Redis `/data`.
+
 ### 1.4 Percorso alternativo: VM ISPConfig (MariaDB)
 
-- Profilo: `velvet/src/main/resources/application-prod.properties` (`jdbc:mariadb`, porta default **8082**)
-- Env: `velvet/deploy/velvet.env.example` → `/etc/velvet/velvet.env`
-- Systemd: `velvet/deploy/velvet.service.example`
-- Nginx sito: `velvet/deploy/nginx-velvet-api-location.snippet.conf` (proxy `/api/` → `127.0.0.1:8082`)
+- Profilo: `luxury/src/main/resources/application-prod.properties` (`jdbc:mariadb`, porta default **8082**)
+- Env: `luxury/deploy/luxury.env.example` → `/etc/luxury/luxury.env`
+- Systemd: `luxury/deploy/luxury.service.example`
+- Nginx sito: `luxury/deploy/nginx-luxury-api-location.snippet.conf` (proxy `/api/` → `127.0.0.1:8082`)
 
 Non mescolare questo percorso con lo stack PostGIS Docker senza migrazione dati esplicita.
 
 ### 1.5 App mobile (architettura)
 
-L’app **non chiama direttamente** l’API Spring: è una **WebView** su `velvet-frontend`.
+L’app **non chiama direttamente** l’API Spring: è una **WebView** su `luxury-frontend`.
 
 ```
-Flutter (velvet-app)
-  └── WebView → VELVET_WEB_BASE_URL (default https://saloniluxury.it)
+Flutter (luxury-app)
+  └── WebView → LUXURY_WEB_BASE_URL (default https://saloniluxury.it)
         └── React SPA
               └── /api/v1/... (path relativi se VITE_API_BASE_URL vuoto)
                     └── nginx → Spring Boot
@@ -173,38 +192,38 @@ Flutter (velvet-app)
 | `DB_USER` | `.env.example` | Utente non `postgres` | `SPRING_DATASOURCE_USERNAME` |
 | `DB_PASSWORD` | `.env.example` | Password ≥ 20 caratteri casuali | `SPRING_DATASOURCE_PASSWORD` |
 | `REDIS_PASSWORD` | `.env.example` | Password forte | `redis-server --requirepass` (container; **API non connessa**) |
-| `JWT_SECRET` | `.env.example` | `openssl rand -base64 48` | `VELVET_TOKEN_SECRET`, `VELVET_AUTH_JWT_SECRET` |
-| `CORS_ORIGINS` | `.env.example` | `https://www.saloniluxury.it,https://saloniluxury.it` (virgola, no spazi superflui) | `VELVET_CORS_ALLOWED_ORIGINS` |
-| `SITE_BASE_URL` | `.env.example` | URL canonico HTTPS, es. `https://www.saloniluxury.it` | `VELVET_PUBLIC_FRONTEND_URL` |
-| `VELVET_SUPER_ADMIN_USERNAME` | `docker-compose.prod.yml` | Email admin | Bootstrap super admin |
-| `VELVET_SUPER_ADMIN_PASSWORD` | compose (opz.) | Password forte **oppure** usare hash | Solo prima installazione; preferire BCrypt hash in prod |
-| `VELVET_SUPER_ADMIN_SETUP_TOKEN` | compose (opz.) | Token lungo monouso | `POST /api/v1/admin/auth/register` — **revocare dopo setup** |
+| `JWT_SECRET` | `.env.example` | `openssl rand -base64 48` | `LUXURY_TOKEN_SECRET`, `LUXURY_AUTH_JWT_SECRET` |
+| `CORS_ORIGINS` | `.env.example` | `https://www.saloniluxury.it,https://saloniluxury.it` (virgola, no spazi superflui) | `LUXURY_CORS_ALLOWED_ORIGINS` |
+| `SITE_BASE_URL` | `.env.example` | URL canonico HTTPS, es. `https://www.saloniluxury.it` | `LUXURY_PUBLIC_FRONTEND_URL` |
+| `LUXURY_SUPER_ADMIN_USERNAME` | `docker-compose.prod.yml` | Email admin | Bootstrap super admin |
+| `LUXURY_SUPER_ADMIN_PASSWORD` | compose (opz.) | Password forte **oppure** usare hash | Solo prima installazione; preferire BCrypt hash in prod |
+| `LUXURY_SUPER_ADMIN_SETUP_TOKEN` | compose (opz.) | Token lungo monouso | `POST /api/v1/admin/auth/register` — **revocare dopo setup** |
 
 **Non presenti nel compose ma disponibili in Spring** (aggiungere sotto `api.environment` se servono):
 
 | Chiave | Tipo | Uso |
 |--------|------|-----|
-| `VELVET_SUPER_ADMIN_PASSWORD_HASH` | BCrypt | Preferito al posto password in chiaro |
-| `VELVET_NOTIFICATIONS_WHATSAPP_ENABLED` | `true`/`false` | Canale esterno WhatsApp |
-| `VELVET_NOTIFICATIONS_WHATSAPP_WEBHOOK_URL` | URL interno/esterno | Es. bridge `http://host:3099/webhooks/whatsapp` |
-| `VELVET_NOTIFICATIONS_WHATSAPP_BEARER_TOKEN` | Segreto | Auth verso bridge |
-| `VELVET_REVIEW_INVITE_OFFSET_HOURS` | intero | Default 2 |
-| `VELVET_AUTH_ACCESS_TTL_MINUTES` | intero | Default 15 |
-| `VELVET_REFRESH_TOKEN_TTL_DAYS` | intero | Default 30 |
+| `LUXURY_SUPER_ADMIN_PASSWORD_HASH` | BCrypt | Preferito al posto password in chiaro |
+| `LUXURY_NOTIFICATIONS_WHATSAPP_ENABLED` | `true`/`false` | Canale esterno WhatsApp |
+| `LUXURY_NOTIFICATIONS_WHATSAPP_WEBHOOK_URL` | URL interno/esterno | Es. bridge `http://host:3099/webhooks/whatsapp` |
+| `LUXURY_NOTIFICATIONS_WHATSAPP_BEARER_TOKEN` | Segreto | Auth verso bridge |
+| `LUXURY_REVIEW_INVITE_OFFSET_HOURS` | intero | Default 2 |
+| `LUXURY_AUTH_ACCESS_TTL_MINUTES` | intero | Default 15 |
+| `LUXURY_REFRESH_TOKEN_TTL_DAYS` | intero | Default 30 |
 
 ### 2.2 Backend — profilo Docker (`application-docker.properties`)
 
 | Proprietà Spring | Env Docker | Note |
 |------------------|------------|------|
-| `velvet.security.token-secret` | `VELVET_TOKEN_SECRET` | Obbligatorio, mai default dev |
-| `velvet.security.auth-jwt-secret` | `VELVET_AUTH_JWT_SECRET` | Default = token secret |
-| `velvet.notifications.frontend-base-url` | `VELVET_PUBLIC_FRONTEND_URL` | Link gestione/recensione/reset |
-| `velvet.cors.allowed-origins` | `VELVET_CORS_ALLOWED_ORIGINS` | Bean CORS solo se valorizzato e non vuoto |
-| `velvet.super-admin.*` | vedi compose | Nessun default sicuro in docker |
+| `luxury.security.token-secret` | `LUXURY_TOKEN_SECRET` | Obbligatorio, mai default dev |
+| `luxury.security.auth-jwt-secret` | `LUXURY_AUTH_JWT_SECRET` | Default = token secret |
+| `luxury.notifications.frontend-base-url` | `LUXURY_PUBLIC_FRONTEND_URL` | Link gestione/recensione/reset |
+| `luxury.cors.allowed-origins` | `LUXURY_CORS_ALLOWED_ORIGINS` | Bean CORS solo se valorizzato e non vuoto |
+| `luxury.super-admin.*` | vedi compose | Nessun default sicuro in docker |
 
-### 2.3 Backend — VM prod (`velvet/deploy/velvet.env.example`)
+### 2.3 Backend — VM prod (`luxury/deploy/luxury.env.example`)
 
-Stesse variabili `VELVET_*` + `SPRING_DATASOURCE_*` per MariaDB + `SERVER_PORT=8082`.
+Stesse variabili `LUXURY_*` + `SPRING_DATASOURCE_*` per MariaDB + `SERVER_PORT=8082`.
 
 ### 2.4 Frontend — `.env.production` (build-time Vite)
 
@@ -227,36 +246,36 @@ Stesse variabili `VELVET_*` + `SPRING_DATASOURCE_*` per MariaDB + `SERVER_PORT=8
 
 | Chiave | Default nel codice | Produzione |
 |--------|-------------------|------------|
-| `VELVET_WEB_BASE_URL` | `https://saloniluxury.it` | **HTTPS** dominio live (con o senza `www`, coerente con certificato) |
-| `VELVET_WEB_INITIAL_PATH` | `/` | Opzionale, es. `/ricerca` |
-| `VELVET_WEB_USER_AGENT` | Chrome Mobile UA | Raramente da cambiare |
+| `LUXURY_WEB_BASE_URL` | `https://saloniluxury.it` | **HTTPS** dominio live (con o senza `www`, coerente con certificato) |
+| `LUXURY_WEB_INITIAL_PATH` | `/` | Opzionale, es. `/ricerca` |
+| `LUXURY_WEB_USER_AGENT` | Chrome Mobile UA | Raramente da cambiare |
 
 **Esempio build release:**
 
 ```bash
-cd velvet-app
+cd luxury-app
 flutter build appbundle --release \
-  --dart-define=VELVET_WEB_BASE_URL=https://www.saloniluxury.it
+  --dart-define=LUXURY_WEB_BASE_URL=https://www.saloniluxury.it
 flutter build ipa --release \
-  --dart-define=VELVET_WEB_BASE_URL=https://www.saloniluxury.it
+  --dart-define=LUXURY_WEB_BASE_URL=https://www.saloniluxury.it
 ```
 
 ### 2.6 Email / SMTP — stato attuale
 
-Integrazione JavaMail attiva: `VelvetMailProperties`, `TransactionalEmailDispatchService`, env in `application-docker.properties` e `infrastructure/.env.example`.
+Integrazione JavaMail attiva: `LuxuryMailProperties`, `TransactionalEmailDispatchService`, env in `application-docker.properties` e `infrastructure/.env.example`.
 
 | Funzione | Implementazione | Env |
 |----------|-----------------|-----|
-| Conferme / promemoria prenotazione | Inbox in-app + push FCM + **SMTP** (`BOOKING_CONFIRMATION`, `REMINDER_24H`, `REMINDER_1H`) | `VELVET_MAIL_ENABLED=true` + `SPRING_MAIL_*` |
-| Reset password | `VelvetPasswordResetService` — link **solo in log** | **Da integrare** (SMTP separato) |
+| Conferme / promemoria prenotazione | Inbox in-app + push FCM + **SMTP** (`BOOKING_CONFIRMATION`, `REMINDER_24H`, `REMINDER_1H`) | `LUXURY_MAIL_ENABLED=true` + `SPRING_MAIL_*` |
+| Reset password | `LuxuryPasswordResetService` — link **solo in log** | **Da integrare** (SMTP separato) |
 | Messaggi super admin | Solo in-app | N/A |
 
 **Aruba (produzione `saloniluxury.it`):**
 
 | Chiave | Valore |
 |--------|--------|
-| `VELVET_MAIL_ENABLED` | `true` |
-| `VELVET_MAIL_FROM` | `noreply@saloniluxury.it` |
+| `LUXURY_MAIL_ENABLED` | `true` |
+| `LUXURY_MAIL_FROM` | `noreply@saloniluxury.it` |
 | `SPRING_MAIL_HOST` | `smtps.aruba.it` |
 | `SPRING_MAIL_PORT` | `465` |
 | `SPRING_MAIL_SMTP_SSL` | `true` |
@@ -266,13 +285,13 @@ Integrazione JavaMail attiva: `VelvetMailProperties`, `TransactionalEmailDispatc
 
 **Login area clienti Aruba** (gestione dominio/caselle): username **`19867967@aruba.it`** — la Gmail personale è solo contatto fatturazione, non username di login.
 
-### 2.7 WhatsApp bridge (opzionale) — `velvet/deploy/whatsapp-bridge/env.example`
+### 2.7 WhatsApp bridge (opzionale) — `luxury/deploy/whatsapp-bridge/env.example`
 
 | Chiave | Uso |
 |--------|-----|
 | `PORT` | Default 3099 |
-| `VELVET_BRIDGE_BEARER_TOKEN` | = `VELVET_NOTIFICATIONS_WHATSAPP_BEARER_TOKEN` lato API |
-| `VELVET_BRIDGE_PROVIDER` | `meta` \| `twilio` \| `log` |
+| `LUXURY_BRIDGE_BEARER_TOKEN` | = `LUXURY_NOTIFICATIONS_WHATSAPP_BEARER_TOKEN` lato API |
+| `LUXURY_BRIDGE_PROVIDER` | `meta` \| `twilio` \| `log` |
 | `WHATSAPP_CLOUD_*` / `TWILIO_*` | Credenziali provider |
 
 ---
@@ -312,29 +331,29 @@ Finché **non** c’è invio SMTP dal backend, SPF/DKIM sono comunque necessari 
 
 ### 3.3 CORS — quando configurarlo
 
-| Scenario | `CORS_ORIGINS` / `velvet.cors.allowed-origins` |
+| Scenario | `CORS_ORIGINS` / `luxury.cors.allowed-origins` |
 |----------|-----------------------------------------------|
 | SPA e API su **stesso** `https://www.saloniluxury.it`, `VITE_API_BASE_URL` vuoto | CORS **non necessario** per il browser (same-origin) |
 | SPA su `www` e API su `api.saloniluxury.it` | Obbligatorio: entrambe le origini HTTPS esatte |
 | Dev Vite `localhost:5173` → API diretta | `http://localhost:5173` (solo lab) |
 
-Implementazione: `VelvetCorsConfiguration.java` — attivo solo se `velvet.cors.allowed-origins` non vuoto; path `/api/**`; `allowCredentials=false`.
+Implementazione: `LuxuryCorsConfiguration.java` — attivo solo se `luxury.cors.allowed-origins` non vuoto; path `/api/**`; `allowCredentials=false`.
 
 ### 3.4 Cookie refresh e dominio
 
-Refresh token: cookie `velvet_rt`, path `/api/v1/auth`, `Secure` in produzione. SPA e API devono condividere **stesso site** (stesso registrable domain) per il refresh via cookie.
+Refresh token: cookie `luxury_rt`, path `/api/v1/auth`, `Secure` in produzione. SPA e API devono condividere **stesso site** (stesso registrable domain) per il refresh via cookie.
 
 ---
 
-## 4. Checklist Store Mobile (Flutter `velvet-app`)
+## 4. Checklist Store Mobile (Flutter `luxury-app`)
 
 ### 4.1 Endpoint di produzione
 
 | Componente | URL produzione | Note |
 |------------|----------------|------|
-| Sito / WebView | `https://saloniluxury.it` o `https://www.saloniluxury.it` | `--dart-define=VELVET_WEB_BASE_URL=...` |
+| Sito / WebView | `https://saloniluxury.it` o `https://www.saloniluxury.it` | `--dart-define=LUXURY_WEB_BASE_URL=...` |
 | API REST | `https://<stesso-host>/api/v1/...` | Gestita dal frontend, **non** dall’app nativa |
-| Legal embed | `{WEB_BASE}/privacy/clienti?embed=1` ecc. | `velvetLegalPanelPaths.ts` |
+| Legal embed | `{WEB_BASE}/privacy/clienti?embed=1` ecc. | `luxuryLegalPanelPaths.ts` |
 
 **Non usare in release:** `http://127.0.0.1:5173`, `http://10.0.2.2:5173`, IP LAN.
 
@@ -342,8 +361,8 @@ Refresh token: cookie `velvet_rt`, path `/api/v1/auth`, `Secure` in produzione. 
 
 | Piattaforma | Identificativo nel repo | Azione |
 |-------------|-------------------------|--------|
-| Android | `applicationId` = `it.saloniluxury.velvet_app` | Deve coincidere con Play Console |
-| iOS | `PRODUCT_BUNDLE_IDENTIFIER` = `it.saloniluxury.velvetApp` | **Diverso da Android** — registrare bundle Apple corretto |
+| Android | `applicationId` = `it.saloniluxury.luxury_app` | Deve coincidere con Play Console |
+| iOS | `PRODUCT_BUNDLE_IDENTIFIER` = `it.saloniluxury.luxuryApp` | **Diverso da Android** — registrare bundle Apple corretto |
 | Versione | `pubspec.yaml` `1.0.0+1` | Incrementare `version` per ogni upload |
 
 ### 4.3 Android — build produzione
@@ -352,8 +371,8 @@ Refresh token: cookie `velvet_rt`, path `/api/v1/auth`, `Secure` in produzione. 
 |------|----------------|
 | Keystore release | Creare `upload-keystore.jks`; configurare `signingConfigs` in `android/app/build.gradle.kts` (**oggi firma debug in release — da correggere**) |
 | Cleartext | `AndroidManifest.xml` ha `usesCleartextTraffic="true"` — per prod usare solo HTTPS; collegare `network_security_config.xml` nel manifest |
-| Permessi | `INTERNET` in debug/profile; geolocalizzazione **non** a livello nativo (Web API nel browser/WebView) |
-| AAB Play Store | `flutter build appbundle --release --dart-define=VELVET_WEB_BASE_URL=https://www.saloniluxury.it` |
+| Permessi | `INTERNET`; geolocalizzazione nativa (`ACCESS_FINE_LOCATION` / `NSLocationWhenInUse`) con bridge WebView → `geolocator` |
+| AAB Play Store | `flutter build appbundle --release --dart-define=LUXURY_WEB_BASE_URL=https://www.saloniluxury.it` |
 | APK sideload | `flutter build apk --release` (stesso define) |
 
 ### 4.4 iOS — build produzione
@@ -361,15 +380,15 @@ Refresh token: cookie `velvet_rt`, path `/api/v1/auth`, `Secure` in produzione. 
 | Step | Comando / file |
 |------|----------------|
 | Team / certificati | Xcode → Signing & Capabilities |
-| Display name | `Info.plist` → `Velvet App` (allineare branding store) |
+| Display name | `Info.plist` → `Luxury App` (allineare branding store) |
 | ATS | `NSAllowsLocalNetworking` = true (utile dev); produzione solo HTTPS |
 | Geolocalizzazione | **Nessuna** `NSLocationWhenInUseUsageDescription` oggi — se in futuro si espone GPS nativo, aggiungere stringa |
-| IPA / TestFlight | `flutter build ipa --release --dart-define=VELVET_WEB_BASE_URL=https://www.saloniluxury.it` |
+| IPA / TestFlight | `flutter build ipa --release --dart-define=LUXURY_WEB_BASE_URL=https://www.saloniluxury.it` |
 | Upload | Xcode Organizer o `xcrun altool` / Transporter |
 
 ### 4.5 Sicurezza WebView
 
-- `VelvetDomainGuard` — navigazione limitata a `saloniluxury.it`, `www.saloniluxury.it` + host dev se `isLocalDev`
+- `LuxuryDomainGuard` — navigazione limitata a `saloniluxury.it`, `www.saloniluxury.it` + host dev se `isLocalDev`
 - Link esterni `tel:`, `mailto:`, `whatsapp:` → `url_launcher`
 
 ### 4.6 Console store — URL obbligatori
@@ -390,11 +409,11 @@ Base: `https://www.saloniluxury.it` + path (con `?embed=1` solo in-app, non rich
 ### 4.7 Checklist pre-upload
 
 - [ ] Sito produzione live su HTTPS
-- [ ] `VELVET_WEB_BASE_URL` = dominio live nella build release
+- [ ] `LUXURY_WEB_BASE_URL` = dominio live nella build release
 - [ ] Firma release Android configurata (non debug)
 - [ ] Bundle ID iOS registrato su Apple Developer
 - [ ] Screenshot e policy data safety allineati a privacy B2C pubblicata
-- [ ] `./velvet-audit.sh` e `./go-live-check.sh` senza FAIL critici
+- [ ] `./luxury-audit.sh` e `./go-live-check.sh` senza FAIL critici
 
 ---
 
@@ -423,9 +442,9 @@ Base: `https://www.saloniluxury.it` + path (con `?embed=1` solo in-app, non rich
 4. **Segreti:** `infrastructure/.env` da `.env.example`; ruotare `JWT_SECRET`, password DB/Redis.
 5. **Legal + frontend:** `.env.production` completo; `npm run build`; copia in `frontend-web-dist`.
 6. **Stack:** `docker compose -f docker-compose.prod.yml up -d --build`; smoke test login, ricerca, prenotazione.
-7. **Super admin:** setup token o register; poi **rimuovere** `VELVET_SUPER_ADMIN_SETUP_TOKEN` e password in chiaro.
+7. **Super admin:** setup token o register; poi **rimuovere** `LUXURY_SUPER_ADMIN_SETUP_TOKEN` e password in chiaro.
 8. **Search Console:** invio `sitemap.xml`.
-9. **Mobile:** fix signing Android; build AAB/IPA con `VELVET_WEB_BASE_URL`; upload store.
+9. **Mobile:** fix signing Android; build AAB/IPA con `LUXURY_WEB_BASE_URL`; upload store.
 10. **Post go-live:** valutare SMTP, allineare copy “Redis” vs Postgres, hardening `ddl-auto`.
 
 ---
@@ -437,14 +456,14 @@ Base: `https://www.saloniluxury.it` + path (con `?embed=1` solo in-app, non rich
 | Compose prod | `infrastructure/docker-compose.prod.yml` |
 | Nginx | `infrastructure/nginx/conf.d/app.conf` |
 | Env infra | `infrastructure/.env.example` |
-| Backend Docker | `velvet/Dockerfile`, `velvet/src/main/resources/application-docker.properties` |
-| Backend VM prod | `velvet/src/main/resources/application-prod.properties`, `velvet/deploy/velvet.env.example` |
-| CORS | `velvet/src/main/java/it/velvet/config/VelvetCorsConfiguration.java` |
-| Notifiche / no email | `velvet/.../ScheduledNotificationProcessor.java`, `VelvetPasswordResetService.java` |
-| Frontend env | `velvet-frontend/.env.example`, `velvet-frontend/src/config/env.ts` |
-| App mobile | `velvet-app/lib/config/velvet_app_config.dart`, `velvet-app/README.md` |
-| Script verifica | `go-live-check.sh`, `velvet-audit.sh`, `docs/GO_LIVE.md` |
+| Backend Docker | `luxury/Dockerfile`, `luxury/src/main/resources/application-docker.properties` |
+| Backend VM prod | `luxury/src/main/resources/application-prod.properties`, `luxury/deploy/luxury.env.example` |
+| CORS | `luxury/src/main/java/it/luxury/config/LuxuryCorsConfiguration.java` |
+| Notifiche / no email | `luxury/.../ScheduledNotificationProcessor.java`, `LuxuryPasswordResetService.java` |
+| Frontend env | `luxury-frontend/.env.example`, `luxury-frontend/src/config/env.ts` |
+| App mobile | `luxury-app/lib/config/luxury_app_config.dart`, `luxury-app/README.md` |
+| Script verifica | `go-live-check.sh`, `luxury-audit.sh`, `docs/GO_LIVE.md` |
 
 ---
 
-*Documento generato da analisi statica del monorepo. Eseguire `./go-live-check.sh` e `./velvet-audit.sh` sul branch da rilasciare prima del deploy.*
+*Documento generato da analisi statica del monorepo. Eseguire `./go-live-check.sh` e `./luxury-audit.sh` sul branch da rilasciare prima del deploy.*

@@ -1,0 +1,534 @@
+/**
+ * Info e privacy — cliente B2C (area account).
+ * Card e sezioni in stile prenotazioni / notifiche (zinc + accento arancio).
+ */
+
+.luxury-info-privacy-consumer-page .luxury-consumer-bookings-dash__header--hero {
+  animation: luxury-info-privacy-consumer-enter 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.luxury-info-privacy-consumer-page .luxury-consumer-bookings-dash__title-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy-page__subtitle {
+  position: relative;
+  margin: 0;
+  max-width: 42rem;
+  padding: 0.72rem 0.95rem 0.78rem;
+  border-radius: 14px;
+  border: 1px solid rgba(249, 115, 22, 0.22);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(249, 115, 22, 0.1) 0%, transparent 52%),
+    linear-gradient(155deg, rgba(39, 39, 42, 0.72) 0%, rgba(24, 24, 27, 0.88) 58%, rgba(20, 20, 22, 0.9) 100%);
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 251, 235, 0.04);
+  font-size: clamp(0.9rem, 2.1vw, 0.98rem);
+  line-height: 1.58;
+  letter-spacing: 0.01em;
+  color: rgba(255, 251, 235, 0.72);
+  text-wrap: pretty;
+  animation: luxury-info-privacy-consumer-enter 0.46s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy-page__subtitle::before {
+  content: "";
+  display: block;
+  width: min(8.5rem, 38%);
+  height: 3px;
+  margin-bottom: 0.55rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.92) 0%, rgba(251, 191, 36, 0.48) 62%, transparent 100%);
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.2);
+}
+
+.luxury-account-page-shell--narrow:not(.luxury-info-privacy-consumer-page) .luxury-info-privacy-page__subtitle {
+  margin: 0;
+  max-width: 42rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(161, 161, 170, 0.96);
+}
+
+.luxury-info-privacy-consumer-page .luxury-link-back {
+  animation: luxury-info-privacy-consumer-enter 0.42s cubic-bezier(0.22, 1, 0.36, 1) 0.04s both;
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy-consumer-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: 0.35rem;
+  padding: 0;
+  border-radius: 18px;
+  border: 2px solid #000000;
+  background: linear-gradient(165deg, rgba(30, 30, 33, 0.98) 0%, rgba(24, 24, 27, 0.99) 100%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  animation: luxury-info-privacy-consumer-enter 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition:
+    border-color 0.26s ease,
+    box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes luxury-info-privacy-consumer-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.luxury-info-privacy-consumer-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  border-radius: 0 0 8px 8px;
+  margin: 0 auto;
+  width: min(72%, 14rem);
+  background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.85), rgba(251, 191, 36, 0.65), transparent);
+  box-shadow: 0 0 16px rgba(249, 115, 22, 0.25);
+  z-index: 2;
+}
+
+.luxury-info-privacy-consumer-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 55% at 20% 0%, rgba(249, 115, 22, 0.08) 0%, transparent 52%),
+    radial-gradient(ellipse 60% 45% at 100% 100%, rgba(251, 191, 36, 0.05) 0%, transparent 55%);
+  opacity: 0.9;
+}
+
+.luxury-info-privacy-consumer-card__glow {
+  pointer-events: none;
+  position: absolute;
+  inset: -30% -20% auto -20%;
+  height: 70%;
+  background: radial-gradient(ellipse 55% 42% at 50% 0%, rgba(249, 115, 22, 0.14) 0%, transparent 64%);
+  opacity: 0.75;
+  z-index: 0;
+}
+
+.luxury-info-privacy-consumer-card__head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
+  padding: clamp(1.15rem, 2.4vw, 1.4rem) clamp(1.15rem, 2.4vw, 1.45rem) 0.95rem;
+  border-bottom: 1px solid rgba(255, 251, 235, 0.06);
+}
+
+.luxury-info-privacy-consumer-card__headline {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.4vw, 1.18rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fffbeb;
+}
+
+.luxury-info-privacy-consumer-card__headline::after {
+  content: "";
+  display: block;
+  width: min(8rem, 42%);
+  height: 3px;
+  margin-top: 0.55rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.9) 0%, rgba(251, 191, 36, 0.45) 55%, transparent 100%);
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.22);
+}
+
+.luxury-info-privacy-consumer-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.luxury-info-privacy-consumer-card__toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+  min-width: min(100%, 15.5rem);
+  padding: 0.3rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(249, 115, 22, 0.35);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(249, 115, 22, 0.14) 0%, transparent 52%),
+    linear-gradient(155deg, rgba(30, 30, 33, 0.96) 0%, rgba(24, 24, 27, 0.98) 58%, rgba(20, 20, 22, 0.96) 100%);
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(249, 115, 22, 0.12);
+}
+
+.luxury-info-privacy-consumer-card__toggle-btn {
+  appearance: none;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  padding: 0.38rem 0.72rem;
+  background: transparent;
+  color: rgba(253, 186, 116, 0.82);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-consumer-card__toggle-btn:hover:not(.luxury-info-privacy-consumer-card__toggle-btn--active) {
+    color: #ffedd5;
+    background: rgba(249, 115, 22, 0.12);
+  }
+}
+
+.luxury-info-privacy-consumer-card__toggle-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.22);
+}
+
+.luxury-info-privacy-consumer-card__toggle-btn--active {
+  border-color: #000000;
+  background: linear-gradient(140deg, #fdba74 0%, #f97316 48%, #fb923c 100%);
+  color: #000000;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.42),
+    0 6px 14px rgba(249, 115, 22, 0.24),
+    inset 0 1px 0 rgba(255, 247, 237, 0.35);
+}
+
+.luxury-info-privacy-consumer-card__inline-action {
+  appearance: none;
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  text-align: inherit;
+}
+
+.luxury-info-privacy-consumer-card__inline-action:focus-visible {
+  outline: 2px solid rgba(249, 115, 22, 0.55);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.luxury-info-privacy-consumer-card__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.62rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff7ed;
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.28), rgba(234, 88, 12, 0.18));
+  border: 1px solid rgba(249, 115, 22, 0.42);
+  box-shadow: 0 2px 10px rgba(249, 115, 22, 0.12);
+}
+
+.luxury-info-privacy-consumer-card__badge--muted {
+  color: rgba(255, 251, 235, 0.72);
+  background: rgba(39, 39, 42, 0.72);
+  border-color: rgba(255, 251, 235, 0.1);
+  box-shadow: none;
+}
+
+.luxury-info-privacy-consumer-card__badge--link {
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-consumer-card__badge--link:hover {
+    color: #fffbeb;
+    border-color: rgba(249, 115, 22, 0.35);
+    background: rgba(49, 49, 54, 0.88);
+    box-shadow: 0 2px 10px rgba(249, 115, 22, 0.1);
+  }
+}
+
+.luxury-info-privacy-consumer-card__badge--link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.22);
+}
+
+.luxury-info-privacy-consumer-card__inner {
+  position: relative;
+  z-index: 1;
+  padding: clamp(0.35rem, 1.2vw, 0.55rem) clamp(1.15rem, 2.4vw, 1.45rem) clamp(1.2rem, 2.4vw, 1.55rem);
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__body {
+  max-width: none;
+  padding: 0;
+  counter-reset: ip-consumer-section;
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__section {
+  position: relative;
+  margin: 0;
+  padding: clamp(1rem, 2.2vw, 1.2rem) 0 clamp(1.05rem, 2.2vw, 1.25rem);
+  border-bottom: 1px solid rgba(255, 251, 235, 0.06);
+  animation: luxury-info-privacy-section-enter 0.46s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: background 0.24s ease;
+}
+
+@keyframes luxury-info-privacy-section-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__section:nth-child(1) {
+  animation-delay: 0.08s;
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__section:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__section:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__section:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__section::after {
+  content: counter(ip-consumer-section, decimal-leading-zero);
+  counter-increment: ip-consumer-section;
+  position: absolute;
+  top: clamp(1rem, 2.2vw, 1.15rem);
+  right: 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: rgba(253, 186, 116, 0.55);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-consumer-page .luxury-info-privacy__section:hover {
+    background: rgba(249, 115, 22, 0.04);
+  }
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__section:last-child {
+  border-bottom: none;
+  padding-bottom: 0.15rem;
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 0.72rem;
+  font-size: clamp(1rem, 2.2vw, 1.08rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: #fffbeb;
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__section-title::before {
+  content: "";
+  flex: 0 0 4px;
+  width: 4px;
+  height: 1.05em;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fb923c 0%, #f97316 55%, rgba(249, 115, 22, 0.35) 100%);
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.35);
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__text {
+  margin: 0;
+  line-height: 1.62;
+  font-size: 0.94rem;
+  color: rgba(255, 251, 235, 0.68);
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__text strong {
+  color: rgba(255, 251, 235, 0.92);
+  font-weight: 650;
+}
+
+.luxury-info-privacy-consumer-card__inner--gdpr::after {
+  content: "Informativa privacy clienti (B2C) · testo legalmente vincolante";
+}
+
+.luxury-info-privacy-consumer-card__legal {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.luxury-info-privacy-consumer-card__legal-hint {
+  margin: 0;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(255, 251, 235, 0.06);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: rgba(255, 251, 235, 0.48);
+}
+
+.luxury-info-privacy-consumer-card__legal .luxury-legal-public__layered {
+  gap: 0.65rem;
+}
+
+.luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion {
+  padding: 0.85rem 0.95rem;
+  border: 1.5px solid rgba(249, 115, 22, 0.22);
+  border-radius: 14px;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(249, 115, 22, 0.1) 0%, transparent 52%),
+    linear-gradient(155deg, rgba(28, 28, 31, 0.92) 0%, rgba(20, 20, 22, 0.96) 58%, rgba(24, 24, 27, 0.94) 100%);
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(249, 115, 22, 0.1);
+}
+
+.luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion[open] {
+  border-color: rgba(249, 115, 22, 0.5);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(249, 115, 22, 0.12),
+    inset 0 1px 0 rgba(253, 186, 116, 0.14);
+}
+
+.luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion-summary {
+  padding: 0.1rem 0;
+}
+
+.luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion-title {
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: #ffedd5;
+}
+
+.luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion[open] .luxury-legal-public__accordion-title {
+  color: #fdba74;
+}
+
+.luxury-info-privacy-consumer-card__legal .luxury-legal-public__accordion-body {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(249, 115, 22, 0.18);
+}
+
+.luxury-info-privacy-consumer-card__legal .luxury-legal-public__text,
+.luxury-info-privacy-consumer-card__legal .luxury-legal-public__list {
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: rgba(255, 237, 213, 0.8);
+}
+
+.luxury-info-privacy-consumer-card__legal .luxury-legal-public__inline-link {
+  color: #fdba74;
+}
+
+.luxury-info-privacy-consumer-card__legal .luxury-legal-public__citations {
+  margin-top: 0.65rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed rgba(249, 115, 22, 0.2);
+}
+
+.luxury-info-privacy-consumer-card__inner::after {
+  content: "Documenti ufficiali sul sito · diritti GDPR in area account";
+  display: block;
+  margin-top: 0.35rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 251, 235, 0.06);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 251, 235, 0.38);
+  text-align: center;
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy__text .luxury-link-inline {
+  color: #fdba74;
+  text-decoration-color: rgba(253, 186, 116, 0.45);
+  text-underline-offset: 0.14em;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-info-privacy-consumer-page .luxury-info-privacy-consumer-card:hover {
+    border-color: #000000;
+    box-shadow:
+      0 22px 48px rgba(0, 0, 0, 0.42),
+      0 0 0 1px rgba(249, 115, 22, 0.18);
+    transform: translateY(-2px);
+  }
+
+  .luxury-info-privacy-consumer-page .luxury-info-privacy__text .luxury-link-inline:hover {
+    color: #fed7aa;
+    text-decoration-color: rgba(254, 215, 170, 0.75);
+  }
+}
+
+.luxury-info-privacy-consumer-page .luxury-info-privacy-consumer-card:focus-within {
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(249, 115, 22, 0.12);
+}
+
+.luxury-info-privacy-consumer-page .luxury-link-back {
+  margin-bottom: 0.85rem;
+}
+
+@media (max-width: 520px) {
+  .luxury-info-privacy-consumer-card__toggle {
+    min-width: 100%;
+    grid-template-columns: 1fr;
+    border-radius: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-info-privacy-consumer-page .luxury-info-privacy-consumer-card,
+  .luxury-info-privacy-consumer-page .luxury-consumer-bookings-dash__header--hero,
+  .luxury-info-privacy-consumer-page .luxury-info-privacy-page__subtitle,
+  .luxury-info-privacy-consumer-page .luxury-link-back,
+  .luxury-info-privacy-consumer-page .luxury-info-privacy__section {
+    animation: none;
+    transition: none;
+  }
+}

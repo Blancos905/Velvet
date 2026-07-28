@@ -1,0 +1,544 @@
+/**
+ * Hub account OPERATORE staff — masthead benvenuto: stesso trattamento ricco
+ * dell'hub cliente (`luxury-account-hub-consumer.css`) ma in tema GIALLO + ambra.
+ * Scoped a `.luxury-account-hub--salon-staff`.
+ */
+
+/* =========================================================================
+ * Tema giallo operatore: nav, bottoni (Profilo, Recensioni, Notifiche…), body.
+ * Sovrascrive la palette arancio generica di `--luxury-plans`.
+ * ========================================================================= */
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans {
+  --hub-plans-orange: #fbbf24;
+  --hub-plans-orange-hot: #f59e0b;
+  --hub-plans-edge: rgba(251, 191, 36, 0.72);
+  --hub-plans-edge-soft: rgba(253, 224, 71, 0.38);
+  --hub-plans-btn-ink: #1c0a00;
+  --hub-plans-btn-ink-strong: #000000;
+  --hub-plans-btn-fill: linear-gradient(180deg, #fef9c3 0%, #fde68a 16%, #fbbf24 50%, #f59e0b 100%);
+  --hub-plans-btn-fill-hover: linear-gradient(180deg, #fffbeb 0%, #fde68a 18%, #fbbf24 56%, #d97706 100%);
+  --hub-plans-btn-fill-active: linear-gradient(165deg, #fffbeb 0%, #fbbf24 32%, #d97706 100%);
+  --hub-plans-btn-rim: rgba(0, 0, 0, 0.88);
+  --hub-plans-btn-shadow: #92400e;
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans::before {
+  background:
+    radial-gradient(ellipse 130% 90% at 50% -18%, rgba(255, 251, 235, 0.35), transparent 52%),
+    radial-gradient(ellipse 95% 70% at 100% 35%, rgba(253, 224, 71, 0.45), transparent 48%),
+    radial-gradient(ellipse 85% 65% at 0% 75%, rgba(251, 191, 36, 0.4), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(146, 64, 14, 0.55), transparent 55%),
+    linear-gradient(180deg, #fbbf24 0%, #f59e0b 22%, #d97706 48%, #b45309 78%, #92400e 100%);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__masthead::before {
+  background: radial-gradient(ellipse 75% 48% at 12% 20%, rgba(251, 191, 36, 0.22), transparent 55%);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__welcome {
+  border-top-color: rgba(251, 191, 36, 0.28);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__reg {
+  color: rgba(253, 224, 71, 0.95);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__greeting {
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.85),
+    0 0 28px rgba(251, 191, 36, 0.35);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__nav {
+  box-shadow:
+    0 0 0 1px #000 inset,
+    0 5px 0 #000,
+    0 24px 52px rgba(0, 0, 0, 0.65),
+    0 0 36px rgba(251, 191, 36, 0.1);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__nav::before {
+  background:
+    radial-gradient(ellipse 70% 50% at 8% 0%, rgba(251, 191, 36, 0.16), transparent 62%),
+    radial-gradient(ellipse 60% 45% at 92% 8%, rgba(253, 224, 71, 0.1), transparent 58%);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__nav-label {
+  color: rgba(253, 224, 71, 0.82);
+  border-top-color: rgba(251, 191, 36, 0.22);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll {
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  scrollbar-color: rgba(253, 224, 71, 0.55) rgba(0, 0, 0, 0.55);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll:hover {
+    border-color: rgba(253, 224, 71, 0.45);
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.12) 0%, rgba(0, 0, 0, 0.55) 100%);
+  }
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__btn {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.48) inset,
+    0 4px 0 var(--hub-plans-btn-shadow),
+    0 14px 28px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(253, 224, 71, 0.24);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__btn:hover {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 7px 0 var(--hub-plans-btn-shadow),
+      0 20px 40px rgba(217, 119, 6, 0.38),
+      0 0 36px rgba(251, 191, 36, 0.22);
+  }
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__nav-scroll .luxury-account-hub__btn:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--hub-plans-btn-ink-strong),
+    0 0 0 4px #fffbeb,
+    0 4px 0 var(--hub-plans-btn-shadow),
+    0 18px 36px rgba(251, 191, 36, 0.28);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__btn--active {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.72) inset,
+    0 5px 0 #92400e,
+    0 0 0 2px rgba(253, 224, 71, 0.65),
+    0 18px 42px rgba(217, 119, 6, 0.42),
+    0 0 48px rgba(251, 191, 36, 0.28);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__btn--sky,
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__btn--ghost,
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__btn--admin {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.48) inset,
+    0 4px 0 var(--hub-plans-btn-shadow),
+    0 14px 28px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(253, 224, 71, 0.24);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__btn--sky:hover,
+  .luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__btn--ghost:hover,
+  .luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__btn--admin:hover {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 7px 0 var(--hub-plans-btn-shadow),
+      0 20px 40px rgba(217, 119, 6, 0.38),
+      0 0 36px rgba(251, 191, 36, 0.22);
+  }
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__btn--sky.luxury-account-hub__btn--active,
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__btn--ghost.luxury-account-hub__btn--active,
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__btn--admin.luxury-account-hub__btn--active {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.72) inset,
+    0 5px 0 #92400e,
+    0 0 0 2px rgba(253, 224, 71, 0.65),
+    0 18px 42px rgba(217, 119, 6, 0.42),
+    0 0 48px rgba(251, 191, 36, 0.28);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__notif-pill {
+  background: linear-gradient(145deg, #fffbeb 0%, #fef08a 48%, #facc15 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    0 6px 14px rgba(0, 0, 0, 0.28),
+    0 0 12px rgba(251, 191, 36, 0.22);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__body {
+  box-shadow:
+    0 0 0 1px #000 inset,
+    0 5px 0 #000,
+    0 24px 52px rgba(0, 0, 0, 0.65),
+    0 0 36px rgba(251, 191, 36, 0.1);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__masthead {
+  padding: 2px;
+  background: linear-gradient(
+    145deg,
+    rgba(253, 224, 71, 0.7) 0%,
+    rgba(251, 191, 36, 0.5) 42%,
+    rgba(245, 158, 11, 0.4) 100%
+  );
+  box-shadow:
+    0 0 0 1px #000 inset,
+    0 7px 0 #000,
+    0 32px 64px rgba(0, 0, 0, 0.62),
+    0 0 48px rgba(251, 191, 36, 0.18);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__masthead-inner {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(95% 70% at 0% 0%, rgba(251, 191, 36, 0.16) 0%, transparent 55%),
+    radial-gradient(80% 60% at 100% 20%, rgba(245, 158, 11, 0.12) 0%, transparent 52%),
+    linear-gradient(168deg, #141008 0%, #000000 54%, #0a0804 100%);
+  box-shadow:
+    inset 5px 0 0 #fbbf24,
+    inset 0 1px 0 rgba(255, 251, 235, 0.06),
+    0 0 0 1px #000 inset,
+    0 6px 0 #000,
+    0 28px 60px rgba(0, 0, 0, 0.72);
+}
+
+.luxury-account-hub--salon-staff.luxury-account-hub--luxury-plans .luxury-account-hub__masthead-inner::after {
+  content: "";
+  position: absolute;
+  right: -8%;
+  bottom: -35%;
+  width: min(42%, 16rem);
+  height: min(70%, 12rem);
+  border-radius: 999px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.14) 0%, transparent 68%);
+  z-index: 0;
+}
+
+.luxury-account-hub--salon-staff .luxury-account-hub__top {
+  position: relative;
+  z-index: 1;
+}
+
+/* Badge «Staff salone». */
+.luxury-account-hub--salon-staff .luxury-account-hub__plan--staff {
+  color: #1c0a00;
+  border: 2px solid #000000;
+  background: linear-gradient(180deg, #fffbeb 0%, #fde68a 48%, #fbbf24 100%);
+  box-shadow:
+    0 2px 0 #000,
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 0 20px rgba(251, 191, 36, 0.24);
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-account-hub--salon-staff .luxury-account-hub__plan--staff:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 3px 0 #000,
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 0 24px rgba(251, 191, 36, 0.34);
+  }
+}
+
+.luxury-account-hub--salon-staff .luxury-account-hub__welcome {
+  position: relative;
+  z-index: 1;
+  align-items: center;
+  padding-top: clamp(0.95rem, 2.2vw, 1.25rem);
+  border-top: 1px solid rgba(251, 191, 36, 0.38);
+}
+
+.luxury-account-hub--salon-staff .luxury-account-hub__welcome::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: min(12rem, 45%);
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 55%, transparent 100%);
+  pointer-events: none;
+}
+
+.luxury-account-hub--salon-staff .luxury-account-hub__mark-wrap {
+  position: relative;
+  z-index: 1;
+  padding: 0.55rem 0.65rem;
+  border-radius: 16px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(251, 191, 36, 0.12) 0%, transparent 60%),
+    #0a0a0a;
+  box-shadow:
+    0 3px 0 #000,
+    0 0 0 1px rgba(251, 191, 36, 0.12) inset;
+  transition:
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.26s ease;
+}
+
+.luxury-account-hub--salon-staff .luxury-account-hub__mark-wrap::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.45), rgba(245, 158, 11, 0.28));
+  z-index: -1;
+  opacity: 0.55;
+}
+
+.luxury-account-hub--salon-staff .luxury-account-hub__welcome-copy {
+  position: relative;
+  z-index: 1;
+  gap: 0.65rem;
+  padding: clamp(0.85rem, 2vw, 1.1rem) clamp(0.95rem, 2.2vw, 1.2rem);
+  border-radius: 16px;
+  border: 2px solid #000000;
+  background: linear-gradient(165deg, rgba(24, 16, 6, 0.92) 0%, rgba(18, 12, 4, 0.98) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    inset 0 1px 0 rgba(255, 251, 235, 0.05);
+  animation: luxury-hub-staff-welcome-in 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes luxury-hub-staff-welcome-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* «Benvenuto in Saloni Luxury» → pill con pallino giallo. */
+.luxury-account-hub--salon-staff .luxury-account-hub__welcome-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(251, 191, 36, 0.55);
+  background: rgba(0, 0, 0, 0.78);
+  font-size: clamp(0.68rem, 1.5vw, 0.78rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fffbeb;
+  box-shadow: 0 2px 0 #000;
+}
+
+.luxury-account-hub--salon-staff .luxury-account-hub__welcome-line::before {
+  content: "";
+  flex-shrink: 0;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #fbbf24;
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.7);
+}
+
+/* «Accesso operatore» — etichetta sopra il nome salone. */
+.luxury-account-hub--salon-staff .luxury-account-hub__reg {
+  margin: 0.15rem 0 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(253, 224, 71, 0.85);
+}
+
+/* Saluto operatore in pannello giallo/ambra. */
+.luxury-account-hub--salon-staff .luxury-account-hub__greeting {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.7rem;
+  margin: 0.35rem 0 0;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(0.85rem, 2.2vw, 1.15rem);
+  border-radius: 14px;
+  border: 2px solid #000000;
+  background:
+    radial-gradient(95% 80% at 0% 0%, rgba(251, 191, 36, 0.16) 0%, transparent 58%),
+    radial-gradient(80% 70% at 100% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 55%),
+    linear-gradient(165deg, rgba(22, 14, 4, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%);
+  box-shadow:
+    0 3px 0 #000,
+    inset 0 1px 0 rgba(255, 251, 235, 0.07);
+  overflow: hidden;
+}
+
+.luxury-account-hub--salon-staff .luxury-account-hub__greeting::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(251, 191, 36, 0.55) 40%, rgba(245, 158, 11, 0.45) 70%, transparent 100%);
+  pointer-events: none;
+}
+
+.luxury-account-hub--salon-staff .luxury-account-hub__greeting::after {
+  content: "";
+  position: absolute;
+  left: clamp(0.85rem, 2.2vw, 1.15rem);
+  bottom: 0.55rem;
+  width: min(10rem, 48%);
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fbbf24 0%, #fde68a 50%, rgba(245, 158, 11, 0.7) 100%);
+  box-shadow: 0 1px 0 #000;
+  pointer-events: none;
+}
+
+.luxury-account-hub--salon-staff .luxury-account-hub__greeting-name {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0.5rem 1.05rem 0.58rem;
+  border-radius: 999px;
+  font-size: clamp(2rem, 5vw, 2.85rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: #fde68a;
+  -webkit-text-fill-color: #fde68a;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.72) 0%, rgba(28, 16, 4, 0.82) 100%);
+  border: 2px solid #000000;
+  border-bottom: 3px solid #fbbf24;
+  box-shadow:
+    0 2px 0 #000,
+    inset 0 1px 0 rgba(255, 251, 235, 0.1),
+    0 0 18px rgba(251, 191, 36, 0.18);
+  text-shadow: 0 1px 0 #000;
+  transition:
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.24s ease,
+    color 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-account-hub--salon-staff .luxury-account-hub__greeting:hover .luxury-account-hub__greeting-name {
+    transform: translateY(-2px);
+    color: #fffbeb;
+    -webkit-text-fill-color: #fffbeb;
+    box-shadow:
+      0 4px 0 #000,
+      inset 0 1px 0 rgba(255, 251, 235, 0.16),
+      0 0 32px rgba(251, 191, 36, 0.32);
+  }
+}
+
+/* «Ciao» — identico all'hub cliente (dimensioni e responsive). */
+.luxury-account-hub--salon-staff .luxury-account-hub__greeting-hi {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font-size: clamp(2.2rem, 6.5vw, 3.5rem);
+  font-weight: 800;
+  font-style: normal;
+  letter-spacing: -0.03em;
+  text-transform: none;
+  line-height: 1.02;
+  color: #fffbeb;
+  text-shadow:
+    0 2px 0 #000,
+    0 4px 14px rgba(0, 0, 0, 0.65);
+}
+
+@media (min-width: 560px) {
+  .luxury-account-hub--salon-staff .luxury-account-hub__greeting {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.65rem 0.85rem;
+    padding-bottom: clamp(1rem, 2.4vw, 1.2rem);
+  }
+
+  .luxury-account-hub--salon-staff .luxury-account-hub__greeting-hi {
+    font-size: clamp(2.45rem, 5.8vw, 3.65rem);
+  }
+
+  .luxury-account-hub--salon-staff .luxury-account-hub__greeting-name {
+    font-size: clamp(2.15rem, 4.2vw, 3.05rem);
+  }
+}
+
+/* Nome del salone: riga «Il tuo salone» + chip giallo più piccolo. */
+.luxury-account-hub--salon-staff .luxury-account-hub__salon-name {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  margin: 0.45rem 0 0;
+}
+
+.luxury-account-hub--salon-staff .luxury-account-hub__salon-name strong {
+  display: inline-block;
+  min-width: 0;
+  padding: 0.34rem 0.9rem 0.38rem;
+  border-radius: 999px;
+  font-size: clamp(1rem, 2.4vw, 1.28rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #fde68a;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.62) 0%, rgba(28, 16, 4, 0.8) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  border-bottom: 2px solid #fbbf24;
+  box-shadow:
+    0 2px 0 #000,
+    0 0 14px rgba(251, 191, 36, 0.14);
+}
+
+@media (min-width: 720px) {
+  .luxury-account-hub--salon-staff .luxury-account-hub__welcome {
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .luxury-account-hub--salon-staff .luxury-account-hub__welcome-copy {
+    flex: 1.15;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-account-hub--salon-staff .luxury-account-hub__masthead:hover .luxury-account-hub__mark-wrap {
+    transform: scale(1.02);
+    box-shadow:
+      0 3px 0 #000,
+      0 0 22px rgba(251, 191, 36, 0.28),
+      0 0 0 1px rgba(251, 191, 36, 0.18) inset;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-account-hub--salon-staff .luxury-account-hub__welcome-copy {
+    animation: none;
+  }
+
+  .luxury-account-hub--salon-staff .luxury-account-hub__mark-wrap,
+  .luxury-account-hub--salon-staff .luxury-account-hub__plan--staff,
+  .luxury-account-hub--salon-staff .luxury-account-hub__greeting-name {
+    transition: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .luxury-account-hub--salon-staff .luxury-account-hub__masthead:hover .luxury-account-hub__mark-wrap,
+    .luxury-account-hub--salon-staff .luxury-account-hub__plan--staff:hover,
+    .luxury-account-hub--salon-staff .luxury-account-hub__greeting:hover .luxury-account-hub__greeting-name {
+      transform: none;
+    }
+  }
+}

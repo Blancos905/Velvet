@@ -1,0 +1,209 @@
+/**
+ * Assistenza cliente B2C — area account (`/account/assistenza`), contatti + modulo.
+ * Il contenuto vive direttamente dentro `ClientAccountContentCard` (nessun riquadro
+ * annidato): stessa impostazione delle altre pagine account.
+ */
+
+.luxury-client-account-page.luxury-support-page--client .luxury-feedback-client-page__card-body {
+  padding-top: 0.35rem;
+  display: grid;
+  gap: 1rem;
+}
+
+/* Contatti diretti (email / telefono). */
+.luxury-client-account-page.luxury-support-page--client .luxury-support-contacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 0.65rem;
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-contact {
+  display: grid;
+  gap: 0.22rem;
+  padding: 0.72rem 0.85rem;
+  border-radius: 12px;
+  border: 2px solid #000000;
+  background: linear-gradient(165deg, rgba(39, 28, 58, 0.62) 0%, rgba(24, 24, 27, 0.92) 100%);
+  color: rgba(250, 250, 250, 0.96);
+  box-shadow: 0 2px 0 #000;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-contact strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-contact__label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(167, 139, 250, 0.9);
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-contact--muted strong {
+  color: rgba(161, 161, 170, 0.9);
+  font-weight: 600;
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-contact__value-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-contact__tel {
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-contact__whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 10px;
+  border: 2px solid #000000;
+  color: #fff;
+  background: #25d366;
+  box-shadow: 0 2px 0 #000;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-client-account-page.luxury-support-page--client .luxury-support-contact:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(165deg, rgba(76, 45, 120, 0.55) 0%, rgba(30, 30, 33, 0.96) 100%);
+    box-shadow:
+      0 2px 0 #000,
+      0 0 16px rgba(167, 139, 250, 0.18);
+  }
+}
+
+/* Nota di risposta. */
+.luxury-client-account-page.luxury-support-page--client .luxury-support-note {
+  margin: 0;
+  padding: 0.5rem 0.65rem;
+  border-radius: 10px;
+  border: 1px dashed rgba(113, 113, 122, 0.5);
+  background: rgba(24, 24, 27, 0.45);
+  color: rgba(161, 161, 170, 0.95);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+/* Modulo richiesta assistenza. */
+.luxury-client-account-page.luxury-support-page--client .luxury-support-request-form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-request-form .luxury-form-label {
+  display: grid;
+  gap: 0.38rem;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(161, 161, 170, 0.95);
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-request-form .luxury-soft-field {
+  border-radius: 12px;
+  border: 2px solid #000000;
+  background: rgba(12, 12, 14, 0.88);
+  color: rgba(250, 250, 250, 0.96);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-request-form .luxury-soft-field:hover:not(:disabled):not(:focus) {
+  background: rgba(18, 18, 21, 0.95);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(167, 139, 250, 0.14);
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-request-form .luxury-soft-field:focus {
+  background: rgba(24, 18, 36, 0.96);
+  box-shadow:
+    0 0 0 3px rgba(167, 139, 250, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-request-form .luxury-form-label:has(.luxury-soft-field:focus) {
+  color: rgba(216, 180, 254, 0.95);
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-request-form__textarea {
+  min-height: 7.5rem;
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-request-form .luxury-btn--primary {
+  justify-self: flex-start;
+  padding: 0.55rem 1.15rem;
+  border: 2px solid #000000;
+  border-radius: 999px;
+  background: linear-gradient(165deg, rgba(167, 139, 250, 0.95) 0%, rgba(124, 58, 237, 0.98) 48%, rgba(76, 45, 120, 1) 100%);
+  box-shadow: 0 2px 0 #000;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-client-account-page.luxury-support-page--client .luxury-support-request-form .luxury-btn--primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow:
+      0 2px 0 #000,
+      0 0 18px rgba(167, 139, 250, 0.32);
+  }
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-request-form .luxury-alert {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  border: 2px solid #000000;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-request-form .luxury-alert--success {
+  background: rgba(20, 83, 45, 0.45);
+  border-color: rgba(74, 222, 128, 0.35);
+  color: rgba(220, 252, 231, 0.96);
+}
+
+.luxury-client-account-page.luxury-support-page--client .luxury-support-request-form .luxury-alert--error {
+  background: rgba(127, 29, 29, 0.4);
+  border-color: rgba(248, 113, 113, 0.4);
+  color: rgba(254, 226, 226, 0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-client-account-page.luxury-support-page--client .luxury-support-contact,
+  .luxury-client-account-page.luxury-support-page--client .luxury-support-request-form .luxury-btn--primary {
+    transition: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .luxury-client-account-page.luxury-support-page--client .luxury-support-contact:hover,
+    .luxury-client-account-page.luxury-support-page--client .luxury-support-request-form .luxury-btn--primary:hover:not(:disabled) {
+      transform: none;
+    }
+  }
+}

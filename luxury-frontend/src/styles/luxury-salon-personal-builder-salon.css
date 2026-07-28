@@ -1,0 +1,341 @@
+/**
+ * «Crea il tuo sito» (`/account/salone/tuo-salone`) — hero `ClientAccountHeroHeader` +
+ * contenuto con accento AZZURRO (form card via `luxury-salon-services-salon.css`).
+ * Importato DOPO `luxury-salon-personal-builder.css` e `luxury-salon-services-salon.css`.
+ */
+
+.luxury-consumer-bookings-dash.luxury-personal-builder-account--salon-side {
+  --luxury-ip-accent: #f59e0b;
+  --luxury-ip-accent-soft: #fbbf24;
+  --luxury-ip-accent-glow: rgba(245, 158, 11, 0.22);
+  --luxury-ip-secondary: #38bdf8;
+  --luxury-ip-secondary-glow: rgba(56, 189, 248, 0.18);
+}
+
+/* --- Hero --- */
+.luxury-personal-builder-account--salon-side .luxury-consumer-bookings-dash__headline-accent {
+  background: linear-gradient(105deg, #7dd3fc 0%, #38bdf8 42%, #f59e0b 100%);
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(56, 189, 248, 0.3));
+}
+
+.luxury-personal-builder-account--salon-side .luxury-info-privacy-hero__aurora {
+  background:
+    radial-gradient(ellipse 75% 48% at 15% 18%, rgba(56, 189, 248, 0.28), transparent 55%),
+    radial-gradient(ellipse 65% 42% at 88% 28%, rgba(245, 158, 11, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 50% 100%, rgba(251, 191, 36, 0.12), transparent 45%);
+}
+
+.luxury-personal-builder-account--salon-side .luxury-info-privacy-hero__badge--muted {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: linear-gradient(160deg, rgba(3, 105, 161, 0.55), rgba(8, 20, 28, 0.5));
+  color: #e0f2fe;
+}
+
+.luxury-personal-builder-account--salon-side .luxury-info-privacy-hero__subtitle-card {
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 52%),
+    linear-gradient(158deg, rgba(10, 16, 24, 0.88) 0%, rgba(0, 0, 0, 0.94) 55%, rgba(6, 10, 14, 0.96) 100%);
+  box-shadow:
+    0 4px 0 #000,
+    0 0 0 1px rgba(56, 189, 248, 0.14) inset,
+    0 14px 32px rgba(0, 0, 0, 0.32),
+    0 0 28px rgba(56, 189, 248, 0.18);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-personal-builder-account--salon-side .luxury-info-privacy-hero__subtitle-card:hover {
+    border-color: rgba(56, 189, 248, 0.35);
+  }
+}
+
+.luxury-personal-builder-account--salon-side .luxury-info-privacy-hero__subtitle-chip {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(3, 105, 161, 0.35);
+  color: #e0f2fe;
+}
+
+.luxury-personal-builder-account--salon-side .luxury-info-privacy-hero__subtitle em,
+.luxury-personal-builder-account--salon-side .luxury-info-privacy-hero__subtitle strong {
+  color: #7dd3fc;
+}
+
+.luxury-personal-builder-account--salon-side .luxury-info-privacy-hero__subtitle-foot {
+  border-top-color: rgba(56, 189, 248, 0.18);
+}
+
+/* --- Builder: variabili e componenti specifici (gallery, CTA anteprima). --- */
+.luxury-personal-builder--salon-side {
+  --vpb-accent: rgba(56, 189, 248, 0.95);
+  --vpb-accent-soft: rgba(56, 189, 248, 0.14);
+  --vpb-line: rgba(125, 211, 252, 0.14);
+  --vpb-ink: rgba(240, 249, 255, 0.92);
+  --vpb-muted: rgba(186, 230, 253, 0.55);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .luxury-personal-builder--salon-side .luxury-salon-services-form-card:hover .luxury-personal-builder__eyebrow {
+    color: #e0f2fe;
+  }
+}
+
+.luxury-personal-builder--salon-side .luxury-personal-builder__gallery-slot {
+  background: rgba(6, 18, 26, 0.38);
+  border-color: rgba(125, 211, 252, 0.1);
+}
+
+@media (hover: hover) {
+  .luxury-personal-builder--salon-side .luxury-personal-builder__gallery-slot:hover {
+    border-color: rgba(56, 189, 248, 0.42);
+    background: rgba(8, 24, 36, 0.55);
+    box-shadow: 0 10px 26px rgba(2, 40, 60, 0.35);
+  }
+}
+
+.luxury-personal-builder--salon-side .luxury-personal-builder__gallery-slot:focus-within {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.2),
+    0 12px 28px rgba(2, 40, 60, 0.38);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .luxury-personal-builder--salon-side .luxury-personal-builder__gallery-slot:hover .luxury-personal-builder__gallery-thumb {
+    border-color: rgba(56, 189, 248, 0.35);
+    box-shadow: 0 14px 32px rgba(2, 40, 60, 0.45);
+  }
+}
+
+.luxury-personal-builder--salon-side .luxury-personal-builder__gallery-placeholder {
+  border-color: rgba(56, 189, 248, 0.35);
+  background: repeating-linear-gradient(
+    -12deg,
+    rgba(6, 18, 26, 0.2) 0 10px,
+    rgba(8, 28, 42, 0.15) 10px 20px
+  );
+}
+
+@keyframes vpb-placeholder-glow-salon {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 0 rgba(56, 189, 248, 0);
+  }
+  50% {
+    box-shadow: inset 0 0 32px 0 rgba(56, 189, 248, 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .luxury-personal-builder--salon-side .luxury-personal-builder__gallery-placeholder {
+    animation: vpb-placeholder-glow-salon 5s ease-in-out infinite;
+  }
+}
+
+@media (hover: hover) {
+  .luxury-personal-builder--salon-side .luxury-personal-builder__gallery-slot:hover .luxury-personal-builder__gallery-placeholder {
+    border-color: rgba(125, 211, 252, 0.55);
+  }
+}
+
+.luxury-personal-builder--salon-side .luxury-personal-builder__actions .luxury-personal-builder__btn-public {
+  color: #e0f2fe !important;
+  border: 2px solid rgba(56, 189, 248, 0.8) !important;
+  background:
+    linear-gradient(165deg, rgba(56, 189, 248, 0.28) 0%, rgba(2, 132, 199, 0.18) 42%, rgba(6, 18, 26, 0.65) 100%) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.35) inset,
+    0 10px 28px rgba(56, 189, 248, 0.28),
+    0 0 40px -12px rgba(56, 189, 248, 0.4);
+}
+
+@media (hover: hover) {
+  .luxury-personal-builder--salon-side .luxury-personal-builder__actions .luxury-personal-builder__btn-public:hover {
+    color: #f0f9ff !important;
+    border-color: #7dd3fc !important;
+    background:
+      linear-gradient(165deg, rgba(125, 211, 252, 0.38) 0%, rgba(56, 189, 248, 0.28) 45%, rgba(8, 28, 42, 0.72) 100%) !important;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.18) inset,
+      0 14px 36px rgba(56, 189, 248, 0.38),
+      0 0 52px -8px rgba(125, 211, 252, 0.45);
+  }
+}
+
+.luxury-personal-builder--salon-side .luxury-personal-builder__actions .luxury-personal-builder__btn-public:focus-visible {
+  outline-color: #38bdf8;
+}
+
+.luxury-personal-builder--salon-side .luxury-personal-builder__actions .luxury-personal-builder__btn-public:active {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 6px 18px rgba(56, 189, 248, 0.24);
+}
+
+/* ============================================================================
+ * Rifinitura estesa del box «Crea il tuo sito»: occhielli, titoli sezione,
+ * giorni d'apertura, etichette gallery, campi e micro-interazioni card.
+ * Accento azzurro con code ambra, coerente col resto del pannello salone.
+ * ==========================================================================*/
+
+/* Occhiello di sezione (Intestazione / Contenuti / …): da testo a pill con pallino. */
+.luxury-personal-builder--salon-side .luxury-personal-builder__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.26rem 0.72rem 0.28rem 0.58rem;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.32);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.16) 0%, rgba(3, 105, 161, 0.1) 100%);
+  color: #bae6fd;
+  letter-spacing: 0.14em;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.12);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.24s ease,
+    letter-spacing 0.24s ease;
+}
+
+.luxury-personal-builder--salon-side .luxury-personal-builder__eyebrow::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #7dd3fc, #38bdf8);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.65);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .luxury-personal-builder--salon-side .luxury-salon-services-form-card:hover .luxury-personal-builder__eyebrow {
+    border-color: rgba(125, 211, 252, 0.6);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.22);
+  }
+}
+
+/* Intro di sezione: separatore inferiore sfumato azzurro → ambra. */
+.luxury-personal-builder--salon-side .luxury-personal-builder__card-intro {
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, rgba(56, 189, 248, 0.5) 0%, rgba(245, 158, 11, 0.28) 55%, transparent 100%) 1;
+}
+
+/* Titolo di sezione: rail verticale azzurro→ambra. */
+.luxury-personal-builder--salon-side .luxury-personal-builder__card-intro .luxury-card-title {
+  position: relative;
+  padding-left: 0.85rem;
+}
+
+.luxury-personal-builder--salon-side .luxury-personal-builder__card-intro .luxury-card-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.12em;
+  bottom: 0.08em;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #7dd3fc 0%, #38bdf8 55%, #f59e0b 100%);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+/* Fieldset «Giorni di apertura»: cornice morbida azzurra. */
+.luxury-personal-builder--salon-side .luxury-personal-builder__open-days {
+  padding: 0.85rem 0.9rem 0.95rem;
+  border-radius: 14px;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  background:
+    radial-gradient(120% 120% at 100% 0%, rgba(56, 189, 248, 0.07), transparent 55%),
+    rgba(6, 18, 26, 0.4);
+}
+
+.luxury-personal-builder--salon-side .luxury-personal-builder__open-days legend.luxury-form-label {
+  color: #bae6fd;
+}
+
+/* Ogni giorno come chip; stato selezionato azzurro pieno. */
+.luxury-personal-builder--salon-side .luxury-personal-builder__open-day {
+  padding: 0.4rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(56, 189, 248, 0.07), transparent 60%),
+    rgba(6, 18, 26, 0.5);
+  color: rgba(224, 242, 254, 0.82);
+  transition:
+    color 0.18s ease,
+    border-color 0.18s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.luxury-personal-builder--salon-side .luxury-personal-builder__open-day input[type="checkbox"] {
+  accent-color: #38bdf8;
+}
+
+.luxury-personal-builder--salon-side .luxury-personal-builder__open-day:has(input[type="checkbox"]:checked) {
+  border-color: rgba(56, 189, 248, 0.6);
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(56, 189, 248, 0.16), transparent 62%),
+    rgba(8, 26, 38, 0.72);
+  color: #e0f2fe;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.16);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-personal-builder--salon-side .luxury-personal-builder__open-day:hover {
+    border-color: rgba(125, 211, 252, 0.5);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.14);
+  }
+}
+
+/* Etichetta slot gallery: mini chip con pallino azzurro. */
+.luxury-personal-builder--salon-side .luxury-personal-builder__gallery-slot-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #bae6fd;
+}
+
+.luxury-personal-builder--salon-side .luxury-personal-builder__gallery-slot-label::before {
+  content: "";
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+}
+
+/* Campi: caret azzurro + focus azzurro. */
+.luxury-personal-builder--salon-side .luxury-soft-field {
+  caret-color: #38bdf8;
+}
+
+.luxury-personal-builder--salon-side .luxury-soft-field:focus {
+  border-color: rgba(56, 189, 248, 0.55);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.14);
+}
+
+/* Card sezione: micro-lift all'hover. */
+.luxury-personal-builder--salon-side .luxury-personal-builder__stack > .luxury-salon-services-form-card {
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.24s ease,
+    box-shadow 0.28s ease;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .luxury-personal-builder--salon-side .luxury-personal-builder__stack > .luxury-salon-services-form-card:hover {
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-personal-builder--salon-side .luxury-personal-builder__eyebrow,
+  .luxury-personal-builder--salon-side .luxury-personal-builder__open-day,
+  .luxury-personal-builder--salon-side .luxury-personal-builder__stack > .luxury-salon-services-form-card {
+    transition: none;
+  }
+}

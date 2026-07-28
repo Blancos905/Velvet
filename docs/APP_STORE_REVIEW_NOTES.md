@@ -54,8 +54,8 @@ Copiare e adattare nel campo «Note for reviewer» / «Istruzioni per il tester�
 ## Build release
 
 ```bash
-cd velvet-app
+cd luxury-app
 ./scripts/setup-android-release-signing.sh   # una tantum
 ./scripts/build-android-release.sh
-flutter build ipa --release --dart-define=VELVET_WEB_BASE_URL=https://www.saloniluxury.it
+flutter build ipa --release --dart-define=LUXURY_WEB_BASE_URL=https://www.saloniluxury.it
 ```

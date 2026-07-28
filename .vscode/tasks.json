@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Velvet: Check All",
+      "label": "Luxury: Check All",
       "type": "shell",
       "command": "./check-all.sh",
       "options": {
@@ -22,9 +22,9 @@
       "problemMatcher": []
     },
     {
-      "label": "Velvet: Check Backend (velvet)",
+      "label": "Luxury: Check Backend (luxury)",
       "type": "shell",
-      "command": "./check-all.sh velvet",
+      "command": "./check-all.sh luxury",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -37,9 +37,9 @@
       "problemMatcher": []
     },
     {
-      "label": "Velvet: Check Frontend (velvet-frontend)",
+      "label": "Luxury: Check Frontend (luxury-frontend)",
       "type": "shell",
-      "command": "./check-all.sh velvet-frontend",
+      "command": "./check-all.sh luxury-frontend",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -52,9 +52,9 @@
       "problemMatcher": []
     },
     {
-      "label": "Velvet: Check App (velvet-app)",
+      "label": "Luxury: Check App (luxury-app)",
       "type": "shell",
-      "command": "./check-all.sh velvet-app",
+      "command": "./check-all.sh luxury-app",
       "options": {
         "cwd": "${workspaceFolder}"
       },

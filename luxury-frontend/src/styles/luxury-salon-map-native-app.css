@@ -1,0 +1,22 @@
+/*
+ * Mappa salone in WebView Flutter: il filtro CSS sull'iframe (tema scuro) rende l'embed vuoto su WKWebView.
+ * Altezza fissa evita frame collassati con min-height: 0 sulla card pubblica o flex nell'overlay account.
+ */
+.luxury-native-app .luxury-salon-public-meta__card--map-warm .luxury-salon-map-card__iframe,
+.luxury-native-app .luxury-salon-map-card__iframe {
+  filter: none !important;
+  -webkit-filter: none !important;
+  transform: none;
+}
+
+.luxury-native-app .luxury-salon-public-meta__card--map-warm .luxury-salon-map-card__frame,
+.luxury-native-app .luxury-salon-map-card__frame,
+.luxury-native-app .luxury-salon-map-card--compact .luxury-salon-map-card__frame {
+  min-height: 220px;
+  height: clamp(220px, 52vw, 280px);
+}
+
+.luxury-native-app .luxury-salon-explore__map-iframe {
+  min-height: 200px;
+  height: clamp(200px, 48vw, 260px);
+}

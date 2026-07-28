@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Push monorepo completo (velvet + velvet-frontend + velvet-app + infrastructure + docs).
+# Push monorepo completo (luxury + luxury-frontend + luxury-app + infrastructure + docs).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -21,7 +21,7 @@ fi
 if ! gh repo view "${OWNER}/${REPO}" >/dev/null 2>&1; then
   gh repo create "${OWNER}/${REPO}" \
     --private \
-    --description "Velvet salon platform — monorepo (backend, frontend, app, infrastructure)" \
+    --description "Luxury salon platform — monorepo (backend, frontend, app, infrastructure)" \
     --source=. \
     --remote=origin \
     --push

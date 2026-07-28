@@ -1,0 +1,1168 @@
+/**
+ * Panoramica Premium salone — stili dedicati + micro-interazioni.
+ * Ambito: solo elementi dentro `.salon-premium-panorama`.
+ */
+
+.salon-premium-panorama {
+  --spp-orange: #ea580c;
+  --spp-orange-deep: #9a3412;
+  --spp-orange-glow: rgba(251, 146, 60, 0.55);
+  --spp-card: rgba(18, 18, 18, 0.96);
+  --spp-card-border: rgba(255, 255, 255, 0.12);
+  --spp-well: rgba(255, 255, 255, 0.045);
+  --spp-well-border: rgba(255, 255, 255, 0.1);
+  --spp-text: rgba(255, 255, 255, 0.92);
+  --spp-muted: rgba(255, 255, 255, 0.52);
+  --spp-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --spp-radius-lg: 1rem;
+  --spp-radius-xl: 1.25rem;
+  --spp-radius-2xl: 1.5rem;
+}
+
+/* ─── Shell pagina: leggero “respiro” sullo sfondo arancio ─── */
+.salon-premium-panorama__shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.salon-premium-panorama__shell::before {
+  content: "";
+  position: absolute;
+  inset: -40% -20%;
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255, 255, 255, 0.14) 0%, transparent 55%);
+  pointer-events: none;
+  animation: spp-shell-shimmer 14s ease-in-out infinite;
+}
+
+@keyframes spp-shell-shimmer {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: translateY(4%) scale(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .salon-premium-panorama__shell::before {
+    animation: none;
+    opacity: 0.25;
+  }
+}
+
+/* ─── Contenitore card (più largo su desktop) ─── */
+.salon-premium-panorama__inner {
+  max-width: min(100%, 36rem);
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__inner {
+    max-width: min(100%, 44rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .salon-premium-panorama__inner {
+    max-width: min(100%, 52rem);
+  }
+}
+
+@media (min-width: 1280px) {
+  .salon-premium-panorama__inner {
+    max-width: min(100%, 56rem);
+  }
+}
+
+/* ─── Halo animato + lift (interattivo) ─── */
+.salon-premium-panorama__card-glow {
+  position: relative;
+  isolation: isolate;
+  border-radius: 1.55rem;
+  padding: 2px;
+  overflow: hidden;
+  background-image: linear-gradient(
+    125deg,
+    rgba(251, 146, 60, 0.55),
+    rgba(254, 215, 170, 0.35),
+    rgba(234, 88, 12, 0.5),
+    rgba(255, 251, 235, 0.22),
+    rgba(249, 115, 22, 0.48)
+  );
+  background-size: 240% 240%;
+  background-repeat: no-repeat;
+  box-shadow:
+    0 20px 50px -14px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(251, 146, 60, 0.12),
+    0 0 40px -8px rgba(249, 115, 22, 0.22);
+  transition:
+    transform 0.55s var(--spp-ease-out),
+    box-shadow 0.5s ease,
+    filter 0.45s ease,
+    background-position 0.6s ease;
+  animation: spp-card-border-flow 7s ease-in-out infinite;
+  cursor: default;
+}
+
+@keyframes spp-card-border-flow {
+  0%,
+  100% {
+    background-position: 0% 40%;
+  }
+  50% {
+    background-position: 100% 60%;
+  }
+}
+
+.salon-premium-panorama__card-glow::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  z-index: 0;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(251, 146, 60, 0.12) 12%,
+    rgba(255, 237, 213, 0.18) 28%,
+    rgba(249, 115, 22, 0.2) 42%,
+    transparent 58%
+  );
+  opacity: 0.85;
+  animation: spp-card-halo-spin 12s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes spp-card-halo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (hover: hover) {
+  .salon-premium-panorama__card-glow:hover {
+    transform: translateY(-6px) scale(1.012);
+    filter: saturate(1.08);
+    box-shadow:
+      0 28px 60px -12px rgba(0, 0, 0, 0.62),
+      0 0 0 1px rgba(253, 186, 116, 0.35),
+      0 0 56px -6px rgba(249, 115, 22, 0.42),
+      0 0 100px -24px rgba(251, 146, 60, 0.28);
+    animation-play-state: paused;
+  }
+
+  .salon-premium-panorama__card-glow:hover::before {
+    animation-play-state: paused;
+    opacity: 1;
+  }
+
+  .salon-premium-panorama__card-glow:active {
+    transform: translateY(-2px) scale(1.004);
+    transition-duration: 0.12s;
+  }
+}
+
+.salon-premium-panorama__card-glow:focus-within {
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(10, 10, 10, 0.85),
+    0 0 0 4px rgba(253, 186, 116, 0.75),
+    0 24px 56px -12px rgba(0, 0, 0, 0.55),
+    0 0 48px -8px rgba(249, 115, 22, 0.35);
+}
+
+/* ─── Card principale ─── */
+.salon-premium-panorama__card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  background: var(--spp-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 18px 44px -14px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  transition:
+    transform 0.5s var(--spp-ease-out),
+    box-shadow 0.5s ease,
+    border-color 0.35s ease;
+}
+
+.salon-premium-panorama__card--rich::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    transparent 38%,
+    transparent 62%,
+    rgba(249, 115, 22, 0.06) 100%
+  );
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+
+@media (hover: hover) {
+  .salon-premium-panorama__card-glow:hover .salon-premium-panorama__card--rich {
+    border-color: rgba(253, 186, 116, 0.22);
+    box-shadow:
+      0 22px 50px -14px rgba(0, 0, 0, 0.58),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+      0 0 72px -20px rgba(249, 115, 22, 0.18);
+  }
+
+  .salon-premium-panorama__card-glow:hover .salon-premium-panorama__card--rich::after {
+    opacity: 0.85;
+  }
+}
+
+.salon-premium-panorama__card-glow:hover .salon-premium-panorama__brand-mark {
+  transform: translateY(-3px);
+  transition: transform 0.45s var(--spp-ease-out);
+}
+
+.salon-premium-panorama__brand-mark {
+  transition: transform 0.45s var(--spp-ease-out);
+}
+
+.salon-premium-panorama__card-glow:hover .salon-premium-panorama__title {
+  letter-spacing: -0.02em;
+  transition: letter-spacing 0.4s ease, color 0.35s ease, text-shadow 0.45s ease;
+}
+
+.salon-premium-panorama__card-glow:hover .salon-premium-panorama__well {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.06);
+}
+
+.salon-premium-panorama__card-glow:hover .salon-premium-panorama__well--public {
+  background: rgba(249, 115, 22, 0.14);
+  border-color: rgba(253, 186, 116, 0.42);
+  box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.16) inset;
+}
+
+.salon-premium-panorama__card-glow:hover .salon-premium-panorama__feature-list {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 24px -8px rgba(249, 115, 22, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .salon-premium-panorama__card-glow {
+    animation: none;
+    background-position: 50% 50%;
+  }
+
+  .salon-premium-panorama__card-glow::before {
+    animation: none;
+    opacity: 0.35;
+    transform: none;
+  }
+
+  .salon-premium-panorama__card-glow:hover,
+  .salon-premium-panorama__card-glow:active {
+    transform: none;
+    filter: none;
+  }
+
+  .salon-premium-panorama__brand-mark {
+    transition: none;
+  }
+
+  .salon-premium-panorama__card-glow:hover .salon-premium-panorama__brand-mark {
+    transform: none;
+  }
+}
+
+/* ─── Brand: logo Saloni Luxury (sostituisce corona + label testuale) ─── */
+.salon-premium-panorama__brand-mark .saloni-luxury-mark {
+  margin: 0;
+}
+
+/* ─── Crown hero (legacy; header usa logo Saloni Luxury) ─── */
+.salon-premium-panorama__crown-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--spp-radius-xl);
+  background: linear-gradient(145deg, #c2410c, #f97316);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 12px 40px rgba(249, 115, 22, 0.55);
+  transition: transform 0.35s var(--spp-ease-out), box-shadow 0.35s var(--spp-ease-out);
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__crown-box {
+    width: 4rem;
+    height: 4rem;
+  }
+}
+
+.salon-premium-panorama__crown-box::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.45) 0%, transparent 70%);
+  opacity: 0.65;
+  z-index: -1;
+  animation: spp-crown-glow 2.8s ease-in-out infinite;
+}
+
+@keyframes spp-crown-glow {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .salon-premium-panorama__crown-box::after {
+    animation: none;
+    opacity: 0.5;
+    transform: scale(1);
+  }
+}
+
+.salon-premium-panorama__crown-box:hover {
+  transform: scale(1.04) rotate(-2deg);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 16px 48px rgba(249, 115, 22, 0.65);
+}
+
+.salon-premium-panorama__crown-box:active {
+  transform: scale(0.98);
+}
+
+/* ─── Badge piano ─── */
+.salon-premium-panorama__plan-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid rgba(251, 146, 60, 0.45);
+  background: rgba(249, 115, 22, 0.22);
+  padding: 0.2rem 0.65rem;
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffedd5;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease;
+}
+
+.salon-premium-panorama__plan-badge:hover {
+  background: rgba(249, 115, 22, 0.32);
+  border-color: rgba(253, 186, 116, 0.65);
+  transform: translateY(-1px);
+}
+
+/* ─── Titolo ─── */
+.salon-premium-panorama__title {
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* `/partner`: titolo senza «Ciao», arancio brand */
+.salon-premium-panorama__title.salon-premium-panorama__title--public-headline {
+  color: #fb923c;
+  text-shadow:
+    0 0 32px rgba(251, 146, 60, 0.55),
+    0 2px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* ─── `/partner`: halo più caldo ─── */
+.salon-premium-panorama__card-glow--public {
+  box-shadow:
+    0 22px 56px -12px rgba(0, 0, 0, 0.68),
+    0 0 0 1px rgba(251, 146, 60, 0.45),
+    0 0 56px -4px rgba(249, 115, 22, 0.38);
+}
+
+@media (hover: hover) {
+  .salon-premium-panorama__card-glow--public:hover {
+    box-shadow:
+      0 30px 64px -12px rgba(0, 0, 0, 0.72),
+      0 0 0 1px rgba(254, 215, 170, 0.55),
+      0 0 72px -2px rgba(249, 115, 22, 0.48),
+      0 0 120px -20px rgba(251, 146, 60, 0.32);
+  }
+}
+
+/* ─── `/partner`: card nera + trama / alone arancio ─── */
+.salon-premium-panorama__card--public {
+  background:
+    radial-gradient(ellipse 130% 75% at 0% -5%, rgba(249, 115, 22, 0.32), transparent 50%),
+    radial-gradient(ellipse 100% 60% at 100% 0%, rgba(251, 146, 60, 0.22), transparent 46%),
+    radial-gradient(ellipse 95% 55% at 50% 108%, rgba(234, 88, 12, 0.28), transparent 52%),
+    repeating-linear-gradient(
+      -17deg,
+      transparent 0,
+      transparent 13px,
+      rgba(249, 115, 22, 0.045) 13px,
+      rgba(249, 115, 22, 0.045) 14px
+    ),
+    linear-gradient(168deg, rgba(249, 115, 22, 0.12) 0%, transparent 24%, transparent 76%, rgba(251, 146, 60, 0.08) 100%),
+    #030303;
+  border-color: rgba(251, 146, 60, 0.42);
+  box-shadow:
+    0 20px 48px -14px rgba(0, 0, 0, 0.72),
+    0 0 0 1px rgba(249, 115, 22, 0.2) inset,
+    0 1px 0 rgba(253, 186, 116, 0.14) inset;
+}
+
+.salon-premium-panorama__card--public.salon-premium-panorama__card--rich::after {
+  background: linear-gradient(
+    150deg,
+    rgba(251, 146, 60, 0.2) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(234, 88, 12, 0.12) 100%
+  );
+  opacity: 0.8;
+}
+
+@media (hover: hover) {
+  .salon-premium-panorama__card-glow:hover .salon-premium-panorama__card--public {
+    border-color: rgba(253, 186, 116, 0.5);
+    box-shadow:
+      0 24px 52px -14px rgba(0, 0, 0, 0.75),
+      0 0 0 1px rgba(249, 115, 22, 0.28) inset,
+      0 0 64px -18px rgba(249, 115, 22, 0.22);
+  }
+
+  .salon-premium-panorama__card-glow:hover .salon-premium-panorama__card--public.salon-premium-panorama__card--rich::after {
+    opacity: 0.95;
+  }
+}
+
+.salon-premium-panorama__well--public {
+  background: rgba(249, 115, 22, 0.1);
+  border-color: rgba(251, 146, 60, 0.38);
+  box-shadow:
+    0 0 0 1px rgba(249, 115, 22, 0.12) inset,
+    0 8px 28px -12px rgba(249, 115, 22, 0.15);
+}
+
+.salon-premium-panorama__card--public .salon-premium-panorama__feature-list {
+  border-color: rgba(251, 146, 60, 0.28);
+  background: rgba(249, 115, 22, 0.04);
+  box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.06) inset;
+}
+
+.salon-premium-panorama__card--public .salon-premium-panorama__chip {
+  background: rgba(249, 115, 22, 0.22);
+  border: 1px solid rgba(253, 186, 116, 0.28);
+  color: #ffedd5;
+}
+
+.salon-premium-panorama__card--public .salon-premium-panorama__plan-badge {
+  border-color: rgba(253, 186, 116, 0.45);
+  background: rgba(249, 115, 22, 0.28);
+}
+
+.salon-premium-panorama__card--public .salon-premium-panorama__qlink-card {
+  border-color: rgba(251, 146, 60, 0.55);
+  background: rgba(249, 115, 22, 0.07);
+  box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.1) inset;
+}
+
+.salon-premium-panorama__card--public .salon-premium-panorama__qlink:hover .salon-premium-panorama__qlink-card {
+  border-color: rgba(253, 186, 116, 0.8);
+  background: rgba(249, 115, 22, 0.14);
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.4),
+    0 0 48px -6px rgba(249, 115, 22, 0.35);
+}
+
+/* ─── Well / sezioni contenitore ─── */
+.salon-premium-panorama__well {
+  background: var(--spp-well);
+  border: 1px solid var(--spp-well-border);
+  border-radius: var(--spp-radius-lg);
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.salon-premium-panorama__well:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.08);
+}
+
+/* ─── Piano: crown piccolo ─── */
+.salon-premium-panorama__plan-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  background: linear-gradient(145deg, #ea580c, #f97316);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s var(--spp-ease-out), box-shadow 0.3s ease;
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__plan-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+.salon-premium-panorama__well:hover .salon-premium-panorama__plan-icon {
+  transform: scale(1.05);
+  box-shadow: 0 10px 28px rgba(249, 115, 22, 0.35);
+}
+
+/* ─── CTA Gestisci ─── */
+.salon-premium-panorama__cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  border: 1px solid rgba(251, 146, 60, 0.55);
+  background: rgba(249, 115, 22, 0.18);
+  padding: 0.55rem 1.1rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #fff7ed;
+  text-decoration: none;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+.salon-premium-panorama__cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  left: -100%;
+  background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.18) 45%, transparent 55%);
+  transition: left 0.55s var(--spp-ease-out);
+}
+
+.salon-premium-panorama__cta:hover {
+  background: rgba(249, 115, 22, 0.32);
+  border-color: rgba(254, 215, 170, 0.75);
+  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.35);
+  transform: translateY(-1px);
+}
+
+.salon-premium-panorama__cta:hover::before {
+  left: 100%;
+}
+
+.salon-premium-panorama__cta:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.salon-premium-panorama__cta:focus-visible {
+  outline: 2px solid #fdba74;
+  outline-offset: 3px;
+}
+
+/* «Scegli il tuo piano» — arancio pieno, testo nero (`/partner`) */
+.salon-premium-panorama__cta--plan-pick {
+  border: 2px solid #0a0a0a;
+  background: linear-gradient(185deg, #fdba74 0%, #fb923c 35%, #f97316 72%, #ea580c 100%);
+  color: #0a0a0a;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  box-shadow:
+    0 4px 0 #0a0a0a,
+    0 12px 32px rgba(234, 88, 12, 0.5);
+}
+
+.salon-premium-panorama__cta--plan-pick::before {
+  background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.45) 48%, transparent 58%);
+}
+
+.salon-premium-panorama__cta--plan-pick svg {
+  color: #0a0a0a;
+}
+
+.salon-premium-panorama__cta--plan-pick:hover {
+  background: linear-gradient(185deg, #fff7ed 0%, #fdba74 38%, #fb923c 100%);
+  color: #000000;
+  border-color: #0a0a0a;
+  transform: translateY(-3px);
+  box-shadow:
+    0 7px 0 #0a0a0a,
+    0 16px 40px rgba(249, 115, 22, 0.55);
+}
+
+.salon-premium-panorama__cta--plan-pick:hover::before {
+  left: 100%;
+}
+
+.salon-premium-panorama__cta--plan-pick:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 2px 0 #0a0a0a,
+    0 8px 24px rgba(234, 88, 12, 0.45);
+}
+
+.salon-premium-panorama__cta--plan-pick:focus-visible {
+  outline: 3px solid #0a0a0a;
+  outline-offset: 3px;
+  box-shadow:
+    0 4px 0 #0a0a0a,
+    0 0 0 3px rgba(253, 186, 116, 0.9),
+    0 12px 32px rgba(234, 88, 12, 0.5);
+}
+
+/* ─── Sezione titolo + chip ─── */
+.salon-premium-panorama__section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.salon-premium-panorama__section-head--split {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.salon-premium-panorama__section-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--spp-text);
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__section-title {
+    font-size: 1rem;
+  }
+}
+
+.salon-premium-panorama__chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.15rem 0.55rem;
+  font-size: 0.625rem;
+  font-weight: 800;
+  color: rgba(254, 215, 170, 0.95);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+/* ─── Lista funzioni (accordion) ─── */
+.salon-premium-panorama__feature-list {
+  border-radius: var(--spp-radius-lg);
+  border: 1px solid var(--spp-well-border);
+  background: var(--spp-well);
+  overflow: hidden;
+}
+
+.salon-premium-panorama__feature {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 0.85rem;
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    padding-left 0.25s var(--spp-ease-out);
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__feature {
+    padding: 0.95rem 1rem;
+  }
+}
+
+.salon-premium-panorama__feature:hover {
+  background: rgba(255, 255, 255, 0.05);
+  padding-left: 1rem;
+}
+
+.salon-premium-panorama__feature:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(251, 146, 60, 0.65);
+  z-index: 1;
+}
+
+.salon-premium-panorama__feature--open {
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.salon-premium-panorama__feature--open:hover {
+  background: rgba(249, 115, 22, 0.14);
+}
+
+.salon-premium-panorama__feature-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-top: 0.1rem;
+  border-radius: 0.5rem;
+  background: rgba(249, 115, 22, 0.2);
+  color: #fdba74;
+  transition:
+    transform 0.3s var(--spp-ease-out),
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.salon-premium-panorama__feature:hover .salon-premium-panorama__feature-icon {
+  transform: scale(1.08) rotate(-3deg);
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
+}
+
+.salon-premium-panorama__feature--open .salon-premium-panorama__feature-icon {
+  background: rgba(249, 115, 22, 0.35);
+  color: #fff7ed;
+}
+
+.salon-premium-panorama__feature-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.salon-premium-panorama__feature-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__feature-text {
+    font-size: 0.875rem;
+  }
+}
+
+.salon-premium-panorama__feature-chevron {
+  flex-shrink: 0;
+  margin-top: 0.35rem;
+  color: rgba(255, 255, 255, 0.28);
+  transition: transform 0.3s var(--spp-ease-out), color 0.2s ease;
+}
+
+.salon-premium-panorama__feature--open .salon-premium-panorama__feature-chevron {
+  transform: rotate(90deg);
+  color: rgba(251, 146, 60, 0.85);
+}
+
+.salon-premium-panorama__feature-detail-card {
+  margin: 0 0.35rem 0.5rem;
+  padding: 0.75rem 0.85rem 0.85rem;
+  border-radius: var(--spp-radius-lg);
+  border: 2px solid #000000;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  animation: spp-detail-in 0.3s var(--spp-ease-out);
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__feature-detail-card {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    padding: 0.85rem 1rem 0.95rem;
+  }
+}
+
+.salon-premium-panorama__feature-detail {
+  margin: 0;
+  padding: 0;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: rgba(254, 215, 170, 0.82);
+}
+
+/* Card CTA nell’accordion: stessi token/hover delle quicklink (`.salon-premium-panorama__qlink`). */
+.salon-premium-panorama__feature-cta-card {
+  margin: 0 0.35rem 0.5rem;
+  animation: spp-detail-in 0.3s var(--spp-ease-out);
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__feature-cta-card {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.65rem;
+  }
+}
+
+@keyframes spp-detail-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .salon-premium-panorama__feature-detail-card,
+  .salon-premium-panorama__feature-cta-card {
+    animation: none;
+  }
+}
+
+/* ─── Progress bar ─── */
+.salon-premium-panorama__progress-track {
+  position: relative;
+  height: 0.4rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+.salon-premium-panorama__progress-fill {
+  position: relative;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #9a3412, #ea580c, #fbbf24);
+  transition: width 0.55s var(--spp-ease-out);
+}
+
+.salon-premium-panorama__progress-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 45%,
+    transparent 55%
+  );
+  animation: spp-progress-shine 2.2s ease-in-out infinite;
+}
+
+@keyframes spp-progress-shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .salon-premium-panorama__progress-fill::after {
+    animation: none;
+    opacity: 0.2;
+  }
+}
+
+/* ─── Checklist ─── */
+.salon-premium-panorama__step-wrap {
+  border-radius: var(--spp-radius-lg);
+  border: 1px solid var(--spp-well-border);
+  background: var(--spp-well);
+  padding: 0.15rem 0.35rem;
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__step-wrap {
+    padding: 0.2rem 0.5rem;
+  }
+}
+
+.salon-premium-panorama__step {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.22s ease;
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__step {
+    gap: 0.85rem;
+    padding: 0.95rem 0.5rem;
+  }
+}
+
+.salon-premium-panorama__step:last-child {
+  border-bottom: none;
+}
+
+.salon-premium-panorama__step:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--spp-radius-xl);
+}
+
+.salon-premium-panorama__check {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.2s ease,
+    box-shadow 0.22s ease;
+}
+
+.salon-premium-panorama__check:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(253, 186, 116, 0.45);
+  transform: scale(1.06);
+}
+
+.salon-premium-panorama__check:active {
+  transform: scale(0.94);
+}
+
+.salon-premium-panorama__check:focus-visible {
+  outline: 2px solid #fb923c;
+  outline-offset: 2px;
+}
+
+.salon-premium-panorama__check--done {
+  border-color: rgba(251, 146, 60, 0.55);
+  background: rgba(249, 115, 22, 0.18);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.2);
+}
+
+.salon-premium-panorama__step-text {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__step-text {
+    font-size: 0.875rem;
+  }
+}
+
+.salon-premium-panorama__step-text--done {
+  color: rgba(255, 255, 255, 0.38);
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.salon-premium-panorama__step-link {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fb923c;
+  text-decoration: underline;
+  text-decoration-color: rgba(251, 146, 60, 0.45);
+  text-underline-offset: 3px;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease, transform 0.2s ease;
+}
+
+.salon-premium-panorama__step-link:hover {
+  color: #fdba74;
+  text-decoration-color: rgba(253, 186, 116, 0.85);
+  transform: translateX(2px);
+}
+
+.salon-premium-panorama__step-link:focus-visible {
+  outline: 2px solid #fdba74;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.salon-premium-panorama__step-done-label {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(52, 211, 153, 0.95);
+}
+
+/* ─── Toast completamento ─── */
+.salon-premium-panorama__toast {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--spp-radius-lg);
+  border: 1px solid rgba(251, 146, 60, 0.4);
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.22), rgba(124, 45, 18, 0.35));
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+}
+
+/* ─── Quick link cards ─── */
+.salon-premium-panorama__qlink-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__qlink-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+.salon-premium-panorama__qlink {
+  display: block;
+  min-width: 0;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.salon-premium-panorama__qlink-card {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  border-radius: var(--spp-radius-lg);
+  border: 2px solid #000000;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.75rem 0.4rem;
+  text-align: center;
+  transition:
+    transform 0.3s var(--spp-ease-out),
+    border-color 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.35s ease;
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__qlink-card {
+    padding: 1rem 0.65rem;
+  }
+}
+
+.salon-premium-panorama__qlink:hover .salon-premium-panorama__qlink-card {
+  transform: translateY(-4px);
+  border-color: #000000;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.35),
+    0 0 40px -8px rgba(249, 115, 22, 0.35);
+}
+
+.salon-premium-panorama__qlink:active .salon-premium-panorama__qlink-card {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.salon-premium-panorama__qlink:focus-visible .salon-premium-panorama__qlink-card {
+  outline: 2px solid #fdba74;
+  outline-offset: 3px;
+}
+
+.salon-premium-panorama__qlink-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  background: rgba(249, 115, 22, 0.22);
+  color: #fdba74;
+  transition: transform 0.35s var(--spp-ease-out), background 0.25s ease;
+}
+
+.salon-premium-panorama__qlink:hover .salon-premium-panorama__qlink-icon {
+  transform: scale(1.12) rotate(4deg);
+  background: rgba(249, 115, 22, 0.35);
+}
+
+.salon-premium-panorama__qlink-title {
+  margin: 0.5rem 0 0;
+  font-size: 0.625rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__qlink-title {
+    font-size: 0.6875rem;
+  }
+}
+
+.salon-premium-panorama__qlink-desc {
+  margin: 0.35rem 0 0;
+  font-size: 0.5625rem;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.38);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .salon-premium-panorama__qlink-desc {
+    font-size: 0.625rem;
+  }
+}
+
+.salon-premium-panorama__qlink-cta {
+  margin-top: 0.45rem;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(251, 146, 60, 0.75);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.3s var(--spp-ease-out),
+    color 0.2s ease;
+}
+
+.salon-premium-panorama__qlink:hover .salon-premium-panorama__qlink-cta {
+  opacity: 1;
+  transform: translateY(0);
+  color: #fdba74;
+}

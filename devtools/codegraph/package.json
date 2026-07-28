@@ -1,7 +1,7 @@
 {
-  "name": "velvet-codegraph",
+  "name": "luxury-codegraph",
   "private": true,
-  "description": "CodeGraph locale per indicizzazione MCP del monorepo Velvet",
+  "description": "CodeGraph locale per indicizzazione MCP del monorepo Luxury",
   "devDependencies": {
     "@colbymchenry/codegraph": "1.0.1"
   }

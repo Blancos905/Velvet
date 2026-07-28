@@ -1,0 +1,44 @@
+{
+  "name": "luxury-frontend",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:clean": "rm -rf /tmp/luxury-vite-cache node_modules/.vite && vite --force",
+    "dev:icloud": "bash scripts/dev-local.sh",
+    "dev:fallback": "bash scripts/dev-fallback.sh",
+    "dev:local": "bash scripts/dev-local.sh",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "build:countries": "node scripts/build-countries-json.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run test && npm run build"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.97.0",
+    "comuni-json": "^1.0.0",
+    "framer-motion": "^12.38.0",
+    "jspdf": "^2.5.2",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-rnd": "^10.5.3",
+    "react-router-dom": "^6.30.3"
+  },
+  "devDependencies": {
+    "@fontsource/dm-sans": "^5.2.8",
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/playfair-display": "^5.2.8",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.13",
+    "tailwindcss": "^3.4.19",
+    "typescript": "~5.6.2",
+    "vite": "^5.4.11",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Filtro di esclusione per SpotBugs (audit-compliance.sh).
+  Qui si elencano i pattern di bug considerati falsi positivi o non applicabili
+  alle convenzioni Spring/JPA del progetto Luxury.
+-->
+<FindBugsFilter>
+	<!-- Entità JPA e DTO espongono/ricevono riferimenti a oggetti mutabili
+	     (collezioni, date) per design: è il pattern standard di Spring Data. -->
+	<Match>
+		<Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+	</Match>
+	<!-- Spring inietta i bean via field/costruttore; SpotBugs non riconosce
+	     l'inizializzazione gestita dal container. -->
+	<Match>
+		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
+	</Match>
+	<!-- Template HTML email, notifiche e SSR SEO: '\n' letterale nel sorgente
+	     (portabile e leggibile), non il separatore di riga dipendente dall'OS. -->
+	<Match>
+		<Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
+	</Match>
+	<!-- Bean Spring: costruttore con ObjectProvider opzionale, nessun finalizer attack surface. -->
+	<Match>
+		<Class name="it.luxury.billing.service.BillingStatusService"/>
+		<Bug pattern="CT_CONSTRUCTOR_THROW"/>
+	</Match>
+</FindBugsFilter>

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# go-live-check.sh — Promemoria e verifica automatica pre-produzione (Velvet monorepo)
+# go-live-check.sh — Promemoria e verifica automatica pre-produzione (Luxury monorepo)
 #
 # Eseguire quando il software è pronto per il deploy pubblico, PRIMA di:
 #   - pubblicare su server di produzione
@@ -13,7 +13,7 @@
 #   ./go-live-check.sh --help
 #
 # Combinabile con l'audit tecnico:
-#   ./velvet-audit.sh && ./go-live-check.sh
+#   ./luxury-audit.sh && ./go-live-check.sh
 #
 set -uo pipefail
 
@@ -148,25 +148,25 @@ check_env_var() {
 print_checklist() {
   print_header "Checklist Go-Live (da completare manualmente)"
   cat <<'EOF'
-  LEGALI (velvet-frontend)
+  LEGALI (luxury-frontend)
     [ ] Build con VITE_COMPANY_LEGAL_NAME, ADDRESS, VAT, EMAIL (nessun placeholder legale pubblico)
     [ ] Allineare LEGAL_DOCUMENT_VERSION / LEGAL_UPDATED_AT (legalSharedCopy.ts + registrazione)
-    [ ] Allineare VITE_LOG_RETENTION_DAYS con velvet.logging.retention-days (default 180; job purge audit attivo)
+    [ ] Allineare VITE_LOG_RETENTION_DAYS con luxury.logging.retention-days (default 180; job purge audit attivo)
     [ ] Caselle attive: privacy@saloniluxury.it, assistenza@saloniluxury.it (SPF/DKIM/DMARC)
     [ ] URL store: B2C /privacy/clienti · Staff /privacy/staff · B2B /privacy · Elimina /privacy/elimina-account
 
   FRONTEND BUILD
-    [ ] npm run build in velvet-frontend con .env.production valorizzato
-    [ ] cp -r velvet-frontend/dist → infrastructure/frontend-web-dist/
+    [ ] npm run build in luxury-frontend con .env.production valorizzato
+    [ ] cp -r luxury-frontend/dist → infrastructure/frontend-web-dist/
     [ ] VITE_GOOGLE_MAPS_EMBED_API_KEY (se usi mappa embed)
     [ ] VITE_APP_STORE_URL link app definitivo (non ricerca generica)
     [ ] VITE_PARTNER_CONTACT_EMAIL per piani/partner
 
-  BACKEND (velvet)
-    [ ] VELVET_TOKEN_SECRET / JWT: chiave casuale ≥ 32 byte (mai velvet-dev-token-secret…)
+  BACKEND (luxury)
+    [ ] LUXURY_TOKEN_SECRET / JWT: chiave casuale ≥ 32 byte (mai luxury-dev-token-secret…)
     [ ] Super admin: BCrypt hash in prod; revocare SETUP_TOKEN dopo prima installazione
-    [ ] VELVET_PUBLIC_FRONTEND_URL = https://www.saloniluxury.it (o dominio canonico)
-    [ ] CORS solo domini produzione (VELVET_CORS_ALLOWED_ORIGINS)
+    [ ] LUXURY_PUBLIC_FRONTEND_URL = https://www.saloniluxury.it (o dominio canonico)
+    [ ] CORS solo domini produzione (LUXURY_CORS_ALLOWED_ORIGINS)
     [ ] Valutare ddl-auto=validate + migrazioni DB (non solo update in prod)
     [ ] Email: oggi notifiche in-app+log — se serve SMTP reale, integrare prima del go-live
 
@@ -176,12 +176,12 @@ print_checklist() {
     [ ] Certificati TLS validi in infrastructure/nginx/certs/
     [ ] docker compose -f docker-compose.prod.yml up -d --build
 
-  APP MOBILE (velvet-app)
-    [ ] Release con VELVET_WEB_BASE_URL=https://saloniluxury.it
+  APP MOBILE (luxury-app)
+    [ ] Release con LUXURY_WEB_BASE_URL=https://saloniluxury.it
     [ ] WebView legali: URL B2C/B2B/Staff coerenti con ?embed=1
 
   STORE & SICUREZZA
-    [ ] ./velvet-audit.sh superato
+    [ ] ./luxury-audit.sh superato
     [ ] Play Console / App Store Connect: Privacy URL + Data safety allineati al testo pubblicato
     [ ] Non committare: infrastructure/.env, certificati, spring-dev.local.env
 
@@ -190,7 +190,7 @@ EOF
 }
 
 # =============================================================================
-print_header "Mappa Go-Live — Velvet Salon Platform"
+print_header "Mappa Go-Live — Luxury Salon Platform"
 echo "Root: $ROOT_DIR"
 if [[ "$REMINDER_ONLY" -eq 1 ]]; then
   echo "Modalità: ${C_CYAN}solo promemoria${C_RESET} (nessun controllo pattern)"
@@ -202,30 +202,30 @@ fi
 print_header "[1/4] Frontend — informative e placeholder legali"
 # =============================================================================
 check_fail legal "Placeholder [TODO_LEGAL] nel sorgente" 'TODO_LEGAL' \
-  "$ROOT_DIR/velvet-frontend/src"
+  "$ROOT_DIR/luxury-frontend/src"
 
 check_fail legal "Google Fonts CDN in index.html (usare /fonts/fonts.css self-hosted)" 'fonts\.googleapis\.com|fonts\.gstatic\.com' \
-  "$ROOT_DIR/velvet-frontend/index.html"
+  "$ROOT_DIR/luxury-frontend/index.html"
 
 check_fail legal 'Data "Fase di Sviluppo (Pre-Release)" ancora pubblicata' 'Pre-Release|Fase di Sviluppo' \
-  "$ROOT_DIR/velvet-frontend/src/pages/legal" \
-  "$ROOT_DIR/velvet-frontend/src/content"
+  "$ROOT_DIR/luxury-frontend/src/pages/legal" \
+  "$ROOT_DIR/luxury-frontend/src/content"
 
 check_warn legal 'Periodo log non definitivo "[es. 30/90 giorni]"' '30/90' \
-  "$ROOT_DIR/velvet-frontend/src/pages/legal"
+  "$ROOT_DIR/luxury-frontend/src/pages/legal"
 
 check_warn legal "App Store URL placeholder (ricerca generica)" 'apps\.apple\.com/it/search' \
-  "$ROOT_DIR/velvet-frontend/src/config/env.ts"
+  "$ROOT_DIR/luxury-frontend/src/config/env.ts"
 
-if [[ -f "$ROOT_DIR/velvet-frontend/.env.production" ]]; then
-  if ! grep -qE 'VITE_COMPANY_LEGAL_NAME=|VITE_LEGAL_ENTITY_LEGAL_NAME=' "$ROOT_DIR/velvet-frontend/.env.production" 2>/dev/null; then
+if [[ -f "$ROOT_DIR/luxury-frontend/.env.production" ]]; then
+  if ! grep -qE 'VITE_COMPANY_LEGAL_NAME=|VITE_LEGAL_ENTITY_LEGAL_NAME=' "$ROOT_DIR/luxury-frontend/.env.production" 2>/dev/null; then
     echo "${C_YELLOW}⚠ WARN${C_RESET}  [legal] .env.production senza VITE_COMPANY_LEGAL_NAME"
     WARN_COUNT=$((WARN_COUNT + 1))
   else
     echo "${C_GREEN}✔ PASS${C_RESET}  [legal] .env.production contiene dati societari (VITE_COMPANY_*)"
   fi
 else
-  echo "${C_YELLOW}⚠ WARN${C_RESET}  [legal] Creare velvet-frontend/.env.production (vedi .env.example)"
+  echo "${C_YELLOW}⚠ WARN${C_RESET}  [legal] Creare luxury-frontend/.env.production (vedi .env.example)"
   WARN_COUNT=$((WARN_COUNT + 1))
 fi
 
@@ -233,31 +233,31 @@ fi
 print_header "[2/4] Backend — segreti e URL di sviluppo"
 # =============================================================================
 check_fail backend "JWT/token secret di sviluppo in application.properties" \
-  'velvet-dev-token-secret-change-in-production' \
-  "$ROOT_DIR/velvet/src/main/resources/application.properties"
+  'luxury-dev-token-secret-change-in-production' \
+  "$ROOT_DIR/luxury/src/main/resources/application.properties"
 
 check_fail backend "Credenziali super-admin di default (dev)" \
   'mikele@admin\.com|chelsea95@' \
-  "$ROOT_DIR/velvet/src/main/resources/application.properties"
+  "$ROOT_DIR/luxury/src/main/resources/application.properties"
 
 check_warn backend "frontend-base-url localhost in application.properties" \
   'localhost:5173' \
-  "$ROOT_DIR/velvet/src/main/resources/application.properties"
+  "$ROOT_DIR/luxury/src/main/resources/application.properties"
 
 check_warn backend "Default https://localhost in application-prod.properties" \
   'https://localhost' \
-  "$ROOT_DIR/velvet/src/main/resources/application-prod.properties"
+  "$ROOT_DIR/luxury/src/main/resources/application-prod.properties"
 
 check_warn backend "ddl-auto=update in profilo prod/docker" \
   'ddl-auto=update' \
-  "$ROOT_DIR/velvet/src/main/resources/application-prod.properties" \
-  "$ROOT_DIR/velvet/src/main/resources/application-docker.properties"
+  "$ROOT_DIR/luxury/src/main/resources/application-prod.properties" \
+  "$ROOT_DIR/luxury/src/main/resources/application-docker.properties"
 
-check_warn backend "Fallback JWT hardcoded in VelvetSecurityProperties.java" \
-  'velvet-dev-token-secret-change-in-production' \
-  "$ROOT_DIR/velvet/src/main/java/it/velvet/config/VelvetSecurityProperties.java"
+check_warn backend "Fallback JWT hardcoded in LuxurySecurityProperties.java" \
+  'luxury-dev-token-secret-change-in-production' \
+  "$ROOT_DIR/luxury/src/main/java/it/luxury/config/LuxurySecurityProperties.java"
 
-if rg_search 'spring\.mail\.' "$ROOT_DIR/velvet/src/main/resources" | grep -q .; then
+if rg_search 'spring\.mail\.' "$ROOT_DIR/luxury/src/main/resources" | grep -q .; then
   echo "${C_GREEN}✔ PASS${C_RESET}  [backend] spring.mail configurato"
 else
   echo "${C_YELLOW}⚠ WARN${C_RESET}  [backend] Nessun spring.mail.* — email esterne non inviate (solo inbox+log)"
@@ -283,9 +283,9 @@ if [[ -f "$ENV_FILE" ]]; then
 fi
 
 if [[ -d "$ROOT_DIR/infrastructure/frontend-web-dist" ]]; then
-  if [[ -d "$ROOT_DIR/velvet-frontend/dist" ]]; then
-    if [[ "$ROOT_DIR/velvet-frontend/dist/index.html" -nt "$ROOT_DIR/infrastructure/frontend-web-dist/index.html" ]] 2>/dev/null; then
-      echo "${C_YELLOW}⚠ WARN${C_RESET}  [infra] velvet-frontend/dist più recente di infrastructure/frontend-web-dist — ricopiare la build"
+  if [[ -d "$ROOT_DIR/luxury-frontend/dist" ]]; then
+    if [[ "$ROOT_DIR/luxury-frontend/dist/index.html" -nt "$ROOT_DIR/infrastructure/frontend-web-dist/index.html" ]] 2>/dev/null; then
+      echo "${C_YELLOW}⚠ WARN${C_RESET}  [infra] luxury-frontend/dist più recente di infrastructure/frontend-web-dist — ricopiare la build"
       WARN_COUNT=$((WARN_COUNT + 1))
     else
       echo "${C_GREEN}✔ PASS${C_RESET}  [infra] frontend-web-dist presente"
@@ -300,10 +300,10 @@ fi
 print_header "[4/4] Email @gmail e riferimenti noti"
 # =============================================================================
 check_fail hygiene "Indirizzi @gmail.com nel sorgente applicativo" '@gmail\.com' \
-  "$ROOT_DIR/velvet-frontend/src" \
-  "$ROOT_DIR/velvet/src" \
+  "$ROOT_DIR/luxury-frontend/src" \
+  "$ROOT_DIR/luxury/src" \
   "$ROOT_DIR/infrastructure" \
-  "$ROOT_DIR/velvet-app/lib"
+  "$ROOT_DIR/luxury-app/lib"
 
 # =============================================================================
 print_header "Riepilogo controlli automatici"
@@ -326,6 +326,6 @@ else
 fi
 
 echo ""
-echo "${C_CYAN}Suggerimento:${C_RESET} prima del deploy esegui anche ${C_BOLD}./velvet-audit.sh${C_RESET}"
+echo "${C_CYAN}Suggerimento:${C_RESET} prima del deploy esegui anche ${C_BOLD}./luxury-audit.sh${C_RESET}"
 
 exit "$OVERALL_STATUS"

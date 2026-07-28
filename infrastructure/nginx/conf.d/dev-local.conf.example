@@ -14,7 +14,7 @@
 # server {
 #     listen 8081;
 #     server_name localhost;
-#     root /path/to/velvet-frontend/dist;
+#     root /path/to/luxury-frontend/dist;
 #     location / {
 #         try_files $uri $uri/ /index.html;
 #     }
@@ -28,5 +28,5 @@
 #     }
 # }
 #
-# Produzione: usa app.conf con TLS; CORS è gestito da Spring (velvet.cors.allowed-origins).
+# Produzione: usa app.conf con TLS; CORS è gestito da Spring (luxury.cors.allowed-origins).
 # =============================================================================

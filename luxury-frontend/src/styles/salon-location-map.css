@@ -1,0 +1,149 @@
+/**
+ * Mappa e blocchi pagina Posizione del salone.
+ * Contenitore: .luxury-salon-services-page.luxury-salon-location-account | .luxury-salon-panorama-account (stesso effetto mappa).
+ */
+
+.luxury-salon-location-page__alert {
+  margin-bottom: 0.85rem;
+}
+
+.luxury-salon-location-page__editor {
+  margin-bottom: 1.25rem;
+}
+
+.luxury-salon-location-page__hint {
+  margin: 0 0 1rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+/* Stessa resa del submit in “Aggiungi servizio”: ultima riga a tutta larghezza nella griglia del form. */
+.luxury-salon-location-page__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  align-items: stretch;
+  width: 100%;
+}
+
+.luxury-salon-location-page__actions .luxury-btn {
+  width: 100%;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.luxury-salon-location-page__map-wrap {
+  margin-top: 0.25rem;
+}
+
+.luxury-salon-map-card {
+  margin-top: 0;
+  padding: clamp(1rem, 2.5vw, 1.35rem);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(24, 24, 35, 0.9), rgba(18, 18, 28, 0.96));
+  border: 2px solid #000000;
+  box-shadow:
+    0 14px 38px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition:
+    border-color 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.luxury-salon-services-page.luxury-salon-location-account .luxury-salon-map-card,
+.luxury-salon-services-page.luxury-salon-panorama-account .luxury-salon-map-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.luxury-salon-services-page.luxury-salon-location-account .luxury-salon-map-card::after,
+.luxury-salon-services-page.luxury-salon-panorama-account .luxury-salon-map-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  background: radial-gradient(ellipse 80% 70% at 50% 0%, rgba(251, 191, 36, 0.12), transparent 55%);
+  transition: opacity 0.35s ease;
+}
+
+.luxury-salon-services-page.luxury-salon-location-account .luxury-salon-map-card > *,
+.luxury-salon-services-page.luxury-salon-panorama-account .luxury-salon-map-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .luxury-salon-services-page.luxury-salon-location-account .luxury-salon-map-card:hover,
+  .luxury-salon-services-page.luxury-salon-panorama-account .luxury-salon-map-card:hover {
+    border-color: #000000;
+    transform: translateY(-4px) scale(1.005);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 22px 48px rgba(0, 0, 0, 0.32),
+      0 0 36px rgba(56, 189, 248, 0.12),
+      0 0 42px rgba(249, 115, 22, 0.08);
+  }
+
+  .luxury-salon-services-page.luxury-salon-location-account .luxury-salon-map-card:hover::after,
+  .luxury-salon-services-page.luxury-salon-panorama-account .luxury-salon-map-card:hover::after {
+    opacity: 1;
+  }
+}
+
+.luxury-salon-map-card--compact .luxury-salon-map-card__frame {
+  min-height: 220px;
+}
+
+.luxury-salon-map-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.luxury-salon-map-card__title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.luxury-salon-map-card__external {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.luxury-salon-map-card__frame {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  background: rgba(15, 23, 42, 0.5);
+  transition:
+    border-color 0.28s ease,
+    box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.luxury-salon-services-page.luxury-salon-location-account .luxury-salon-map-card:hover .luxury-salon-map-card__frame,
+.luxury-salon-services-page.luxury-salon-panorama-account .luxury-salon-map-card:hover .luxury-salon-map-card__frame {
+  border-color: rgba(253, 186, 116, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(249, 115, 22, 0.12),
+    inset 0 0 40px rgba(56, 189, 248, 0.06);
+}
+
+.luxury-salon-map-card__iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}

@@ -1,0 +1,313 @@
+/**
+ * Piano Free — layout contenuto + card upgrade Premium (compatta).
+ */
+
+.luxury-salon-free-page {
+  flex: 1;
+  width: 100%;
+  margin: 0;
+  padding-bottom: clamp(1.5rem, 4vh, 3rem);
+}
+
+.luxury-salon-free-page__layout {
+  display: grid;
+  gap: clamp(1.75rem, 4vh, 3rem);
+  align-items: start;
+}
+
+.luxury-salon-free-page__layout--promo-only {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+
+.luxury-salon-free-page__layout--promo-only .luxury-salon-free-page__promo {
+  max-width: min(328px, 100%);
+  margin-inline: auto;
+}
+
+@media (min-width: 900px) {
+  .luxury-salon-free-page__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(248px, 340px);
+    gap: clamp(2.25rem, 4vw, 4.25rem);
+  }
+
+  .luxury-salon-free-page__promo {
+    position: sticky;
+    top: calc(52px + 1.25rem);
+  }
+}
+
+.luxury-salon-free-page__primary {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2.5vh, 1.75rem);
+  min-height: min(36vh, 420px);
+}
+
+.luxury-salon-free-page__promo {
+  width: 100%;
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 900px) {
+  .luxury-salon-free-page__promo {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: none;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Card upgrade — formato ridotto (non compete con masthead / intro)        */
+/* -------------------------------------------------------------------------- */
+
+.luxury-free-upgrade-card {
+  --luxury-upgrade-ink: rgba(67, 20, 7, 0.95);
+  position: relative;
+  width: 100%;
+  max-width: 328px;
+  margin: 0 auto;
+  border-radius: 16px;
+  isolation: isolate;
+  overflow: hidden;
+  color: rgba(255, 251, 235, 0.92);
+  border: 2px solid #000000;
+  box-shadow:
+    0 0 0 1px rgba(253, 186, 116, 0.2),
+    0 2px 0 rgba(255, 247, 237, 0.08) inset,
+    0 14px 40px rgba(45, 16, 6, 0.45),
+    0 0 48px rgba(249, 115, 22, 0.12);
+  animation: luxury-free-upgrade-card-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (min-width: 900px) {
+  .luxury-free-upgrade-card {
+    max-width: none;
+  }
+}
+
+@keyframes luxury-free-upgrade-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.luxury-free-upgrade-card__mesh {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 95% 75% at 15% 0%, rgba(255, 247, 237, 0.2) 0%, transparent 52%),
+    radial-gradient(ellipse 70% 55% at 100% 85%, rgba(249, 115, 22, 0.22) 0%, transparent 48%),
+    linear-gradient(162deg, rgba(67, 20, 7, 0.94) 0%, rgba(45, 12, 4, 0.96) 45%, rgba(24, 8, 3, 0.98) 100%);
+}
+
+.luxury-free-upgrade-card__rim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 247, 237, 0.45) 0%,
+    rgba(253, 186, 116, 0.35) 42%,
+    rgba(249, 115, 22, 0.28) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.luxury-free-upgrade-card__shine {
+  position: absolute;
+  inset: -35% -25%;
+  z-index: 1;
+  background: linear-gradient(
+    108deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 45%,
+    rgba(255, 255, 255, 0.09) 50%,
+    transparent 60%
+  );
+  transform: translateX(-12%) rotate(-7deg);
+  animation: luxury-free-upgrade-shine 12s ease-in-out infinite;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+@keyframes luxury-free-upgrade-shine {
+  0%,
+  100% {
+    transform: translateX(-14%) rotate(-7deg);
+  }
+  50% {
+    transform: translateX(12%) rotate(-7deg);
+  }
+}
+
+.luxury-free-upgrade-card__inner {
+  position: relative;
+  z-index: 2;
+  padding: 1.1rem 1.2rem 1.2rem;
+}
+
+.luxury-free-upgrade-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.luxury-free-upgrade-card__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--luxury-upgrade-ink);
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 40%, #fdba74 100%);
+  border: 1px solid rgba(255, 251, 235, 0.5);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 6px 18px rgba(124, 45, 18, 0.25);
+}
+
+.luxury-free-upgrade-card__spark {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fffbeb 0%, #fdba74 45%, #ea580c 100%);
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2), 0 0 16px rgba(253, 186, 116, 0.55);
+  animation: luxury-free-upgrade-pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes luxury-free-upgrade-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0.8;
+  }
+}
+
+.luxury-free-upgrade-card__title {
+  margin: 0 0 0.55rem;
+  font-family: var(--luxury-font, "DM Sans", system-ui, sans-serif);
+  font-size: clamp(0.88rem, 2.1vw, 0.98rem);
+  font-weight: 700;
+  line-height: 1.38;
+  letter-spacing: -0.015em;
+  color: #fffbeb;
+  text-shadow: 0 2px 14px rgba(45, 16, 6, 0.5);
+}
+
+.luxury-free-upgrade-card__title em {
+  font-style: italic;
+  font-weight: 800;
+  color: #fde68a;
+}
+
+.luxury-free-upgrade-card__lede {
+  margin: 0 0 0.65rem;
+  font-size: clamp(0.78rem, 1.75vw, 0.88rem);
+  line-height: 1.48;
+  color: rgba(255, 251, 235, 0.76);
+}
+
+.luxury-free-upgrade-card__perks {
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.luxury-free-upgrade-card__perks li {
+  position: relative;
+  padding-left: 1.05rem;
+  font-size: 0.74rem;
+  line-height: 1.42;
+  color: rgba(255, 237, 213, 0.88);
+}
+
+.luxury-free-upgrade-card__perks li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.42em;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #fb923c, #ea580c);
+}
+
+.luxury-free-upgrade-card__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.35rem;
+}
+
+.luxury-free-upgrade-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.62rem 0.85rem;
+  border-radius: 11px;
+  font-size: clamp(0.74rem, 1.75vw, 0.86rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  color: rgba(67, 20, 7, 0.95);
+  background: linear-gradient(180deg, #fffbeb 0%, #ffedd5 35%, #fdba74 100%);
+  border: 1px solid rgba(255, 251, 235, 0.55);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 8px 22px rgba(124, 45, 18, 0.35);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease;
+}
+
+.luxury-free-upgrade-card__cta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+
+.luxury-free-upgrade-card__cta:focus-visible {
+  outline: 2px solid #fffbeb;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-free-upgrade-card,
+  .luxury-free-upgrade-card__shine,
+  .luxury-free-upgrade-card__spark {
+    animation: none;
+  }
+
+  .luxury-free-upgrade-card {
+    opacity: 1;
+    transform: none;
+  }
+}
