@@ -5,7 +5,6 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
-import 'config/luxury_subscription_guards.dart';
 import 'shell/free_account_wrapper.dart';
 
 Future<void> main() async {
@@ -24,11 +23,10 @@ Future<void> main() async {
   }
 
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  await LuxurySubscriptionGuards.load();
   runApp(const LuxuryApp());
 }
 
-/// Entry point: [FreeAccountWrapper] — tema Premium unificato; vincoli piano Free solo in WebView.
+/// Entry point: [FreeAccountWrapper] è la shell WebView dell'app (tema Premium).
 class LuxuryApp extends StatelessWidget {
   const LuxuryApp({super.key});
 

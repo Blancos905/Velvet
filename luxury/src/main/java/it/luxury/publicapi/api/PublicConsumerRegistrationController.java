@@ -9,10 +9,10 @@ import it.luxury.publicapi.dto.ConsumerRegistrationRequest;
 import it.luxury.publicapi.dto.RegistrationCreatedResponse;
 import it.luxury.publicapi.dto.RegistrationSalonLocation;
 import it.luxury.publicapi.dto.SalonBillingRegistrationPolicyDto;
+import it.luxury.publicapi.dto.SalonRegistrationLocations;
 import it.luxury.publicapi.validation.ConsumerRegistrationValidator;
 import it.luxury.studio.domain.SalonBusinessType;
 import it.luxury.studio.domain.SalonClientGender;
-import it.luxury.studio.domain.StudioGroup;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Objects;
@@ -42,9 +42,11 @@ public class PublicConsumerRegistrationController {
 	@PostMapping
 	@Operation(summary = "Crea titolare salone (ruolo OWNER) e directory salone (form /piani)")
 	public ResponseEntity<RegistrationCreatedResponse> register(@Valid @RequestBody ConsumerRegistrationRequest body) {
-		RegistrationSalonLocation salon = withDefaultCountrySalon(body.salonLocationDetails());
-		salon = salon.withDisplayName(Objects.toString(body.salonName(), "").trim());
-		ConsumerRegistrationValidator.requireSalonLocationForFreePlan(body.planTier(), salon);
+		List<RegistrationSalonLocation> locations = SalonRegistrationLocations.withDisplayNames(
+				Objects.toString(body.salonName(), "").trim(),
+				body.resolvedSalonLocations().stream().map(PublicConsumerRegistrationController::withDefaultCountrySalon).toList());
+		ConsumerRegistrationValidator.requireSalonLocations(locations);
+		RegistrationSalonLocation salon = locations.get(0);
 
 		List<SalonBusinessType> businessTypes =
 				ConsumerRegistrationValidator.normalizeSalonBusinessTypesOrThrow(body.salonBusinessTypes());
@@ -56,23 +58,29 @@ public class PublicConsumerRegistrationController {
 			ConsumerRegistrationValidator.requireBillingForPremiumPlan(body.planTier(), body.billingDetails(), body.email());
 		}
 
-		String requestedPlan = body.planTier();
-		String provisionPlan = billingRegistrationPlanPolicy.effectiveProvisionPlanTier(requestedPlan);
+			String requestedPlan = body.planTier();
+			String provisionPlan = billingRegistrationPlanPolicy.effectiveProvisionPlanTier(requestedPlan);
 
-		SalonPartnerRegistrationOutcome outcome = luxuryAccountRegistrationService.registerSalonPartner(
-				body, provisionPlan, salon, businessTypes, clientGenders);
-		boolean premium = "PREMIUM".equalsIgnoreCase(StudioGroup.canonicalPlanTier(body.planTier()));
-		boolean checkoutRequired = billingRegistrationPlanPolicy.billingCheckoutRequiredForPremiumRegistration(body.planTier());
-		String message = outcome.emailVerificationRequired()
-				? "Abbiamo inviato un'email di conferma. Clicca il link per completare il pagamento Premium e attivare il salone."
-				: premium
-						? checkoutRequired
-								? "Prosegui con il pagamento Premium su Stripe per attivare il salone."
-								: "Salone registrato: l'email risulta già verificata. Accedi con le tue credenziali per iniziare con Premium."
-						: "Salone registrato: l'email risulta già verificata. Accedi con le tue credenziali.";
+			SalonPartnerRegistrationOutcome outcome = luxuryAccountRegistrationService.registerSalonPartner(
+					body, provisionPlan, salon, locations, businessTypes, clientGenders);
+			boolean checkoutRequired = billingRegistrationPlanPolicy.billingCheckoutRequiredForPremiumRegistration(requestedPlan);
+			String message = "PLUS".equals(provisionPlan)
+					? outcome.emailVerificationRequired()
+							? "Abbiamo inviato un'email di conferma. Clicca il link per attivare il salone Plus."
+							: "Salone registrato: l'email risulta già verificata. Accedi con le tue credenziali per iniziare con Plus."
+					: outcome.emailVerificationRequired()
+							? checkoutRequired
+									? "Abbiamo inviato un'email di conferma. Clicca il link per completare il pagamento Premium e attivare il salone."
+									: "Abbiamo inviato un'email di conferma. Clicca il link per attivare il salone Premium."
+							: checkoutRequired
+									? "Prosegui con il pagamento Premium su Stripe per attivare il salone."
+									: "Salone registrato: l'email risulta già verificata. Accedi con le tue credenziali per iniziare con Premium.";
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(new RegistrationCreatedResponse(
-						message, outcome.emailVerificationRequired(), outcome.premiumCheckoutToken()));
+						message,
+						outcome.emailVerificationRequired(),
+						outcome.premiumCheckoutToken(),
+						outcome.pollSecret()));
 	}
 
 	@GetMapping("/billing-policy")
@@ -93,6 +101,8 @@ public class PublicConsumerRegistrationController {
 				s.city(),
 				s.province(),
 				"IT",
-				s.displayName());
+				s.displayName(),
+				s.salonBusinessTypes(),
+				s.salonClientGenders());
 	}
 }

@@ -86,6 +86,25 @@ class AppointmentNotificationServiceTest {
 	}
 
 	@Test
+	void onConsumerBookingAutoAccepted_salonInboxRemindersAndEmail_noClientConfirmationPopup() {
+		stubSavePassthrough();
+		Instant start = Instant.now().plus(26, ChronoUnit.HOURS);
+		Appointment appointment = mockAppointmentWithConsumer(start);
+
+		service.onConsumerBookingAutoAccepted(appointment.getId());
+
+		assertThat(savedTypes()).contains(
+				NotificationType.BOOKING_CREATED_FOR_SALON,
+				NotificationType.REMINDER_24H,
+				NotificationType.REMINDER_1H,
+				NotificationType.REVIEW_INVITE);
+		assertThat(savedTypes()).doesNotContain(NotificationType.BOOKING_CONFIRMATION);
+		verify(scheduledNotificationProcessor, never()).processDue();
+		verify(transactionalEmailDispatchService).dispatchConsumerAppointmentEmail(
+				eq(NotificationType.BOOKING_CONFIRMATION), eq(appointment));
+	}
+
+	@Test
 	void onBookingConfirmedBySalon_schedulesConfirmation24hAnd2hReminders() {
 		stubSavePassthrough();
 		Instant start = Instant.now().plus(26, ChronoUnit.HOURS);

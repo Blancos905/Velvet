@@ -3,6 +3,12 @@ import { isLuxuryNativeAppShell } from "../hooks/useLuxuryNativeAppShell";
 const LEGACY_STORAGE_KEY = "luxury.savedLogin.v1";
 const STORAGE_KEY = "luxury.savedLoginEmail.v1";
 const NATIVE_STORAGE_KEY = "luxury.nativeSavedLogin.v1";
+const LOGOUT_KIND_KEY = "luxury.logoutLoginKind";
+
+/** Cliente, salone, operatore e super admin non condividono l’email ricordata. */
+export type SavedLoginAccountKind = "client" | "salon" | "staff" | "admin";
+
+const SAVED_LOGIN_KINDS: readonly SavedLoginAccountKind[] = ["client", "salon", "staff", "admin"];
 
 export type SavedLoginEmail = {
   email: string;
@@ -26,56 +32,85 @@ export function isSavedLoginPersistenceAllowed(): boolean {
   return isSavedLoginEmailAllowed() || isNativeSavedCredentialsAllowed();
 }
 
-export function readSavedLoginCredentials(): SavedLoginCredentials | null {
-  if (isNativeSavedCredentialsAllowed()) {
-    return readNativeSavedLoginCredentials();
-  }
-  const saved = readSavedLoginEmail();
-  if (!saved) return null;
-  return { email: saved.email, password: "" };
+function isSavedLoginAccountKind(value: string | null | undefined): value is SavedLoginAccountKind {
+  return SAVED_LOGIN_KINDS.some((kind) => kind === value);
 }
 
-export function writeSavedLoginCredentials(email: string, password = ""): void {
-  if (isNativeSavedCredentialsAllowed()) {
-    writeNativeSavedLoginCredentials(email, password);
-    return;
-  }
-  writeSavedLoginEmail(email);
+function emailStorageKey(kind: SavedLoginAccountKind): string {
+  return `${STORAGE_KEY}.${kind}`;
 }
 
-export function clearSavedLoginCredentials(): void {
-  clearSavedLoginEmail();
-  clearNativeSavedLoginCredentials();
-}
-
-export function readSavedLoginEmail(): SavedLoginEmail | null {
-  if (typeof localStorage === "undefined") return null;
-  if (!isSavedLoginEmailAllowed()) {
-    purgeLegacySavedLoginStorage();
-    return null;
-  }
+/** Chi è appena uscito: il login successivo mostra solo la sua email. */
+export function rememberLogoutLoginKind(kind: SavedLoginAccountKind): void {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as Partial<SavedLoginEmail>;
-      const email = typeof parsed.email === "string" ? parsed.email.trim().toLowerCase() : "";
-      return email ? { email } : null;
-    }
-    return migrateLegacySavedLoginEmail();
+    sessionStorage.setItem(LOGOUT_KIND_KEY, kind);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function readLoginAccountKind(search = ""): SavedLoginAccountKind | null {
+  const fromQuery = new URLSearchParams(search).get("account");
+  if (isSavedLoginAccountKind(fromQuery)) return fromQuery;
+  try {
+    const stored = sessionStorage.getItem(LOGOUT_KIND_KEY);
+    return isSavedLoginAccountKind(stored) ? stored : null;
   } catch {
     return null;
   }
 }
 
-export function writeSavedLoginEmail(email: string): void {
+export function readSavedLoginCredentials(kind: SavedLoginAccountKind | null = null): SavedLoginCredentials | null {
+  if (isNativeSavedCredentialsAllowed()) {
+    return readNativeSavedLoginCredentials();
+  }
+  if (!kind) return null;
+  const saved = readSavedLoginEmail(kind);
+  if (!saved) return null;
+  return { email: saved.email, password: "" };
+}
+
+export function writeSavedLoginCredentials(email: string, password = "", kind: SavedLoginAccountKind | null = null): void {
+  if (isNativeSavedCredentialsAllowed()) {
+    writeNativeSavedLoginCredentials(email, password);
+    return;
+  }
+  if (!kind) return;
+  writeSavedLoginEmail(email, kind);
+}
+
+export function clearSavedLoginCredentials(kind: SavedLoginAccountKind | null = null): void {
+  if (kind) clearSavedLoginEmail(kind);
+  else clearNativeSavedLoginCredentials();
+}
+
+export function readSavedLoginEmail(kind: SavedLoginAccountKind): SavedLoginEmail | null {
+  if (typeof localStorage === "undefined") return null;
+  if (!isSavedLoginEmailAllowed()) {
+    purgeSharedSavedLoginStorage();
+    return null;
+  }
+  try {
+    purgeSharedSavedLoginStorage();
+    const raw = localStorage.getItem(emailStorageKey(kind));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<SavedLoginEmail>;
+    const email = typeof parsed.email === "string" ? parsed.email.trim().toLowerCase() : "";
+    return email ? { email } : null;
+  } catch {
+    return null;
+  }
+}
+
+export function writeSavedLoginEmail(email: string, kind: SavedLoginAccountKind): void {
   if (typeof localStorage === "undefined") return;
   if (!isSavedLoginEmailAllowed()) return;
   const normalizedEmail = email.trim().toLowerCase();
   if (!normalizedEmail) return;
   try {
-    purgeLegacySavedLoginStorage();
+    purgeSharedSavedLoginStorage();
     localStorage.setItem(
-      STORAGE_KEY,
+      emailStorageKey(kind),
       JSON.stringify({ email: normalizedEmail } satisfies SavedLoginEmail),
     );
   } catch {
@@ -83,11 +118,11 @@ export function writeSavedLoginEmail(email: string): void {
   }
 }
 
-export function clearSavedLoginEmail(): void {
+export function clearSavedLoginEmail(kind: SavedLoginAccountKind): void {
   if (typeof localStorage === "undefined") return;
   try {
-    localStorage.removeItem(STORAGE_KEY);
-    purgeLegacySavedLoginStorage();
+    localStorage.removeItem(emailStorageKey(kind));
+    purgeSharedSavedLoginStorage();
   } catch {
     /* ignore */
   }
@@ -134,25 +169,10 @@ function clearNativeSavedLoginCredentials(): void {
   }
 }
 
-function migrateLegacySavedLoginEmail(): SavedLoginEmail | null {
-  try {
-    const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
-    if (!legacyRaw) return null;
-    const parsed = JSON.parse(legacyRaw) as { email?: string; password?: string };
-    const email = typeof parsed.email === "string" ? parsed.email.trim().toLowerCase() : "";
-    purgeLegacySavedLoginStorage();
-    if (!email) return null;
-    writeSavedLoginEmail(email);
-    return { email };
-  } catch {
-    purgeLegacySavedLoginStorage();
-    return null;
-  }
-}
-
-function purgeLegacySavedLoginStorage(): void {
+function purgeSharedSavedLoginStorage(): void {
   try {
     localStorage.removeItem(LEGACY_STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
   } catch {
     /* ignore */
   }

@@ -62,6 +62,7 @@ public class MeNotificationInboxService {
 		this.superAdminConsumerProfileEnsureService = superAdminConsumerProfileEnsureService;
 	}
 
+	@Transactional(readOnly = true)
 	public MeSalonNotificationInboxDto resolve(LuxuryUserPrincipal principal) {
 		if (isSalonStaffAccount(principal)) {
 			return emptyConsumerStyleInbox();
@@ -71,6 +72,7 @@ public class MeNotificationInboxService {
 		return buildForConsumer(profile);
 	}
 
+	@Transactional
 	public MeSalonNotificationInboxDto acknowledgeBucketInbox(LuxuryUserPrincipal principal, String bucketParam) {
 		if (isSalonStaffAccount(principal)) {
 			return emptyConsumerStyleInbox();
@@ -86,6 +88,7 @@ public class MeNotificationInboxService {
 		return buildForConsumer(profile);
 	}
 
+	@Transactional(readOnly = true)
 	public List<MeSalonNotificationMessageDto> listMessagesForBucket(LuxuryUserPrincipal principal, String bucketParam) {
 		if (isSalonStaffAccount(principal)) {
 			return List.of();
@@ -319,6 +322,7 @@ public class MeNotificationInboxService {
 		String location = a.getLocation() != null && a.getLocation().getName() != null ? a.getLocation().getName() : "Salone";
 		String operatorName = resolveOperatorDisplayName(a);
 		String preview = buildPreviewLine(n.getType(), location, operatorName, dateStr, timeStr);
+		String appointmentStatus = a.getStatus() != null ? a.getStatus().name() : null;
 		return new MeSalonNotificationMessageDto(
 				n.getId(),
 				n.getType().name(),
@@ -332,23 +336,20 @@ public class MeNotificationInboxService {
 				null,
 				a.getStart(),
 				null,
-				a.getStatus().name());
+				appointmentStatus);
 	}
 
 	private static String buildPreviewLine(
 			NotificationType type, String location, String operatorName, String dateStr, String timeStr) {
 		return switch (type) {
 			case BOOKING_CONFIRMATION ->
-					operatorName != null
-							? operatorName
-									+ " ha accettato il tuo appuntamento presso "
-									+ location
-									+ " per il "
-									+ dateStr
-									+ " alle "
-									+ timeStr
-									+ "."
-							: location + " ha confermato il tuo appuntamento per il " + dateStr + " alle " + timeStr + ".";
+					"La tua prenotazione presso "
+							+ location
+							+ " è confermata per il "
+							+ dateStr
+							+ " alle "
+							+ timeStr
+							+ ".";
 			case BOOKING_UPDATED -> location + " ha aggiornato la prenotazione al " + dateStr + " alle " + timeStr + ".";
 			case BOOKING_CANCELLED_BY_CONSUMER ->
 					"Hai disdetto l'appuntamento del " + dateStr + " alle " + timeStr + ".";

@@ -56,27 +56,28 @@ public class LuxuryAccountRegistrationService {
 	}
 
 	@Transactional
-	public void registerBookingClient(
+	public String registerBookingClient(
 			String email,
 			String password,
 			String firstName,
 			String lastName,
 			String country,
+			String preferredLocale,
 			String phone,
 			boolean bootstrapSuperAdmin,
 			String legalDocumentVersion) {
 		boolean grantAdmin = bootstrapSuperAdmin && registrationCompletionService.mayBootstrapPlatformSuperAdmin();
 		if (shouldDeferUntilEmailConfirmed(grantAdmin)) {
-			pendingRegistrationService.queueClientRegistration(
+			return pendingRegistrationService.queueClientRegistration(
 					email,
 					password,
 					firstName,
 					lastName,
 					country,
+					preferredLocale,
 					phone,
 					bootstrapSuperAdmin,
 					legalDocumentVersion);
-			return;
 		}
 		registrationCompletionService.completeClientRegistration(
 				email,
@@ -87,9 +88,11 @@ public class LuxuryAccountRegistrationService {
 						firstName,
 						lastName,
 						country,
+						preferredLocale,
 						phone,
 						bootstrapSuperAdmin,
 						legalDocumentVersion));
+		return null;
 	}
 
 	@Transactional(readOnly = true)
@@ -107,9 +110,21 @@ public class LuxuryAccountRegistrationService {
 			RegistrationSalonLocation salon,
 			java.util.List<SalonBusinessType> businessTypes,
 			java.util.List<SalonClientGender> clientGenders) {
+		return registerSalonPartner(body, provisionPlan, salon, java.util.List.of(salon), businessTypes, clientGenders);
+	}
+
+	@Transactional
+	public SalonPartnerRegistrationOutcome registerSalonPartner(
+			ConsumerRegistrationRequest body,
+			String provisionPlan,
+			RegistrationSalonLocation salon,
+			java.util.List<RegistrationSalonLocation> salonLocations,
+			java.util.List<SalonBusinessType> businessTypes,
+			java.util.List<SalonClientGender> clientGenders) {
 		String norm = normalizeEmail(body.email());
 		var existing = consumerProfileRepository.findByEmailIgnoreCase(norm);
-		PendingSalonRegistrationPayload payload = toSalonPayload(body, provisionPlan, salon, businessTypes, clientGenders);
+		PendingSalonRegistrationPayload payload =
+				toSalonPayload(body, provisionPlan, salon, salonLocations, businessTypes, clientGenders);
 		boolean premiumCheckoutRequired =
 				billingRegistrationPlanPolicy.billingCheckoutRequiredForPremiumRegistration(provisionPlan);
 
@@ -134,19 +149,19 @@ public class LuxuryAccountRegistrationService {
 
 		if (premiumCheckoutRequired) {
 			if (shouldDeferUntilEmailConfirmed(false)) {
-				pendingRegistrationService.queueSalonRegistration(body.email(), body.password(), payload);
-				return new SalonPartnerRegistrationOutcome(true);
+				String pollSecret = pendingRegistrationService.queueSalonRegistration(body.email(), body.password(), payload);
+				return new SalonPartnerRegistrationOutcome(true, null, pollSecret);
 			}
 			String checkoutToken = pendingRegistrationService.queueSalonRegistrationAwaitingPremiumCheckout(
 					body.email(), body.password(), payload);
 			return new SalonPartnerRegistrationOutcome(false, checkoutToken);
 		}
 		if (shouldDeferUntilEmailConfirmed(false)) {
-			pendingRegistrationService.queueSalonRegistration(
+			String pollSecret = pendingRegistrationService.queueSalonRegistration(
 					body.email(),
 					body.password(),
 					payload);
-			return new SalonPartnerRegistrationOutcome(true);
+			return new SalonPartnerRegistrationOutcome(true, null, pollSecret);
 		}
 		registrationCompletionService.completeSalonRegistration(
 				norm,
@@ -201,7 +216,9 @@ public class LuxuryAccountRegistrationService {
 				phone,
 				planTier,
 				legalDocumentVersion,
-				dpaDocumentVersion);
+				dpaDocumentVersion,
+				null,
+				null);
 	}
 
 	private ConsumerProfile promoteExistingProfileToStaff(
@@ -252,8 +269,11 @@ public class LuxuryAccountRegistrationService {
 			ConsumerRegistrationRequest body,
 			String provisionPlan,
 			RegistrationSalonLocation salon,
+			java.util.List<RegistrationSalonLocation> salonLocations,
 			java.util.List<SalonBusinessType> businessTypes,
 			java.util.List<SalonClientGender> clientGenders) {
+		java.util.List<RegistrationSalonLocation> locations =
+				salonLocations == null || salonLocations.isEmpty() ? java.util.List.of(salon) : salonLocations;
 		return new PendingSalonRegistrationPayload(
 				body.firstName(),
 				body.lastName(),
@@ -265,11 +285,13 @@ public class LuxuryAccountRegistrationService {
 				salon.city(),
 				salon.province(),
 				salon.country(),
+				body.preferredLocale(),
 				businessTypes.stream().map(Enum::name).toList(),
 				clientGenders.stream().map(Enum::name).toList(),
 				body.legalDocumentVersion(),
 				body.dpaDocumentVersion(),
-				body.billingDetails());
+				body.billingDetails(),
+				locations);
 	}
 
 	private static String normalizeEmail(String email) {

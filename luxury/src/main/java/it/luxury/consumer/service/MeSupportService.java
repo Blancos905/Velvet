@@ -7,6 +7,7 @@ import it.luxury.consumer.domain.ConsumerProfile;
 import it.luxury.consumer.domain.ConsumerProfileRepository;
 import it.luxury.notification.domain.ScheduledNotification;
 import it.luxury.notification.domain.ScheduledNotificationRepository;
+import it.luxury.notification.service.SupportRequestEmailDispatchService;
 import it.luxury.security.auth.LuxuryUserPrincipal;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,16 +27,19 @@ public class MeSupportService {
 	private final ConsumerProfileService consumerProfileService;
 	private final ScheduledNotificationRepository scheduledNotificationRepository;
 	private final SuperAdminConsumerProfileEnsureService superAdminConsumerProfileEnsureService;
+	private final SupportRequestEmailDispatchService supportRequestEmailDispatchService;
 
 	public MeSupportService(
 			ConsumerProfileRepository consumerProfileRepository,
 			ConsumerProfileService consumerProfileService,
 			ScheduledNotificationRepository scheduledNotificationRepository,
-			SuperAdminConsumerProfileEnsureService superAdminConsumerProfileEnsureService) {
+			SuperAdminConsumerProfileEnsureService superAdminConsumerProfileEnsureService,
+			SupportRequestEmailDispatchService supportRequestEmailDispatchService) {
 		this.consumerProfileRepository = consumerProfileRepository;
 		this.consumerProfileService = consumerProfileService;
 		this.scheduledNotificationRepository = scheduledNotificationRepository;
 		this.superAdminConsumerProfileEnsureService = superAdminConsumerProfileEnsureService;
+		this.supportRequestEmailDispatchService = supportRequestEmailDispatchService;
 	}
 
 	public SupportInfo resolveSupportInfo() {
@@ -99,6 +103,13 @@ public class MeSupportService {
 		Instant at = Instant.now();
 		scheduledNotificationRepository.save(
 				ScheduledNotification.supportRequestToLuxuryInbox(superAdmin, cleanSubject, body, at, fromSalonSide));
+		supportRequestEmailDispatchService.dispatchSupportRequest(
+				cleanSubject,
+				cleanMessage,
+				requesterName == null || requesterName.isBlank() ? "n/d" : requesterName,
+				requesterEmail,
+				roles.isBlank() ? null : roles,
+				fromSalonSide);
 	}
 
 	public record SupportInfo(

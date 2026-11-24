@@ -1,5 +1,5 @@
 /**
- * «Il tuo staff» (`/account/salone/staff`) — stessa struttura delle altre pagine
+ * «Il tuo staff» (`/salone/staff`) — stessa struttura delle altre pagine
  * account (hero `ClientAccountHeroHeader` + shell), con accento AZZURRO al posto
  * dell'arancio. Le schede form ereditano il top-bar da `luxury-salon-services-salon.css`.
  * Importato DOPO `luxury-account-salon-staff.css` e `luxury-salon-services-salon.css`.

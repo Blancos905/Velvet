@@ -46,6 +46,45 @@ public class MeSalonReviewInboxService {
 				.orElseGet(() -> listForLinkedStaffOperator(principal));
 	}
 
+	/**
+	 * Elimina una recensione ricevuta: titolare su tutto lo studio; staff solo sulle proprie.
+	 */
+	@Transactional
+	public void delete(LuxuryUserPrincipal principal, UUID reviewId) {
+		if (principal == null || principal.getSubject() == null || principal.getSubject().isBlank()) {
+			throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Permessi insufficienti.");
+		}
+		Review review = reviewRepository.findDetailedById(reviewId)
+				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Recensione non trovata."));
+		var appointment = review.getAppointment();
+		if (appointment == null || appointment.getLocation() == null || appointment.getLocation().getStudioGroup() == null) {
+			throw new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Recensione non trovata.");
+		}
+		UUID studioId = appointment.getLocation().getStudioGroup().getId();
+		var ownerGroup = studioGroupOwnerResolver.resolveStudioGroupForOwner(principal);
+		if (ownerGroup.isPresent()) {
+			if (!ownerGroup.get().getId().equals(studioId)) {
+				throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Recensione non del tuo salone.");
+			}
+			reviewRepository.delete(review);
+			return;
+		}
+		UUID profileId = principal.getProfileId();
+		String sub = principal.getSubject();
+		var linked = staffOperatorRepository.resolveLinkedOperatorForInbox(profileId, sub != null ? sub : "");
+		if (linked.isEmpty()) {
+			throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Permessi insufficienti per cancellare la recensione.");
+		}
+		var op = linked.get();
+		if (!op.getLocation().getStudioGroup().getId().equals(studioId)) {
+			throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Recensione non del tuo salone.");
+		}
+		if (appointment.getOperator() == null || !appointment.getOperator().getId().equals(op.getId())) {
+			throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Puoi cancellare solo le recensioni dei tuoi appuntamenti.");
+		}
+		reviewRepository.delete(review);
+	}
+
 	private List<MeSalonReviewDto> listForLinkedStaffOperator(LuxuryUserPrincipal principal) {
 		UUID profileId = principal.getProfileId();
 		String sub = principal.getSubject();

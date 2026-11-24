@@ -38,6 +38,7 @@ class LuxuryRegistrationCompletionServiceSalonUpgradeTest {
 				null,
 				null,
 				studioGroupRepository,
+				null,
 				null);
 	}
 

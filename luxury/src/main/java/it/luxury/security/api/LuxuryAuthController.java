@@ -61,7 +61,7 @@ public class LuxuryAuthController {
 		var r = luxuryAuthLoginService.login(body.email(), body.password(), request);
 		boolean secure = refreshTokenCookieSupport.isSecureRequest(request);
 		refreshTokenCookieSupport.writeRefreshCookie(response, r.refreshToken(), r.refreshTokenExpiresInDays(), secure);
-		return new AuthLoginResponse(r.accessToken(), r.refreshToken(), "Bearer", r.expiresInSeconds(), r.refreshTokenExpiresInDays());
+		return new AuthLoginResponse(r.accessToken(), null, "Bearer", r.expiresInSeconds(), r.refreshTokenExpiresInDays());
 	}
 
 	@PostMapping("/refresh")
@@ -80,7 +80,7 @@ public class LuxuryAuthController {
 				secure);
 		return new AuthLoginResponse(
 				rotated.accessToken(),
-				rotated.refreshToken(),
+				null,
 				"Bearer",
 				rotated.expiresInSeconds(),
 				securityProperties.refreshTokenTtlDays());
@@ -151,7 +151,7 @@ public class LuxuryAuthController {
 				new EmailVerificationConfirmResponse(
 						result.message(),
 						result.accessToken(),
-						result.refreshToken(),
+						null,
 						result.expiresInSeconds(),
 						result.nextPath(),
 						result.premiumCheckoutToken()));
@@ -168,8 +168,8 @@ public class LuxuryAuthController {
 			@RequestBody @Valid EmailVerificationPollBody body,
 			HttpServletRequest request,
 			HttpServletResponse response) {
-		Optional<EmailVerificationConfirmResult> result =
-				luxuryEmailVerificationService.pollRegistrationSync(body.email(), body.registrationAt(), request);
+			Optional<EmailVerificationConfirmResult> result = luxuryEmailVerificationService.pollRegistrationSync(
+					body.email(), body.registrationAt(), body.pollSecret(), request);
 		if (result.isEmpty()) {
 			return ResponseEntity.noContent().build();
 		}
@@ -183,7 +183,7 @@ public class LuxuryAuthController {
 				new EmailVerificationConfirmResponse(
 						confirmed.message(),
 						confirmed.accessToken(),
-						confirmed.refreshToken(),
+						null,
 						confirmed.expiresInSeconds(),
 						confirmed.nextPath(),
 						confirmed.premiumCheckoutToken()));
@@ -258,10 +258,11 @@ public class LuxuryAuthController {
 		}
 	}
 
-	public record EmailVerificationPollBody(
-			@NotBlank @Email @Size(max = 320) String email,
-			long registrationAt) {
-	}
+		public record EmailVerificationPollBody(
+				@NotBlank @Email @Size(max = 320) String email,
+				long registrationAt,
+				@Size(max = 128) String pollSecret) {
+		}
 
 	public record EmailVerificationResendBody(@NotBlank @Email @Size(max = 320) String email) {
 	}

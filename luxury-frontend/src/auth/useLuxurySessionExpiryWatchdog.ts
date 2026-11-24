@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { isLuxuryAccessTokenExpired, readJwtExpirationEpochMs } from "../lib/luxuryAccessTokenExpiry";
+import { isLuxuryLoginSessionExpired, readLuxurySessionExpiresAtMs } from "../lib/luxurySessionStartedAt";
 
-/** Rimuove token scaduto e richiama `onExpired` al momento della scadenza (o al ritorno sul tab). */
+/** Rimuove token scaduto e richiama `onExpired` al momento della scadenza (JWT o 24h dal login). */
 export function useLuxurySessionExpiryWatchdog(
   accessToken: string | undefined,
   onExpired: () => void,
@@ -10,7 +11,7 @@ export function useLuxurySessionExpiryWatchdog(
     if (!accessToken) return;
 
     const runCheck = (): boolean => {
-      if (isLuxuryAccessTokenExpired(accessToken)) {
+      if (isLuxuryLoginSessionExpired() || isLuxuryAccessTokenExpired(accessToken)) {
         onExpired();
         return true;
       }
@@ -19,10 +20,13 @@ export function useLuxurySessionExpiryWatchdog(
 
     if (runCheck()) return;
 
-    const expMs = readJwtExpirationEpochMs(accessToken);
-    if (expMs == null) return;
+    const jwtExpMs = readJwtExpirationEpochMs(accessToken);
+    const sessionExpMs = readLuxurySessionExpiresAtMs();
+    const deadlines = [jwtExpMs, sessionExpMs].filter((value): value is number => value != null);
+    if (deadlines.length === 0) return;
 
-    const delay = Math.max(0, expMs - Date.now() + 50);
+    const nextExpiryMs = Math.min(...deadlines);
+    const delay = Math.max(0, nextExpiryMs - Date.now() + 50);
     const timer = window.setTimeout(runCheck, delay);
 
     const onResume = () => {

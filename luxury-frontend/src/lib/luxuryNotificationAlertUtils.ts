@@ -86,6 +86,7 @@ export function hydrateSalonAlertState(accountKey: string | undefined | null): v
   seenSalonAlertIds.clear();
   snoozedUntilById.clear();
   sessionBaselineNotificationIds.clear();
+  activePopupNotificationIds.clear();
   clearAllSnoozeTimers();
 
   const persisted = readPersistedSalonAlertState(trimmed);
@@ -138,6 +139,11 @@ export function markSalonAlertPopupActive(id: string | undefined | null): void {
 export function clearSalonAlertPopupActive(id: string | undefined | null): void {
   const trimmed = id?.trim();
   if (trimmed) activePopupNotificationIds.delete(trimmed);
+}
+
+/** Host popup smontato: libera gli ID attivi così il poller può ripresentare Accetta/Rifiuta. */
+export function clearAllSalonAlertPopupsActive(): void {
+  activePopupNotificationIds.clear();
 }
 
 export function isSalonAlertNotificationSeen(id: string | undefined | null): boolean {

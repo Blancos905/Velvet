@@ -43,13 +43,24 @@ public class MeProfileController {
 	@Operation(summary = "Aggiorna campi consentiti")
 	@PreAuthorize("hasAnyAuthority('ROLE_CLIENT','ROLE_OWNER','ROLE_STAFF','ROLE_ADMIN')")
 	public ProfileDto patch(@AuthenticationPrincipal LuxuryUserPrincipal principal, @RequestBody @Valid ProfilePatchBody body) {
-		ConsumerProfile p = consumerProfileService.updateProfile(
-				principal,
-				body.email(),
-				body.displayName(),
-				body.phone(),
-				body.country(),
-				body.preferredLocale());
+			ConsumerProfile p = consumerProfileService.updateProfile(
+					principal,
+					body.email(),
+					body.displayName(),
+					body.phone(),
+					body.country(),
+					body.preferredLocale(),
+					body.currentPassword());
+		return ProfileDto.from(p);
+	}
+
+	@PatchMapping("/photo")
+	@Operation(summary = "Imposta o rimuove l'immagine profilo (stringa vuota = rimuovi)")
+	@PreAuthorize("hasAnyAuthority('ROLE_CLIENT','ROLE_OWNER','ROLE_STAFF','ROLE_ADMIN')")
+	public ProfileDto updatePhoto(
+			@AuthenticationPrincipal LuxuryUserPrincipal principal,
+			@RequestBody @Valid ProfilePhotoBody body) {
+		ConsumerProfile p = consumerProfileService.updateProfilePhoto(principal, body.photoDataUrl());
 		return ProfileDto.from(p);
 	}
 
@@ -68,31 +79,40 @@ public class MeProfileController {
 		consumerProfileService.changePassword(principal, body.currentPassword(), body.newPassword());
 	}
 
-	public record ProfileDto(
-			java.util.UUID id,
-			String email,
-			String displayName,
-			String phone,
-			String country,
-			String preferredLocale) {
-		public static ProfileDto from(ConsumerProfile p) {
-			return new ProfileDto(
-					p.getId(),
-					p.getEmail(),
-					p.getDisplayName(),
-					p.getPhone(),
-					p.getCountry(),
-					p.getPreferredLocale());
+		public record ProfileDto(
+				java.util.UUID id,
+				String email,
+				String displayName,
+				String phone,
+				String country,
+				String preferredLocale,
+				String photoDataUrl,
+				boolean emailVerified) {
+			public static ProfileDto from(ConsumerProfile p) {
+				return new ProfileDto(
+						p.getId(),
+						p.getEmail(),
+						p.getDisplayName(),
+						p.getPhone(),
+						p.getCountry(),
+						p.getPreferredLocale(),
+						p.getPhotoDataUrl(),
+						p.getEmailVerifiedAt() != null);
+			}
 		}
+
+	/** Stringa vuota rimuove la foto. {@code null} non è accettato. */
+	public record ProfilePhotoBody(@Size(max = 1_500_000) String photoDataUrl) {
 	}
 
 	public record ProfilePatchBody(
 			@Email @Size(max = 320) String email,
 			@Size(max = 200) String displayName,
 			@Size(max = 40) String phone,
-			@Pattern(regexp = "^[A-Z]{2}$", message = "Paese: usa codice ISO a 2 lettere (es. IT)") String country,
-			@Size(max = 16) String preferredLocale) {
-	}
+				@Pattern(regexp = "^[A-Z]{2}$", message = "Paese: usa codice ISO a 2 lettere (es. IT)") String country,
+				@Pattern(regexp = "^(it|en|fr|de|es|pt)$", message = "Lingua UI non supportata") String preferredLocale,
+				@Size(max = 200) String currentPassword) {
+		}
 
 	public record PasswordChangeBody(
 			@Size(min = 1, max = 200) String currentPassword,

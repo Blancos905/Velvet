@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Attende che Spring Boot risponda su :8080 (proxy target Vite in dev).
+# Attende che Spring Boot risponda (proxy target Vite in dev; default locale :8081).
 # Con LUXURY_AUTO_START_BACKEND=1 (default) avvia ./mvnw spring-boot:run se la porta è libera.
 set -euo pipefail
 
@@ -7,10 +7,12 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 LUXURY_DIR="${LUXURY_BACKEND_DIR:-$REPO_ROOT/luxury}"
 
-BACKEND_URL="${LUXURY_PROXY_API_TARGET:-http://127.0.0.1:8080}"
+BACKEND_URL="${LUXURY_PROXY_API_TARGET:-http://127.0.0.1:8081}"
 BACKEND_URL="${BACKEND_URL%/}"
 HEALTH_PATH="/api/v1/public/health"
 HEALTH_URL="${BACKEND_URL}${HEALTH_PATH}"
+BACKEND_PORT="${BACKEND_URL##*:}"
+BACKEND_PORT="${BACKEND_PORT%%/*}"
 
 MAX_WAIT_SEC="${LUXURY_BACKEND_WAIT_SEC:-240}"
 INTERVAL_SEC=2
@@ -26,7 +28,7 @@ backend_healthy() {
 }
 
 port_in_use() {
-  lsof -ti ":8080" >/dev/null 2>&1
+  lsof -ti ":${BACKEND_PORT}" >/dev/null 2>&1
 }
 
 spring_boot_starting() {
@@ -43,7 +45,7 @@ maybe_start_backend() {
     return 0
   fi
   if port_in_use; then
-    echo "  Porta 8080 occupata — attendo che Spring Boot finisca l'avvio..."
+    echo "  Porta ${BACKEND_PORT} occupata — attendo che Spring Boot finisca l'avvio..."
     return 0
   fi
   if spring_boot_starting; then

@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 /**
- * Registrazione da form Piani: identità e sede pubblica (Free / {@code BASE}); per {@code PREMIUM} la sede in vetrina è opzionale nel payload.
+ * Registrazione da form Piani: identità, sede e piano commerciale {@code PREMIUM}.
  */
 public record ConsumerRegistrationRequest(
 		@NotBlank @Email @Size(max = 320) String email,
@@ -20,18 +20,21 @@ public record ConsumerRegistrationRequest(
 		@Size(max = 40) String phone,
 		@NotBlank @Size(max = 200) String salonName,
 		@NotBlank
-		@Pattern(regexp = "BASE|PREMIUM", message = "Piano deve essere BASE o PREMIUM")
+		@Pattern(regexp = "PREMIUM|PLUS", message = "Il piano disponibile è Premium o Plus")
 		String planTier,
-		/** Sede per ricerca / vetrina — obbligatorio se piano BASE. */
+		/** Sede obbligatoria per la registrazione Premium. */
 		@Size(max = 200) String salonAddressLine1,
 		@Size(max = 12) String salonPostalCode,
 		@Size(max = 100) String salonCity,
 		@Size(max = 5, message = "Provincia sede: usa la sigla di max 5 caratteri (es. CS per Cosenza).")
 		String salonProvince,
 		@Size(max = 2) String salonCountry,
-		/** Codici tipologia: {@code HAIR}, {@code BEAUTY}, {@code MASSAGE}; obbligatori per {@code BASE} / {@code PREMIUM} in validazione applicativa. */
+		@Size(max = 16)
+		@Pattern(regexp = "^(it|en|fr|de|es|pt)$", message = "Lingua UI non supportata")
+		String preferredLocale,
+		/** Codici tipologia: {@code HAIR}, {@code BEAUTY}, {@code MASSAGE}; obbligatori per {@code PREMIUM}. */
 		List<String> salonBusinessTypes,
-		/** Pubblico di riferimento: {@code MALE}, {@code FEMALE}; obbligatorio per {@code BASE} / {@code PREMIUM}. */
+		/** Pubblico di riferimento: {@code MALE}, {@code FEMALE}; obbligatorio per {@code PREMIUM}. */
 		List<String> salonClientGenders,
 		@AssertTrue(message = "Accetta termini e informativa privacy") Boolean acceptedTermsAndPrivacy,
 		@Size(max = 40) String legalDocumentVersion,
@@ -49,7 +52,19 @@ public record ConsumerRegistrationRequest(
 		@Size(max = 5) String billingProvince,
 		@Size(max = 2) String billingCountry,
 		@Size(max = 7) String billingSdiCode,
-		@Email @Size(max = 320) String billingPecEmail) {
+		@Email @Size(max = 320) String billingPecEmail,
+		/**
+		 * Sedi della registrazione. Se assente, vale l’indirizzo singolo {@code salonAddressLine1}…
+		 * Obbligatorio in pratica dal form {@code /piani} (una o più sedi).
+		 */
+		@Size(max = 20) List<RegistrationSalonLocation> salonLocations) {
+
+	public List<RegistrationSalonLocation> resolvedSalonLocations() {
+		if (salonLocations != null && !salonLocations.isEmpty()) {
+			return salonLocations;
+		}
+		return List.of(salonLocationDetails());
+	}
 
 	public RegistrationSalonLocation salonLocationDetails() {
 		return new RegistrationSalonLocation(

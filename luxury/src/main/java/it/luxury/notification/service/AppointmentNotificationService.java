@@ -56,6 +56,29 @@ public class AppointmentNotificationService {
 		dispatchSalonBookingCreatedPush(a, salonInbox);
 	}
 
+	/**
+	 * Prenotazione cliente con operatore che non richiede conferma: inbox informativa salone +
+	 * promemoria/email al cliente. Nessun alert Accetta/Rifiuta (stato già {@link AppointmentStatus#CONFIRMED}).
+	 * <p>Non crea {@link NotificationType#BOOKING_CONFIRMATION} in inbox/push: il cliente ha già il
+	 * modale «Appuntamento confermato» in UI; un secondo popup «accettato» sarebbe ridondante.
+	 */
+	@Transactional
+	public void onConsumerBookingAutoAccepted(UUID appointmentId) {
+		if (!notificationProperties.isEnabled()) {
+			return;
+		}
+		Appointment a = appointmentRepository.findByIdWithGraph(appointmentId).orElse(null);
+		if (a == null || a.getConsumerProfile() == null) {
+			return;
+		}
+		ScheduledNotification salonInbox = scheduledNotificationRepository.save(
+				ScheduledNotification.salonInboxDelivered(a, NotificationType.BOOKING_CREATED_FOR_SALON));
+		dispatchSalonBookingAutoAcceptedPush(a, salonInbox);
+		cancelPendingForAppointment(a.getId());
+		scheduleRemindersOnly(a);
+		transactionalEmailDispatchService.dispatchConsumerAppointmentEmail(NotificationType.BOOKING_CONFIRMATION, a);
+	}
+
 	/** Dopo conferma titolare/operatore: notifica cliente (conferma + promemoria programmati). */
 	@Transactional
 	public void onBookingConfirmedBySalon(UUID appointmentId) {
@@ -124,6 +147,27 @@ public class AppointmentNotificationService {
 	@Transactional
 	public void onConsumerBookingRescheduled(UUID appointmentId, Instant previousStart) {
 		onBookingRescheduled(appointmentId, true, previousStart);
+	}
+
+	/**
+	 * Cambio orario cliente con operatore che non richiede conferma: notifica informativa (no Accetta/Rifiuta).
+	 */
+	@Transactional
+	public void onConsumerBookingRescheduleAutoAccepted(UUID appointmentId, Instant previousStart) {
+		if (!notificationProperties.isEnabled()) {
+			return;
+		}
+		Appointment a = appointmentRepository.findByIdWithGraph(appointmentId).orElse(null);
+		if (a == null || a.getConsumerProfile() == null) {
+			return;
+		}
+		cancelPendingForAppointment(appointmentId);
+		ScheduledNotification salonInbox = scheduledNotificationRepository.save(
+				ScheduledNotification.salonInboxDelivered(a, NotificationType.BOOKING_UPDATED, previousStart));
+		dispatchSalonBookingAutoAcceptedReschedulePush(a, salonInbox);
+		scheduleConsumerInboxBookingUpdated(a);
+		transactionalEmailDispatchService.dispatchConsumerAppointmentEmail(NotificationType.BOOKING_UPDATED, a);
+		scheduleRemindersOnly(a);
 	}
 
 	/** Spostamento da agenda salone: avviso informativo all'operatore assegnato (no richiesta accettazione). */
@@ -277,6 +321,38 @@ public class AppointmentNotificationService {
 				ownerBody,
 				"Richiesta prenotazione — " + salon,
 				"Conferma o rifiuta la richiesta del cliente.");
+	}
+
+	private void dispatchSalonBookingAutoAcceptedPush(Appointment a, ScheduledNotification salonInbox) {
+		if (a.getLocation() == null) {
+			return;
+		}
+		String salon = a.getLocation().getName() != null ? a.getLocation().getName() : "Salone";
+		String customer = resolveConsumerDisplayName(a);
+		String operator = resolveOperatorDisplayName(a);
+		String body = withOperatorPhrase(customer + " ha prenotato presso il salone", operator) + ".";
+		fcmPushDispatchService.dispatchForScheduledNotificationWithSalonRoles(
+				salonInbox,
+				"Nuova prenotazione — " + salon,
+				body,
+				"Nuova prenotazione — " + salon,
+				body);
+	}
+
+	private void dispatchSalonBookingAutoAcceptedReschedulePush(Appointment a, ScheduledNotification salonInbox) {
+		if (a.getLocation() == null) {
+			return;
+		}
+		String salon = a.getLocation().getName() != null ? a.getLocation().getName() : "Salone";
+		String customer = resolveConsumerDisplayName(a);
+		String operator = resolveOperatorDisplayName(a);
+		String body = withOperatorPhrase(customer + " ha cambiato l'orario della prenotazione", operator) + ".";
+		fcmPushDispatchService.dispatchForScheduledNotificationWithSalonRoles(
+				salonInbox,
+				"Cambio orario prenotazione — " + salon,
+				body,
+				"Cambio orario prenotazione — " + salon,
+				body);
 	}
 
 	private void dispatchOperatorRescheduleRequestPush(Appointment a, ScheduledNotification operatorInbox) {

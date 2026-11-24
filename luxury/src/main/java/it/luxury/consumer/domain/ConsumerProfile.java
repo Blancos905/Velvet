@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -54,8 +56,12 @@ public class ConsumerProfile {
 	@Column(name = "email_verification_token_hash", length = 64)
 	private String emailVerificationTokenHash;
 
-	@Column(name = "email_verification_expires_at")
-	private Instant emailVerificationExpiresAt;
+		@Column(name = "email_verification_expires_at")
+		private Instant emailVerificationExpiresAt;
+
+		/** SHA-256 del segreto di poll creato in registrazione. Nullo dopo l'emissione della sessione. */
+		@Column(name = "registration_poll_secret_hash", length = 64)
+		private String registrationPollSecretHash;
 
 	/** Valori applicativi separati da virgola, es. {@code CLIENT}, {@code OWNER}. */
 	@Column(name = "security_roles", length = 64)
@@ -106,6 +112,11 @@ public class ConsumerProfile {
 
 	@Column(name = "dpa_document_version", length = 40)
 	private String dpaDocumentVersion;
+
+	/** Data URL compresso (JPEG/PNG/WebP) scelto dal cliente in profilo, pannello e app. */
+	@JdbcTypeCode(SqlTypes.LONGVARCHAR)
+	@Column(name = "photo_data_url", columnDefinition = "text")
+	private String photoDataUrl;
 
 	protected ConsumerProfile() {
 	}
@@ -229,9 +240,17 @@ public class ConsumerProfile {
 		return emailVerificationExpiresAt;
 	}
 
-	public void setEmailVerificationExpiresAt(Instant emailVerificationExpiresAt) {
-		this.emailVerificationExpiresAt = emailVerificationExpiresAt;
-	}
+		public void setEmailVerificationExpiresAt(Instant emailVerificationExpiresAt) {
+			this.emailVerificationExpiresAt = emailVerificationExpiresAt;
+		}
+
+		public String getRegistrationPollSecretHash() {
+			return registrationPollSecretHash;
+		}
+
+		public void setRegistrationPollSecretHash(String registrationPollSecretHash) {
+			this.registrationPollSecretHash = registrationPollSecretHash;
+		}
 
 	public String getSecurityRoles() {
 		return securityRoles;
@@ -339,5 +358,13 @@ public class ConsumerProfile {
 
 	public void setDpaDocumentVersion(String dpaDocumentVersion) {
 		this.dpaDocumentVersion = dpaDocumentVersion;
+	}
+
+	public String getPhotoDataUrl() {
+		return photoDataUrl;
+	}
+
+	public void setPhotoDataUrl(String photoDataUrl) {
+		this.photoDataUrl = (photoDataUrl == null || photoDataUrl.isBlank()) ? null : photoDataUrl;
 	}
 }

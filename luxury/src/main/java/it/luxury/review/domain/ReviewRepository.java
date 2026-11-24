@@ -60,6 +60,12 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 					+ "group by a.operator.id")
 	List<Object[]> summarizeStaffRatingsByOperatorForLocation(@Param("locationId") UUID locationId);
 
+	/** Media e conteggio voti verso un singolo operatore (profilo staff). */
+	@Query(
+			"select avg(r.staffRating), count(r) from Review r join r.appointment a "
+					+ "where a.operator.id = :operatorId and r.staffRating is not null and r.hiddenAt is null")
+	List<Object[]> summarizeStaffRatingForOperator(@Param("operatorId") UUID operatorId);
+
 	/** Media e conteggio voti operatore su tutto il catalogo (classifica nazionale pubblica). */
 	@Query(
 			"select a.operator.id, avg(r.staffRating), count(r) from Review r join r.appointment a "
@@ -179,4 +185,15 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 					"appointment.service"
 			})
 	List<Review> findByAppointment_ConsumerProfile_IdOrderByCreatedAtDesc(UUID consumerProfileId);
+
+	@EntityGraph(
+			attributePaths = {
+					"appointment",
+					"appointment.location",
+					"appointment.location.studioGroup",
+					"appointment.operator",
+					"appointment.consumerProfile"
+			})
+	@Query("select r from Review r where r.id = :id")
+	Optional<Review> findDetailedById(@Param("id") UUID id);
 }

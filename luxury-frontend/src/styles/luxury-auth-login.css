@@ -115,10 +115,36 @@
   isolation: isolate;
 }
 
+/* Login salone e super admin: la pagina è solo il box, lo sfondo riempie il resto. */
+.luxury-auth-page--panel {
+  min-height: 100vh;
+  min-height: 100dvh;
+  align-items: center;
+  padding: clamp(1.25rem, 4vh, 2.5rem) 1rem;
+  background:
+    linear-gradient(165deg, rgba(124, 45, 18, 0.82) 0%, rgba(28, 10, 4, 0.58) 46%, rgba(154, 52, 18, 0.84) 100%),
+    url("/editorial/photo-1560066984-138dadb4c035.webp") center 42% / cover no-repeat;
+}
+
+.luxury-auth-page--panel::before {
+  inset: 0;
+  height: auto;
+  border-radius: 0;
+  filter: none;
+  animation: none;
+  background: radial-gradient(ellipse 78% 58% at 50% 46%, rgba(255, 237, 213, 0.16), transparent 68%);
+}
+
+.luxury-auth-page {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
 .luxury-auth-page::before {
   content: "";
   position: absolute;
-  inset: -10% -20% auto;
+  /* Niente inset laterale: su mobile allargava la pagina e spostava il form di accesso. */
+  inset: -10% 0 auto;
   height: min(55vh, 28rem);
   z-index: 0;
   pointer-events: none;
@@ -126,6 +152,17 @@
   background: radial-gradient(ellipse 70% 70% at 50% 0%, rgba(243, 112, 33, 0.16), transparent 68%);
   filter: blur(1px);
   animation: luxury-auth-page-ambient 7s ease-in-out infinite alternate;
+}
+
+@media (max-width: 700px) {
+  .luxury-auth-page {
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Il banner cookie fisso copriva «Accedi». Sulla pagina di accesso resta sotto il form. */
+  body:has(.luxury-auth-page) .luxury-cookie-banner {
+    position: static;
+  }
 }
 
 .luxury-auth-card {

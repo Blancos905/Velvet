@@ -302,7 +302,7 @@ export function SalonPremiumOwnerInfoPrivacyContent({
                 Profilo
               </Link>{" "}
               e in{" "}
-              <Link to="/account/salone/posizione" className="luxury-info-privacy-premium__link">
+              <Link to="/salone/posizione" className="luxury-info-privacy-premium__link">
                 Posizione del salone
               </Link>
               : indirizzo, città, CAP e, quando disponibili, <strong>coordinate geografiche</strong> della sede derivate da

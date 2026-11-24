@@ -53,7 +53,7 @@ export async function apiFetch(path: string, init?: ApiFetchInit): Promise<Respo
 function apiFailureMessage(status: number, text: string, statusText: string): string {
   const raw = (text || statusText).trim();
   if (status >= 500 && (raw.startsWith("<") || raw.length > 800)) {
-    return `Risposta non valida dall’API (${status}). Spesso Spring non è raggiungibile dal proxy Vite: avvia il backend su 8080 e verifica che le richieste vadano a http://127.0.0.1:8080 (vedi vite.config.ts → proxy /api).`;
+    return `Risposta non valida dall’API (${status}). Spesso Spring non è raggiungibile dal proxy Vite: avvia il backend su 8081 e verifica che le richieste vadano a http://127.0.0.1:8081 (vedi vite.config.ts → proxy /api).`;
   }
   return raw || statusText;
 }

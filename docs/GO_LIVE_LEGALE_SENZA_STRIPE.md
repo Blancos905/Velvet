@@ -2,7 +2,7 @@
 
 Checklist per pubblicare **Saloni Luxury / Luxury** con:
 
-- piano **Free** e **Premium in prova gratuita** (nessun addebito);
+- piano **Premium in prova gratuita** (nessun addebito; non esiste un piano gratuito separato);
 - **zero fatturato** per i prossimi ~6 mesi;
 - **Stripe disattivato** o non configurato in produzione.
 
@@ -34,7 +34,7 @@ Puoi **rimandare** quasi tutto sotto, tranne:
 
 ---
 
-## Fase 1 — Go-live pubblico (Free + trial, €0 incassi)
+## Fase 1 — Go-live pubblico (prova Premium, €0 incassi)
 
 ### A. Soggetto giuridico e fiscale (🔴 bloccante)
 
@@ -67,7 +67,7 @@ Verifica: aprire `/privacy` in produzione e controllare che compaiano P.IVA e se
 |---|------|-------------------|---------------|
 | B1 | Informativa **B2C** `/privacy/clienti` | **Sì** | ✅ Custom |
 | B2 | Informativa **B2B** titolari `/privacy` | **Sì** | ✅ Custom |
-| B2b | Riepilogo account **titolare Free** `/account/info-privacy` | **Sì** (UX) | ✅ `SalonFreeOwnerInfoPrivacyContent` (perimetro Free, senza Stripe) |
+| B2b | Riepilogo account **titolare** `/account/info-privacy` | **Sì** (UX) | ✅ informativa titolare Premium (anche prima dell’attivazione; senza un secondo piano) |
 | B3 | Informativa **Staff** `/privacy/staff` | **Sì** | ✅ Custom |
 | B4 | **Cookie policy** + banner | **Sì** | ✅ Gate Maps; foto home self-hosted (`/editorial/`) |
 | B5 | **Registro consensi** server-side | **Sì** (consigliato) | ✅ `POST /api/v1/public/cookie-consent` — applicare SQL prod |

@@ -74,7 +74,7 @@ export default function PrenotazioniStaffPickPage() {
             metaItems={[{ icon: CLIENT_ACCOUNT_ICONS.calendar, label: "Tutte le sedi dello studio" }]}
           />
           <p className="luxury-salon-staff-agenda-page__manage-row">
-            <Link to="/account/salone/staff" className="luxury-salon-staff-agenda-page__manage-link">
+            <Link to="/salone/staff" className="luxury-salon-staff-agenda-page__manage-link">
               Gestisci elenco staff
             </Link>
           </p>
@@ -121,7 +121,7 @@ export default function PrenotazioniStaffPickPage() {
         ) : null}
 
         <p className="luxury-salon-staff-pick-page__manage-row">
-          <Link to="/account/salone/staff" className="luxury-salon-staff-pick-page__manage-link">
+          <Link to="/salone/staff" className="luxury-salon-staff-pick-page__manage-link">
             Gestisci elenco staff
           </Link>
         </p>

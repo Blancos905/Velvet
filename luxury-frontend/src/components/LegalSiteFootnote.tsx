@@ -30,6 +30,9 @@ export function LegalSiteFootnote({ className, style }: LegalSiteFootnoteProps) 
         <Link to={withLegalReturnTo("/termini", returnTo)} className="luxury-legal-site-footnote__chip">
           Termini
         </Link>
+        <Link to={withLegalReturnTo("/licenza", returnTo)} className="luxury-legal-site-footnote__chip">
+          Licenza gratuita
+        </Link>
         <Link to={withLegalReturnTo("/privacy/cookie", returnTo)} className="luxury-legal-site-footnote__chip">
           Cookie
         </Link>

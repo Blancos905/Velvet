@@ -5,6 +5,8 @@ import { apiJson } from "../api/client";
 import type { AppointmentDto } from "../api/types";
 import { useLuxuryAuth } from "../auth/LuxuryAuthProvider";
 import { canBookOnlineAsConsumer } from "../lib/luxuryConsumerBooking";
+import { refreshOrgAvailabilityAfterBooking } from "../lib/orgAvailabilityRefresh";
+import { suppressConsumerBookingConfirmationPopup } from "../lib/suppressConsumerBookingConfirmationPopup";
 import { notifySalonCatalogClientsChanged } from "../lib/salonCatalogClientsSync";
 
 const STORAGE_KEY = "luxury_pending_booking";
@@ -64,14 +66,25 @@ export function PendingBookingResume() {
           }),
         });
         sessionStorage.removeItem(STORAGE_KEY);
+        const pendingApproval = (res.status ?? "").toUpperCase() === "BOOKED";
+        if (!pendingApproval) {
+          suppressConsumerBookingConfirmationPopup(res.id);
+        }
         await qc.invalidateQueries({ queryKey: ["me", "appointments"] });
         await qc.invalidateQueries({ queryKey: ["me", "notifications"] });
         await qc.invalidateQueries({ queryKey: ["me", "salon-clients"] });
         void qc.invalidateQueries({ queryKey: ["catalog", "clients"] });
         notifySalonCatalogClientsChanged();
+        refreshOrgAvailabilityAfterBooking(qc, payload.organizationSlug, payload.start);
         navigate(`/account/prenotazioni/${res.id}`, {
           replace: true,
-          state: { bookingConfirmed: { startIso: res.start, serviceName: res.serviceName } },
+          state: {
+            bookingConfirmed: {
+              startIso: res.start,
+              serviceName: res.serviceName,
+              pendingApproval,
+            },
+          },
         });
       } catch (e) {
         sessionStorage.removeItem(STORAGE_KEY);

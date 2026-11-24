@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Installa Saloni Luxury (dev)</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f2ef;
+        --ink: #1a1714;
+        --muted: #5c564e;
+        --card: #fff;
+        --line: #e4dfd7;
+        --btn: #1a1714;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: linear-gradient(165deg, #ebe6df 0%, var(--bg) 45%, #e7eef2 100%);
+        color: var(--ink);
+        min-height: 100dvh;
+        line-height: 1.45;
+      }
+      main {
+        max-width: 26rem;
+        margin: 0 auto;
+        padding: 1.75rem 1.15rem 2.5rem;
+      }
+      h1 {
+        font-size: 1.35rem;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.02em;
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin: 0 0 1.1rem;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 1.1rem 1.05rem;
+        margin: 0.85rem 0;
+      }
+      .btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background: var(--btn);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        padding: 1.05rem 1rem;
+        border-radius: 14px;
+        margin: 0.35rem 0 0.75rem;
+        font-size: 1.05rem;
+      }
+      .btn:active {
+        opacity: 0.92;
+      }
+      .btn-sec {
+        background: #fff;
+        color: var(--ink);
+        border: 2px solid var(--ink);
+      }
+      ol {
+        margin: 0.4rem 0 0;
+        padding-left: 1.2rem;
+      }
+      li {
+        margin: 0.45rem 0;
+      }
+      code,
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.78rem;
+        word-break: break-all;
+      }
+      .status {
+        font-size: 0.9rem;
+        margin-top: 0.75rem;
+      }
+      .ok {
+        color: #0d6b3c;
+      }
+      .bad {
+        color: #9b1c1c;
+      }
+      .warn {
+        background: #fff7e8;
+        border-color: #f0d9a8;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Installa Saloni Luxury</h1>
+      <p class="muted">
+        APK di sviluppo · stesso Wi‑Fi del Mac · apre il frontend locale su questo host.
+      </p>
+
+      <a class="btn" id="dl" href="./saloni-luxury.apk" download="saloni-luxury.apk"
+        >Scarica APK</a
+      >
+      <a class="btn btn-sec" href="./saloni-luxury.apk">Apri link diretto</a>
+
+      <div class="card warn">
+        <strong>Dopo «Scarica comunque»</strong>
+        <ol>
+          <li>Chrome → icona <strong>Download</strong> (freccia in alto a destra).</li>
+          <li>Tocca <code>saloni-luxury.apk</code>.</li>
+          <li>
+            Se chiede permesso: Impostazioni → App → <strong>Chrome</strong> → Installa app
+            sconosciute → Consenti.
+          </li>
+          <li>Play Protect → <strong>Installa comunque</strong> (se compare).</li>
+          <li>Apri l’app dalla home. Mac acceso con <code>npm run dev</code> + backend.</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <div><strong>Questo telefono deve usare:</strong></div>
+        <p class="mono" id="origin">…</p>
+        <p class="status" id="apkStatus">Verifica APK…</p>
+      </div>
+    </main>
+    <script>
+      (function () {
+        var origin = location.origin;
+        document.getElementById("origin").textContent = origin + "/dev/install.html";
+        var statusEl = document.getElementById("apkStatus");
+        var url = origin + "/dev/saloni-luxury.apk";
+        fetch(url, { method: "HEAD", cache: "no-store" })
+          .then(function (r) {
+            if (!r.ok) throw new Error("HTTP " + r.status);
+            var len = Number(r.headers.get("content-length") || 0);
+            var mb = len ? Math.max(1, Math.round(len / (1024 * 1024))) : "?";
+            statusEl.className = "status ok";
+            statusEl.textContent = "APK pronto (~" + mb + " MB). Tocca Scarica APK.";
+            document.getElementById("dl").textContent = "Scarica APK (~" + mb + " MB)";
+          })
+          .catch(function () {
+            statusEl.className = "status bad";
+            statusEl.textContent =
+              "APK assente. Sul Mac esegui: ./scripts/publish-dev-apk.sh";
+          });
+      })();
+    </script>
+  </body>
+</html>

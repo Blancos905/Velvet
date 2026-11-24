@@ -84,7 +84,7 @@ export default function AccountBillingSuccessPage() {
   }, [meSalon, premiumActive, queryClient]);
 
   if (!isSalonTitolare) {
-    return <Navigate to="/account/salone" replace />;
+    return <Navigate to="/salone" replace />;
   }
 
   const salonName = meSalon.data?.primaryLocationName ?? null;
@@ -101,7 +101,7 @@ export default function AccountBillingSuccessPage() {
             isLuxuryNativeAppShell()
               ? () => {
                   notifyNativeSalonSessionSync();
-                  window.location.assign("/account/salone");
+                  window.location.assign("/salone");
                 }
               : undefined
           }

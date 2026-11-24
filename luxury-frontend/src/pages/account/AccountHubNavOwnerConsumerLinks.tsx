@@ -1,5 +1,5 @@
 import { AccountHubNavLink } from "./AccountHubNavLink";
-import { isLuxuryNativeAppShell } from "../../hooks/useLuxuryNativeAppShell";
+import { useLuxuryT } from "../../i18n/useLuxuryLocale";
 import { accountHubNavBtn } from "./accountHubNavBtn";
 
 const navBtn = accountHubNavBtn;
@@ -46,52 +46,35 @@ export function AccountHubNavOwnerConsumerLinks({
   trustedSalonsNavBadge,
   showTrustedSalonsNavPill,
 }: AccountHubNavOwnerConsumerLinksProps) {
-  const isNativeApp = isLuxuryNativeAppShell();
-  const showFreeSalonShortcuts = isSalonTitolare && !showPremiumSalonNav && !isNativeApp;
-  const showFreeSalonNativeHome = isSalonTitolare && !showPremiumSalonNav && isNativeApp;
+  const t = useLuxuryT();
 
   return (
     <div
       className="luxury-account-hub__nav-scroll luxury-account-hub__nav-scroll--consumer-grid"
-      aria-label="Menu principale account"
+      aria-label={t("account.nav.main")}
     >
-      {showFreeSalonShortcuts ? (
-        <>
-          <AccountHubNavLink to="/account/salone" className={navBtn()}>
-            Il mio salone
-          </AccountHubNavLink>
-          <AccountHubNavLink to="/account/salone/posizione" className={navBtn()}>
-            Posizione del salone
-          </AccountHubNavLink>
-        </>
-      ) : null}
-      {showFreeSalonNativeHome ? (
-        <AccountHubNavLink to="/account/salone" className={navBtn()}>
-          Il mio salone
-        </AccountHubNavLink>
-      ) : null}
       {!isSalonTitolare ? (
         <AccountHubNavLink to="/" className={navBtn()}>
-          Area di ricerca
+          {t("account.nav.searchArea")}
         </AccountHubNavLink>
       ) : null}
       {isSalonTitolare ? (
-        <AccountHubNavLink to="/account/salone/servizi" className={navBtn()}>
-          <span className="luxury-account-hub__btn-notif">Aggiungi servizi</span>
+        <AccountHubNavLink to="/salone/servizi" className={navBtn()}>
+          <span className="luxury-account-hub__btn-notif">{t("account.nav.addServices")}</span>
         </AccountHubNavLink>
       ) : null}
       {isSalonTitolare ? (
         <AccountHubNavLink
-          to={showPremiumSalonNav ? "/account/salone/strumenti" : "/account/notifiche"}
+          to={showPremiumSalonNav ? "/salone/strumenti" : "/account/notifiche"}
           className={navBtn()}
-          title="Centro notifiche salone: prenotazioni e messaggi in evidenza."
+          title={t("account.nav.notificationsSalonTitle")}
         >
           <span className="luxury-account-hub__btn-notif">
-            Notifiche
+            {t("account.nav.notifications")}
             {showSalonNotificheNavPill ? (
               <span
                 className="luxury-account-hub__notif-pill"
-                title={`Da gestire in notifiche: ${notifInboxAttentionTotal} (in coda + inviate in evidenza)`}
+                title={`${notifInboxAttentionTotal}`}
               >
                 {notifInboxAttentionTotal > 99 ? "99+" : notifInboxAttentionTotal}
               </span>
@@ -101,17 +84,17 @@ export function AccountHubNavOwnerConsumerLinks({
       ) : null}
       <AccountHubNavLink to="/account/prenotazioni" className={navBtn()}>
         {isSalonTitolare ? (
-          <span className="luxury-account-hub__btn-notif">Agenda</span>
+          <span className="luxury-account-hub__btn-notif">{t("account.nav.agenda")}</span>
         ) : (
-          "Prenotazioni"
+          t("account.nav.bookings")
         )}
       </AccountHubNavLink>
       {!isSalonTitolare ? (
-        <AccountHubNavLink to="/account/chat" className={navBtn()} title="Messaggi con i saloni di cui sei cliente.">
+        <AccountHubNavLink to="/account/chat" className={navBtn()} title={t("account.nav.chatClientTitle")}>
           <span className="luxury-account-hub__btn-notif">
-            Chat
+            {t("account.nav.chat")}
             {showClientChatNavPill ? (
-              <span className="luxury-account-hub__notif-pill" title={`Messaggi non letti: ${clientChatUnread}`}>
+              <span className="luxury-account-hub__notif-pill" title={`${clientChatUnread}`}>
                 {clientChatUnread > 99 ? "99+" : clientChatUnread}
               </span>
             ) : null}
@@ -121,7 +104,7 @@ export function AccountHubNavOwnerConsumerLinks({
       {!isSalonTitolare ? (
         <AccountHubNavLink to="/account/notifiche" className={navBtn()}>
           <span className="luxury-account-hub__btn-notif">
-            Notifiche
+            {t("account.nav.notifications")}
             {showConsumerNotificheNavPill ? (
               <span className="luxury-account-hub__notif-pill">
                 {consumerNotifAttentionTotal > 99 ? "99+" : consumerNotifAttentionTotal}
@@ -131,35 +114,28 @@ export function AccountHubNavOwnerConsumerLinks({
         </AccountHubNavLink>
       ) : null}
       <AccountHubNavLink to="/account/profilo" className={navBtn()}>
-        Profilo
+        {t("account.nav.profile")}
       </AccountHubNavLink>
-      {isSalonTitolare && !showPremiumSalonNav ? (
-        <AccountHubNavLink to="/account/salone/staff" className={navBtn()}>
-          Staff
-        </AccountHubNavLink>
-      ) : null}
       {!isSalonTitolare ? (
         <AccountHubNavLink
           to="/account/saloni-di-fiducia"
           className={navBtn()}
-          title="Saloni presso cui sei registrato come cliente; il numerino segnala nuovi legami dall’ultima volta che hai aperto l’elenco."
+          title={t("account.nav.trustedSalonsTitle")}
         >
           <span className="luxury-account-hub__btn-notif">
-            Saloni di fiducia
+            {t("account.nav.trustedSalons")}
             {showTrustedSalonsNavPill ? (
-              <span
-                className="luxury-account-hub__notif-pill"
-                title={`Nuovi saloni di fiducia: ${trustedSalonsNavBadge}`}
-              >
+              <span className="luxury-account-hub__notif-pill" title={`${trustedSalonsNavBadge}`}>
                 {trustedSalonsNavBadge > 99 ? "99+" : trustedSalonsNavBadge}
               </span>
             ) : null}
           </span>
         </AccountHubNavLink>
       ) : null}
+      {!isSalonTitolare || showPremiumSalonNav ? (
       <AccountHubNavLink to="/account/feedback-luxury" className={navBtn()}>
         <span className="luxury-account-hub__btn-notif">
-          Recensioni
+          {t("account.nav.reviews")}
           {showSalonReviewsNavPill || showClientReviewsNavPill ? (
             <span className="luxury-account-hub__notif-pill">
               {isSalonTitolare
@@ -173,19 +149,17 @@ export function AccountHubNavOwnerConsumerLinks({
           ) : null}
         </span>
       </AccountHubNavLink>
+      ) : null}
       {showPremiumSalonNav ? (
         <AccountHubNavLink
-          to="/account/salone/clienti"
+          to="/salone/clienti"
           className={navBtn()}
-          title="Elenco clienti della sede; il numerino indica quanti clienti sono stati aggiunti dall’ultima volta che hai aperto questa pagina."
+          title={t("account.nav.clientsTitle")}
         >
           <span className="luxury-account-hub__btn-notif">
-            Clienti
+            {t("account.nav.clients")}
             {showSalonClientsNavPill ? (
-              <span
-                className="luxury-account-hub__notif-pill"
-                title={`Nuovi clienti da vedere: ${salonClientsNavBadge}`}
-              >
+              <span className="luxury-account-hub__notif-pill" title={`${salonClientsNavBadge}`}>
                 {salonClientsNavBadge > 99 ? "99+" : salonClientsNavBadge}
               </span>
             ) : null}
@@ -193,22 +167,22 @@ export function AccountHubNavOwnerConsumerLinks({
         </AccountHubNavLink>
       ) : null}
       {showPremiumSalonNav ? (
-        <AccountHubNavLink to="/account/chat" className={navBtn()} title="Chat con i clienti collegati al salone.">
+        <AccountHubNavLink to="/account/chat" className={navBtn()} title={t("account.nav.chatOwnerTitle")}>
           <span className="luxury-account-hub__btn-notif">
-            Chat
+            {t("account.nav.chat")}
             {showOwnerChatNavPill ? (
-              <span className="luxury-account-hub__notif-pill" title={`Messaggi dai clienti: ${ownerChatUnread}`}>
+              <span className="luxury-account-hub__notif-pill" title={`${ownerChatUnread}`}>
                 {ownerChatUnread > 99 ? "99+" : ownerChatUnread}
               </span>
             ) : null}
           </span>
         </AccountHubNavLink>
       ) : null}
-      <AccountHubNavLink to="/account/info-privacy" className={navBtn()} title="Informazioni sul trattamento dati e privacy.">
-        Info e privacy
+      <AccountHubNavLink to="/account/info-privacy" className={navBtn()} title={t("account.nav.privacyTitle")}>
+        {t("account.nav.privacy")}
       </AccountHubNavLink>
       <AccountHubNavLink to="/account/assistenza" className={navBtn()}>
-        Assistenza
+        {t("account.nav.support")}
       </AccountHubNavLink>
     </div>
   );

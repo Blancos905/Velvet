@@ -3306,4 +3306,58 @@
   margin: 0 0 1rem;
 }
 
+.luxury-admin-sponsor-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.luxury-admin-sponsor-form label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  color: #e7e5e4;
+}
+
+.luxury-admin-sponsor-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.luxury-admin-sponsor-list__item {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 0.75rem 1rem;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-top: 1px solid rgba(253, 186, 116, 0.2);
+}
+
+.luxury-admin-sponsor-list__item img {
+  width: 5.5rem;
+  height: 3.1rem;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #120603;
+}
+
+.luxury-admin-sponsor-list__item p {
+  margin: 0.2rem 0 0;
+}
+
+.luxury-admin-sponsor-list__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.luxury-admin-sponsor-list__actions .luxury-plan-cta {
+  min-height: 2rem;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+}
+
 /* Statistiche super admin: vedi luxury-admin-statistics.css */

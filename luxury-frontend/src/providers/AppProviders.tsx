@@ -4,6 +4,8 @@ import { AdminAuthProvider } from "../auth/AdminAuthProvider";
 import { LuxuryAuthProvider } from "../auth/LuxuryAuthProvider";
 import { LuxuryFcmTokenSync } from "../components/LuxuryFcmTokenSync";
 import { isLikelyNetworkFetchError } from "../api/fetchWithTimeout";
+import { LuxuryLocaleProvider } from "../i18n/LuxuryLocaleProvider";
+import { ProfileLocaleSync } from "../i18n/ProfileLocaleSync";
 
 function createAppQueryClient(): QueryClient {
   return new QueryClient({
@@ -25,10 +27,13 @@ export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(createAppQueryClient);
   return (
     <QueryClientProvider client={queryClient}>
-      <LuxuryAuthProvider>
-        <LuxuryFcmTokenSync />
-        <AdminAuthProvider>{children}</AdminAuthProvider>
-      </LuxuryAuthProvider>
+      <LuxuryLocaleProvider>
+        <LuxuryAuthProvider>
+          <ProfileLocaleSync />
+          <LuxuryFcmTokenSync />
+          <AdminAuthProvider>{children}</AdminAuthProvider>
+        </LuxuryAuthProvider>
+      </LuxuryLocaleProvider>
     </QueryClientProvider>
   );
 }

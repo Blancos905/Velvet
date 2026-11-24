@@ -5,10 +5,12 @@ type Props = {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  /** `sheet` sale dal basso (app). `window` è quasi a schermo intero, al centro (sito). */
+  placement?: "sheet" | "window";
 };
 
-/** Finestra account sopra la pagina corrente — solo app mobile (WebView). */
-export function LuxuryNativeAccountOverlay({ title, onClose, children }: Props) {
+/** Finestra account sopra la pagina corrente. In app è un foglio dal basso; sul sito è centrata. */
+export function LuxuryNativeAccountOverlay({ title, onClose, children, placement = "sheet" }: Props) {
   const titleId = useId();
 
   useEffect(() => {
@@ -31,7 +33,14 @@ export function LuxuryNativeAccountOverlay({ title, onClose, children }: Props) 
   }, [onClose]);
 
   return (
-    <div className="luxury-native-account-overlay" role="presentation">
+    <div
+      className={
+        placement === "window"
+          ? "luxury-native-account-overlay luxury-native-account-overlay--window"
+          : "luxury-native-account-overlay"
+      }
+      role="presentation"
+    >
       <button
         type="button"
         className="luxury-native-account-overlay__backdrop"

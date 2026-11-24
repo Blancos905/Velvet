@@ -40,13 +40,19 @@ export type MeStaffSalon = {
   planTier: string | null;
 };
 
-/** `GET/PATCH /api/v1/me/staff/operator-profile` — anagrafica e foto operatore (agenda / team salone). */
+/** `GET/PATCH /api/v1/me/staff/operator-profile` — anagrafica, foto e preferenze operatore. */
 export type MeStaffOperatorSelf = {
   id: string;
   firstName: string;
   lastName: string;
   role: string;
   photoDataUrl: string | null;
+  /** Se true: alert Accetta/Rifiuta; se false: conferma automatica e sola notifica informativa. */
+  requireBookingConfirmation?: boolean;
+  /** Media voti verso l'operatore (1–5); assente se nessuna recensione. */
+  averageStaffRating?: number | null;
+  /** Numero di recensioni con voto operatore. */
+  staffReviewCount?: number | null;
 };
 
 export type MeSalonSummary = {
@@ -77,6 +83,13 @@ export type MeSalonSummary = {
   primaryLocationOpenDays?: string[] | null;
   /** Premium con PIN statistiche configurato in registrazione. */
   statisticsPinRequired?: boolean;
+  /**
+   * True se ogni sede è visibile a clienti e ricerca.
+   * Una sede nuova resta nascosta finché il titolare non abilita la visualizzazione.
+   */
+  visibleToClients?: boolean;
+  /** Sedi già create. Il prezzo Premium dipende da questo numero. */
+  locationCount?: number;
 };
 
 /** `GET /api/v1/me/salon/reviews` — recensioni ricevute dal salone. */
@@ -111,6 +124,14 @@ export type OrganizationSummary = {
   salonBusinessTypes?: string[] | null;
 };
 
+/** Altra sede pubblica dello stesso salone. */
+export type SalonSiblingLocation = {
+  slug: string;
+  name: string | null;
+  city: string | null;
+  addressLine: string | null;
+};
+
 export type OrganizationDetail = {
   id: string;
   slug: string;
@@ -132,6 +153,8 @@ export type OrganizationDetail = {
   bookingAfternoonStartMinuteOfDay?: number | null;
   /** Giorni di apertura prenotabile (`MONDAY` … `SUNDAY`). */
   bookingOpenDays?: string[] | null;
+  /** Altre sedi dello stesso salone. Assente o vuota se la sede è unica. */
+  siblingLocations?: SalonSiblingLocation[] | null;
 };
 
 /** `GET /api/v1/clients` con header `X-Location-Id` — anagrafica clienti della sede (stessa base di «Diventa cliente»). */
@@ -243,6 +266,8 @@ export type ProfileDto = {
   /** ISO 3166-1 alpha-2 (es. IT). */
   country: string | null;
   preferredLocale: string | null;
+  /** Data URL compresso. Assente finché il cliente non carica una foto. */
+  photoDataUrl?: string | null;
 };
 
 /** Profilo super admin incluso in `GET /api/v1/admin/overview` (campo `superAdminProfile`). */
@@ -319,6 +344,8 @@ export type SuperAdminRecentSalonRowDto = {
   subscriptionCurrentPeriodEnd?: string | null;
   /** PAYING | TRIAL | CANCELLED */
   subscriptionBillingCategory?: string | null;
+  /** Almeno una sede è nello spazio a pagamento «Saloni sponsorizzati». */
+  sponsoredPlacement?: boolean;
 };
 
 export type SuperAdminRecentSalonClientRowDto = {

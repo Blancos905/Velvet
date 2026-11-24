@@ -19,6 +19,8 @@ import type {
 } from "../api/types";
 import { useLuxuryAuth } from "../auth/LuxuryAuthProvider";
 import { canBookOnlineAsConsumer } from "../lib/luxuryConsumerBooking";
+import { refreshOrgAvailabilityAfterBooking } from "../lib/orgAvailabilityRefresh";
+import { suppressConsumerBookingConfirmationPopup } from "../lib/suppressConsumerBookingConfirmationPopup";
 import { savePendingBooking } from "../components/PendingBookingResume";
 import { BookingConfirmedModal } from "../components/BookingConfirmedModal";
 import { setPostLoginReturnPath } from "../lib/postLoginReturnPath";
@@ -235,7 +237,12 @@ export default function SalonPage() {
   const [bookingSlotsModalOpen, setBookingSlotsModalOpen] = useState(false);
   const [bookingLoginModalOpen, setBookingLoginModalOpen] = useState(false);
   const [bookingConfirmSlot, setBookingConfirmSlot] = useState<string | null>(null);
-  const [bookingSuccess, setBookingSuccess] = useState<{ appointmentId: string; startIso: string } | null>(null);
+  const [bookingSuccess, setBookingSuccess] = useState<{
+    appointmentId: string;
+    startIso: string;
+    /** true = BOOKED in attesa; false = già CONFIRMED (operatore senza alert accettazione). */
+    pendingApproval: boolean;
+  } | null>(null);
   const [bookingMsg, setBookingMsg] = useState<string | null>(null);
   const userPickedAvailabilityDayRef = useRef(false);
   const bookingResumeHandledRef = useRef(false);
@@ -452,7 +459,7 @@ export default function SalonPage() {
     }
   }, [showBookingAgenda, operatorsQ.isLoading, operatorsQ.data, operatorId, isAuthenticated]);
 
-  const operatorsList = operatorsQ.data ?? [];
+  const operatorsList = useMemo(() => operatorsQ.data ?? [], [operatorsQ.data]);
   const selectedOperator = useMemo(
     () => (operatorId.trim() ? operatorsList.find((o) => o.id === operatorId) : undefined),
     [operatorsList, operatorId],
@@ -489,6 +496,10 @@ export default function SalonPage() {
       showBookingAgenda && s && serviceId.trim().length > 0 && from && to && availabilityQueryReady,
     ),
     retry: false,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    /** Mantiene gli slot allineati se un altro cliente prenota nello stesso intervallo. */
+    refetchInterval: showBookingAgenda ? 15_000 : false,
   });
 
   const availabilityDays = useMemo(() => {
@@ -669,9 +680,19 @@ export default function SalonPage() {
       await qc.invalidateQueries({ queryKey: ["me", "salon-clients"] });
       void qc.invalidateQueries({ queryKey: ["catalog", "clients"] });
       notifySalonCatalogClientsChanged();
+      const pendingApproval = (res.status ?? "").toUpperCase() === "BOOKED";
+      if (!pendingApproval) {
+        suppressConsumerBookingConfirmationPopup(res.id);
+      }
       void qc.invalidateQueries({ queryKey: ["me", "notifications"] });
+      refreshOrgAvailabilityAfterBooking(qc, s, startIso, selectedService?.durationMinutes);
       if (isNativeApp) setBookingSlotsModalOpen(false);
-      setBookingSuccess({ appointmentId: res.id, startIso });
+      setBookingConfirmSlot(null);
+      setBookingSuccess({
+        appointmentId: res.id,
+        startIso,
+        pendingApproval,
+      });
     } catch (e) {
       setBookingMsg(e instanceof Error ? e.message : "Errore");
     }
@@ -763,6 +784,9 @@ export default function SalonPage() {
             siteFullscreenBleed
             allowEmptyPreview
             embedHeading
+            siblingLocations={(detail.siblingLocations ?? []).filter(
+              (location) => location.slug.trim().length > 0 && location.slug !== detail.slug,
+            )}
           />
 
           <div className="luxury-salon-public-page__content">
@@ -1341,7 +1365,7 @@ export default function SalonPage() {
           startIso={bookingSuccess.startIso}
           timeZone={salonTimeZone}
           serviceName={selectedService?.name}
-          pendingApproval
+          pendingApproval={bookingSuccess.pendingApproval}
           onClose={() => setBookingSuccess(null)}
           onViewAppointment={() => {
             const id = bookingSuccess.appointmentId;

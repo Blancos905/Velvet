@@ -1,12 +1,14 @@
 package it.luxury.billing.service;
 
-import it.luxury.config.LuxuryStripeProperties;
+import it.luxury.common.api.BusinessException;
 import it.luxury.studio.domain.StudioGroup;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 /**
- * Piano richiesto in registrazione: {@code PREMIUM} resta {@code PREMIUM} anche con Stripe attivo.
- * Le funzionalità Premium sono sbloccate solo dopo pagamento ({@link SalonPremiumEntitlementService}).
+ * Registrazione titolare: l’unico piano commerciale è {@code PREMIUM}.
+ * I 30 giorni di prova non aprono Stripe: checkout e dati fiscali arrivano a fine prova.
+ * Le funzionalità Premium sono sbloccate con {@link SalonPremiumEntitlementService#hasActivePremium}.
  */
 @Component
 public class BillingRegistrationPlanPolicy {
@@ -19,24 +21,33 @@ public class BillingRegistrationPlanPolicy {
 		return base + REGISTRATION_CHECKOUT_START_PATH + "?token=" + encodedCheckoutToken;
 	}
 
-	private final LuxuryStripeProperties stripeProperties;
-
-	public BillingRegistrationPlanPolicy(LuxuryStripeProperties stripeProperties) {
-		this.stripeProperties = stripeProperties;
-	}
-
+	/**
+	 * Piano da materializzare in registrazione. Non restituisce {@code BASE}:
+	 * quel valore resta solo lo stato tecnico «non entitled» scritto da Stripe, non un piano scelto.
+	 */
 	public String effectiveProvisionPlanTier(String requestedPlanTier) {
-		return StudioGroup.canonicalPlanTier(requestedPlanTier);
+		String canonical = StudioGroup.canonicalPlanTier(requestedPlanTier);
+		if ("PLUS".equals(canonical)) {
+			return "PLUS";
+		}
+		if (!"PREMIUM".equals(canonical)) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"VALIDATION_ERROR",
+					"Il piano disponibile per la registrazione è Premium.");
+		}
+		return "PREMIUM";
 	}
 
+	/** La registrazione non raccoglie la carta: Stripe parte dopo i 30 giorni di prova. */
 	public boolean billingCheckoutRequiredForPremiumRegistration(String requestedPlanTier) {
-		return stripeProperties.configured()
-				&& "PREMIUM".equalsIgnoreCase(requestedPlanTier != null ? requestedPlanTier.trim() : "");
+		return false;
 	}
 
 	public String salonOwnerPostConfirmPath(String requestedPlanTier) {
-		return billingCheckoutRequiredForPremiumRegistration(requestedPlanTier)
-				? REGISTRATION_CHECKOUT_START_PATH
-				: "/account/salone";
+		if (requestedPlanTier == null || requestedPlanTier.isBlank()) {
+			return "/salone";
+		}
+		return "/salone";
 	}
 }

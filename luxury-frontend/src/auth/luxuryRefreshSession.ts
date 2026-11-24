@@ -1,5 +1,6 @@
 import { apiUrl } from "../config/env";
 import { fetchWithTimeout } from "../api/fetchWithTimeout";
+import { isLuxuryLoginSessionExpired } from "../lib/luxurySessionStartedAt";
 
 const REFRESH_TOKEN_STORAGE_KEY = "luxury_refresh_token";
 
@@ -14,18 +15,12 @@ type AuthLoginResponse = {
 let refreshInFlight: Promise<string | undefined> | null = null;
 
 export function readStoredRefreshToken(): string | undefined {
-  if (typeof sessionStorage === "undefined") return undefined;
-  const raw = sessionStorage.getItem(REFRESH_TOKEN_STORAGE_KEY);
-  return raw && raw.trim() ? raw.trim() : undefined;
+  return undefined;
 }
 
-export function writeStoredRefreshToken(token: string | undefined): void {
+export function writeStoredRefreshToken(_token: string | undefined): void {
   if (typeof sessionStorage === "undefined") return;
-  if (!token || !token.trim()) {
-    sessionStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY);
-    return;
-  }
-  sessionStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, token.trim());
+  sessionStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY);
 }
 
 export function clearStoredRefreshToken(): void {
@@ -33,24 +28,25 @@ export function clearStoredRefreshToken(): void {
 }
 
 export async function refreshLuxuryAccessToken(): Promise<string | undefined> {
+  if (isLuxuryLoginSessionExpired()) {
+    return undefined;
+  }
   if (refreshInFlight) {
     return refreshInFlight;
   }
   refreshInFlight = (async () => {
-    const storedRefresh = readStoredRefreshToken();
+    writeStoredRefreshToken(undefined);
     const r = await fetchWithTimeout(apiUrl("/api/v1/auth/refresh"), {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(storedRefresh ? { refreshToken: storedRefresh } : {}),
+      body: JSON.stringify({}),
     });
     if (!r.ok) {
       return undefined;
     }
     const body = (await r.json()) as AuthLoginResponse;
-    if (body.refreshToken) {
-      writeStoredRefreshToken(body.refreshToken);
-    }
+    writeStoredRefreshToken(undefined);
     return body.accessToken;
   })().finally(() => {
     refreshInFlight = null;
@@ -59,13 +55,12 @@ export async function refreshLuxuryAccessToken(): Promise<string | undefined> {
 }
 
 export async function logoutLuxurySession(): Promise<void> {
-  const storedRefresh = readStoredRefreshToken();
   try {
     await fetchWithTimeout(apiUrl("/api/v1/auth/logout"), {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(storedRefresh ? { refreshToken: storedRefresh } : {}),
+      body: JSON.stringify({}),
     });
   } catch {
     /* best effort */

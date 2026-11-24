@@ -18,11 +18,11 @@ class SalonPromotionalTrialServiceTest {
 	@BeforeEach
 	void setUp() {
 		service = new SalonPromotionalTrialService();
-		ReflectionTestUtils.setField(service, "promotionalTrialDays", 60);
+		ReflectionTestUtils.setField(service, "promotionalTrialDays", 30);
 	}
 
 	@Test
-	void trialEndsSixtyDaysAfterRegistration() {
+	void trialEndsThirtyDaysAfterRegistration() {
 		Instant createdAt = Instant.parse("2026-01-15T10:00:00Z");
 		var group = new StudioGroup("Test", "owner@example.com", "PREMIUM");
 		ReflectionTestUtils.setField(group, "createdAt", createdAt);
@@ -31,7 +31,9 @@ class SalonPromotionalTrialServiceTest {
 
 		assertNotNull(endsAt);
 		assertTrue(endsAt.isAfter(createdAt));
-		assertTrue(service.isWithinPromotionalTrial(group, createdAt.plusSeconds(59L * 24 * 3600)));
-		assertFalse(service.isWithinPromotionalTrial(group, createdAt.plusSeconds(60L * 24 * 3600)));
+		assertTrue(service.isWithinPromotionalTrial(group, createdAt.plusSeconds(29L * 24 * 3600)));
+		assertFalse(service.isWithinPromotionalTrial(group, createdAt.plusSeconds(30L * 24 * 3600)));
+		assertNotNull(service.deferredStripeChargeEpochSecond(group, createdAt.plusSeconds(24 * 3600)));
+		assertTrue(service.deferredStripeChargeEpochSecond(group, createdAt.plusSeconds(29L * 24 * 3600)) == null);
 	}
 }

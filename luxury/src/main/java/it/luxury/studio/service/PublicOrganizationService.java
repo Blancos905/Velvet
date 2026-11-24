@@ -12,6 +12,10 @@ import it.luxury.publicapi.dto.PublicDtos.TopOperatorSummaryDto;
 import it.luxury.publicapi.dto.PublicDtos.OrganizationSummaryDto;
 import it.luxury.publicapi.dto.PublicDtos.PublicSalonReviewDto;
 import it.luxury.publicapi.dto.PublicDtos.OrganizationDetailDto;
+import it.luxury.publicapi.dto.PublicDtos.SiblingLocationDto;
+import it.luxury.publicapi.dto.SalonSiblingLocations;
+import it.luxury.publicapi.dto.PublicDtos.QuickSuggestAvailabilityDto;
+import it.luxury.publicapi.dto.PublicDtos.QuickSuggestExtraTagDto;
 import it.luxury.review.ReviewPrivacySupport;
 import it.luxury.review.domain.ReviewRepository;
 import it.luxury.studio.domain.Location;
@@ -35,6 +39,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -82,7 +88,24 @@ public class PublicOrganizationService {
 
 	@Transactional(readOnly = true)
 	public OrganizationDetailDto organizationDetail(String slug) {
-		Location loc = requireBySlug(slug);
+		return organizationDetail(requireBySlug(slug));
+	}
+
+	/**
+	 * Stessa scheda della vetrina pubblica, anche se il titolare non ha ancora abilitato la visualizzazione ai clienti.
+	 * Va chiamato solo con lo slug della sede del titolare autenticato.
+	 */
+	@Transactional(readOnly = true)
+	public OrganizationDetailDto organizationDetailIgnoringClientVisibility(String slug) {
+		Location loc = locationRepository.findBySlug(slug)
+				.orElseThrow(() -> new it.luxury.common.api.BusinessException(
+						org.springframework.http.HttpStatus.NOT_FOUND,
+						"NOT_FOUND",
+						"Sede non trovata."));
+		return organizationDetail(loc);
+	}
+
+	private OrganizationDetailDto organizationDetail(Location loc) {
 		String contactEmail = null;
 		String contactPhone = null;
 		StudioGroup sg = loc.getStudioGroup();
@@ -96,7 +119,29 @@ public class PublicOrganizationService {
 				contactPhone = p.getPhone().trim();
 			}
 		}
-		return OrganizationDetailDto.from(loc, contactEmail, contactPhone);
+		return OrganizationDetailDto.from(loc, contactEmail, contactPhone, siblingLocationsOf(loc));
+	}
+
+	/**
+	 * Altre sedi pubbliche dello stesso salone. Lista vuota se la sede è unica.
+	 */
+	private List<SiblingLocationDto> siblingLocationsOf(Location current) {
+		StudioGroup group = current.getStudioGroup();
+		if (group == null || group.getId() == null || current.getId() == null) {
+			return List.of();
+		}
+		List<SalonSiblingLocations.Candidate> candidates = locationRepository
+				.findByStudioGroup_IdOrderByNameAsc(group.getId())
+				.stream()
+				.filter(this::isPremiumLocation)
+				.map(other -> new SalonSiblingLocations.Candidate(
+						other.getId(),
+						other.getSlug(),
+						other.getName(),
+						other.getCity(),
+						other.getAddressLine()))
+				.toList();
+		return SalonSiblingLocations.others(current.getId(), candidates);
 	}
 
 	/**
@@ -168,20 +213,117 @@ public class PublicOrganizationService {
 	 */
 	/**
 	 * Query rapide home («Oppure un tocco») con almeno un salone premium nel raggio che offre il servizio in listino
-	 * (stessa logica di {@link #searchWithReviewSummaries} per testo + geolocalizzazione).
+	 * (stessa logica di {@link #searchWithReviewSummaries} per testo + geolocalizzazione), più tag dinamici da
+	 * servizi listino non già coperti dai tasti curati.
 	 */
-	public List<String> availableQuickSuggestQueries(double nearLat, double nearLng, Double nearKm) {
+	@Transactional(readOnly = true)
+	public QuickSuggestAvailabilityDto quickSuggestAvailability(double nearLat, double nearLng, Double nearKm) {
 		if (!isFiniteLatLng(nearLat, nearLng)) {
-			return List.of();
+			return new QuickSuggestAvailabilityDto(List.of(), List.of());
 		}
 		double radiusKm = (nearKm != null && nearKm > 0) ? Math.min(nearKm, 200.0) : 25.0;
-		List<String> out = new ArrayList<>();
+		List<String> curated = new ArrayList<>();
 		for (String q : SalonQuickSearchCatalogHints.registeredQuickSearchQueries()) {
 			if (hasQuickSuggestMatchesNear(q, nearLat, nearLng, radiusKm)) {
-				out.add(q);
+				curated.add(q);
 			}
 		}
-		return out;
+		return new QuickSuggestAvailabilityDto(curated, extraQuickSuggestTagsNear(nearLat, nearLng, radiusKm));
+	}
+
+	/** @deprecated preferire {@link #quickSuggestAvailability}; tenuto per eventuali caller interni. */
+	public List<String> availableQuickSuggestQueries(double nearLat, double nearLng, Double nearKm) {
+		return quickSuggestAvailability(nearLat, nearLng, nearKm).curatedQueries();
+	}
+
+	private static final int MAX_QUICK_SUGGEST_EXTRAS = 30;
+
+	/**
+	 * Servizi in listino di sedi premium nel raggio il cui nome non è già coperto dai tasti curati home.
+	 * Ordinati per frequenza (quanti saloni vicini li offrono), poi etichetta; max {@link #MAX_QUICK_SUGGEST_EXTRAS}.
+	 */
+	private List<QuickSuggestExtraTagDto> extraQuickSuggestTagsNear(double nearLat, double nearLng, double radiusKm) {
+		List<Location> nearPremium = filterPremiumWithinRadius(
+				locationRepository.findPremiumLocationsWithCoordinates(), nearLat, nearLng, radiusKm, true);
+		if (nearPremium.isEmpty()) {
+			return List.of();
+		}
+		Map<UUID, Location> byId = nearPremium.stream()
+				.collect(Collectors.toMap(Location::getId, l -> l, (a, b) -> a, HashMap::new));
+		List<SalonService> services = salonServiceRepository.findByLocation_IdIn(byId.keySet());
+		return collectExtraQuickSuggestTags(services, byId);
+	}
+
+	private List<QuickSuggestExtraTagDto> collectExtraQuickSuggestTags(
+			List<SalonService> services, Map<UUID, Location> byId) {
+		class Acc {
+			String label;
+			final String q;
+			final Map<String, Integer> groupVotes = new HashMap<>();
+			final Set<UUID> salonIds = new HashSet<>();
+
+			Acc(String label, String q) {
+				this.label = label;
+				this.q = q;
+			}
+		}
+		Map<String, Acc> byNorm = new LinkedHashMap<>();
+		for (SalonService svc : services) {
+			if (svc == null || svc.getName() == null || svc.getName().isBlank()) {
+				continue;
+			}
+			if (SalonQuickSearchCatalogHints.isCoveredByCuratedQuickSuggest(svc.getName())) {
+				continue;
+			}
+			UUID locId = svc.getLocation() != null ? svc.getLocation().getId() : null;
+			Location loc = locId != null ? byId.get(locId) : null;
+			if (loc == null) {
+				continue;
+			}
+			String label = svc.getName().trim();
+			String norm = label.toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
+			if (norm.length() < 2) {
+				continue;
+			}
+			Acc acc = byNorm.computeIfAbsent(norm, k -> new Acc(label, label));
+			if (label.length() > acc.label.length()) {
+				acc.label = label;
+			}
+			acc.salonIds.add(loc.getId());
+			String groupId = quickSuggestGroupIdForLocation(loc);
+			acc.groupVotes.merge(groupId, 1, Integer::sum);
+		}
+		return byNorm.values().stream()
+				.sorted(Comparator
+						.comparingInt((Acc a) -> a.salonIds.size())
+						.reversed()
+						.thenComparing(a -> a.label, String.CASE_INSENSITIVE_ORDER))
+				.limit(MAX_QUICK_SUGGEST_EXTRAS)
+				.map(a -> new QuickSuggestExtraTagDto(a.label, a.q, winningQuickSuggestGroup(a.groupVotes)))
+				.toList();
+	}
+
+	private static String quickSuggestGroupIdForLocation(Location loc) {
+		Set<SalonBusinessType> types = SalonBusinessType.parseCsv(loc.getSalonBusinessTypes());
+		if (types.size() == 1) {
+			if (types.contains(SalonBusinessType.HAIR)) {
+				return "parrucchieri";
+			}
+			if (types.contains(SalonBusinessType.BEAUTY)) {
+				return "estetisti";
+			}
+			if (types.contains(SalonBusinessType.MASSAGE)) {
+				return "massaggi-fisio";
+			}
+		}
+		return "altri";
+	}
+
+	private static String winningQuickSuggestGroup(Map<String, Integer> votes) {
+		return votes.entrySet().stream()
+				.max(Map.Entry.comparingByValue())
+				.map(Map.Entry::getKey)
+				.orElse("altri");
 	}
 
 	@Transactional(readOnly = true)
@@ -262,6 +404,34 @@ public class PublicOrganizationService {
 				.limit(cap)
 				.toList();
 		return sorted.stream()
+				.map(loc -> {
+					RatingAgg agg = byLocation.get(loc.getId());
+					if (agg == null) {
+						return OrganizationSummaryDto.from(loc, null, null);
+					}
+					return OrganizationSummaryDto.from(loc, agg.average(), agg.count());
+				})
+				.toList();
+	}
+
+	/**
+	 * Saloni con spazio a pagamento in home («Saloni sponsorizzati»).
+	 * Ordine per nome: non è una classifica sulle recensioni.
+	 * Compaiono solo sedi visibili e con Premium attivo.
+	 */
+	@Transactional(readOnly = true)
+	public List<OrganizationSummaryDto> sponsoredPlacementSummaries(int limit) {
+		int cap = Math.min(Math.max(limit, 1), 30);
+		List<Location> sponsored = locationRepository.findSponsoredVisibleLocations().stream()
+				.filter(this::isPremiumLocation)
+				.limit(cap)
+				.toList();
+		if (sponsored.isEmpty()) {
+			return List.of();
+		}
+		List<UUID> ids = sponsored.stream().map(Location::getId).toList();
+		Map<UUID, RatingAgg> byLocation = reviewAggregatesByLocationIds(ids);
+		return sponsored.stream()
 				.map(loc -> {
 					RatingAgg agg = byLocation.get(loc.getId());
 					if (agg == null) {
@@ -1135,6 +1305,10 @@ public class PublicOrganizationService {
 	}
 
 	private boolean isPremiumLocation(Location loc) {
+		return isPremiumEntitled(loc) && loc.isVisibleToClients();
+	}
+
+	private boolean isPremiumEntitled(Location loc) {
 		if (loc == null || loc.getStudioGroup() == null) {
 			return false;
 		}

@@ -2,7 +2,7 @@ import type { BillingStatus } from "../api/billing";
 import type { SalonPlanTier } from "../data/salonPlans";
 import { PREMIUM_SALON_POST_LOGIN_PATH } from "./salonRegistrationPostLogin";
 
-export const SALON_OWNER_HOME_PATH = "/account/salone";
+export const SALON_OWNER_HOME_PATH = "/salone";
 
 export type SalonPremiumCheckoutPolicy = {
   premiumCheckoutRequired: boolean;
@@ -28,8 +28,11 @@ export function postLoginPathForSalonPlan(
   if (plan === "PREMIUM" && premiumCheckoutRequired) {
     return PREMIUM_SALON_POST_LOGIN_PATH;
   }
-  if (plan === "PREMIUM" || plan === "BASE") {
+  if (plan === "PREMIUM" || plan === "PLUS") {
     return SALON_OWNER_HOME_PATH;
+  }
+  if (plan === "BASE") {
+    return "/piani?plan=PREMIUM";
   }
   return "/account";
 }

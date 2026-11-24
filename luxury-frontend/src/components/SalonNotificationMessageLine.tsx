@@ -36,7 +36,11 @@ export function SalonNotificationMessageLine({
   const openPopup = (event?: MouseEvent | KeyboardEvent) => {
     event?.preventDefault();
     event?.stopPropagation();
-    openLuxuryNotificationPopup(messageToNotificationPopup(message, categoryLabel, viewerRole));
+    // Riapertura dallo storico: solo popup, senza chime/suono urgente.
+    openLuxuryNotificationPopup({
+      ...messageToNotificationPopup(message, categoryLabel, viewerRole),
+      playSound: false,
+    });
   };
 
   const previewLine = notificationPreviewLine(message);

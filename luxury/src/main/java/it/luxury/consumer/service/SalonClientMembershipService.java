@@ -3,6 +3,8 @@ package it.luxury.consumer.service;
 import it.luxury.appointment.domain.AppointmentRepository;
 import it.luxury.catalog.domain.SalonClient;
 import it.luxury.catalog.domain.SalonClientRepository;
+import it.luxury.catalog.domain.SalonLuxuryChatMessageRepository;
+import it.luxury.catalog.domain.SalonLuxuryChatReadStateRepository;
 import it.luxury.common.api.BusinessException;
 import it.luxury.consumer.domain.ConsumerProfile;
 import it.luxury.security.auth.LuxuryUserPrincipal;
@@ -34,18 +36,24 @@ public class SalonClientMembershipService {
 	private final ConsumerProfileService consumerProfileService;
 	private final AppointmentRepository appointmentRepository;
 	private final SalonEngagementNotificationService salonEngagementNotificationService;
+	private final SalonLuxuryChatMessageRepository salonLuxuryChatMessageRepository;
+	private final SalonLuxuryChatReadStateRepository salonLuxuryChatReadStateRepository;
 
 	public SalonClientMembershipService(
 			SalonClientRepository salonClientRepository,
 			LocationRepository locationRepository,
 			ConsumerProfileService consumerProfileService,
 			AppointmentRepository appointmentRepository,
-			SalonEngagementNotificationService salonEngagementNotificationService) {
+			SalonEngagementNotificationService salonEngagementNotificationService,
+			SalonLuxuryChatMessageRepository salonLuxuryChatMessageRepository,
+			SalonLuxuryChatReadStateRepository salonLuxuryChatReadStateRepository) {
 		this.salonClientRepository = salonClientRepository;
 		this.locationRepository = locationRepository;
 		this.consumerProfileService = consumerProfileService;
 		this.appointmentRepository = appointmentRepository;
 		this.salonEngagementNotificationService = salonEngagementNotificationService;
+		this.salonLuxuryChatMessageRepository = salonLuxuryChatMessageRepository;
+		this.salonLuxuryChatReadStateRepository = salonLuxuryChatReadStateRepository;
 	}
 
 	@Transactional(readOnly = true)
@@ -151,8 +159,14 @@ public class SalonClientMembershipService {
 			salonClient.setConsumerProfile(null);
 			salonClientRepository.save(salonClient);
 		} else {
+			purgeSalonClientChatData(salonClient.getId());
 			salonClientRepository.delete(salonClient);
 		}
+	}
+
+	private void purgeSalonClientChatData(UUID salonClientId) {
+		salonLuxuryChatMessageRepository.deleteBySalonClient_Id(salonClientId);
+		salonLuxuryChatReadStateRepository.deleteBySalonClient_Id(salonClientId);
 	}
 
 	private Optional<SalonClient> findOrphanSalonClientForRelink(UUID locationId, ConsumerProfile consumer) {

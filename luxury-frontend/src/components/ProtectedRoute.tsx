@@ -1,4 +1,4 @@
-import { useId, useEffect, useRef, useState, type ReactNode } from "react";
+import { useId, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLuxuryAuth } from "../auth/LuxuryAuthProvider";
 import { LUXURY_ACCESS_TOKEN_KEY } from "../auth/adminSession";
@@ -19,9 +19,11 @@ import {
 import { isSalonPremiumCheckoutRequired, shouldOfferSalonPremiumCheckout } from "../lib/salonPremiumCheckoutPolicy";
 import { useSalonPremiumCheckoutPolicyQuery } from "../hooks/useSalonPremiumCheckoutPolicy";
 import { useBillingStatusQuery } from "../hooks/useSalonFeaturePlanTier";
-import { humanizePostRegistrationAuthError } from "../utils/authErrors";
+import { humanizePostRegistrationAuthErrorLocalized } from "../utils/authErrors";
+import { useLuxuryT } from "../i18n/useLuxuryLocale";
 import { luxuryJwtHintsFromAccessToken } from "../lib/luxuryJwtHintsFromAccessToken";
 import { hasPendingBooking } from "./PendingBookingResume";
+import { currentSurface, isPublicSalonRegistrationPath, panelKindForRoles, readSurfaceLocation } from "../lib/luxurySurfaces";
 import { LuxuryEntrySplashGate } from "./LuxuryEntrySplashGate";
 import {
   scheduleLuxuryLoginFormDomClear,
@@ -31,11 +33,13 @@ import {
 import {
   clearSavedLoginCredentials,
   isNativeSavedCredentialsAllowed,
-  isSavedLoginEmailAllowed,
   isSavedLoginPersistenceAllowed,
+  readLoginAccountKind,
   readSavedLoginCredentials,
+  rememberLogoutLoginKind,
   writeSavedLoginCredentials,
   writeSavedLoginEmail,
+  type SavedLoginAccountKind,
 } from "../lib/luxurySavedLoginCredentials";
 
 function shouldSwitchAwayFromSuperAdminSession(premiumCheckoutRequired: boolean): boolean {
@@ -45,8 +49,17 @@ function shouldSwitchAwayFromSuperAdminSession(premiumCheckoutRequired: boolean)
   return isPremiumSalonRegistrationPending() && premiumCheckoutRequired;
 }
 
-function readInitialLoginFormState(): { email: string; password: string; rememberEmail: boolean } {
-  const saved = readSavedLoginCredentials();
+function formAccountKind(search: string): SavedLoginAccountKind | null {
+  const hinted = readLoginAccountKind(search);
+  if (hinted) return hinted;
+  const surface = currentSurface(readSurfaceLocation());
+  if (surface === "admin") return "admin";
+  if (surface === "public") return "client";
+  return null;
+}
+
+function readInitialLoginFormState(kind: SavedLoginAccountKind | null): { email: string; password: string; rememberEmail: boolean } {
+  const saved = readSavedLoginCredentials(kind);
   return {
     email: saved?.email ?? "",
     password: saved?.password ?? "",
@@ -61,9 +74,11 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const rememberFieldId = `${formId}-remember`;
   const navigate = useNavigate();
   const location = useLocation();
+  const t = useLuxuryT();
   const { isAuthenticated, isLoading, isLuxurySuperAdmin, isSalonTitolare, signInWithPassword, signOutForAccountSwitch } =
     useLuxuryAuth();
-  const initialLoginForm = readInitialLoginFormState();
+  const accountKind = formAccountKind(location.search);
+  const initialLoginForm = readInitialLoginFormState(accountKind);
   const [email, setEmail] = useState(initialLoginForm.email);
   const [password, setPassword] = useState(initialLoginForm.password);
   const [showPassword, setShowPassword] = useState(false);
@@ -81,8 +96,8 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const switchingSessionRef = useRef(false);
   const wasAuthenticatedRef = useRef(false);
 
-  const applyLoginFormDefaults = () => {
-    const saved = readSavedLoginCredentials();
+  const applyLoginFormDefaults = useCallback(() => {
+    const saved = readSavedLoginCredentials(accountKind);
     if (saved) {
       setEmail(saved.email);
       setPassword(saved.password);
@@ -95,17 +110,17 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     setShowPassword(false);
     setError(null);
     setLoginFormKey((k) => k + 1);
-  };
+  }, [accountKind]);
 
-  const clearLoginFields = () => {
+  const clearLoginFields = useCallback(() => {
     applyLoginFormDefaults();
-  };
+  }, [applyLoginFormDefaults]);
 
   useEffect(() => {
     const onSessionEnded = () => clearLoginFields();
     window.addEventListener(LUXURY_SESSION_ENDED_EVENT, onSessionEnded);
     return () => window.removeEventListener(LUXURY_SESSION_ENDED_EVENT, onSessionEnded);
-  }, []);
+  }, [clearLoginFields]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -113,7 +128,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
       clearLoginFields();
     }
     wasAuthenticatedRef.current = isAuthenticated;
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, clearLoginFields]);
 
   useEffect(() => {
     if (isLoading || isAuthenticated) return;
@@ -127,10 +142,11 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     if (!shouldClear) return;
     clearLoginFields();
     scheduleLuxuryLoginFormDomClear(clearLoginFields);
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, clearLoginFields]);
 
   useEffect(() => {
     if (isLoading || !isAuthenticated || !isLuxurySuperAdmin) return;
+    if (currentSurface(readSurfaceLocation()) === "public") return;
     if (!shouldSwitchAwayFromSuperAdminSession(premiumCheckoutRequired)) {
       navigate("/admin/dashboard", { replace: true });
       return;
@@ -164,7 +180,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isLoading || isAuthenticated) return;
     const intendedPlan = readIntendedSalonPlanFromSession();
-    if (intendedPlan === "PREMIUM") {
+    if (intendedPlan === "PREMIUM" || intendedPlan === "PLUS") {
       setPostLoginReturnPath(loginReturnPathForSalonRegistration(intendedPlan, premiumCheckoutRequired));
       return;
     }
@@ -179,22 +195,23 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     return (
       <main className="luxury-auth-page">
         <div className="luxury-auth-card">
-          <p className="luxury-auth-loading">Accesso in corso…</p>
+          <p className="luxury-auth-loading">{t("auth.loading")}</p>
         </div>
       </main>
     );
   }
 
   if (!isAuthenticated) {
-    return (
-      <LuxuryEntrySplashGate>
-        <main className="luxury-auth-page">
+    const panelLoginOnly = currentSurface(readSurfaceLocation()) !== "public";
+    const loginCard = (
+        <main className={panelLoginOnly ? "luxury-auth-page luxury-auth-page--panel" : "luxury-auth-page"}>
         <div className="luxury-auth-card">
+          {panelLoginOnly ? null : (
           <div className="luxury-auth-card-toolbar">
             <button
               type="button"
               className="luxury-auth-back"
-              aria-label="Torna indietro"
+              aria-label={t("auth.backAria")}
               onClick={() => navigate(-1)}
             >
               <svg
@@ -212,10 +229,11 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
                   strokeLinejoin="round"
                 />
               </svg>
-              <span>Indietro</span>
+              <span>{t("common.back")}</span>
             </button>
           </div>
-          <h1 className="luxury-auth-title">Accedi</h1>
+          )}
+          <h1 className="luxury-auth-title">{t("header.login")}</h1>
           {error ? (
             <p className="luxury-alert luxury-alert--error luxury-auth-alert" role="alert">
               {error}
@@ -230,24 +248,45 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
               setError(null);
               const u = email.trim().toLowerCase();
               if (!u || !password) {
-                setError("Inserisci email e password.");
+                setError(t("auth.missingFields"));
                 return;
               }
               setSubmitting(true);
               void (async () => {
                 try {
                   await signInWithPassword(u, password);
-                  if (rememberEmail && isSavedLoginPersistenceAllowed()) {
-                    writeSavedLoginCredentials(u, password);
-                  } else {
-                    clearSavedLoginCredentials();
-                  }
-                  clearLoginFields();
                   const tok =
                     typeof sessionStorage !== "undefined"
                       ? sessionStorage.getItem(LUXURY_ACCESS_TOKEN_KEY)
                       : null;
-                  if (luxuryJwtHintsFromAccessToken(tok ?? undefined).realmRoles.includes("ADMIN")) {
+                  const roles = luxuryJwtHintsFromAccessToken(tok ?? undefined).realmRoles;
+                  const savedKind =
+                    panelKindForRoles({
+                      admin: roles.includes("ADMIN"),
+                      owner: roles.includes("OWNER"),
+                      staff: roles.includes("STAFF"),
+                    }) ?? "client";
+                  rememberLogoutLoginKind(savedKind);
+                  if (rememberEmail && isSavedLoginPersistenceAllowed()) {
+                    writeSavedLoginCredentials(u, password, savedKind);
+                  } else {
+                    clearSavedLoginCredentials(savedKind);
+                  }
+                  clearLoginFields();
+                  const onClientHome = currentSurface(readSurfaceLocation()) === "public";
+                  const pendingReturn = readPostLoginReturnPath();
+                  const salonRegistration =
+                    isPremiumSalonRegistrationPending()
+                    || (pendingReturn != null && isPublicSalonRegistrationPath(pendingReturn));
+                  if (
+                    onClientHome
+                    && !salonRegistration
+                    && (roles.includes("ADMIN") || roles.includes("OWNER") || roles.includes("STAFF"))
+                  ) {
+                    clearPostLoginReturnPath();
+                    return;
+                  }
+                  if (roles.includes("ADMIN")) {
                     const adminReturn = consumePostLoginReturnPath();
                     navigate(
                       adminReturn && adminReturn.startsWith("/admin") ? adminReturn : "/admin/dashboard",
@@ -273,7 +312,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
                     }
                   }
                 } catch (err) {
-                  setError(err instanceof Error ? err.message : humanizePostRegistrationAuthError(err));
+                  setError(humanizePostRegistrationAuthErrorLocalized(err, t));
                 } finally {
                   setSubmitting(false);
                 }
@@ -282,13 +321,13 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
           >
             <div className="luxury-auth-field">
               <label htmlFor={emailFieldId} className="luxury-auth-label">
-                Email
+                {t("auth.email")}
               </label>
               <input
                 id={emailFieldId}
-                name="email"
+                name={accountKind ? `${accountKind}-email` : "panel-email"}
                 type="email"
-                autoComplete="email"
+                autoComplete={`section-${accountKind ?? "panel"} username`}
                 inputMode="email"
                 value={email}
                 onChange={(ev) => setEmail(ev.target.value)}
@@ -298,14 +337,14 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
             </div>
             <div className="luxury-auth-field">
               <label htmlFor={passFieldId} className="luxury-auth-label">
-                Password
+                {t("auth.password")}
               </label>
               <div className="luxury-auth-password-wrap">
                 <input
                   id={passFieldId}
-                  name="password"
+                  name={accountKind ? `${accountKind}-password` : "panel-password"}
                   type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
+                  autoComplete={`section-${accountKind ?? "panel"} current-password`}
                   value={password}
                   onChange={(ev) => setPassword(ev.target.value)}
                   disabled={submitting}
@@ -316,7 +355,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
                   className="luxury-auth-password-toggle"
                   onClick={() => setShowPassword((v) => !v)}
                   disabled={submitting}
-                  aria-label={showPassword ? "Nascondi password" : "Mostra password"}
+                  aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
                   aria-pressed={showPassword}
                 >
                   {showPassword ? (
@@ -362,34 +401,34 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
                       const checked = ev.target.checked;
                       setRememberEmail(checked);
                       if (!checked) {
-                        clearSavedLoginCredentials();
-                      } else if (email.trim()) {
+                        clearSavedLoginCredentials(accountKind);
+                      } else if (email.trim() && accountKind) {
                         if (isNativeSavedCredentialsAllowed()) {
-                          writeSavedLoginCredentials(email, password);
+                          writeSavedLoginCredentials(email, password, accountKind);
                         } else {
-                          writeSavedLoginEmail(email);
+                          writeSavedLoginEmail(email, accountKind);
                         }
                       }
                     }}
                     disabled={submitting}
                   />
-                  <span>{isNativeSavedCredentialsAllowed() ? "Salva credenziali" : "Ricorda email"}</span>
+                  <span>{isNativeSavedCredentialsAllowed() ? t("auth.rememberCredentials") : t("auth.rememberEmail")}</span>
                 </label>
               ) : null}
               <p className="luxury-auth-recover">
                 <Link className="luxury-auth-recover-link" to="/reimposta-password">
-                  Password dimenticata?
+                  {t("auth.forgotPassword")}
                 </Link>
               </p>
             </div>
             <button type="submit" className="luxury-auth-submit" disabled={submitting}>
-              {submitting ? "Accesso…" : "Accedi"}
+              {submitting ? t("auth.submitting") : t("header.login")}
             </button>
           </form>
         </div>
       </main>
-      </LuxuryEntrySplashGate>
     );
+    return panelLoginOnly ? loginCard : <LuxuryEntrySplashGate>{loginCard}</LuxuryEntrySplashGate>;
   }
 
   if (isAuthenticated && isLuxurySuperAdmin) {
@@ -397,7 +436,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
       return (
         <main className="luxury-auth-page">
           <div className="luxury-auth-card">
-            <p className="luxury-auth-loading">Accedi con l&apos;account del salone per continuare…</p>
+            <p className="luxury-auth-loading">{t("auth.switchToSalonAccount")}</p>
           </div>
         </main>
       );

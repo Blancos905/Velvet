@@ -2,13 +2,17 @@ package it.luxury.consumer.service;
 
 import it.luxury.catalog.domain.SalonClient;
 import it.luxury.catalog.domain.SalonClientRepository;
+import it.luxury.common.api.BusinessException;
 import it.luxury.consumer.domain.ConsumerProfile;
 import it.luxury.consumer.domain.ConsumerProfileRepository;
 import it.luxury.notification.domain.UserDeviceRepository;
+import it.luxury.notification.service.AccountLifecycleEmailDispatchService;
 import it.luxury.review.ReviewPrivacySupport;
 import it.luxury.review.domain.Review;
 import it.luxury.review.domain.ReviewRepository;
 import it.luxury.security.auth.LuxuryRefreshTokenService;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,18 +29,44 @@ public class ConsumerAccountService {
 	private final UserDeviceRepository userDeviceRepository;
 	private final ReviewRepository reviewRepository;
 	private final SalonClientRepository salonClientRepository;
+	private final AccountLifecycleEmailDispatchService accountLifecycleEmailDispatchService;
+	private final PasswordEncoder passwordEncoder;
 
 	public ConsumerAccountService(
 			ConsumerProfileRepository consumerProfileRepository,
 			LuxuryRefreshTokenService luxuryRefreshTokenService,
 			UserDeviceRepository userDeviceRepository,
 			ReviewRepository reviewRepository,
-			SalonClientRepository salonClientRepository) {
+			SalonClientRepository salonClientRepository,
+			AccountLifecycleEmailDispatchService accountLifecycleEmailDispatchService,
+			PasswordEncoder passwordEncoder) {
 		this.consumerProfileRepository = consumerProfileRepository;
 		this.luxuryRefreshTokenService = luxuryRefreshTokenService;
 		this.userDeviceRepository = userDeviceRepository;
 		this.reviewRepository = reviewRepository;
 		this.salonClientRepository = salonClientRepository;
+		this.accountLifecycleEmailDispatchService = accountLifecycleEmailDispatchService;
+		this.passwordEncoder = passwordEncoder;
+	}
+
+	/**
+	 * Chiusura richiesta dall'utente: senza password corretta il profilo resta attivo.
+	 */
+	@Transactional
+	public void deleteOwnAccount(String authSub, String currentPassword) {
+		Optional<ConsumerProfile> existing = consumerProfileRepository.findByAuthSub(authSub);
+		if (existing.isPresent() && existing.get().getDeletedAt() != null) {
+			return;
+		}
+		ConsumerProfile profile = existing.orElseThrow(
+				() -> new BusinessException(HttpStatus.UNAUTHORIZED, "PROFILE_NOT_FOUND", "Profilo non trovato."));
+		if (currentPassword == null || currentPassword.isBlank()) {
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Inserisci la password attuale.");
+		}
+		if (profile.getPasswordHash() == null || !passwordEncoder.matches(currentPassword, profile.getPasswordHash())) {
+			throw new BusinessException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Password attuale non corretta.");
+		}
+		deleteAccount(authSub);
 	}
 
 	/**
@@ -51,6 +81,8 @@ public class ConsumerAccountService {
 			return;
 		}
 		existing.ifPresent(profile -> {
+			String emailBeforeScrub = profile.getEmail();
+			String displayNameBeforeScrub = profile.getDisplayName();
 			UUID profileId = profile.getId();
 			luxuryRefreshTokenService.revokeAllForProfile(profileId);
 			userDeviceRepository.deleteByUserId(profileId);
@@ -58,6 +90,7 @@ public class ConsumerAccountService {
 			scrubProfileIdentifiers(profile);
 			profile.setDeletedAt(Instant.now());
 			consumerProfileRepository.save(profile);
+			accountLifecycleEmailDispatchService.dispatchAccountDeleted(emailBeforeScrub, displayNameBeforeScrub);
 		});
 	}
 

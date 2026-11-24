@@ -1,0 +1,332 @@
+.luxury-billing-flow-standalone .luxury-billing-checkout-hero {
+  margin-bottom: 1.35rem;
+  padding: 1.15rem 1.35rem;
+  border-radius: 1.4rem;
+  border: 1px solid rgba(251, 146, 60, 0.34);
+  background:
+    radial-gradient(90% 140% at 0% 0%, rgba(249, 115, 22, 0.28), transparent 58%),
+    linear-gradient(165deg, rgba(36, 16, 8, 0.96), rgba(10, 6, 4, 0.98));
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 237, 213, 0.1);
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-hero .luxury-account-page-shell__hero-title {
+  margin: 0;
+  font-size: clamp(1.55rem, 3vw, 2rem);
+  color: #fff7ed;
+  letter-spacing: -0.02em;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card {
+  position: relative;
+  margin: 0;
+  padding: 0.55rem;
+  border-radius: 1.7rem;
+  border: 1px solid rgba(251, 146, 60, 0.45);
+  background:
+    linear-gradient(160deg, rgba(249, 115, 22, 0.18), rgba(12, 8, 6, 0.2) 42%, rgba(251, 191, 36, 0.08));
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 28px 60px rgba(0, 0, 0, 0.42),
+    0 0 48px rgba(249, 115, 22, 0.12);
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card::before {
+  display: block;
+  left: 1.1rem;
+  right: 1.1rem;
+  height: 2px;
+  opacity: 0;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel {
+  gap: 1.15rem;
+  padding: clamp(1.25rem, 2.6vw, 1.75rem);
+  border-radius: 1.35rem;
+  border: 1px solid rgba(253, 186, 116, 0.28);
+  background:
+    radial-gradient(70% 42% at 50% -8%, rgba(249, 115, 22, 0.28), transparent 62%),
+    linear-gradient(168deg, #2a140c 0%, #140c09 55%, #0c0806 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 237, 213, 0.12),
+    inset 0 -24px 40px rgba(0, 0, 0, 0.28);
+  transform: none;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel::before {
+  opacity: 0.55;
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(251, 191, 36, 0.22), transparent 68%);
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel:hover,
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel:focus-within {
+  transform: none;
+  border-color: rgba(251, 146, 60, 0.55);
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff7ed;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel .luxury-profile-card__title::after {
+  width: 4.5rem;
+  height: 3px;
+  margin-top: 0.7rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fb923c, #fdba74 70%, transparent);
+  box-shadow: 0 0 16px rgba(249, 115, 22, 0.45);
+  animation: none;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-form {
+  gap: 0.95rem;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-salon-billing-fields {
+  margin: 0;
+  padding: 0.15rem 0 0;
+  border: 0;
+  min-width: 0;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-form__row {
+  gap: 0.85rem;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel .luxury-form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.42rem;
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(253, 186, 116, 0.95);
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel .luxury-form-label:has(.luxury-soft-field:focus) {
+  color: #ffedd5;
+  letter-spacing: 0.1em;
+  transform: none;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel .luxury-soft-field {
+  width: 100%;
+  min-height: 2.85rem;
+  padding: 0.78rem 0.95rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(251, 146, 60, 0.32);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 237, 0.04), transparent 40%),
+    rgba(8, 5, 3, 0.82);
+  color: #fff7ed;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  box-shadow: inset 0 1px 0 rgba(255, 237, 213, 0.05);
+  transform: none;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel .luxury-soft-field::placeholder {
+  color: rgba(253, 186, 116, 0.38);
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel select.luxury-soft-field {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #fb923c 50%),
+    linear-gradient(135deg, #fb923c 50%, transparent 50%),
+    linear-gradient(180deg, rgba(255, 247, 237, 0.04), transparent 40%);
+  background-position:
+    calc(100% - 1.15rem) 1.2rem,
+    calc(100% - 0.78rem) 1.2rem,
+    0 0;
+  background-size: 6px 6px, 6px 6px, 100% 100%;
+  background-repeat: no-repeat;
+  background-color: rgba(8, 5, 3, 0.82);
+  padding-right: 2.2rem;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel .luxury-soft-field:hover:not(:disabled):not(:focus) {
+  border-color: rgba(253, 186, 116, 0.62);
+  background-color: rgba(18, 10, 6, 0.92);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  transform: none;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel .luxury-soft-field:focus {
+  outline: none;
+  border-color: #fb923c;
+  box-shadow:
+    0 0 0 3px rgba(249, 115, 22, 0.24),
+    0 12px 28px rgba(249, 115, 22, 0.16);
+  transform: none;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-alert {
+  margin: 0;
+  border-radius: 0.95rem;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-form__submit,
+.luxury-billing-flow-standalone .luxury-billing-checkout-card__stripe {
+  justify-self: stretch;
+  width: 100%;
+  min-width: 0;
+  min-height: 3rem;
+  margin-top: 0.2rem;
+  padding: 0.8rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(253, 186, 116, 0.5);
+  background: linear-gradient(180deg, #fdba74 0%, #f97316 42%, #c2410c 100%);
+  color: #1c0a06;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  box-shadow:
+    0 10px 26px rgba(249, 115, 22, 0.32),
+    inset 0 1px 0 rgba(255, 247, 237, 0.45);
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel .luxury-btn--primary:hover:not(:disabled),
+.luxury-billing-flow-standalone .luxury-billing-checkout-card__stripe:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 30px rgba(249, 115, 22, 0.4),
+    inset 0 1px 0 rgba(255, 247, 237, 0.5);
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-insert-panel .luxury-btn--primary:active:not(:disabled),
+.luxury-billing-flow-standalone .luxury-billing-checkout-card__stripe:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-btn--primary:disabled,
+.luxury-billing-flow-standalone .luxury-billing-checkout-card__stripe:disabled {
+  opacity: 0.45;
+  filter: grayscale(0.2);
+  box-shadow: none;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card__pay {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 0.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(251, 146, 60, 0.22);
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card__hint,
+.luxury-billing-flow-standalone .luxury-billing-checkout-card__legal {
+  margin: 0;
+  color: rgba(255, 237, 213, 0.74);
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card__legal {
+  font-size: 0.82rem;
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card__unavailable {
+  padding: 0.95rem 1.05rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(251, 146, 60, 0.4);
+  background:
+    linear-gradient(180deg, rgba(249, 115, 22, 0.16), rgba(249, 115, 22, 0.06));
+  color: #ffedd5;
+  box-shadow: inset 0 1px 0 rgba(255, 237, 213, 0.08);
+}
+
+.luxury-billing-flow-standalone .luxury-billing-checkout-card__unavailable p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.luxury-trial-billing-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 9100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6vh 1.35rem;
+  background: rgba(8, 6, 5, 0.38);
+}
+
+.luxury-trial-billing-prompt__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(26rem, 100%);
+  min-height: min(32rem, 74vh);
+  padding: 2rem 1.6rem 1.5rem;
+  border-radius: 1.6rem;
+  border: 1px solid rgba(251, 146, 60, 0.48);
+  background:
+    radial-gradient(80% 42% at 50% 0%, rgba(249, 115, 22, 0.28), transparent 58%),
+    linear-gradient(180deg, #2a140c 0%, #140c09 55%, #0c0806 100%);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.48),
+    0 0 0 1px rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+.luxury-trial-billing-prompt__logo {
+  width: 9.25rem;
+  height: 9.25rem;
+  margin-bottom: 1.15rem;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow:
+    0 0 0 1px rgba(251, 146, 60, 0.45),
+    0 12px 32px rgba(249, 115, 22, 0.28);
+}
+
+.luxury-trial-billing-prompt__title {
+  margin: 0 0 0.85rem;
+  font-size: 1.45rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff7ed;
+}
+
+.luxury-trial-billing-prompt__lead {
+  margin: 0;
+  max-width: 22rem;
+  color: rgba(255, 237, 213, 0.84);
+  line-height: 1.55;
+  font-size: 1rem;
+}
+
+.luxury-trial-billing-prompt__go.luxury-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 3rem;
+  margin-top: auto;
+  padding: 0.85rem 1.2rem;
+  border: 1px solid rgba(253, 186, 116, 0.5);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fdba74 0%, #f97316 42%, #c2410c 100%);
+  color: #1c0a06;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  box-shadow:
+    0 10px 26px rgba(249, 115, 22, 0.32),
+    inset 0 1px 0 rgba(255, 247, 237, 0.45);
+}
+
+@media (max-width: 640px) {
+  .luxury-billing-flow-standalone .luxury-billing-checkout-card .luxury-profile-form__row {
+    grid-template-columns: 1fr;
+  }
+}

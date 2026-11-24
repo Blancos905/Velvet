@@ -1,7 +1,7 @@
 /** Query param per tornare alla pagina di origine dopo un documento legale. */
 export const LEGAL_RETURN_TO_QUERY = "returnTo";
 
-const LEGAL_DOCUMENT_PREFIXES = ["/privacy", "/termini", "/legale"] as const;
+const LEGAL_DOCUMENT_PREFIXES = ["/privacy", "/termini", "/legale", "/licenza"] as const;
 
 function pathOnly(pathWithQuery: string): string {
   return pathWithQuery.split("#")[0]?.split("?")[0] ?? "";

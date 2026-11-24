@@ -27,7 +27,7 @@ export default function SalonStaffAgendaPage() {
   }, [mergedStaffMembers, staffId]);
 
   if (!isSalonTitolare) {
-    return <Navigate to={isSalonStaff ? STAFF_MEMBER_AGENDA_PATH : "/account/salone"} replace />;
+    return <Navigate to={isSalonStaff ? STAFF_MEMBER_AGENDA_PATH : "/salone"} replace />;
   }
 
   if (!staffId) {
@@ -89,7 +89,7 @@ export default function SalonStaffAgendaPage() {
           ]}
         />
         <p className="luxury-salon-staff-agenda-page__manage-row">
-          <Link to="/account/salone/staff" className="luxury-salon-staff-agenda-page__manage-link">
+          <Link to="/salone/staff" className="luxury-salon-staff-agenda-page__manage-link">
             Gestione staff
           </Link>
         </p>

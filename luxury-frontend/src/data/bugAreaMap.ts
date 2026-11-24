@@ -147,7 +147,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "geocoding",
     label: "CAP, indirizzo, coordinate sede",
-    surfaces: ["/search", "/account/salone/posizione", "/account/profilo"],
+    surfaces: ["/search", "/salone/posizione", "/account/profilo"],
     aliases: ["geocoding", "cap", "indirizzo", "coordinate", "localizza", "locate"],
     example: "@geocoding c'è un bug, controlla",
     frontend: [
@@ -211,7 +211,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "premium",
     label: "Piano Premium, tier, guard",
-    surfaces: ["/account/salone", "/piani"],
+    surfaces: ["/salone", "/piani"],
     aliases: ["premium", "tier", "piano", "provisioned", "guard"],
     example: "@premium c'è un bug, controlla",
     frontend: [
@@ -229,7 +229,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "panorama",
     label: "Hub / checklist Premium",
-    surfaces: ["/account/salone"],
+    surfaces: ["/salone"],
     aliases: ["panorama", "checklist", "hub premium"],
     example: "@panorama c'è un bug, controlla",
     frontend: [
@@ -242,7 +242,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "brand",
     label: "Brand, logo, colori salone",
-    surfaces: ["/account/salone/brand"],
+    surfaces: ["/salone/brand"],
     aliases: ["brand", "logo", "colori", "carousel"],
     example: "@brand c'è un bug, controlla",
     frontend: ["luxury-frontend/src/pages/account/salon/SalonBrandPage.tsx", "luxury-frontend/src/lib/salonShowcaseStorage.ts"],
@@ -252,7 +252,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "layout",
     label: "Anteprima layout vetrina",
-    surfaces: ["/account/salone/brand/anteprima-layout", "/account/salone/layout"],
+    surfaces: ["/salone/brand/anteprima-layout", "/salone/layout"],
     aliases: ["layout", "anteprima layout", "catalogo layout"],
     example: "@layout c'è un bug, controlla",
     frontend: [
@@ -266,7 +266,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "editor-sito",
     label: "Crea il tuo sito (titolare)",
-    surfaces: ["/account/salone/tuo-salone"],
+    surfaces: ["/salone/tuo-salone"],
     aliases: ["editor sito", "crea sito", "builder", "tuo salone"],
     example: "@editor-sito c'è un bug, controlla",
     frontend: [
@@ -279,7 +279,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "statistiche",
     label: "Statistiche salone / PDF",
-    surfaces: ["/account/salone/statistiche"],
+    surfaces: ["/salone/statistiche"],
     aliases: ["statistiche", "stats", "pdf", "report", "semestrale"],
     example: "@statistiche c'è un bug, controlla",
     frontend: [
@@ -294,7 +294,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "posizione",
     label: "Posizione sede salone",
-    surfaces: ["/account/salone/posizione"],
+    surfaces: ["/salone/posizione"],
     aliases: ["posizione", "sede", "mappa salone"],
     example: "@posizione c'è un bug, controlla",
     frontend: ["luxury-frontend/src/pages/account/salon/SalonLocationPage.tsx"],
@@ -304,7 +304,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "strumenti",
     label: "Strumenti standard salone",
-    surfaces: ["/account/salone/strumenti"],
+    surfaces: ["/salone/strumenti"],
     aliases: ["strumenti", "tools salone"],
     example: "@strumenti c'è un bug, controlla",
     frontend: ["luxury-frontend/src/pages/account/salon/SalonStandardToolsPage.tsx"],
@@ -314,7 +314,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "salone",
     label: "Home salone in account",
-    surfaces: ["/account/salone"],
+    surfaces: ["/salone"],
     aliases: ["salone", "hub salone"],
     example: "@salone c'è un bug, controlla",
     frontend: [
@@ -340,7 +340,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "servizi",
     label: "Catalogo servizi salone",
-    surfaces: ["/account/salone/servizi"],
+    surfaces: ["/salone/servizi"],
     aliases: ["servizi", "catalogo servizi", "listino"],
     example: "@servizi c'è un bug, controlla",
     frontend: ["luxury-frontend/src/pages/account/salon/SalonServicesPage.tsx"],
@@ -350,7 +350,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "staff",
     label: "Operatori salone",
-    surfaces: ["/account/salone/staff", "/account/staff"],
+    surfaces: ["/salone/staff", "/account/staff"],
     aliases: ["staff", "operatori", "team"],
     example: "@staff c'è un bug, controlla",
     frontend: [
@@ -384,7 +384,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "clienti",
     label: "Anagrafica clienti salone",
-    surfaces: ["/account/salone/clienti"],
+    surfaces: ["/salone/clienti"],
     aliases: ["clienti", "anagrafica", "rubrica clienti"],
     example: "@clienti c'è un bug, controlla",
     frontend: [
@@ -554,7 +554,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "legale",
     label: "Pagine legali pubbliche",
-    surfaces: ["/privacy", "/privacy/clienti", "/privacy/staff", "/termini", "/legale"],
+    surfaces: ["/privacy", "/privacy/clienti", "/privacy/staff", "/termini", "/licenza", "/legale"],
     aliases: ["legale", "termini", "privacy policy", "documenti legali"],
     example: "@legale c'è un bug, controlla",
     frontend: [
@@ -744,7 +744,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "storage-vetrina",
     label: "Persistenza vetrina / pagina personale",
-    surfaces: ["/s/:slug", "/account/salone/brand", "/account/salone/tuo-salone"],
+    surfaces: ["/s/:slug", "/salone/brand", "/salone/tuo-salone"],
     aliases: ["storage", "idb", "localstorage vetrina", "showcase storage"],
     example: "@storage-vetrina c'è un bug, controlla",
     frontend: [
@@ -800,7 +800,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "redirect",
     label: "Redirect post-login e indice account",
-    surfaces: ["/account", "/account/salone/layout"],
+    surfaces: ["/account", "/salone/layout"],
     aliases: ["redirect", "navigate", "post login", "indice account"],
     example: "@redirect c'è un bug, controlla",
     frontend: [
@@ -814,7 +814,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "pannello-legale",
     label: "Pannelli legali embedded",
-    surfaces: ["/legale", "/privacy", "/privacy/clienti", "/privacy/staff", "/termini"],
+    surfaces: ["/legale", "/privacy", "/privacy/clienti", "/privacy/staff", "/termini", "/licenza"],
     aliases: ["pannello legale", "legal panel", "documento embedded"],
     example: "@pannello-legale c'è un bug, controlla",
     frontend: [
@@ -843,7 +843,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "catalogo-backend",
     label: "Catalogo servizi lato server",
-    surfaces: ["/account/salone/servizi"],
+    surfaces: ["/salone/servizi"],
     aliases: ["catalogo backend", "me salon catalog", "salon service entity"],
     example: "@catalogo-backend c'è un bug, controlla",
     frontend: ["luxury-frontend/src/pages/account/salon/SalonServicesPage.tsx"],
@@ -885,7 +885,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "provisioning",
     label: "Provisioning salone, slug, repair",
-    surfaces: ["/piani", "/account/salone"],
+    surfaces: ["/piani", "/salone"],
     aliases: ["provisioning", "slug salone", "orphan repair", "directory salone"],
     example: "@provisioning c'è un bug, controlla",
     frontend: ["luxury-frontend/src/pages/SalonPlansPage.tsx"],
@@ -934,7 +934,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "layout-catalogo",
     label: "Catalogo layout e wireframe",
-    surfaces: ["/account/salone/brand", "/account/salone/brand/anteprima-layout"],
+    surfaces: ["/salone/brand", "/salone/brand/anteprima-layout"],
     aliases: ["catalogo layout", "wireframe", "standard layout", "stili testo"],
     example: "@layout-catalogo c'è un bug, controlla",
     frontend: [
@@ -950,7 +950,7 @@ export const BUG_AREA_MAP: BugAreaMapEntry[] = [
   {
     tag: "brand-sidebar",
     label: "Sidebar brand e ambientazione layout",
-    surfaces: ["/account/salone/brand"],
+    surfaces: ["/salone/brand"],
     aliases: ["sidebar brand", "ambient sidebar", "layout sidebar"],
     example: "@brand-sidebar c'è un bug, controlla",
     frontend: [
@@ -1134,6 +1134,7 @@ export const CANONICAL_APP_ROUTE_SAMPLES = [
   "/privacy/scelte",
   "/privacy/elimina-account",
   "/termini",
+  "/licenza",
   "/legale",
   "/auth/callback",
   "/reimposta-password",
@@ -1146,17 +1147,17 @@ export const CANONICAL_APP_ROUTE_SAMPLES = [
   "/account",
   "/account/home",
   "/account/staff",
-  "/account/salone",
-  "/account/salone/servizi",
-  "/account/salone/staff",
-  "/account/salone/clienti",
-  "/account/salone/brand",
-  "/account/salone/brand/anteprima-layout",
-  "/account/salone/tuo-salone",
-  "/account/salone/layout",
-  "/account/salone/strumenti",
-  "/account/salone/statistiche",
-  "/account/salone/posizione",
+  "/salone",
+  "/salone/servizi",
+  "/salone/staff",
+  "/salone/clienti",
+  "/salone/brand",
+  "/salone/brand/anteprima-layout",
+  "/salone/tuo-salone",
+  "/salone/layout",
+  "/salone/strumenti",
+  "/salone/statistiche",
+  "/salone/posizione",
   "/account/prenotazioni",
   "/account/prenotazioni/demo-id",
   "/account/prenotazioni/staff/demo-staff/agenda",

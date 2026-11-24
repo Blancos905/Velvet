@@ -1,6 +1,5 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useLuxuryAuth } from "../auth/LuxuryAuthProvider";
-import { useEffectiveSalonPlanTier } from "../hooks/useEffectiveSalonPlanTier";
 import { isLuxuryNativeAppShell } from "../hooks/useLuxuryNativeAppShell";
 import {
   CONSUMER_PROFILE_MENU_ITEMS,
@@ -8,27 +7,30 @@ import {
   STAFF_PROFILE_MENU_ITEMS,
   SUPER_ADMIN_PROFILE_MENU_ITEMS,
 } from "../lib/appHeaderProfileMenuItems";
-import { useMeSalonSummaryQuery } from "../hooks/useMeSalonSummary";
-import { isSalonFreeOwnerBlockedOnWeb } from "../lib/subscription-guards";
 import { setPostLoginReturnPath } from "../lib/postLoginReturnPath";
+import { useLuxuryT } from "../i18n/useLuxuryLocale";
 import { AppHeaderProfileMenu } from "./AppHeaderProfileMenu";
+import { HeaderTrialCountdown } from "./HeaderTrialCountdown";
+import { HeaderSponsorRotator } from "./HeaderSponsorRotator";
 import { PartnerSignupLink } from "./PartnerSignupLink";
 import "../styles/app-header.css";
 
 export function AppHeader() {
+  const t = useLuxuryT();
   const location = useLocation();
   const { isAuthenticated, isSalonTitolare, isSalonStaff, isLuxurySuperAdmin, signOut } = useLuxuryAuth();
   const isNativeApp = isLuxuryNativeAppShell();
-  const salonPlanTier = useEffectiveSalonPlanTier();
-  const meSalon = useMeSalonSummaryQuery();
-  const hideOwnerSalonHeaderLink =
-    isSalonTitolare && !isNativeApp && isSalonFreeOwnerBlockedOnWeb(meSalon.data);
   const adminAreaActive = location.pathname.startsWith("/admin");
+  const onPartnerPage = location.pathname === "/partner";
   const isConsumerAuthenticated = isAuthenticated && !isSalonTitolare && !isLuxurySuperAdmin && !isSalonStaff;
+
+  const showHeaderSponsors = !isNativeApp;
 
   return (
     <header className="luxury-site-header">
-      <div className="luxury-header-main">
+      <div
+        className={`luxury-header-main${showHeaderSponsors ? " luxury-header-main--with-sponsors" : ""}`}
+      >
         <Link to="/" className="luxury-brand">
           <img
             src="/logo-saloni-luxury.png"
@@ -42,82 +44,99 @@ export function AppHeader() {
             <span className="luxury-brand-luxury">Luxury</span>
           </div>
         </Link>
-        <nav className="luxury-header-nav" aria-label="Navigazione principale">
+        {showHeaderSponsors ? <HeaderSponsorRotator /> : null}
+        <nav className="luxury-header-nav" aria-label={t("header.nav")}>
           {!isAuthenticated ? (
             <Link
               to="/registrati"
               className="luxury-header-cta-pill luxury-header-partner-cta"
             >
-              <span className="luxury-header-partner-label">Registrati</span>
+              <span className="luxury-header-partner-label">{t("header.register")}</span>
             </Link>
           ) : null}
           {!isAuthenticated || isConsumerAuthenticated ? (
-            <PartnerSignupLink className="luxury-header-cta-pill luxury-header-partner-cta">
-              <svg
-                className="luxury-header-partner-icon"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden
-              >
-                <path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z" />
-              </svg>
-              <span className="luxury-header-partner-label">Diventa partner</span>
-            </PartnerSignupLink>
+            onPartnerPage ? (
+              <Link to="/piani" className="luxury-header-cta-pill luxury-header-partner-cta">
+                <svg
+                  className="luxury-header-partner-icon"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden
+                >
+                  <path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z" />
+                </svg>
+                <span className="luxury-header-partner-label">{t("header.partnerProceed")}</span>
+              </Link>
+            ) : (
+              <PartnerSignupLink className="luxury-header-cta-pill luxury-header-partner-cta">
+                <svg
+                  className="luxury-header-partner-icon"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden
+                >
+                  <path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z" />
+                </svg>
+                <span className="luxury-header-partner-label">{t("header.becomePartner")}</span>
+              </PartnerSignupLink>
+            )
           ) : null}
           {isAuthenticated && (
             <>
+              {isSalonTitolare ? <HeaderTrialCountdown /> : null}
               {isLuxurySuperAdmin ? (
                 isNativeApp ? (
                   <AppHeaderProfileMenu
                     items={SUPER_ADMIN_PROFILE_MENU_ITEMS}
-                    ariaLabel="Menu super admin"
-                    headerLabel="Amministrazione"
+                    ariaLabel={t("header.menuAdmin")}
+                    headerLabel={t("header.adminArea")}
                   />
                 ) : (
                   <NavLink
                     to="/admin/dashboard"
                     className={() => (adminAreaActive ? "active" : "")}
                   >
-                    Gestione piattaforma
+                    {t("header.platformAdmin")}
                   </NavLink>
                 )
               ) : isSalonTitolare ? (
-                isNativeApp || hideOwnerSalonHeaderLink ? (
+                isNativeApp ? (
                   <AppHeaderProfileMenu
-                    items={ownerProfileMenuItems(salonPlanTier)}
-                    ariaLabel="Menu profilo titolare"
-                    headerLabel="Il tuo salone"
+                    items={ownerProfileMenuItems(t("account.nav.showcasePreview"))}
+                    ariaLabel={t("header.menuOwner")}
+                    headerLabel={t("header.ownerSalon")}
                   />
                 ) : (
                   <NavLink
-                    to="/account/salone"
+                    to="/salone"
                     className={({ isActive }) =>
                       `luxury-header-cta-pill luxury-header-btn-primary${isActive ? " active" : ""}`
                     }
                   >
-                    Il mio salone
+                    {t("header.mySalon")}
                   </NavLink>
                 )
               ) : isSalonStaff ? (
                 <AppHeaderProfileMenu
                   items={STAFF_PROFILE_MENU_ITEMS}
-                  ariaLabel="Menu profilo staff"
-                  headerLabel="Accesso operatore"
+                  ariaLabel={t("header.menuStaff")}
+                  headerLabel={t("header.staffAccess")}
                 />
               ) : (
                 <AppHeaderProfileMenu
                   items={CONSUMER_PROFILE_MENU_ITEMS}
-                  ariaLabel="Menu profilo cliente"
+                  ariaLabel={t("header.menuClient")}
                 />
               )}
-              {isAuthenticated && (isNativeApp || !isConsumerAuthenticated || hideOwnerSalonHeaderLink) ? (
+              {isAuthenticated && (isNativeApp || !isConsumerAuthenticated) ? (
                 <button
                   type="button"
                   className="luxury-header-cta-pill luxury-header-btn-primary"
                   onClick={() => void signOut()}
                 >
-                  Esci
+                  {t("header.logout")}
                 </button>
               ) : null}
             </>
@@ -132,7 +151,7 @@ export function AppHeader() {
                 setPostLoginReturnPath("/account");
               }}
             >
-              Accedi
+              {t("header.login")}
             </NavLink>
           )}
         </nav>

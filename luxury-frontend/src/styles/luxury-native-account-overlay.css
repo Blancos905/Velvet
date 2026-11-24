@@ -26,7 +26,11 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   max-height: min(92dvh, 920px);
+  overflow: hidden;
+  box-sizing: border-box;
   border-radius: 22px 22px 0 0;
   border: 2px solid rgba(253, 186, 116, 0.35);
   border-bottom: 0;
@@ -48,6 +52,40 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Sito: popup quasi a schermo intero, centrato, non un foglio dal basso. */
+.luxury-native-account-overlay--window {
+  justify-content: center;
+  align-items: stretch;
+  padding: 3vh 3vw;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.luxury-native-account-overlay--window .luxury-native-account-overlay__panel {
+  align-self: stretch;
+  width: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+  border-radius: 22px;
+  border-bottom: 2px solid rgba(253, 186, 116, 0.35);
+  box-shadow:
+    0 18px 60px rgba(0, 0, 0, 0.5),
+    0 0 48px rgba(249, 115, 22, 0.12);
+  /* Tiene nel riquadro anche i blocchi position:fixed / 100vw delle altre sezioni. */
+  transform: translateZ(0);
+  animation-name: luxury-native-account-overlay-window-in;
+}
+
+@keyframes luxury-native-account-overlay-window-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -214,6 +252,10 @@
 .luxury-native-account-overlay__body {
   flex: 1;
   min-height: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior-x: none;
@@ -227,14 +269,28 @@
 .luxury-native-account-overlay__body .luxury-support-page,
 .luxury-native-account-overlay__body .luxury-consumer-home,
 .luxury-native-account-overlay__body .luxury-profile-page,
-.luxury-native-account-overlay__body .luxury-owner-dash {
-  max-width: none;
+.luxury-native-account-overlay__body .luxury-owner-dash,
+.luxury-native-account-overlay__body .luxury-notifications-client-page,
+.luxury-native-account-overlay__body .luxury-feedback-client-page,
+.luxury-native-account-overlay__body .luxury-trusted-salons-page {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding-top: 0;
   padding-left: 0;
   padding-right: 0;
 }
 
 .luxury-native-account-overlay__body .luxury-link-back {
+  display: none;
+}
+
+/*
+ * Overlay account (notifiche, profilo, saloni di fiducia, recensioni, prenotazioni, chat, …):
+ * l’hero web è ridondante — il titolo è già nella barra «Indietro». Così il contenuto
+ * parte subito, senza dover scorrere sotto il blocco hero.
+ */
+.luxury-native-account-overlay__body .luxury-info-privacy-hero__header {
   display: none;
 }
 
@@ -300,14 +356,146 @@
 
 .luxury-native-account-overlay__body .luxury-staff-home,
 .luxury-native-account-overlay__body .luxury-staff-agenda-page {
-  max-width: none;
+  max-width: 100%;
+  min-width: 0;
   padding-top: 0;
   padding-left: 0;
   padding-right: 0;
 }
 
+/* Niente contenuto fuori dal riquadro: bleed hub, 100vw e altezza viewport restano nel popup. */
+.luxury-native-account-overlay__body > * {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.luxury-native-account-overlay__body .luxury-stats-dash--metrics-pro.luxury-stats-page,
+.luxury-native-account-overlay__body .luxury-staff-member-page__hero,
+.luxury-native-account-overlay__body .luxury-salon-showcase.luxury-salon-showcase--site-fullscreen,
+.luxury-native-account-overlay__body .luxury-salon-explore__tail,
+.luxury-native-account-overlay__body .luxury-page-main,
+.luxury-native-account-overlay__body .luxury-account-page-shell,
+.luxury-native-account-overlay__body .luxury-consumer-bookings-dash,
+.luxury-native-account-overlay__body .luxury-consumer-bookings-dash__shell,
+.luxury-native-account-overlay__body .luxury-consumer-bookings-dash__header--hero,
+.luxury-native-account-overlay__body .luxury-account-page-shell__hero,
+.luxury-native-account-overlay__body .luxury-info-privacy-hero__header,
+.luxury-native-account-overlay__body .luxury-salon-services-page,
+.luxury-native-account-overlay__body .luxury-profile-page,
+.luxury-native-account-overlay__body .luxury-support-page,
+.luxury-native-account-overlay__body .luxury-feedback-page,
+.luxury-native-account-overlay__body .luxury-salon-chat-account,
+.luxury-native-account-overlay__body .luxury-clients-dash,
+.luxury-native-account-overlay__body .luxury-salon-notif-page,
+.luxury-native-account-overlay__body .luxury-personal-builder,
+.luxury-native-account-overlay__body .luxury-salon-panorama-account-shell,
+.luxury-native-account-overlay__body .salon-premium-panorama,
+.luxury-native-account-overlay__body .luxury-salon-location-account,
+.luxury-native-account-overlay__body .luxury-salon-staff-account {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
+}
+
+.luxury-native-account-overlay__body .luxury-stats-dash--base44,
+.luxury-native-account-overlay__body .luxury-salon-explore,
+.luxury-native-account-overlay__body .luxury-consumer-bookings-dash--base44,
+.luxury-native-account-overlay__body .luxury-page-main,
+.luxury-native-account-overlay__body .luxury-profile-page,
+.luxury-native-account-overlay__body .luxury-support-page,
+.luxury-native-account-overlay__body .luxury-feedback-page,
+.luxury-native-account-overlay__body .luxury-salon-chat-account,
+.luxury-native-account-overlay__body .luxury-salon-notif-page,
+.luxury-native-account-overlay__body .luxury-personal-builder,
+.luxury-native-account-overlay__body .luxury-salon-services-page {
+  min-height: 0;
+}
+
 html.luxury-native-account-overlay-open .luxury-layout-main {
   overflow: hidden;
+}
+
+/*
+ * Sul sito il riquadro è quasi a schermo intero. Senza questo vincolo la colonna
+ * (notifiche, servizi, brand, staff, profilo, …) resta su un lato. Stessa larghezza
+ * del centro notifiche, al centro del riquadro. Agenda, chat e statistiche restano
+ * larghe: lì il contenuto occupa già il pannello.
+ */
+.luxury-native-account-overlay--window
+  .luxury-native-account-overlay__body
+  .luxury-consumer-bookings-dash:not(.luxury-salon-staff-agenda-page):not(.luxury-salon-chat-account)
+  > .luxury-consumer-bookings-dash__shell,
+.luxury-native-account-overlay--window
+  .luxury-native-account-overlay__body
+  .luxury-clients-dash
+  > .luxury-clients-dash__shell {
+  width: min(44rem, 100%);
+  max-width: min(44rem, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.luxury-native-account-overlay--window .luxury-native-account-overlay__body .luxury-salon-services-page,
+.luxury-native-account-overlay--window
+  .luxury-native-account-overlay__body
+  .luxury-salon-services-page
+  .luxury-salon-services-form-card {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/*
+ * Solo app: meta recensioni («Servizio: … — fine appuntamento …») restano nel box.
+ * Sul web le pill restano com'erano.
+ */
+.luxury-native-app .luxury-feedback-invite-card__meta,
+.luxury-native-app .luxury-feedback-review-card__service {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  padding: 0.2rem 0.45rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.luxury-native-app .luxury-feedback-invite-card__title {
+  font-size: 0.88rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.luxury-native-app .luxury-feedback-page__history-meta {
+  font-size: 0.62rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.luxury-native-app .luxury-feedback-page__history-salon {
+  font-size: 0.88rem;
+}
+
+.luxury-native-app .luxury-feedback-page__history-stars {
+  font-size: 0.7rem;
+}
+
+.luxury-native-app .luxury-feedback-review-card__comment,
+.luxury-native-app .luxury-feedback-page__history-comment {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -84,6 +84,13 @@ public class StaffOperator {
 	@Column(name = "notification_inbox_ack_system_at")
 	private Instant notificationInboxAckSystemAt;
 
+	/**
+	 * Se {@code true} (default): prenotazione/cambio orario cliente restano {@code BOOKED} con alert Accetta/Rifiuta.
+	 * Se {@code false}: conferma automatica e sola notifica informativa («il cliente ha prenotato»).
+	 */
+	@Column(name = "require_booking_confirmation", nullable = false)
+	private boolean requireBookingConfirmation = true;
+
 	protected StaffOperator() {
 	}
 
@@ -240,5 +247,13 @@ public class StaffOperator {
 
 	public void setNotificationInboxAckSystemAt(Instant notificationInboxAckSystemAt) {
 		this.notificationInboxAckSystemAt = notificationInboxAckSystemAt;
+	}
+
+	public boolean isRequireBookingConfirmation() {
+		return requireBookingConfirmation;
+	}
+
+	public void setRequireBookingConfirmation(boolean requireBookingConfirmation) {
+		this.requireBookingConfirmation = requireBookingConfirmation;
 	}
 }

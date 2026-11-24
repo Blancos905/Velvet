@@ -32,7 +32,7 @@ export function SalonBrandLayoutSidebar({ selectedId, onSelect, services = [] }:
         ) : (
           <p className="luxury-brand-layout-sidebar__services-empty">
             Aggiungi trattamenti da{" "}
-            <Link to="/account/salone/servizi" className="luxury-link-inline">
+            <Link to="/salone/servizi" className="luxury-link-inline">
               Servizi
             </Link>{" "}
             per vederli qui e nella vetrina.

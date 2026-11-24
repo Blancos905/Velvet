@@ -38,10 +38,17 @@ public record MeSalonSummaryDto(
 		/** Giorni di apertura prima sede (`MONDAY` … `SUNDAY`). */
 		List<String> primaryLocationOpenDays,
 		/** {@code true} se piano Premium e PIN statistiche configurato in registrazione. */
-		boolean statisticsPinRequired) {
+		boolean statisticsPinRequired,
+		/**
+		 * {@code true} se ogni sede del salone è visibile a clienti e ricerca.
+		 * Una sede nuova nasce nascosta finché il titolare non abilita la visualizzazione.
+		 */
+		boolean visibleToClients,
+		/** Sedi già create sul gruppo. Il listino Premium dipende da questo numero. */
+		int locationCount) {
 
 	public static MeSalonSummaryDto notProvisioned() {
 		return new MeSalonSummaryDto(
-				false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, false);
+				false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, false, false, 0);
 	}
 }

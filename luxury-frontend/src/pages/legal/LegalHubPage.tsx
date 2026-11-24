@@ -29,6 +29,7 @@ export default function LegalHubPage() {
             `Privacy Choices URL: ${PUBLIC_SITE_ORIGIN}${LUXURY_LEGAL_PANEL_PATHS.privacyChoices}`,
             `Account deletion URL: ${PUBLIC_SITE_ORIGIN}${LUXURY_LEGAL_PANEL_PATHS.deleteAccount}`,
             `Termini di servizio: ${PUBLIC_SITE_ORIGIN}${LUXURY_LEGAL_PANEL_PATHS.terms}`,
+            `Licenza gratuita clienti: ${PUBLIC_SITE_ORIGIN}${LUXURY_LEGAL_PANEL_PATHS.freeLicense}`,
             `Accordo trattamento dati Art. 28 (DPA saloni): ${PUBLIC_SITE_ORIGIN}${LUXURY_LEGAL_PANEL_PATHS.dataProcessingAgreement}`,
             `Informativa cookie: ${PUBLIC_SITE_ORIGIN}${LUXURY_LEGAL_PANEL_PATHS.cookies}`,
             `Info e privacy in account: ${luxuryLegalPanelUrl(PUBLIC_SITE_ORIGIN, LUXURY_LEGAL_PANEL_PATHS.accountInfoPrivacy)}`,

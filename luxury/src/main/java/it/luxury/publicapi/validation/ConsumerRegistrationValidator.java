@@ -1,5 +1,6 @@
 package it.luxury.publicapi.validation;
 
+import it.luxury.billing.service.SalonMultiLocationPricing;
 import it.luxury.billing.domain.SalonBillingProfile;
 import it.luxury.billing.dto.RegistrationSalonBillingDetails;
 import it.luxury.billing.validation.SalonBillingProfileValidator;
@@ -35,9 +36,9 @@ public final class ConsumerRegistrationValidator {
 		}
 	}
 
-	/** Per piani con vetrina ({@code BASE} / {@code PREMIUM}) richiediamo almeno una tipologia. */
+	/** Registrazione Premium o Plus: almeno una tipologia. */
 	public static void requireSalonBusinessTypesForPartnerPlans(String planTier, List<SalonBusinessType> types) {
-		if (!"BASE".equals(planTier) && !"PREMIUM".equals(planTier)) {
+		if (!isCommercialSalonPlan(planTier)) {
 			return;
 		}
 		if (types == null || types.isEmpty()) {
@@ -47,9 +48,9 @@ public final class ConsumerRegistrationValidator {
 		}
 	}
 
-	/** Per piani con vetrina ({@code BASE} / {@code PREMIUM}) richiediamo almeno un pubblico di riferimento. */
+	/** Registrazione Premium o Plus: almeno un pubblico di riferimento. */
 	public static void requireSalonClientGendersForPartnerPlans(String planTier, List<SalonClientGender> genders) {
-		if (!"BASE".equals(planTier) && !"PREMIUM".equals(planTier)) {
+		if (!isCommercialSalonPlan(planTier)) {
 			return;
 		}
 		if (genders == null || genders.isEmpty()) {
@@ -59,16 +60,47 @@ public final class ConsumerRegistrationValidator {
 		}
 	}
 
-	public static void requireSalonLocationForFreePlan(String planTier, RegistrationSalonLocation loc) {
-		if (!"BASE".equals(planTier)) {
-			return;
-		}
-		if (blank(loc.addressLine1()) || blank(loc.postalCode()) || blank(loc.city()) || blank(loc.province())) {
-			throw bad("Per il piano Free indica l’indirizzo della sede (via, CAP, città e provincia) così i clienti possono trovarti in ricerca e in vetrina.");
+	/** Sede obbligatoria per l’unico piano commerciale (Premium). */
+	public static void requireSalonLocation(RegistrationSalonLocation loc) {
+		if (loc == null || blank(loc.addressLine1()) || blank(loc.postalCode()) || blank(loc.city()) || blank(loc.province())) {
+			throw bad("Indica l’indirizzo della sede (via, CAP, città e provincia).");
 		}
 	}
 
-	/** Piano Premium: dati fatturazione obbligatori in registrazione. */
+	/** Una o più sedi, entro il massimo del listino. */
+	public static void requireSalonLocations(List<RegistrationSalonLocation> locations) {
+		if (locations == null || locations.isEmpty()) {
+			throw bad("Indica almeno una sede.");
+		}
+		if (locations.size() > SalonMultiLocationPricing.MAX_LOCATIONS) {
+			throw bad("Puoi registrare al massimo " + SalonMultiLocationPricing.MAX_LOCATIONS + " sedi.");
+		}
+		for (int i = 0; i < locations.size(); i++) {
+			RegistrationSalonLocation loc = locations.get(i);
+			if (loc == null || blank(loc.addressLine1()) || blank(loc.postalCode()) || blank(loc.city()) || blank(loc.province())) {
+				throw bad("Indica l’indirizzo della sede " + (i + 1) + " (via, CAP, città e provincia).");
+			}
+			requireLocationAudienceIfPresent(loc, i + 1);
+		}
+	}
+
+	/**
+	 * Se la sede porta tipologia e pubblico propri, devono essere valorizzati.
+	 * Liste assenti: si usano quelle della richiesta (registrazioni già in coda).
+	 */
+	public static void requireLocationAudienceIfPresent(RegistrationSalonLocation loc, int index) {
+		if (loc == null) {
+			return;
+		}
+		if (loc.salonBusinessTypes() != null && normalizeSalonBusinessTypesOrThrow(loc.salonBusinessTypes()).isEmpty()) {
+			throw bad("Sede " + index + ": seleziona almeno una tipologia (parrucchiere, estetista e/o massaggio).");
+		}
+		if (loc.salonClientGenders() != null && normalizeSalonClientGendersOrThrow(loc.salonClientGenders()).isEmpty()) {
+			throw bad("Sede " + index + ": seleziona almeno un pubblico (maschile e/o femminile).");
+		}
+	}
+
+	/** Dati fatturazione Premium: usati solo se un flusso chiede il checkout in registrazione. */
 	public static void requireBillingForPremiumPlan(String planTier, RegistrationSalonBillingDetails billing, String accountEmail) {
 		if (!"PREMIUM".equalsIgnoreCase(planTier != null ? planTier.trim() : "")) {
 			return;
@@ -80,8 +112,16 @@ public final class ConsumerRegistrationValidator {
 		SalonBillingProfileValidator.validateForSave(scratch);
 	}
 
+	private static boolean isCommercialSalonPlan(String planTier) {
+		if (planTier == null) {
+			return false;
+		}
+		String tier = planTier.trim();
+		return "PREMIUM".equalsIgnoreCase(tier) || "PLUS".equalsIgnoreCase(tier);
+	}
+
 	private static SalonBillingProfile scratchProfile(RegistrationSalonBillingDetails billing, String accountEmail) {
-		var group = new it.luxury.studio.domain.StudioGroup("Salone", accountEmail, "BASE");
+		var group = new it.luxury.studio.domain.StudioGroup("Salone", accountEmail, "PREMIUM");
 		SalonBillingProfile profile = new SalonBillingProfile(group);
 		profile.setLegalName(billing.legalName());
 		profile.setBillingEmail(

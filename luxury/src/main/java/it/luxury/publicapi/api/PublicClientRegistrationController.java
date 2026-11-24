@@ -26,19 +26,23 @@ public class PublicClientRegistrationController {
 
 	@PostMapping
 	@Operation(summary = "Crea account cliente (form /registrati: ruolo CLIENT)")
-	public ResponseEntity<RegistrationCreatedResponse> register(@Valid @RequestBody ClientRegistrationRequest body) {
-		luxuryAccountRegistrationService.registerBookingClient(
-				body.email(),
-				body.password(),
-				body.firstName(),
-				body.lastName(),
-				body.country(),
-				body.phone() != null ? body.phone() : "",
-				Boolean.TRUE.equals(body.bootstrapSuperAdmin()),
-				body.legalDocumentVersion());
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(
-						new RegistrationCreatedResponse(
-								"Abbiamo inviato un'email di conferma. Clicca il link per attivare l'account, poi accedi."));
-	}
+		public ResponseEntity<RegistrationCreatedResponse> register(@Valid @RequestBody ClientRegistrationRequest body) {
+			String pollSecret = luxuryAccountRegistrationService.registerBookingClient(
+					body.email(),
+					body.password(),
+					body.firstName(),
+					body.lastName(),
+					body.country(),
+					body.preferredLocale(),
+					body.phone() != null ? body.phone() : "",
+					Boolean.TRUE.equals(body.bootstrapSuperAdmin()),
+					body.legalDocumentVersion());
+			return ResponseEntity.status(HttpStatus.CREATED)
+					.body(
+							new RegistrationCreatedResponse(
+									"Abbiamo inviato un'email di conferma. Clicca il link per attivare l'account, poi accedi.",
+									true,
+									null,
+									pollSecret));
+		}
 }

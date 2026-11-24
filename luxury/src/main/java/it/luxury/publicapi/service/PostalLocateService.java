@@ -55,26 +55,24 @@ public class PostalLocateService {
 	}
 
 	public Optional<PostalLocateResponse> locate(String postalCodeRaw, String countryCodeRaw) {
-		String country = countryCodeRaw != null ? countryCodeRaw.trim().toUpperCase(Locale.ROOT) : "";
-		String digits = postalCodeRaw != null ? postalCodeRaw.replaceAll("\\D", "") : "";
-		if (!country.matches("IT|CH|SM")) {
+		Optional<String> countryOpt = PostalCodeFormats.normalizeCountry(countryCodeRaw);
+		if (countryOpt.isEmpty()) {
 			return Optional.empty();
 		}
-		int expected = switch (country) {
-			case "CH" -> 4;
-			case "IT", "SM" -> 5;
-			default -> 0;
-		};
-		if (digits.length() != expected) {
+		String country = countryOpt.get();
+		Optional<PostalCodeFormats.NormalizedPostal> postalOpt =
+				PostalCodeFormats.normalizeForLookup(postalCodeRaw, country);
+		if (postalOpt.isEmpty()) {
 			return Optional.empty();
 		}
+		String postal = postalOpt.get().value();
 
 		String nominatimCc = country.toLowerCase(Locale.ROOT);
 		URI uri = UriComponentsBuilder.newInstance()
 				.scheme("https")
 				.host("nominatim.openstreetmap.org")
 				.path("/search")
-				.queryParam("postalcode", digits)
+				.queryParam("postalcode", postal)
 				.queryParam("countrycodes", nominatimCc)
 				.queryParam("format", "json")
 				.queryParam("addressdetails", "1")
@@ -94,26 +92,28 @@ public class PostalLocateService {
 			return parseHit(root.get(0));
 		}
 		catch (Exception e) {
-			log.warn("Nominatim lookup failed for postal={} country={}: {}", digits, country, e.getMessage());
+			log.warn("Nominatim lookup failed for postal={} country={}: {}", postal, country, e.getMessage());
 			return Optional.empty();
 		}
 	}
 
 	public List<PlaceLocateSuggestionResponse> suggestPlacesByPostal(String postalCodeRaw, String countryCodeRaw, int limitRaw) {
-		String country = countryCodeRaw != null ? countryCodeRaw.trim().toUpperCase(Locale.ROOT) : "";
-		String digits = postalCodeRaw != null ? postalCodeRaw.replaceAll("\\D", "") : "";
-		if (!country.matches("^[A-Z]{2}$")) {
+		Optional<String> countryOpt = PostalCodeFormats.normalizeCountry(countryCodeRaw);
+		if (countryOpt.isEmpty()) {
 			return List.of();
 		}
-		if (digits.length() < 2) {
+		String country = countryOpt.get();
+		Optional<String> prefixOpt = PostalCodeFormats.normalizeForSuggestPrefix(postalCodeRaw, country);
+		if (prefixOpt.isEmpty()) {
 			return List.of();
 		}
+		String postal = prefixOpt.get();
 		int limit = Math.max(1, Math.min(limitRaw, 100));
 		URI uri = UriComponentsBuilder.newInstance()
 				.scheme("https")
 				.host("nominatim.openstreetmap.org")
 				.path("/search")
-				.queryParam("postalcode", digits)
+				.queryParam("postalcode", postal)
 				.queryParam("countrycodes", country.toLowerCase(Locale.ROOT))
 				.queryParam("format", "json")
 				.queryParam("addressdetails", "1")
@@ -143,7 +143,7 @@ public class PostalLocateService {
 			return out;
 		}
 		catch (Exception e) {
-			log.warn("Nominatim postal suggest failed for postal={} country={}: {}", digits, country, e.getMessage());
+			log.warn("Nominatim postal suggest failed for postal={} country={}: {}", postal, country, e.getMessage());
 			return List.of();
 		}
 	}

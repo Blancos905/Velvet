@@ -1,0 +1,342 @@
+---
+description: Contesto completo monorepo Luxury — architettura, domini, convenzioni, flussi critici
+alwaysApply: true
+---
+
+# Luxury (Saloni Luxury) — contesto progetto
+
+Piattaforma **SaaS B2B2C** per saloni di bellezza: area privata per titolari/staff, area pubblica SEO per consumatori, app mobile come shell WebView.
+
+**Brand produzione:** Saloni Luxury (`saloniluxury.it`). Repo: `my-salon-platform/`.
+
+---
+
+## Documentazione — regola obbligatoria
+
+### Prima di ogni modifica
+
+1. **Consulta la documentazione** pertinente all'area che stai toccando:
+   - `docs/LUXURY_PROJECT_MASTER.md` — contesto generale
+   - `.cursor/rules/*.mdc` — regole specializzate (booking, chat, billing, ruoli, staff, admin, audit)
+   - `docs/GO_LIVE.md` e correlati — se impatti deploy, legali o store
+   - CodeGraph (`codegraph_explore`) — per refactor o blast radius non ovvio
+2. Non implementare su supposizioni se esiste già una regola o un flusso documentato che copre il caso.
+
+### Dopo ogni modifica
+
+**Aggiorna la documentazione** nello stesso task, non in un secondo momento:
+
+| Cosa hai cambiato | Dove aggiornare |
+|-------------------|-----------------|
+| Flusso prodotto, API, ruoli, routing | `.cursor/rules/luxury-*.mdc` pertinente + `docs/LUXURY_PROJECT_MASTER.md` |
+| Architettura o convenzioni trasversali | `docs/LUXURY_PROJECT_MASTER.md` + questa regola se necessario |
+| Go-live, legali, store | `docs/GO_LIVE*.md`, `docs/APP_STORE_REVIEW_NOTES.md` |
+| Solo dettaglio implementativo minore | almeno un commento in codice se la logica non è autoesplicativa |
+
+La documentazione deve restare **allineata al codice**: se il comportamento cambia, la doc cambia nello stesso commit/PR.
+
+---
+
+## Monorepo — cartelle reali
+
+| Cartella | Ruolo | Stack |
+|----------|-------|-------|
+| `luxury/` | Backend API + SSR SEO | Java 21, Spring Boot 3, Spring Security 6, JPA, PostgreSQL/PostGIS, Redis |
+| `luxury-frontend/` | UI web unica (pubblica + account + admin) | React 18, TypeScript, Vite, Tailwind, React Query, React Router 6 |
+| `luxury-app/` | App iOS/Android | Flutter — WebView che carica `luxury-frontend` (zero logica duplicata) |
+| `infrastructure/` | Produzione | Docker Compose, Nginx, PostGIS, Redis |
+| `scripts/` · `docs/` | Dev, seed, go-live | Bash, Python |
+| `devtools/codegraph/` | Indice strutturale | CodeGraph (704+ file Java/TS/Dart) |
+
+> I nomi storici `backend/`, `frontend-web/`, `frontend-mobile/` nel README non sono più validi.
+
+---
+
+## Gerarchia dominio (backend)
+
+```
+StudioGroup (salone / titolare)
+  └── Location (sede, slug pubblico /s/:slug)
+        ├── SalonService (listino)
+        ├── StaffOperator (operatore, collegato a ConsumerProfile opzionale)
+        └── SalonClient (anagrafica cliente del salone)
+              └── Appointment (location + service + operator + salonClient)
+ConsumerProfile (utente JWT: auth_sub, security_roles, email)
+```
+
+**Correlazioni critiche:**
+- Titolare: `studio_groups.owner_auth_sub` ↔ `consumer_profiles.auth_sub` (`StudioGroupOwnerResolver`)
+- Staff: `StaffOperatorRepository.resolveLinkedOperatorId(profileId, subject)`
+- Piano salone: `PREMIUM` (40 / 35 / 30 € a sede) e `PLUS` (60 € al mese, card `/piani`, sedi in `sponsored_placement`). `studio_groups.plan_tier` = `BASE` è solo «non entitled» (downgrade Stripe e righe già in DB). Legacy `STANDARD`/`FULL` → PREMIUM. Il webhook non riscrive `PLUS` in `PREMIUM`.
+
+---
+
+## Package backend (`it.luxury.*`)
+
+| Package | Responsabilità |
+|---------|----------------|
+| `security/` | JWT HS256, login/register/refresh, `LuxuryUserPrincipal`, OIDC |
+| `consumer/` | Area `/api/v1/me/*` cliente, profilo, appuntamenti B2C, chat, export GDPR |
+| `studio/` | `StudioGroup`, `Location`, agenda titolare, vetrina, `StudioGroupOwnerResolver` |
+| `staff/` | API staff-sede (`X-Location-Id`), `SalonLocationAccessService`, `/me/staff/*` |
+| `catalog/` | `SalonService`, `StaffOperator`, `SalonClient` |
+| `appointment/` | Prenotazioni, `AvailabilityService`, `WorkSchedule`, stati `BOOKED`/`CONFIRMED`/`CANCELLED` |
+| `notification/` | Inbox salone, FCM push, email HTML luxury, job schedulati |
+| `billing/` | Stripe, `SalonPremiumEntitlementService`, FatturaPA, lifecycle disdetta |
+| `publicapi/` | Ricerca geo, vetrina `/api/v1/public/organizations/{slug}/*`, SEO |
+| `review/` | Recensioni salone/operatore/piattaforma |
+| `admin/` | Super admin: overview, impersonazione, fatture fiscali |
+| `legal/` | GDPR, export, eliminazione account |
+| `integrations/` | Servizi esterni (Stripe webhook, ecc.) |
+| `bootstrap/` | Demo data, super-admin setup |
+| `common/` | `BusinessException`, utility condivise |
+
+Main: `it.luxury.LuxuryApplication` — `@EnableScheduling`, `@EnableAsync`.
+
+---
+
+## Autenticazione e ruoli JWT
+
+Claim JWT: `sub` = `consumer_profiles.auth_sub`, `uid` = profile id, ruoli in claim custom.
+
+| Ruolo JWT | Authority Spring | Chi è |
+|-----------|------------------|-------|
+| `CLIENT` | `ROLE_CLIENT` | Consumatore B2C (default se assente) |
+| `OWNER` | `ROLE_OWNER` | Titolare salone |
+| `STAFF` | `ROLE_STAFF` | Operatore collegato a `StaffOperator` |
+| `ADMIN` | `ROLE_ADMIN` | Super admin Luxury |
+
+- Un utente può avere **più ruoli**; frontend: `isSalonStaff = STAFF && !OWNER`
+- Token in `sessionStorage` (`LuxuryAuthProvider`); admin separato in `luxury_super_admin_access_token`
+- Refresh rotation su Redis; cookie httpOnly per refresh
+- Gate B2C: `ConsumerB2CEligibility.assertMayActAsConsumer` — titolare/staff **non** prenotano online
+
+---
+
+## Namespace API backend
+
+| Area | Base path | `@PreAuthorize` tipico |
+|------|-----------|------------------------|
+| Pubblico | `/api/v1/public/**` | nessuna |
+| Auth | `/api/v1/auth/**` | pubblico |
+| Cliente B2C | `/api/v1/me/appointments`, `/me/salon-clients`, `/me/profile` | `ROLE_CLIENT` |
+| Chat B2C Premium | `/api/v1/me/salon-clients/chat/**` | `isAuthenticated()` |
+| Titolare | `/api/v1/me/salon/**` | `ROLE_OWNER` |
+| Staff app | `/api/v1/me/staff/**` | `ROLE_STAFF` |
+| Staff sede (header) | `/api/v1/clients`, `/services`, `/operators` | autenticato + **`X-Location-Id`** |
+| Billing titolare | `/api/v1/me/billing/**` | `ROLE_OWNER` |
+| Super admin | `/api/v1/admin/**` | `ROLE_ADMIN` |
+
+Prima di nuovi endpoint: verifica ruolo minimo, se serve `X-Location-Id`, e se il titolare si risolve via `StudioGroupOwnerResolver`.
+
+---
+
+## Routing frontend (`luxury-frontend/src/App.tsx`)
+
+| Ruolo | Home account | Pannello admin |
+|-------|--------------|----------------|
+| Super admin | redirect → `/admin/dashboard` | `/admin/*` |
+| Staff | `/account/staff` (hub) · agenda `/account/staff/agenda` (overlay in app) | — |
+| Titolare | `/salone` (hub, solo le due card). I tasti, Panoramica compresa, aprono l’overlay centrato; checkout e successo Stripe restano pagina intera | — |
+| Cliente | hub `/account`. Prenotazioni, chat e le altre voci aprono l’overlay centrato come il menu salone; in app il foglio resta dal basso | — |
+
+Cliente e ricerca: `/`, `/search`, `/account`. Admin salone: `/salone`. `/account/salone` e `/account/salone/*` reindirizzano a `/salone`. `/admin` è solo il super admin Luxury.
+
+Sono tre origini della stessa app. Locale: clienti `http://127.0.0.1:8080`, pannello titolare e dipendente `http://127.0.0.1:8083`, super admin `http://127.0.0.1:8084`. Produzione: `www.saloniluxury.it`, `salone.saloniluxury.it`, `admin.saloniluxury.it`. Sulla home di ricerca l’accesso è solo del cliente. Il salone si registra da lì; a registrazione finita vede l’avviso. «Vai al tuo profilo» apre il pannello in una finestra nuova, chiude l’avviso e lascia la home di ricerca. «Esci» su quell’avviso resta sulla home di ricerca. Dal pannello, «Esci» torna al login del pannello. Il cliente non apre il pannello dalla home di ricerca. Su `8083` e `8084` non c’è la home di ricerca: solo il login, poi l’area. L’app nativa resta una sola WebView. Il cliente imposta l’immagine profilo da `/account/profilo` (`PATCH /api/v1/me/profile/photo`), nel pannello web e nell’app: zoom e posizione prima del salvataggio. Sul hub l’immagine sta a destra del nome.
+
+**Route pubbliche chiave:** `/`, `/search`, `/s/:slug`, `/s/:slug/esplora`, `/saloni/sponsorizzati`, `/piani`, `/partner`, `/registrati`.
+
+**Idee e saloni in home:** da «Idee per la tua prossima visita» (parrucchieri, estetisti, massaggi) e da In evidenza il pannello di attesa resta finché le schede non arrivano. Indietro riporta alla home nel punto lasciato.
+
+**Saloni sponsorizzati:** sulla home di ricerca, accanto a «Migliori operatori», la card «Saloni sponsorizzati» apre `/saloni/sponsorizzati`. Sono sedi Premium visibili con `locations.sponsored_placement = true`: uno spazio acquistato, distinto dalla classifica per recensioni. Il super admin lo accende o lo spegne per tutte le sedi dello studio. API pubblica `GET /api/v1/public/organizations/sponsored`.
+
+**Salone multisede:** `GET /api/v1/public/organizations/{slug}` include `siblingLocations` (altre sedi Premium dello stesso studio). Su `/s/:slug` il tasto «Cambia sede», in alto a sinistra, apre una card per ogni altra sede e il tap porta a quel profilo. Una sede sola non mostra il tasto.
+
+**Pubblicazione vetrina:** una sede nuova nasce con `locations.visible_to_clients = false`. Finché il titolare non accende «Abilita visualizzazione agli utenti» (profilo e anteprima `/salone/anteprima`, scheda intera come la vedrà il cliente), ricerca, sitemap, SEO e `requireBySlug` rispondono come sede assente. I saloni già in elenco restano visibili. Lo switch aggiorna tutte le sedi dello studio.
+
+Home (`/`): geolocalizzazione e «Oppure un tocco» senza login (ospite) e con qualsiasi account loggato (cliente, titolare, staff).
+All’apertura di «Oppure un tocco»: GPS + `GET …/quick-suggest-availability` → tasti curati disponibili nel raggio + tag dinamici da servizi listino Premium non già coperti dai curati.
+
+**Account:** `/account/chat`, `/account/profilo`, `/account/prenotazioni`, `/salone/*`, `/account/billing/*`.
+
+Lazy loading: `src/routes/lazyPages.ts`. Auth: `LuxuryAuthProvider`. API client: `src/api/`.
+
+---
+
+## App Flutter (`luxury-app/`)
+
+- Entry: `lib/main.dart` → `FreeAccountWrapper` (shell WebView di tutta l’app, tema Premium; non è un piano)
+- Shell WebView: `lib/shell/luxury_web_shell.dart`
+- Sicurezza: `lib/security/luxury_domain_guard.dart` (domini consentiti)
+- Push FCM: `lib/push/luxury_fcm_service.dart`
+- **Regola:** non duplicare logica UI — tutto passa dal frontend web
+
+---
+
+## Piani e billing
+
+- DB: `plan_tier` = `PREMIUM` (dopo la prova 40 / 35 / 30 € a sede) oppure `PLUS` (60 € al mese, stesso flusso di registrazione, vetrina sponsorizzata) oppure `BASE` (non entitled, non vendibile)
+- Entitlement: `SalonPremiumEntitlementService.hasActivePremium` — prova 30 giorni anche con Stripe acceso. Cerchio giorni in header (alto a destra) apre il form di fatturazione con sopra un popup col logo; Prosegui chiude il popup; Partita IVA prima di Stripe; addebito a fine prova se restano almeno 49 ore. Popup rinnovo da 48 ore (ogni 4 ore nelle ultime 24).
+- Premium abilita: SEO pubblico, statistiche PIN, chat B2C, ricerca geo avanzata, vetrina pubblica. La vetrina pubblica richiede anche `locations.visible_to_clients`: il titolare la accende da profilo o da Anteprima vetrina dopo aver controllato immagini e testi.
+- Le funzioni Premium si verificano con `hasActivePremium` sul backend
+- Webhook Stripe → `StripeWebhookProcessor` → `SalonSubscriptionLifecycleService` (blast radius alto)
+
+---
+
+## Prenotazioni — regole prodotto essenziali
+
+| Stato | Significato |
+|-------|-------------|
+| `BOOKED` | Richiesta cliente — **in attesa conferma** operatore/salone |
+| `CONFIRMED` | Accettata o walk-in titolare |
+| `CANCELLED` | Annullata/rifiutata |
+
+**Canali notifica distinti titolare vs operatore:**
+- Titolare (`OWNER`): inbox informativa, **mai** popup urgente Accetta/Rifiuta automatico
+- Operatore (`STAFF && !OWNER`): popup urgente + suono per prenotazioni/cambi orario (disattivabile da profilo Premium: `require_booking_confirmation=false` → auto-conferma + sola notifica «ha prenotato»; al cliente solo modale prenotazione, niente secondo popup `BOOKING_CONFIRMATION`)
+- Conferma API: titolare → `/me/salon/appointments/{id}/confirm`; staff → `/me/staff/appointments/{id}/confirm`
+
+Dettaglio completo: regola `luxury-booking-appointments.mdc`.
+
+---
+
+## Chat luxury (Premium)
+
+- Thread separati: salone generale (`staffOperatorId=null`) vs operatore (`staffOperatorId=UUID`)
+- Titolare: sempre thread salone, mai `staffOperatorId` in API
+- Staff: sempre il proprio operatore
+- API: `/api/v1/me/salon-clients/chat/*` + `salonClientId` (non `locationId`/`organizationId`)
+- DB: `salon_luxury_chat_read_state` — unicità per thread, non per solo `salon_client_id`
+
+Dettaglio: regola `luxury-chat.mdc`.
+
+---
+
+## SEO
+
+- `/s/:slug` (SPA) + backend SSR head per crawler (`/saloni/{slug}`)
+- JSON-LD `HairSalon`/`BeautySalon` iniettato server-side
+- `/sitemap.xml` dinamica, `/robots.txt` blocca `/api/`
+- Saloni Premium in evidenza ricerca (`topRated`, geo PostGIS)
+- Saloni sponsorizzati: spazio a pagamento (`sponsored_placement`), card in home e pagina `/saloni/sponsorizzati`
+
+---
+
+## Sviluppo locale
+
+Solo stack Docker di sviluppo (`luxury-dev-docker-only.mdc`). Non avviare Spring sulla 8081 né Vite sulla 5173.
+
+```bash
+./scripts/dev-docker.sh -d
+# sito http://127.0.0.1:8080
+# API  http://127.0.0.1:8082/api/v1/public/health
+# DB   PostgreSQL del Mac, localhost:5432, database e schema c1luxury
+```
+
+Verifica: `curl -sf http://127.0.0.1:8082/api/v1/public/health`
+Test completi: `cd luxury && ./mvnw test` · `./check-all.sh` · `./luxury-audit.sh`
+
+---
+
+## Convenzioni codice
+
+### Backend (Java)
+- Eccezioni business: `BusinessException(HttpStatus, code, message)` — non `ResponseStatusException` sparsa
+- Servizi cross-tenant: sempre risolvere studio/sede via `StudioGroupOwnerResolver` / `SalonLocationAccessService`
+- Transazioni: `@Transactional` su service, non controller
+- Test integrazione: `luxury/src/test/java/it/luxury/**` — preferire test controller per nuove API
+- SQL migration: `luxury/deploy/sql/` + runner allineamento schema
+
+### Frontend (React/TS)
+- Ruoli: `useLuxuryAuth()` — non parsare JWT manualmente fuori da `LuxuryAuthProvider`
+- Fetch: `apiJson()` con `accessToken`; React Query key `["me", ...]`
+- Modali conferma: `BookingActionConfirmModal` o modali branded — **mai `window.confirm`** in area account/WebView
+- Helper condivisi in `src/lib/` — non duplicare controlli ruolo sparsi
+- Stili luxury: `src/styles/luxury-*.css`
+
+### Flutter
+- Bridge JS: `*_web_bridge.dart` per comunicazione con frontend
+- Piano Free: policy in `luxury_free_plan_policy.dart` + guards JSON
+
+### Generale
+- **Consulta la doc prima** — vedi sezione «Documentazione — regola obbligatoria»
+- **Aggiorna la doc dopo** — ogni modifica che cambia comportamento, API o flussi
+- **Minimizza scope** — diff focalizzato, niente refactor non richiesti
+- **Riusa convenzioni esistenti** — leggi il codice circostante prima di scrivere
+- **Backend = fonte di verità** per permessi, piani, stati business
+- Non committare segreti (`.env`, credenziali, `key.properties`)
+- Commit/PR solo se esplicitamente richiesti dall'utente
+
+---
+
+## CodeGraph — usare prima di refactor trasversali
+
+Indice in `.codegraph/` (Java, TS/TSX, Dart).
+
+1. MCP `codegraph_explore` con query mirata (classe/metodo/flusso)
+2. Verificare **callers**, blast radius, test correlati
+3. Dopo cambi strutturali: `devtools/codegraph/node_modules/.bin/codegraph sync`
+
+Aree ad alto blast radius: `Appointment`, `StaffOperator`, `SalonService`, `StudioGroupOwnerResolver`, `StripeWebhookProcessor`, `SalonLuxuryChatService`, `MeSalonNotificationInboxService`.
+
+---
+
+## Regole specializzate (approfondimento per area)
+
+| File | Quando consultare |
+|------|-------------------|
+| `luxury-roles-routing.mdc` | Ruoli JWT, routing account, namespace API |
+| `luxury-booking-appointments.mdc` | Stati appuntamento, notifiche, popup operatore, modali |
+| `luxury-consumer-booking.mdc` | Separazione prenotazione B2C vs agenda salone |
+| `luxury-salon-plans-billing.mdc` | PREMIUM, stato BASE non entitled, Stripe, disdetta, FatturaPA |
+| `luxury-chat.mdc` | Thread chat, read state DB, API chat |
+| `luxury-staff-location-access.mdc` | `X-Location-Id`, catalogo filtrato staff |
+| `luxury-super-admin.mdc` | Pannello admin, impersonazione |
+| `luxury-audit.mdc` | Audit pre-release, go-live, store compliance |
+| `luxury-backend-maintenance.mdc` | Manutenzione backend (trigger: «manutenzione backend») |
+| `luxury-frontend-maintenance.mdc` | Manutenzione frontend (trigger: «manutenzione frontend») |
+| `luxury-i18n.mdc` | Testi UI frontend: chiavi i18n + traduzioni IT/EN/FR/DE/ES/PT (niente IT hardcoded) |
+| `luxury-app-maintenance.mdc` | Manutenzione app Flutter (trigger: «manutenzione app») |
+| `luxury-database-maintenance.mdc` | Manutenzione database/infrastruttura (trigger: «manutenzione database») |
+| `codegraph.mdc` | Uso CodeGraph MCP/CLI |
+| `luxury-dev-docker-only.mdc` | Avvio locale: solo Docker di sviluppo (8080/8082), mai Spring 8081 né Vite 5173 |
+
+---
+
+## Audit e go-live
+
+```bash
+./luxury-audit.sh                    # statici + test + flussi + store
+./luxury-backend-maintenance.sh      # manutenzione backend Java (CodeGraph + smell + test)
+./luxury-frontend-maintenance.sh     # manutenzione frontend React/TS (CodeGraph + smell + test)
+./luxury-app-maintenance.sh          # manutenzione app Flutter shell (CodeGraph + smell + test)
+./luxury-database-maintenance.sh     # manutenzione infra/Docker/Postgres/Redis + backup
+./go-live-check.sh                   # placeholder legali, segreti, checklist
+./go-live-status.sh                  # stato avanzamento
+```
+
+Trigger agent:
+- **manutenzione backend** → `luxury-backend-maintenance.mdc` + skill `.cursor/skills/manutenzione-backend/`
+- **manutenzione frontend** → `luxury-frontend-maintenance.mdc` + skill `.cursor/skills/manutenzione-frontend/`
+- **manutenzione app** → `luxury-app-maintenance.mdc` + skill `.cursor/skills/manutenzione-app/`
+- **manutenzione database** → `luxury-database-maintenance.mdc` + skill `.cursor/skills/manutenzione-database/`
+
+Per tutte le frasi trigger `manutenzione ...`: l'agent deve eseguire non solo l'analisi ma anche le **correzioni automatiche sicure e locali**, rilanciare i check e riportare solo i finding residui non correggibili automaticamente.
+
+Docs: `docs/GO_LIVE.md`, `docs/GO_LIVE_LEGALE_SENZA_STRIPE.md`.
+
+---
+
+## Errori frequenti da evitare
+
+1. Dare al titolare popup Accetta/Rifiuta o suono operatore
+2. Permettere prenotazione online B2C a titolare/staff
+3. Gate Premium solo frontend senza `hasActivePremium` backend
+4. Confondere `salonClientId` con `locationId` in chat/anagrafica
+5. Reintrodurre unicità `salon_client_id` su read state chat
+6. Usare solo `ROLE_STAFF` senza verificare sede (`X-Location-Id`)
+7. Duplicare logica ruolo nel frontend invece di estendere helper/servizi esistenti
+8. Bypassare `assertNoOverlap` / `WorkSchedule` in availability
+9. Duplicare UI/logica nell'app Flutter invece del frontend web
+10. Modificare `StripeWebhookProcessor` senza verificare blast radius con CodeGraph
+11. Avviare `dev-backend.sh` o `dev-frontend.sh` mentre si lavora: l’ambiente è solo `./scripts/dev-docker.sh`

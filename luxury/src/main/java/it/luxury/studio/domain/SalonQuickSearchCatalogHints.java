@@ -50,6 +50,36 @@ public final class SalonQuickSearchCatalogHints {
 		return BY_NORMALIZED_QUERY.containsKey(normalize(raw));
 	}
 
+	/**
+	 * True se il nome servizio è già coperto da un tasto curato «Oppure un tocco» (query o needle ≥ 4 caratteri).
+	 * I servizi non coperti possono comparire come tag dinamici vicino all'utente.
+	 */
+	public static boolean isCoveredByCuratedQuickSuggest(String serviceName) {
+		if (serviceName == null || serviceName.isBlank()) {
+			return true;
+		}
+		String ns = normalize(serviceName);
+		if (BY_NORMALIZED_QUERY.containsKey(ns)) {
+			return true;
+		}
+		for (Map.Entry<String, List<String>> entry : BY_NORMALIZED_QUERY.entrySet()) {
+			String curatedQ = entry.getKey();
+			if (ns.contains(curatedQ) || curatedQ.contains(ns)) {
+				return true;
+			}
+			for (String needle : entry.getValue()) {
+				String nn = normalize(needle);
+				if (nn.length() < 4) {
+					continue;
+				}
+				if (ns.contains(nn) || nn.contains(ns)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	private static String normalize(String raw) {
 		return raw.trim().toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
 	}

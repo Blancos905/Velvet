@@ -3,6 +3,7 @@ package it.luxury.billing.dto;
 /**
  * Dati fatturazione opzionali nel payload registrazione; obbligatori se {@code planTier = PREMIUM}.
  */
+@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
 public record RegistrationSalonBillingDetails(
 		String legalName,
 		String billingEmail,

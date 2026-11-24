@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.time.Instant;
 
 /**
  * Store in-memory con stessa semantica di {@link RedisRefreshTokenStore} (dev locale e test).
@@ -21,12 +22,14 @@ public class InMemoryRefreshTokenStore implements RefreshTokenStore {
 	private final Map<String, TokenRecord> tokens = new ConcurrentHashMap<>();
 	private final Map<UUID, Set<String>> familyMembers = new ConcurrentHashMap<>();
 	private final Map<UUID, Set<UUID>> profileFamilies = new ConcurrentHashMap<>();
+	private final Map<UUID, Long> familySessionStartedAtEpochSec = new ConcurrentHashMap<>();
 
 	@Override
 	public synchronized IssuedToken issue(UUID profileId, String tokenHash, UUID familyId, UUID tokenId, long ttlSeconds) {
 		tokens.put(tokenHash, new TokenRecord(profileId, familyId, tokenId, STATUS_ACTIVE));
 		familyMembers.computeIfAbsent(familyId, ignored -> ConcurrentHashMap.newKeySet()).add(tokenHash);
 		profileFamilies.computeIfAbsent(profileId, ignored -> ConcurrentHashMap.newKeySet()).add(familyId);
+		familySessionStartedAtEpochSec.putIfAbsent(familyId, Instant.now().getEpochSecond());
 		return new IssuedToken(profileId, familyId, tokenId);
 	}
 
@@ -34,6 +37,10 @@ public class InMemoryRefreshTokenStore implements RefreshTokenStore {
 	public synchronized RotateOutcome rotate(String tokenHash, String newTokenHash, UUID newTokenId, long ttlSeconds) {
 		TokenRecord existing = tokens.get(tokenHash);
 		if (existing == null) {
+			return new RotateOutcome(RotateStatus.NOT_FOUND, null, null, null);
+		}
+		Long sessionStartedAt = familySessionStartedAtEpochSec.get(existing.familyId());
+		if (sessionStartedAt != null && Instant.now().getEpochSecond() - sessionStartedAt > ttlSeconds) {
 			return new RotateOutcome(RotateStatus.NOT_FOUND, null, null, null);
 		}
 		if (STATUS_REVOKED.equals(existing.status())) {
@@ -59,6 +66,7 @@ public class InMemoryRefreshTokenStore implements RefreshTokenStore {
 
 	@Override
 	public synchronized void revokeFamily(UUID familyId) {
+		familySessionStartedAtEpochSec.remove(familyId);
 		Set<String> members = familyMembers.remove(familyId);
 		if (members != null) {
 			for (String hash : members) {

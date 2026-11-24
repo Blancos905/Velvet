@@ -1,4 +1,8 @@
-import { COUNTRIES } from "./searchLocations";
+import countriesJson from "./countries.json";
+
+type CountryRow = { code: string; name: string };
+
+const ALL_COUNTRIES: CountryRow[] = countriesJson as CountryRow[];
 
 /** Paese europeo con prefisso telefonico internazionale (software EU). */
 export type EuropeanPhoneCountry = {
@@ -56,7 +60,7 @@ const EUROPEAN_DIAL_CODES: Record<string, string> = {
 
 function buildEuropeanPhoneCountries(): EuropeanPhoneCountry[] {
   const rows: EuropeanPhoneCountry[] = [];
-  for (const c of COUNTRIES) {
+  for (const c of ALL_COUNTRIES) {
     const dialCode = EUROPEAN_DIAL_CODES[c.code];
     if (!dialCode) continue;
     rows.push({ code: c.code, name: c.name, dialCode });

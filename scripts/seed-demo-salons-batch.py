@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 import base64
-import hashlib
 import io
 import json
 import os
@@ -357,7 +356,7 @@ def register_salon(spec: SalonSpec) -> bool:
         "lastName": spec.last_name,
         "phone": "+393331234567",
         "salonName": spec.salon_name,
-        "planTier": "BASE",
+        "planTier": "PREMIUM",
         "salonAddressLine1": addr,
         "salonPostalCode": cap,
         "salonCity": city,
@@ -534,18 +533,23 @@ def upgrade_salons_public_visibility(db_password: str = "postgres") -> None:
     if proc.returncode != 0:
         raise RuntimeError(proc.stderr or proc.stdout or "psql upgrade failed")
     print("  upgrade DB: PREMIUM + billing trialing + coordinate")
+
+
+def default_backend_log() -> str:
+    repo = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+    slug = repo.lstrip(os.sep).replace(os.sep, "-")
+    return os.path.join(os.path.expanduser("~"), ".cursor", "projects", slug, "terminals", "3.txt")
+
+
+def main() -> int:
     parser = argparse.ArgumentParser(description="Seed 30 saloni demo Luxury (parrucchieri, estetisti, massaggiatori).")
     parser.add_argument("--api-base", default=API_BASE)
     parser.add_argument(
         "--backend-log",
-        default=os.environ.get(
-            "LUXURY_BACKEND_LOG",
-            os.path.expanduser(
-                "~/.cursor/projects/Users-michelecostantino-Developer-Luxury-my-salon-platform/terminals/3.txt"
-            ),
-        ),
+        default=os.environ.get("LUXURY_BACKEND_LOG", default_backend_log()),
         help="File log Spring (per estrarre token conferma email).",
     )
+    parser.add_argument("--dry-run", action="store_true", help="Non scrive saloni né aggiorna il database.")
     parser.add_argument("--skip-db-upgrade", action="store_true", help="Non eseguire upgrade PREMIUM/geocoding post-seed.")
     parser.add_argument("--db-password", default=os.environ.get("PGPASSWORD", "postgres"))
     parser.add_argument("--only", help="Filtra per email (substring).")

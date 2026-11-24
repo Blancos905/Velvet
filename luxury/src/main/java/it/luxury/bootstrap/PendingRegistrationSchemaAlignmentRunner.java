@@ -53,6 +53,25 @@ public class PendingRegistrationSchemaAlignmentRunner implements ApplicationRunn
 					c,
 					"checkout_token_plain",
 					"ALTER TABLE " + TABLE + " ADD COLUMN checkout_token_plain VARCHAR(64) NULL");
+			ensureColumn(
+					c,
+					"poll_sync_secret_hash",
+					"ALTER TABLE " + TABLE + " ADD COLUMN poll_sync_secret_hash VARCHAR(64) NULL");
+			clearPlainVerificationTokens(c);
+		}
+	}
+
+	/** Il token di conferma non resta in chiaro: le righe già salvate vengono azzerate. */
+	private static void clearPlainVerificationTokens(Connection c) throws SQLException {
+		if (!columnExists(c, TABLE, "verification_token_plain")) {
+			return;
+		}
+		try (Statement st = c.createStatement()) {
+			int updated = st.executeUpdate(
+					"UPDATE " + TABLE + " SET verification_token_plain = NULL WHERE verification_token_plain IS NOT NULL");
+			if (updated > 0) {
+				log.info("Schema alignment: azzerati {} token di verifica in chiaro su {}", updated, TABLE);
+			}
 		}
 	}
 

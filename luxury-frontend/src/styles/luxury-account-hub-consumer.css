@@ -448,6 +448,22 @@
   pointer-events: none;
 }
 
+.luxury-account-hub--consumer-client .luxury-account-hub__greeting-photo {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  width: clamp(3.85rem, 8.4vw, 5.15rem);
+  height: clamp(3.85rem, 8.4vw, 5.15rem);
+  margin-left: 0.95rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #000000;
+  background: #14081f;
+  box-shadow:
+    0 2px 0 #000,
+    0 0 18px rgba(139, 92, 246, 0.28);
+}
+
 .luxury-account-hub--consumer-client .luxury-account-hub__greeting-hi {
   flex-shrink: 0;
   margin: 0;

@@ -120,7 +120,10 @@ public class ScheduledNotificationProcessor {
 			emailSubject = BookingNotificationEmailContent.buildSubject(type, a);
 			emailBody = BookingNotificationEmailContent.buildPlainBody(
 					type, a, notificationProperties, appointmentTokenService);
-			htmlBody = BookingNotificationEmailContent.buildHtmlBody(type, a, notificationProperties);
+			htmlBody = type == NotificationType.REVIEW_INVITE
+					? BookingNotificationEmailContent.buildReviewInviteHtmlBody(
+							a, notificationProperties, appointmentTokenService)
+					: BookingNotificationEmailContent.buildHtmlBody(type, a, notificationProperties);
 		}
 
 		String toEmail = TransactionalEmailDispatchService.resolveRecipientEmail(type, a);
@@ -366,11 +369,7 @@ public class ScheduledNotificationProcessor {
 	}
 
 	private static String bookingConfirmationIntro(Appointment a, String salon) {
-		String operator = resolveOperatorDisplayName(a);
-		if (operator != null) {
-			return operator + " ha accettato il tuo appuntamento presso " + salon + ".";
-		}
-		return salon + " ha confermato il tuo appuntamento.";
+		return "La tua prenotazione presso " + salon + " è confermata.";
 	}
 
 	private static String bookingRequestRejectedBody(

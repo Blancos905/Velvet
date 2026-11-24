@@ -67,6 +67,49 @@ public class SalonBillingNotificationService {
 				? "invoice:" + invoice.getId().trim()
 				: "invoice-sub:" + subscriptionId;
 		dispatchPaymentThankYouOnce(dedupRef, group, amountPaid, invoice.getCurrency(), periodEnd);
+		Instant paidAt = resolvePaidAt(invoice);
+		dispatchBillingEmailOnce(
+				"receipt:" + dedupRef,
+				group,
+				() -> emailDispatchService.dispatchPaymentReceiptPdf(
+						group, amountPaid, invoice.getCurrency(), paidAt, invoice.getId()));
+	}
+
+	private static Instant resolvePaidAt(Invoice invoice) {
+		if (invoice.getStatusTransitions() != null && invoice.getStatusTransitions().getPaidAt() != null) {
+			return Instant.ofEpochSecond(invoice.getStatusTransitions().getPaidAt());
+		}
+		if (invoice.getCreated() != null) {
+			return Instant.ofEpochSecond(invoice.getCreated());
+		}
+		return Instant.now();
+	}
+
+	@Transactional
+	public void onInvoicePaymentFailed(Invoice invoice, String subscriptionId) {
+		if (invoice == null || subscriptionId == null || subscriptionId.isBlank()) {
+			return;
+		}
+		UUID studioGroupId = billingAccountRepository.findByStripeSubscriptionId(subscriptionId)
+				.map(BillingAccount::getStudioGroupId)
+				.orElse(null);
+		if (studioGroupId == null) {
+			return;
+		}
+		StudioGroup group = studioGroupRepository.findById(studioGroupId).orElse(null);
+		if (group == null) {
+			return;
+		}
+		Long amountDue = invoice.getAmountDue();
+		if (amountDue == null) {
+			amountDue = invoice.getAmountRemaining();
+		}
+		long cents = amountDue != null ? amountDue : 0L;
+		String dedupRef = invoice.getId() != null && !invoice.getId().isBlank()
+				? "payment-failed:" + invoice.getId().trim()
+				: "payment-failed-sub:" + subscriptionId;
+		dispatchBillingEmailOnce(dedupRef, group, () ->
+				emailDispatchService.dispatchPaymentFailed(group, cents, invoice.getCurrency()));
 	}
 
 	@Transactional
@@ -98,41 +141,6 @@ public class SalonBillingNotificationService {
 				? "checkout:" + session.getId().trim()
 				: "checkout-sub:" + session.getSubscription().trim();
 		dispatchPaymentThankYouOnce(dedupRef, group, 0L, "eur", periodEnd);
-	}
-
-	/** Fallback al ritorno da Checkout quando l'importo è > 0 e il webhook {@code invoice.paid} non è ancora arrivato. */
-	@Transactional
-	public void onCheckoutSessionConfirmedPaid(Session session, UUID studioGroupIdHint) {
-		if (session == null || session.getSubscription() == null || session.getSubscription().isBlank()) {
-			return;
-		}
-		Long amountTotal = session.getAmountTotal();
-		if (amountTotal == null || amountTotal <= 0) {
-			return;
-		}
-		UUID studioGroupId = studioGroupIdHint;
-		if (studioGroupId == null) {
-			studioGroupId = billingAccountRepository.findByStripeSubscriptionId(session.getSubscription())
-					.map(BillingAccount::getStudioGroupId)
-					.orElse(null);
-		}
-		if (studioGroupId == null) {
-			return;
-		}
-		StudioGroup group = studioGroupRepository.findById(studioGroupId).orElse(null);
-		if (group == null) {
-			return;
-		}
-		Instant periodEnd = billingAccountRepository.findByStudioGroup_Id(studioGroupId)
-				.map(BillingAccount::getCurrentPeriodEnd)
-				.orElse(null);
-		String dedupRef = session.getId() != null && !session.getId().isBlank()
-				? "checkout:" + session.getId().trim()
-				: "checkout-sub:" + session.getSubscription().trim();
-		String currency = session.getCurrency() != null && !session.getCurrency().isBlank()
-				? session.getCurrency()
-				: "eur";
-		dispatchPaymentThankYouOnce(dedupRef, group, amountTotal, currency, periodEnd);
 	}
 
 	public void onSubscriptionEvent(Subscription subscription, UUID studioGroupIdHint) {
@@ -184,13 +192,20 @@ public class SalonBillingNotificationService {
 			long amountPaidCents,
 			String currencyCode,
 			Instant periodEnd) {
-		if (stripeReference == null || stripeReference.isBlank()) {
+		dispatchBillingEmailOnce(
+				stripeReference,
+				group,
+				() -> emailDispatchService.dispatchPaymentThankYou(group, amountPaidCents, currencyCode, periodEnd));
+	}
+
+	void dispatchBillingEmailOnce(String stripeReference, StudioGroup group, Runnable send) {
+		if (stripeReference == null || stripeReference.isBlank() || group == null || send == null) {
 			return;
 		}
 		if (paymentThankYouSentRepository.existsByStripeReference(stripeReference)) {
 			return;
 		}
-		emailDispatchService.dispatchPaymentThankYou(group, amountPaidCents, currencyCode, periodEnd);
+		send.run();
 		paymentThankYouSentRepository.save(new BillingPaymentThankYouSent(stripeReference, group.getId()));
 	}
 }

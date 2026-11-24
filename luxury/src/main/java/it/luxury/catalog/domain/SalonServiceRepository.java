@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,6 +14,9 @@ public interface SalonServiceRepository extends JpaRepository<SalonService, UUID
 
 	@EntityGraph(attributePaths = "operators")
 	List<SalonService> findByLocation_IdOrderByName(UUID locationId);
+
+	@EntityGraph(attributePaths = { "location" })
+	List<SalonService> findByLocation_IdIn(Collection<UUID> locationIds);
 
 	@Query("select s from SalonService s left join fetch s.operators where s.id = :id")
 	Optional<SalonService> findByIdWithOperators(@Param("id") UUID id);

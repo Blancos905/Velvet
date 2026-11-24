@@ -329,7 +329,7 @@ export default function SalonLuxuryChatPage() {
     el.scrollTop = el.scrollHeight;
   }, []);
 
-  const ownerPremium = isSalonTitolare && tier === "PREMIUM";
+  const ownerPremium = isSalonTitolare && (tier === "PREMIUM" || tier === "PLUS");
   const salonChatSideClass = isSalonStaff
     ? "luxury-salon-chat-account--staff-side"
     : "luxury-salon-chat-account--salon-side";
@@ -344,7 +344,8 @@ export default function SalonLuxuryChatPage() {
   const staffPremiumChat =
     isSalonStaff &&
     Boolean(staffSalon.data?.primaryLocationId?.trim()) &&
-    parseSalonPlanTier(staffSalon.data?.planTier) === "PREMIUM";
+    (parseSalonPlanTier(staffSalon.data?.planTier) === "PREMIUM" ||
+      parseSalonPlanTier(staffSalon.data?.planTier) === "PLUS");
   const catalogLocationId = isSalonStaff
     ? (staffSalon.data?.primaryLocationId?.trim() ?? "")
     : primaryLocationId || orgFallbackQ.data?.id || "";
@@ -427,12 +428,17 @@ export default function SalonLuxuryChatPage() {
       }
     }
     if (!isSalonTitolare && !isSalonStaff && membershipsQ.data?.length && !selectedSalonClientId) {
-      setSelectedSalonClientId(membershipsQ.data[0].id);
-      setSelectedStaffOperatorId(null);
+      // In app: resta sulla lista finché l'utente non apre una conversazione.
+      if (!isNativeApp) {
+        setSelectedSalonClientId(membershipsQ.data[0].id);
+        setSelectedStaffOperatorId(null);
+      }
     }
     if (listClientsAsSalonSide && catalogClientsQ.data?.length && !selectedSalonClientId) {
-      setSelectedSalonClientId(catalogClientsQ.data[0].id);
-      setSelectedStaffOperatorId(activeChatStaffOperatorId);
+      if (!isNativeApp) {
+        setSelectedSalonClientId(catalogClientsQ.data[0].id);
+        setSelectedStaffOperatorId(activeChatStaffOperatorId);
+      }
     }
   }, [
     paramThread,
@@ -715,7 +721,7 @@ export default function SalonLuxuryChatPage() {
     if (!staffPremiumChat) {
       const hasLocation = Boolean(staffSalon.data?.primaryLocationId?.trim());
       const tier = parseSalonPlanTier(staffSalon.data?.planTier);
-      const basePlan = hasLocation && tier !== "PREMIUM";
+      const basePlan = hasLocation && tier !== "PREMIUM" && tier !== "PLUS";
       return (
         <main className={mainSalonClasses}>
           <div className="luxury-clients-dash__shell">
@@ -765,7 +771,7 @@ export default function SalonLuxuryChatPage() {
   }
 
   if (isSalonTitolare && !ownerPremium) {
-    return <Navigate to="/account/salone" replace />;
+    return <Navigate to="/salone" replace />;
   }
 
   const heroConsumer = (
@@ -837,11 +843,17 @@ export default function SalonLuxuryChatPage() {
     (isNativeApp && nativeShowsThread && selectedSalonClientId
       ? " luxury-salon-chat__layout--native-thread"
       : "");
+  /** App: thread a schermo intero — la lista contatti non resta sopra. */
+  const nativeThreadOpen = Boolean(isNativeApp && nativeShowsThread && selectedSalonClientId);
 
   const openNativeThread = (salonClientId: string, staffOperatorId: string | null) => {
     setSelectedSalonClientId(salonClientId);
     setSelectedStaffOperatorId(staffOperatorId);
     if (isNativeApp) setNativeShowsThread(true);
+  };
+
+  const closeNativeThread = () => {
+    setNativeShowsThread(false);
   };
 
   const showThreadListAvatar = isNativeApp || !listClientsAsSalonSide;
@@ -857,6 +869,7 @@ export default function SalonLuxuryChatPage() {
         >
         <div className="luxury-salon-chat__shell">
           <div className={nativeLayoutClass}>
+            {!nativeThreadOpen ? (
             <aside className="luxury-salon-chat__sidebar" aria-label="Conversazioni">
               <div className="luxury-salon-chat__sidebar-title">{listClientsAsSalonSide ? "Clienti" : "I tuoi saloni"}</div>
               {threadCount > 0 || normalizedThreadQuery ? (
@@ -1008,9 +1021,10 @@ export default function SalonLuxuryChatPage() {
                 <p className="luxury-salon-chat__empty">Nessun risultato per «{threadQuery.trim()}».</p>
               ) : null}
             </aside>
+            ) : null}
 
             <section className="luxury-salon-chat__panel" aria-label="Messaggi">
-              {!selectedSalonClientId ? (
+              {!selectedSalonClientId || (isNativeApp && !nativeShowsThread) ? (
                 <div className="luxury-salon-chat__empty">Seleziona una conversazione.</div>
               ) : (
                 <>
@@ -1020,7 +1034,7 @@ export default function SalonLuxuryChatPage() {
                         type="button"
                         className="luxury-salon-chat__panel-back"
                         aria-label="Torna alle conversazioni"
-                        onClick={() => setNativeShowsThread(false)}
+                        onClick={closeNativeThread}
                       >
                         ←
                       </button>
@@ -1030,7 +1044,9 @@ export default function SalonLuxuryChatPage() {
                     </div>
                     <div className="luxury-salon-chat__panel-head-text">
                       <div className="luxury-salon-chat__panel-title">{selectedLabel}</div>
-                      {!listClientsAsSalonSide && consumerThreadOptionsForSelectedSalon.length > 1 ? (
+                      {!isNativeApp &&
+                      !listClientsAsSalonSide &&
+                      consumerThreadOptionsForSelectedSalon.length > 1 ? (
                         <div
                           className="luxury-salon-chat__thread-picker"
                           role="tablist"

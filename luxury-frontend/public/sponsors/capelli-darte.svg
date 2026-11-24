@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 72" role="img" aria-label="Capelli d Arte">
+  <defs>
+    <linearGradient id="ca-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff7ed"/>
+      <stop offset="45%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </linearGradient>
+  </defs>
+  <circle cx="36" cy="36" r="26" fill="rgba(0,0,0,0.28)" stroke="url(#ca-gold)" stroke-width="1.35"/>
+  <path d="M24 28c8-2 16-2 24 0M24 36c8-2 16-2 24 0M24 44c8-2 16-2 24 0" fill="none" stroke="url(#ca-gold)" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="28" cy="28" r="1.8" fill="url(#ca-gold)"/>
+  <circle cx="28" cy="36" r="1.8" fill="url(#ca-gold)"/>
+  <circle cx="28" cy="44" r="1.8" fill="url(#ca-gold)"/>
+  <text x="74" y="30" fill="url(#ca-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="18" font-style="italic" letter-spacing="0.03em">Capelli d'Arte</text>
+  <text x="74" y="50" fill="url(#ca-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="9" letter-spacing="0.34em">SALON PROFESSIONALE</text>
+  <path d="M74 36h170" stroke="url(#ca-gold)" stroke-width="0.55" opacity="0.4"/>
+</svg>

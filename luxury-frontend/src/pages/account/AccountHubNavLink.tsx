@@ -1,6 +1,9 @@
 import { NavLink, type NavLinkProps } from "react-router-dom";
 import { scrollAccountHubToContent } from "../../lib/accountHubScroll";
+import { accountRouteOpensOverlay } from "../../lib/nativeAccountHubPaths";
 import { prefetchAccountRoute } from "../../lib/prefetchAccountRoutes";
+import { isLuxuryNativeAppShell } from "../../hooks/useLuxuryNativeAppShell";
+import { useLuxuryAuth } from "../../auth/LuxuryAuthProvider";
 
 type AccountHubNavLinkProps = NavLinkProps & {
   prefetchPath?: string;
@@ -18,6 +21,8 @@ export function AccountHubNavLink({
   ...rest
 }: AccountHubNavLinkProps) {
   const path = prefetchPath ?? (typeof to === "string" ? to : "");
+  const { isSalonTitolare, isSalonStaff, isLuxurySuperAdmin } = useLuxuryAuth();
+  const isNativeApp = isLuxuryNativeAppShell();
 
   const warmRoute = () => {
     if (path) prefetchAccountRoute(path);
@@ -42,6 +47,16 @@ export function AccountHubNavLink({
       onClick={(event) => {
         onClick?.(event);
         if (event.defaultPrevented) return;
+        // Destinazioni overlay (prenotazioni, chat, profilo, …) non scrollano l’hub.
+        const opensOverlay =
+          Boolean(path) &&
+          accountRouteOpensOverlay(path, {
+            isNativeApp,
+            isSalonTitolare,
+            isSalonStaff,
+            isLuxurySuperAdmin,
+          });
+        if (opensOverlay) return;
         window.setTimeout(() => scrollAccountHubToContent(), 0);
       }}
     >

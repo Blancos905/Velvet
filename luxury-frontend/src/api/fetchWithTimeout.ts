@@ -1,4 +1,4 @@
-/** Timeout fetch: in dev fallisce in fretta se Spring non è su :8080 (evita UI bloccata in WebView). */
+/** Timeout fetch: in dev fallisce in fretta se Spring non è su :8081 (evita UI bloccata in WebView). */
 export const API_FETCH_TIMEOUT_MS = import.meta.env.DEV ? 8_000 : 30_000;
 
 export function fetchWithTimeout(url: string, init?: RequestInit): Promise<Response> {

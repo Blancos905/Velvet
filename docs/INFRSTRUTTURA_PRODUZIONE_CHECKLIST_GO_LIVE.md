@@ -389,6 +389,7 @@ Refresh token: cookie `luxury_rt`, path `/api/v1/auth`, `Secure` in produzione. 
 ### 4.5 Sicurezza WebView
 
 - `LuxuryDomainGuard` — navigazione limitata a `saloniluxury.it`, `www.saloniluxury.it` + host dev se `isLocalDev`
+- Foto profilo: su Android `setOnShowFileSelector` (`file_picker`); su iOS il selettore di WKWebView. `Info.plist`: `NSPhotoLibraryUsageDescription` e `NSCameraUsageDescription`
 - Link esterni `tel:`, `mailto:`, `whatsapp:` → `url_launcher`
 
 ### 4.6 Console store — URL obbligatori

@@ -1,0 +1,14 @@
+---
+description: Kit di affidabilità — codegraph, verify-change, lint e test sul comportamento toccato
+alwaysApply: true
+---
+
+# Affidabilità
+
+Per ogni compito di test, bug, vulnerabilità, regressione o verifica, usa gli strumenti di questo kit che nel repo ci sono. Gli hook restano sempre attivi: non aggirarli. Se un comando del kit non parte, dillo. Non chiudere test, bug o vulnerabilità senza aver passato gli strumenti applicabili.
+
+- Prima di modificare il codice coinvolto, usa `codegraph_explore` sul path `/Users/michelecostantino/Developer/Velvet/my-salon-platform`.
+- Prima di dichiarare il lavoro finito, esegui la skill `verify-change` sul modulo toccato.
+- Se la configurazione c’è, esegui Ruff sul Python toccato ed ESLint sul TypeScript o JavaScript toccato.
+- Esegui i test del comportamento toccato. Non sostituirli con una build APK.
+- Prima di un push, quando il compito tocca bug, sicurezza o vulnerabilità, esegui `/review-bugbot`.

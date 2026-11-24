@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { LuxuryEmailLinkConfirmSuccessBox } from "./LuxuryEmailLinkConfirmSuccessBox";
+import { LuxuryEmailLinkConfirmSuccessBox, LuxuryEmailLinkInvalidBox } from "./LuxuryEmailLinkConfirmSuccessBox";
 import {
   EMAIL_CONFIRMED_CELEBRATION_HOLD_MS,
   LuxuryEmailConfirmedCelebrationBox,
@@ -30,6 +30,8 @@ type LuxuryRegistrationEmailConfirmFlowProps = LuxuryRegistrationEmailConfirmBox
     listenForCrossTab?: boolean;
     thankYouMessage?: string | null;
     onHeroTitleChange?: (title: string) => void;
+    /** Reload dopo la conferma: resta il ringraziamento, senza rifare il modulo. */
+    resumeThankYou?: boolean;
   };
 
 function shouldShowEmailConfirmedCelebration(
@@ -63,12 +65,14 @@ export function LuxuryRegistrationEmailConfirmFlow({
   surface = "registrationTab",
   thankYouMessage = null,
   onHeroTitleChange,
+  resumeThankYou = false,
   ...boxProps
 }: LuxuryRegistrationEmailConfirmFlowProps) {
   const hasValidToken = isValidEmailVerificationToken(tokenFromUrl);
   const isEmailLinkSurface = surface === "emailLink";
   const [postConfirmThankYouDone, setPostConfirmThankYouDone] = useState(false);
   const [celebrationDone, setCelebrationDone] = useState(false);
+  const continueHomeLockRef = useRef(false);
 
   const verification = useEmailVerificationConfirm({
     tokenFromUrl,
@@ -91,6 +95,16 @@ export function LuxuryRegistrationEmailConfirmFlow({
     celebrationDone,
     postConfirmThankYouDone,
   );
+
+  useLayoutEffect(() => {
+    if (surface !== "registrationTab") return;
+    if (!showCelebration && !showPostConfirmThankYou) return;
+    window.scrollTo(0, 0);
+    const root = document.scrollingElement;
+    if (root) root.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [showCelebration, showPostConfirmThankYou, surface]);
 
   useEffect(() => {
     if (!onHeroTitleChange) return;
@@ -131,19 +145,7 @@ export function LuxuryRegistrationEmailConfirmFlow({
       return <LuxuryEmailVerificationPendingBox />;
     }
     if (verification.phase === "error" && verification.confirmErr) {
-      return (
-        <section className="luxury-email-confirm-box" aria-live="polite">
-          <p className="luxury-alert luxury-alert--error luxury-email-confirm-box__alert" role="alert">
-            {verification.confirmErr}
-          </p>
-          {isTokenAlreadyUsedError(verification.confirmErr) ? (
-            <p className="luxury-email-confirm-box__email-edit-hint">
-              Se hai già cliccato il link, l&apos;email potrebbe essere già confermata: torna alla pagina di
-              registrazione per continuare.
-            </p>
-          ) : null}
-        </section>
-      );
+      return <LuxuryEmailLinkInvalidBox alreadyUsed={isTokenAlreadyUsedError(verification.confirmErr)} />;
     }
     if (verification.phase === "link_confirmed") {
       return <LuxuryEmailLinkConfirmSuccessBox />;
@@ -152,12 +154,15 @@ export function LuxuryRegistrationEmailConfirmFlow({
   }
 
   const handlePostConfirmContinue = () => {
-    setPostConfirmThankYouDone(true);
-
     if (verification.confirmedAsClient || audience === "client") {
+      /* Non smontare il ringraziamento: il frame dopo mostrerebbe «Controlla la tua email» prima della home. */
+      if (continueHomeLockRef.current) return;
+      continueHomeLockRef.current = true;
       void verification.goToClientHomeAfterCelebration();
       return;
     }
+
+    setPostConfirmThankYouDone(true);
 
     if (audience === "salon" && verification.postVerifyLoginPath === PREMIUM_SALON_POST_LOGIN_PATH) {
       verification.goToPremiumCheckout();
@@ -166,6 +171,20 @@ export function LuxuryRegistrationEmailConfirmFlow({
 
     verification.goToSalonDestinationAfterCelebration();
   };
+
+  if (resumeThankYou && !postConfirmThankYouDone) {
+    const thankYouLead = verification.confirmMsg
+      ? successLeadFromApiMessage(verification.confirmMsg)
+      : thankYouMessage;
+    return (
+      <LuxuryRegistrationThankYouBox
+        accountLabel={boxProps.accountLabel}
+        message={thankYouLead}
+        extraNote={boxProps.extraNote}
+        onContinue={handlePostConfirmContinue}
+      />
+    );
+  }
 
   const showWaitingBox =
     !verification.hasValidToken &&

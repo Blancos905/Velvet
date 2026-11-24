@@ -16,13 +16,6 @@ class LuxurySalonSession {
   final bool isLuxurySuperAdmin;
   final SalonPlanTier? planTier;
 
-  /// Titolare salone con piano Free (`BASE`) — vincoli UI solo in app mobile.
-  bool get isFreeSalonOwner =>
-      isAuthenticated &&
-      isSalonOwner &&
-      !isLuxurySuperAdmin &&
-      planTier == SalonPlanTier.base;
-
   static const LuxurySalonSession guest = LuxurySalonSession();
 
   LuxurySalonSession copyWith({

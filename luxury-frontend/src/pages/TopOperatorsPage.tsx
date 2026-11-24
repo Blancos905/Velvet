@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { SalonListLoading } from "../components/SalonListLoading";
+import { goBackOrHome } from "../lib/goBackOrHome";
+import { showResultsLoader } from "../lib/showResultsLoader";
 import { apiJson } from "../api/client";
 import type { TopOperatorSummary } from "../api/types";
 import {
@@ -14,18 +17,12 @@ import { getEditorialMonthKey } from "../lib/editorialMonthKey";
 import { useLuxuryNativeAppShell } from "../hooks/useLuxuryNativeAppShell";
 import { StarRatingDisplay } from "../components/StarRatingDisplay";
 import { formatSalonCityForDisplay } from "../lib/formatSalonCityForDisplay";
+import { formatStarReviewCaption } from "../lib/reviewCaptionForUi";
+import { localizedTopOperatorKind } from "../i18n/homeTopOperatorTranslations";
+import { useLuxuryLocale } from "../i18n/useLuxuryLocale";
 import "../styles/luxury-search-page.css";
 import "../styles/monthly-idea-page.css";
 import "../styles/top-operators-page.css";
-
-function operatorReviewCaption(op: TopOperatorSummary): string | null {
-  const avg = op.averageStaffRating;
-  const n = op.staffReviewCount;
-  if (typeof avg !== "number" || !Number.isFinite(avg) || n == null || n < 1) return null;
-  const avgLabel = avg.toLocaleString("it-IT", { minimumFractionDigits: 0, maximumFractionDigits: 1 });
-  const recLabel = n === 1 ? "1 recensione" : `${n} recensioni`;
-  return `${avgLabel}/5 · ${recLabel}`;
-}
 
 function operatorInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -80,7 +77,18 @@ function TopOperatorsPageContent({
 }) {
   const navigate = useNavigate();
   const isNativeApp = useLuxuryNativeAppShell();
+  const { locale, t } = useLuxuryLocale();
   const editorialMonthKey = getEditorialMonthKey();
+
+  const kindText = localizedTopOperatorKind(locale, selectedKind.id, {
+    label: selectedKind.label,
+    heading: selectedKind.heading,
+  });
+
+  const localizedKinds = TOP_OPERATOR_KINDS.map((kind) => ({
+    ...kind,
+    ...localizedTopOperatorKind(locale, kind.id, { label: kind.label, heading: kind.heading }),
+  }));
 
   const operatorsQ = useQuery({
     queryKey: ["publicOperators", "topRated", editorialMonthKey, selectedKind.id],
@@ -91,7 +99,7 @@ function TopOperatorsPageContent({
   });
 
   const hits = operatorsQ.data ?? [];
-  const showSkeleton = operatorsQ.isLoading && hits.length === 0;
+  const showLoader = showResultsLoader(operatorsQ, hits.length);
 
   return (
     <main
@@ -104,8 +112,8 @@ function TopOperatorsPageContent({
         <button
           type="button"
           className="luxury-search-back"
-          aria-label="Torna indietro"
-          onClick={() => navigate("/")}
+          aria-label={t("auth.backAria")}
+          onClick={() => goBackOrHome(navigate)}
         >
           <svg className="luxury-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path
@@ -116,22 +124,30 @@ function TopOperatorsPageContent({
               strokeLinejoin="round"
             />
           </svg>
-          Torna indietro
+          {t("common.back")}
         </button>
       </div>
 
       <header className="luxury-search-hero">
         <div className="luxury-search-hero__glow" aria-hidden />
         <h1 className="luxury-page-title">
-          <span className="luxury-search-hero__title-text">{selectedKind.heading}</span>
+          <span className="luxury-search-hero__title-text">{kindText.heading}</span>
         </h1>
         <p className="luxury-top-operators-lead">
-          I 10 professionisti più apprezzati a livello nazionale, in base alle recensioni dei clienti.
+          {t("home.topOperators.leadBeforeCount")}
+          <strong>{t("home.topOperators.leadCount")}</strong>
+          {t("home.topOperators.leadMid")}
+          <strong>{t("home.topOperators.leadNational")}</strong>
+          {t("home.topOperators.leadAfter")}
         </p>
       </header>
 
-      <div className="luxury-top-operators-kind-picker" role="tablist" aria-label="Categoria operatori">
-        {TOP_OPERATOR_KINDS.map((kind) => {
+      <div
+        className="luxury-top-operators-kind-picker"
+        role="tablist"
+        aria-label={t("home.topOperators.kindPickerAria")}
+      >
+        {localizedKinds.map((kind) => {
           const active = selectedKind.id === kind.id;
           return (
             <Link
@@ -151,28 +167,29 @@ function TopOperatorsPageContent({
 
       {operatorsQ.isError ? (
         <p className="luxury-alert luxury-alert--error" role="alert">
-          Non siamo riusciti a caricare la classifica. Riprova tra poco.
+          {t("home.topOperators.loadError")}
         </p>
       ) : null}
 
-      {showSkeleton ? (
-        <div className="luxury-search-skeleton-grid" aria-hidden>
-          {Array.from({ length: TOP_OPERATORS_PAGE_LIMIT }).map((_, k) => (
-            <div key={k} className="luxury-search-skeleton-card" />
-          ))}
-        </div>
-      ) : null}
+      {showLoader ? <SalonListLoading label={t("home.topOperators.loading")} /> : null}
 
-      {!showSkeleton && hits.length > 0 ? (
+      {!showLoader && hits.length > 0 ? (
         <>
           <p className="luxury-search-a11y-live" aria-live="polite" aria-atomic="true">
-            {hits.length} {selectedKind.label.toLowerCase()} in classifica nazionale.
+            {t("home.topOperators.resultsLive", {
+              count: hits.length,
+              kind: kindText.label.toLowerCase(),
+            })}
           </p>
           <ul className="luxury-search-grid">
             {hits.map((op, idx) => {
-              const caption = operatorReviewCaption(op);
               const avg = op.averageStaffRating;
-              const showStars = typeof avg === "number" && Number.isFinite(avg) && caption != null;
+              const n = op.staffReviewCount;
+              const caption =
+                typeof avg === "number" && Number.isFinite(avg) && n != null && n >= 1
+                  ? formatStarReviewCaption(avg, n, locale, t)
+                  : null;
+              const showStars = caption != null;
               const pageToneClass =
                 idx === 0 ? " luxury-search-card--page-lead" : " luxury-search-card--page-following";
               const salonCity = op.salonCity ? formatSalonCityForDisplay(op.salonCity) ?? op.salonCity : null;
@@ -188,13 +205,13 @@ function TopOperatorsPageContent({
                       {op.role?.trim() ? (
                         <p className="luxury-top-operator-role">{op.role.trim()}</p>
                       ) : null}
-                      {showStars ? (
+                      {showStars && avg != null ? (
                         <div className="luxury-search-card-rating">
                           <StarRatingDisplay rating={avg} caption={caption} />
                         </div>
                       ) : (
                         <p className="luxury-search-card-rating luxury-monthly-idea-no-reviews">
-                          Recensioni in arrivo
+                          {t("home.monthlyIdea.reviewsPending")}
                         </p>
                       )}
                       <div className="luxury-search-card-footer">
@@ -216,10 +233,10 @@ function TopOperatorsPageContent({
         </>
       ) : null}
 
-      {!showSkeleton && hits.length === 0 && !operatorsQ.isError ? (
+      {!showLoader && hits.length === 0 && !operatorsQ.isError ? (
         <section className="luxury-search-empty-state" aria-labelledby="luxury-top-operators-empty-title">
           <h2 id="luxury-top-operators-empty-title" className="luxury-search-empty-title">
-            Nessun operatore in classifica per {selectedKind.label.toLowerCase()}
+            {t("home.topOperators.emptyTitle", { kind: kindText.label.toLowerCase() })}
           </h2>
           <div className="luxury-search-empty-actions">
             <button
@@ -227,7 +244,7 @@ function TopOperatorsPageContent({
               className="luxury-search-empty-btn luxury-search-empty-btn--primary"
               onClick={() => navigate("/")}
             >
-              Torna alla home
+              {t("home.topOperators.backHome")}
             </button>
           </div>
         </section>

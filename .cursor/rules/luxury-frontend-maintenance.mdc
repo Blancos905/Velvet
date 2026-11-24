@@ -1,0 +1,23 @@
+---
+description: Manutenzione frontend — analisi CodeGraph completa di luxury-frontend/ (React/TS). Usa quando l'utente dice «manutenzione frontend», «manutenzione FE», «frontend maintenance» o chiede controllo totale del frontend.
+alwaysApply: false
+---
+
+# Manutenzione frontend Luxury
+
+Quando l'utente dice **manutenzione frontend**, **manutenzione FE**, **frontend maintenance**, **controllo frontend**, **revisione frontend** o **scan frontend**:
+
+1. Leggi e segui **per intero** la skill di progetto:
+   `.cursor/skills/manutenzione-frontend/SKILL.md`
+2. Usa la checklist area-by-area:
+   `.cursor/skills/manutenzione-frontend/CHECKLIST.md`
+3. Dalla root del repo esegui subito:
+   ```bash
+   ./luxury-frontend-maintenance.sh
+   ```
+4. Poi, con CodeGraph (`codegraph_explore` MCP o CLI), esplora **ogni area** (`auth`, `api`, `routes`, `pages/*`, `hooks`, `lib`, `components`) e tutti i simboli ad alto blast radius della checklist — non fermarti allo script automatico.
+5. Produci un report strutturato (vedi skill) **dopo** aver applicato automaticamente le correzioni sicure e locali compatibili con le regole del repo.
+6. Rilancia script/check/test dopo ogni correzione rilevante fino a ridurre i finding residui.
+
+Non sostituire questa manutenzione con un audit monorepo generico (`luxury-audit.sh`) se l'utente ha chiesto specificamente il frontend.
+Non espandere a Flutter (`luxury-app/`) salvo bridge WebView / path nativi necessari al finding.

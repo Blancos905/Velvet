@@ -69,27 +69,44 @@ public class AppointmentBookingService {
 			UUID operatorId,
 			Instant start) {
 		ConsumerB2CEligibility.assertMayActAsConsumer(consumer);
-		Location location = locationRepository.findBySlug(locationSlug)
-				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Sede non trovata."));
-		SalonService service = salonServiceRepository.findByIdWithOperators(serviceId)
-				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Servizio non trovato."));
-		if (!service.getLocation().getId().equals(location.getId())) {
-			throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Servizio non appartiene alla sede.");
-		}
-		Instant end = start.plus(Duration.ofMinutes(service.getDurationMinutes()));
-		assertWithinLocationWorkHours(location, start, end);
-		StaffOperator operator = resolveOperatorForConsumerBooking(location, service, operatorId, start, end);
-		assertWithinOperatorWorkHours(location, operator, start, end);
+			Location location = locationRepository.findBySlug(locationSlug)
+					.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Sede non trovata."));
+			if (!location.isVisibleToClients()) {
+				throw new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Sede non trovata.");
+			}
+			if (start == null || !start.isAfter(Instant.now())) {
+				throw new BusinessException(
+						HttpStatus.CONFLICT,
+						"SLOT_NOT_BOOKABLE",
+						"L'orario scelto non è prenotabile.");
+			}
+			SalonService service = salonServiceRepository.findByIdWithOperators(serviceId)
+					.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Servizio non trovato."));
+			if (!service.getLocation().getId().equals(location.getId())) {
+				throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Servizio non appartiene alla sede.");
+			}
+			Instant end = start.plus(Duration.ofMinutes(service.getDurationMinutes()));
+			assertWithinLocationWorkHours(location, start, end);
+			StaffOperator operator = resolveOperatorForConsumerBooking(location, service, operatorId, start, end);
+			operator = staffOperatorRepository.findByIdForUpdate(operator.getId())
+					.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Operatore non trovato."));
+			assertNoOverlap(operator.getId(), start, end, null);
+			assertWithinOperatorWorkHours(location, operator, start, end);
 
 		SalonClient client = salonClientMembershipService.ensureLinkedConsumerAtLocation(consumer, location);
 
 		Appointment a = new Appointment(location, service, operator, client, start, end);
 		a.setConsumerProfile(consumer);
-		a.setStatus(AppointmentStatus.BOOKED);
+		boolean requireConfirmation = operator.isRequireBookingConfirmation();
+		a.setStatus(requireConfirmation ? AppointmentStatus.BOOKED : AppointmentStatus.CONFIRMED);
 		appointmentRepository.save(a);
 		appointmentRepository.flush();
 		Appointment created = requireAppointment(a.getId());
-		appointmentNotificationService.onConsumerBookingCreated(created.getId());
+		if (requireConfirmation) {
+			appointmentNotificationService.onConsumerBookingCreated(created.getId());
+		} else {
+			appointmentNotificationService.onConsumerBookingAutoAccepted(created.getId());
+		}
 		return created;
 	}
 
@@ -113,11 +130,12 @@ public class AppointmentBookingService {
 		List<StaffOperator> operators = SalonServiceOperators.filterForBooking(
 				service,
 				staffOperatorRepository.findByLocation_IdOrderByDisplayName(location.getId()));
-		if (operators.isEmpty()) {
-			StaffOperator created = staffOperatorRepository.save(new StaffOperator(location, "Operatore Luxury"));
-			assertNoOverlap(created.getId(), start, end, null);
-			return created;
-		}
+			if (operators.isEmpty()) {
+				throw new BusinessException(
+						HttpStatus.CONFLICT,
+						"NO_OPERATOR",
+						"Nessun operatore disponibile in questa sede.");
+			}
 		ZoneId zone = ZoneId.of(location.getTimeZone());
 		int startMinute = start.atZone(zone).getHour() * 60 + start.atZone(zone).getMinute();
 		int endMinute = end.atZone(zone).getHour() * 60 + end.atZone(zone).getMinute();
@@ -175,9 +193,15 @@ public class AppointmentBookingService {
 		Instant previousStart = appointment.getStart();
 		appointment.setStart(newStart);
 		appointment.setEnd(newEnd);
-		appointment.setStatus(AppointmentStatus.BOOKED);
+		boolean requireConfirmation = appointment.getOperator() == null
+				|| appointment.getOperator().isRequireBookingConfirmation();
+		appointment.setStatus(requireConfirmation ? AppointmentStatus.BOOKED : AppointmentStatus.CONFIRMED);
 		appointmentRepository.save(appointment);
-		appointmentNotificationService.onConsumerBookingRescheduled(appointment.getId(), previousStart);
+		if (requireConfirmation) {
+			appointmentNotificationService.onConsumerBookingRescheduled(appointment.getId(), previousStart);
+		} else {
+			appointmentNotificationService.onConsumerBookingRescheduleAutoAccepted(appointment.getId(), previousStart);
+		}
 	}
 
 	public void assertNoOverlap(UUID operatorId, Instant start, Instant end, UUID excludeAppointmentId) {

@@ -258,10 +258,17 @@ function ownerSiteContentPath(slug: string): string {
   return `/api/v1/me/salon/site-content/${normalizeSlugForApi(slug)}/${SHOWCASE_SITE_CONTENT_KIND}`;
 }
 
-/** Lettura pubblica dal server: raw JSON della vetrina, oppure `null` se non c'è (404) o offline. */
-async function fetchServerShowcaseRaw(slug: string): Promise<string | null> {
+async function fetchServerShowcaseRaw(slug: string, accessToken?: string | null): Promise<string | null> {
+  if (accessToken) {
+    const owned = await readSiteContentPayload(ownerSiteContentPath(slug), accessToken);
+    if (owned) return owned;
+  }
+  return readSiteContentPayload(publicSiteContentPath(slug));
+}
+
+async function readSiteContentPayload(path: string, accessToken?: string): Promise<string | null> {
   try {
-    const r = await apiFetch(publicSiteContentPath(slug));
+    const r = await apiFetch(path, accessToken ? { accessToken } : undefined);
     if (!r.ok) return null;
     const dto = (await r.json()) as ServerSiteContentDto;
     return typeof dto.payload === "string" && dto.payload.length > 0 ? dto.payload : null;
@@ -401,7 +408,7 @@ export async function readSalonShowcaseAsync(
   const key = showcaseStorageKey(slug);
 
   const [serverRaw, localRaw] = await Promise.all([
-    fetchServerShowcaseRaw(slug),
+    fetchServerShowcaseRaw(slug, accessToken),
     readLocalShowcaseRaw(key),
   ]);
   const serverParsed = serverRaw ? parseSalonShowcaseJson(serverRaw) : null;

@@ -1,4 +1,3 @@
-import type { SalonPlanTier } from "../data/salonPlans";
 import { STAFF_MEMBER_AGENDA_PATH } from "./staffMemberAgendaPath";
 
 export type AppHeaderProfileMenuItem = {
@@ -8,13 +7,13 @@ export type AppHeaderProfileMenuItem = {
 };
 
 export const CONSUMER_PROFILE_MENU_ITEMS: AppHeaderProfileMenuItem[] = [
-  { label: "Il tuo account", to: "/account/prenotazioni" },
+  { label: "Il tuo account", to: "/account" },
   { label: "Informazioni", to: "/account/profilo" },
   { label: "Prenotazioni", to: "/account/prenotazioni" },
   { label: "Chat", to: "/account/chat" },
   { label: "Notifiche", to: "/account/notifiche" },
   { label: "Saloni di fiducia", to: "/account/saloni-di-fiducia" },
-  { label: "Recensioni", to: "/recensione" },
+  { label: "Recensioni", to: "/account/feedback-luxury" },
   { label: "Logout", logout: true },
 ];
 
@@ -35,31 +34,19 @@ export const STAFF_PROFILE_MENU_ITEMS: AppHeaderProfileMenuItem[] = [
   { label: "Logout", logout: true },
 ];
 
-export function ownerProfileMenuItems(planTier: SalonPlanTier): AppHeaderProfileMenuItem[] {
-  if (planTier === "PREMIUM") {
-    return [
-      { label: "Il mio salone", to: "/account/salone" },
-      { label: "Crea il tuo sito", to: "/account/salone/tuo-salone" },
-      { label: "Brand e vetrina", to: "/account/salone/brand" },
-      { label: "Agenda", to: "/account/prenotazioni" },
-      { label: "Notifiche", to: "/account/notifiche" },
-      { label: "Profilo", to: "/account/profilo" },
-      { label: "Chat", to: "/account/chat" },
-      { label: "Clienti", to: "/account/salone/clienti" },
-      { label: "Staff", to: "/account/salone/staff" },
-      { label: "Statistiche", to: "/account/salone/statistiche" },
-      { label: "Assistenza", to: "/account/assistenza" },
-      { label: "Logout", logout: true },
-    ];
-  }
-
+export function ownerProfileMenuItems(showcasePreviewLabel: string): AppHeaderProfileMenuItem[] {
   return [
-    { label: "Il mio salone", to: "/account/salone" },
+    { label: "Il mio salone", to: "/salone" },
+    { label: "Crea il tuo sito", to: "/salone/tuo-salone" },
+    { label: "Brand e vetrina", to: "/salone/brand" },
+    { label: showcasePreviewLabel, to: "/salone/anteprima" },
     { label: "Agenda", to: "/account/prenotazioni" },
     { label: "Notifiche", to: "/account/notifiche" },
-    { label: "Posizione salone", to: "/account/salone/posizione" },
     { label: "Profilo", to: "/account/profilo" },
-    { label: "Info e privacy", to: "/account/info-privacy" },
+    { label: "Chat", to: "/account/chat" },
+    { label: "Clienti", to: "/salone/clienti" },
+    { label: "Staff", to: "/salone/staff" },
+    { label: "Statistiche", to: "/salone/statistiche" },
     { label: "Assistenza", to: "/account/assistenza" },
     { label: "Logout", logout: true },
   ];

@@ -11,7 +11,7 @@ import urllib.request
 from pathlib import Path
 
 PORT = int(os.environ.get("LUXURY_DEV_PORT", "5173"))
-API_TARGET = os.environ.get("LUXURY_PROXY_API_TARGET", "http://127.0.0.1:8080").rstrip("/")
+API_TARGET = os.environ.get("LUXURY_PROXY_API_TARGET", "http://127.0.0.1:8081").rstrip("/")
 DIST = Path(__file__).resolve().parent.parent / "dist"
 
 

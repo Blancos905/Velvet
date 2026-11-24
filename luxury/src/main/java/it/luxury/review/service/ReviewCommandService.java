@@ -75,12 +75,33 @@ public class ReviewCommandService {
 		if (salonRating < 1 || salonRating > 5 || staffRating < 1 || staffRating > 5) {
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Ogni voto deve essere tra 1 e 5 stelle.");
 		}
-		Optional<Review> existing = reviewRepository.findByAppointment_Id(a.getId());
-		if (existing.isPresent()) {
-			return existing.get();
-		}
+			if (comment != null && comment.length() > 4000) {
+				throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Il commento può avere al massimo 4000 caratteri.");
+			}
+			Optional<Review> existing = reviewRepository.findByAppointment_Id(a.getId());
+			if (existing.isPresent()) {
+				throw new BusinessException(
+						HttpStatus.CONFLICT,
+						"REVIEW_ALREADY_EXISTS",
+						"Hai già inviato una recensione per questo appuntamento.");
+			}
 		Review saved = reviewRepository.save(new Review(a, salonRating, staffRating, comment));
 		salonEngagementNotificationService.onReviewSubmitted(saved);
 		return saved;
+	}
+
+	/**
+	 * Cliente cancella una propria recensione (rimozione definitiva da storico e vetrina pubblica).
+	 */
+	@Transactional
+	public void deleteAsConsumer(ConsumerProfile consumer, UUID reviewId) {
+		Review review = reviewRepository.findDetailedById(reviewId)
+				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Recensione non trovata."));
+		var appointment = review.getAppointment();
+		var profile = appointment != null ? appointment.getConsumerProfile() : null;
+		if (profile == null || !profile.getId().equals(consumer.getId())) {
+			throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Non puoi cancellare questa recensione.");
+		}
+		reviewRepository.delete(review);
 	}
 }

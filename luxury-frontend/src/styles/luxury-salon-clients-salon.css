@@ -1,5 +1,5 @@
 /**
- * Clienti salone (`/account/salone/clienti`) — stessa struttura delle altre pagine account
+ * Clienti salone (`/salone/clienti`) — stessa struttura delle altre pagine account
  * (hero `ClientAccountHeroHeader` + shell), con accento AZZURRO al posto dell'arancio.
  * Agganciato a `--salon-side` così eventuali altre viste clienti restano invariate.
  * Importato DOPO `salon-clients-page.css` per vincere i pareggi di specificità.

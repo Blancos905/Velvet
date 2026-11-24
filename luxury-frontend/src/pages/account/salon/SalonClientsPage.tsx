@@ -56,7 +56,8 @@ export default function SalonClientsPage() {
   const staffPremiumEligible =
     isSalonStaff &&
     Boolean(staffPrimaryId) &&
-    parseSalonPlanTier(staffSalon.data?.planTier) === "PREMIUM";
+    (parseSalonPlanTier(staffSalon.data?.planTier) === "PREMIUM" ||
+      parseSalonPlanTier(staffSalon.data?.planTier) === "PLUS");
 
   const slug = meSalon.data?.primaryLocationSlug?.trim() ?? "";
   const primaryLocationId = meSalon.data?.primaryLocationId?.trim() ?? "";
@@ -122,8 +123,8 @@ export default function SalonClientsPage() {
     }
   }
 
-  if (isSalonTitolare && tier !== "PREMIUM") {
-    return <Navigate to="/account/salone" replace />;
+  if (isSalonTitolare && tier !== "PREMIUM" && tier !== "PLUS") {
+    return <Navigate to="/salone" replace />;
   }
 
   const showTitolareSlugWarning =

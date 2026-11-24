@@ -53,10 +53,15 @@ public class ConsumerProfileSchemaAlignmentRunner implements ApplicationRunner {
 					c,
 					"email_verification_token_hash",
 					"ALTER TABLE " + TABLE + " ADD COLUMN email_verification_token_hash VARCHAR(64) NULL");
-			ensureColumn(
-					c,
-					"email_verification_expires_at",
-					"ALTER TABLE " + TABLE + " ADD COLUMN email_verification_expires_at TIMESTAMP NULL");
+				ensureColumn(
+						c,
+						"email_verification_expires_at",
+						"ALTER TABLE " + TABLE + " ADD COLUMN email_verification_expires_at TIMESTAMP NULL");
+				ensureColumn(
+						c,
+						"registration_poll_secret_hash",
+						"ALTER TABLE " + TABLE + " ADD COLUMN registration_poll_secret_hash VARCHAR(64) NULL");
+			ensurePhotoColumn(c);
 			backfillLegacyEmailVerification(c);
 		}
 	}
@@ -106,6 +111,28 @@ public class ConsumerProfileSchemaAlignmentRunner implements ApplicationRunner {
 		try (ResultSet rs = md.getColumns(catalog, null, table.toUpperCase(), column.toUpperCase())) {
 			return rs.next();
 		}
+	}
+
+	private static void ensurePhotoColumn(Connection c) throws SQLException {
+		if (columnExists(c, TABLE, "photo_data_url")) {
+			return;
+		}
+		String db = c.getMetaData().getDatabaseProductName();
+		log.info("Schema alignment: aggiungo colonna {}.photo_data_url ({})", TABLE, db);
+		try (Statement st = c.createStatement()) {
+			st.execute(addPhotoColumnSql(db));
+		}
+	}
+
+	private static String addPhotoColumnSql(String databaseProductName) {
+		String p = databaseProductName == null ? "" : databaseProductName.toLowerCase();
+		if (p.contains("mysql") || p.contains("mariadb")) {
+			return "ALTER TABLE " + TABLE + " ADD COLUMN photo_data_url LONGTEXT NULL";
+		}
+		if (p.contains("h2")) {
+			return "ALTER TABLE " + TABLE + " ADD COLUMN photo_data_url CLOB NULL";
+		}
+		return "ALTER TABLE " + TABLE + " ADD COLUMN photo_data_url TEXT NULL";
 	}
 
 	private static void ensureColumn(Connection c, String column, String alterSql) throws SQLException {

@@ -90,6 +90,12 @@ public class StudioGroup {
 		this.ownerAuthSub = normalizeAuthSub(ownerAuthSub);
 	}
 
+	/**
+	 * {@code STANDARD}/{@code FULL} restano {@code PREMIUM}. {@code BASE} è lo stato tecnico non entitled
+	 * (righe già in DB e downgrade Stripe), non un piano vendibile. La registrazione rifiuta i valori diversi
+	 * da {@code PREMIUM} prima della persistenza. Null, blank e valori sconosciuti restano {@code BASE}
+	 * solo per non riscrivere in massa i dati esistenti.
+	 */
 	private static String normalizePlanTier(String raw) {
 		if (raw == null || raw.isBlank()) {
 			return "BASE";
@@ -98,6 +104,7 @@ public class StudioGroup {
 		return switch (u) {
 			case "BASE" -> "BASE";
 			case "PREMIUM", "STANDARD", "FULL" -> "PREMIUM";
+			case "PLUS" -> "PLUS";
 			default -> "BASE";
 		};
 	}

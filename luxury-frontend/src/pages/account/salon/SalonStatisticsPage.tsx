@@ -108,9 +108,9 @@ export default function SalonStatisticsPage() {
     enabled: statsQueriesEnabled,
   });
 
-  const rows = q.data ?? [];
-  const trendAppointments = trendQ.data ?? [];
-  const historyAppointments = historyQ.data ?? [];
+  const rows = useMemo(() => q.data ?? [], [q.data]);
+  const trendAppointments = useMemo(() => trendQ.data ?? [], [trendQ.data]);
+  const historyAppointments = useMemo(() => historyQ.data ?? [], [historyQ.data]);
 
   const appointmentById = useMemo(
     () => mergeAppointmentIndex([trendAppointments, rows, historyAppointments]),
@@ -180,7 +180,7 @@ export default function SalonStatisticsPage() {
       cents,
       label: new Date(`${key}-01T00:00:00`).toLocaleString("it-IT", { month: "short" }),
     }));
-  }, [trendQ.data]);
+  }, [trendAppointments]);
 
   const currentMonthCount = monthlySeries[monthlySeries.length - 1]?.count ?? 0;
   const previousMonthCount = monthlySeries[monthlySeries.length - 2]?.count ?? 0;
@@ -204,7 +204,7 @@ export default function SalonStatisticsPage() {
 
   const catalogCount = clientsQ.data?.length ?? null;
 
-  const firstSeen = useMemo(() => firstAppointmentDayByClient(historyAppointments), [historyQ.data]);
+  const firstSeen = useMemo(() => firstAppointmentDayByClient(historyAppointments), [historyAppointments]);
 
   const newClientsThisMonth = useMemo(() => {
     let n = 0;
@@ -228,7 +228,7 @@ export default function SalonStatisticsPage() {
     return (ret / active.size) * 100;
   }, [rows, firstSeen, from]);
 
-  const reviews = reviewsQ.data ?? [];
+  const reviews = useMemo(() => reviewsQ.data ?? [], [reviewsQ.data]);
   const avgRating = reviews.length > 0 ? avgRatingList(reviews) : null;
   const reviewsThisMonth = reviews.filter((r) => r.createdAt.slice(0, 7) === currentYm);
   const reviewsPrevMonth = reviews.filter((r) => r.createdAt.slice(0, 7) === prevYm);

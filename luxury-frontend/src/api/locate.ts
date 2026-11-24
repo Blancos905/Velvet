@@ -37,6 +37,24 @@ export type ReverseLocateResult = {
   displayName: string;
 };
 
+/**
+ * Posizione approssimata della connessione (IP pubblico).
+ * Usata dal PC quando il browser non espone il GPS (HTTP non sicuro, oppure posizione di rete assente).
+ * 404 → null.
+ */
+export async function locateByNetwork(): Promise<{ lat: number; lng: number } | null> {
+  const r = await apiFetch("/api/v1/public/locate-by-network");
+  if (r.status === 404) return null;
+  const text = await r.text();
+  if (!r.ok) {
+    throw new Error(text || r.statusText);
+  }
+  const data = (text ? JSON.parse(text) : {}) as { lat?: unknown; lng?: unknown };
+  if (typeof data.lat !== "number" || typeof data.lng !== "number") return null;
+  if (!Number.isFinite(data.lat) || !Number.isFinite(data.lng)) return null;
+  return { lat: data.lat, lng: data.lng };
+}
+
 /** Backend reverse: lat/lon → indirizzo strutturato. */
 export async function reverseLocate(lat: number, lon: number): Promise<ReverseLocateResult | null> {
   const p = new URLSearchParams({ lat: String(lat), lon: String(lon) });

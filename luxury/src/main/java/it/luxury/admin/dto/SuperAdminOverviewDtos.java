@@ -78,7 +78,9 @@ public final class SuperAdminOverviewDtos {
 			Boolean cancelAtPeriodEnd,
 			Instant subscriptionCurrentPeriodEnd,
 			/** {@code PAYING}, {@code TRIAL}, {@code CANCELLED} o null se nessun abbonamento Stripe. */
-			String subscriptionBillingCategory) {
+			String subscriptionBillingCategory,
+			/** Almeno una sede ha lo spazio a pagamento «Saloni sponsorizzati». */
+			boolean sponsoredPlacement) {
 	}
 
 	/** Operatori staff (tutte le sedi) per un salone; usato dal pannello super admin. */

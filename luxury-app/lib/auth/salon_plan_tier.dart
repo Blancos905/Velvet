@@ -1,4 +1,4 @@
-/// Piano commerciale salone (allineato a backend / JWT: `BASE` = Free, `PREMIUM`).
+/// Piano salone (JWT / API). `BASE` è lo stato tecnico non-Premium, `PREMIUM` il piano commerciale. `STANDARD`/`FULL` → premium.
 enum SalonPlanTier {
   base,
   premium,

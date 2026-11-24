@@ -14,3 +14,12 @@
 .luxury-monthly-idea-page .luxury-search-grid {
   margin-bottom: 1.5rem;
 }
+
+/* Vuoto tra titolo e saloni: il pannello sta subito sotto il titolo, sopra il banner cookie. */
+.luxury-salon-list-loading {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 1.15rem;
+  padding: 0 0 1.75rem;
+}

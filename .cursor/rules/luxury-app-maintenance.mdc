@@ -1,0 +1,22 @@
+---
+description: Manutenzione app — analisi CodeGraph completa di luxury-app/ (Flutter WebView shell). Usa quando l'utente dice «manutenzione app», «manutenzione flutter», «app maintenance» o chiede controllo totale dell'app mobile.
+alwaysApply: false
+---
+
+# Manutenzione app Luxury (Flutter)
+
+Quando l'utente dice **manutenzione app**, **manutenzione flutter**, **manutenzione mobile**, **app maintenance**, **controllo app**, **revisione app** o **scan app**:
+
+1. Leggi e segui **per intero** la skill di progetto:
+   `.cursor/skills/manutenzione-app/SKILL.md`
+2. Usa la checklist modulo-by-modulo:
+   `.cursor/skills/manutenzione-app/CHECKLIST.md`
+3. Dalla root del repo esegui subito:
+   ```bash
+   ./luxury-app-maintenance.sh
+   ```
+4. Poi, con CodeGraph (`codegraph_explore` MCP o CLI), esplora **ogni modulo** `lib/` (shell, security, free, push, session, bridges) e tutti i simboli ad alto blast radius della checklist — non fermarti allo script automatico.
+5. Produci un report strutturato (vedi skill) **dopo** aver applicato automaticamente le correzioni sicure e locali compatibili con le regole del repo.
+6. Rilancia script/check/test dopo ogni correzione rilevante fino a ridurre i finding residui.
+
+Regola d’oro: l’app è una **shell WebView** — non deve duplicare UI/logica del frontend. Non sostituire con `luxury-audit.sh` se l’utente ha chiesto specificamente l’app.

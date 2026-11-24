@@ -59,5 +59,6 @@ export function loginReturnPathForSalonRegistration(
 }
 
 export function isPremiumSalonRegistrationPending(): boolean {
-  return readIntendedSalonPlanFromSession() === "PREMIUM";
+  const plan = readIntendedSalonPlanFromSession();
+  return plan === "PREMIUM" || plan === "PLUS";
 }

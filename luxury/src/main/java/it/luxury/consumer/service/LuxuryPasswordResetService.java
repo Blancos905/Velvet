@@ -6,6 +6,7 @@ import it.luxury.config.LuxuryNotificationProperties;
 import it.luxury.consumer.domain.ConsumerProfile;
 import it.luxury.consumer.domain.ConsumerProfileRepository;
 import it.luxury.notification.service.PasswordResetEmailDispatchService;
+import it.luxury.security.auth.LuxuryRefreshTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,7 @@ public class LuxuryPasswordResetService {
 	private final LuxuryNotificationProperties notificationProperties;
 	private final LuxuryFrontendBaseUrlResolver frontendBaseUrlResolver;
 	private final PasswordResetEmailDispatchService passwordResetEmailDispatchService;
+	private final LuxuryRefreshTokenService luxuryRefreshTokenService;
 	private final SecureRandom secureRandom = new SecureRandom();
 
 	public LuxuryPasswordResetService(
@@ -43,12 +45,14 @@ public class LuxuryPasswordResetService {
 			PasswordEncoder passwordEncoder,
 			LuxuryNotificationProperties notificationProperties,
 			LuxuryFrontendBaseUrlResolver frontendBaseUrlResolver,
-			PasswordResetEmailDispatchService passwordResetEmailDispatchService) {
+			PasswordResetEmailDispatchService passwordResetEmailDispatchService,
+			LuxuryRefreshTokenService luxuryRefreshTokenService) {
 		this.consumerProfileRepository = consumerProfileRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.notificationProperties = notificationProperties;
 		this.frontendBaseUrlResolver = frontendBaseUrlResolver;
 		this.passwordResetEmailDispatchService = passwordResetEmailDispatchService;
+		this.luxuryRefreshTokenService = luxuryRefreshTokenService;
 	}
 
 	/**
@@ -115,11 +119,14 @@ public class LuxuryPasswordResetService {
 								HttpStatus.BAD_REQUEST,
 								"RESET_TOKEN_INVALID",
 								"Il link non è valido o è scaduto. Richiedi un nuovo invio."));
-		p.setPasswordHash(passwordEncoder.encode(newPassword));
-		p.setPasswordResetTokenHash(null);
-		p.setPasswordResetExpiresAt(null);
-		consumerProfileRepository.save(p);
-	}
+			p.setPasswordHash(passwordEncoder.encode(newPassword));
+			p.setPasswordResetTokenHash(null);
+			p.setPasswordResetExpiresAt(null);
+			consumerProfileRepository.save(p);
+			if (p.getId() != null) {
+				luxuryRefreshTokenService.revokeAllForProfile(p.getId());
+			}
+		}
 
 	private String buildResetUrl(String plainToken) {
 		String base = frontendBaseUrlResolver.resolve().replaceAll("/+$", "");

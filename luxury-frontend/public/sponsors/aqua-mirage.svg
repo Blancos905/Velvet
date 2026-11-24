@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" role="img" aria-label="Aqua Mirage">
+  <defs>
+    <linearGradient id="am-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0f2fe"/>
+      <stop offset="45%" stop-color="#7dd3fc"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+  </defs>
+  <circle cx="34" cy="36" r="22" fill="rgba(0,0,0,0.28)" stroke="url(#am-gold)" stroke-width="1.3"/>
+  <path d="M20 40c6-8 10-8 14 0s8 8 14 0" fill="none" stroke="url(#am-gold)" stroke-width="1.8"/>
+  <path d="M22 32c5-6 8-6 12 0s7 6 12 0" fill="none" stroke="url(#am-gold)" stroke-width="1.2" opacity="0.7"/>
+  <text x="70" y="30" fill="url(#am-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="11" letter-spacing="0.38em">AQUA</text>
+  <text x="70" y="54" fill="url(#am-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="24" font-style="italic" letter-spacing="0.04em">Mirage</text>
+</svg>

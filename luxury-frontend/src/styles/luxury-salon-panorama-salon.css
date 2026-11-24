@@ -1,5 +1,5 @@
 /**
- * Panoramica salone Premium (`/account/salone`) — hero `ClientAccountHeroHeader` +
+ * Panoramica salone Premium (`/salone`) — hero `ClientAccountHeroHeader` +
  * `SalonPremiumPanorama` con accento AZZURRO al posto dell'arancio full-bleed.
  * Scoped a `.salon-premium-panorama--salon-side`; `/partner` resta arancio.
  * Importato DOPO `salon-premium-panorama.css`.
@@ -297,7 +297,7 @@
   color: rgba(125, 211, 252, 0.78);
 }
 
-/* Piano Free: card upgrade nella stessa panoramica. */
+/* Card attivazione Premium nella stessa panoramica. */
 .luxury-salon-panorama-account--salon-side.luxury-salon-services-page {
   --luxury-svc-accent: rgba(56, 189, 248, 0.55);
   --luxury-svc-accent-soft: rgba(56, 189, 248, 0.22);

@@ -7,7 +7,7 @@ import it.luxury.common.api.BusinessException;
 import it.luxury.config.LuxurySuperAdminProperties;
 import it.luxury.consumer.domain.ConsumerProfile;
 import it.luxury.consumer.domain.ConsumerProfileRepository;
-import it.luxury.publicapi.dto.RegistrationSalonLocation;
+import it.luxury.notification.service.AccountLifecycleEmailDispatchService;
 import it.luxury.publicapi.validation.ConsumerRegistrationValidator;
 import it.luxury.studio.domain.SalonBusinessType;
 import it.luxury.studio.domain.SalonClientGender;
@@ -34,6 +34,7 @@ public class LuxuryRegistrationCompletionService {
 	private final SalonDirectoryProvisioningService salonDirectoryProvisioningService;
 	private final StudioGroupRepository studioGroupRepository;
 	private final SalonBillingProfileRegistrationService salonBillingProfileRegistrationService;
+	private final AccountLifecycleEmailDispatchService accountLifecycleEmailDispatchService;
 
 	public LuxuryRegistrationCompletionService(
 			ConsumerProfileRepository consumerProfileRepository,
@@ -41,13 +42,15 @@ public class LuxuryRegistrationCompletionService {
 			LuxurySuperAdminProperties superAdminProperties,
 			SalonDirectoryProvisioningService salonDirectoryProvisioningService,
 			StudioGroupRepository studioGroupRepository,
-			SalonBillingProfileRegistrationService salonBillingProfileRegistrationService) {
+			SalonBillingProfileRegistrationService salonBillingProfileRegistrationService,
+			AccountLifecycleEmailDispatchService accountLifecycleEmailDispatchService) {
 		this.consumerProfileRepository = consumerProfileRepository;
 		this.platformSuperAdminCredentialRepository = platformSuperAdminCredentialRepository;
 		this.superAdminProperties = superAdminProperties;
 		this.salonDirectoryProvisioningService = salonDirectoryProvisioningService;
 		this.studioGroupRepository = studioGroupRepository;
 		this.salonBillingProfileRegistrationService = salonBillingProfileRegistrationService;
+		this.accountLifecycleEmailDispatchService = accountLifecycleEmailDispatchService;
 	}
 
 	@Transactional
@@ -62,21 +65,28 @@ public class LuxuryRegistrationCompletionService {
 
 		String sub = UUID.randomUUID().toString();
 		ConsumerProfile profile = new ConsumerProfile(sub, norm, displayName(firstName, lastName));
-		profile.setPasswordHash(passwordHash);
-		boolean grantAdmin = payload.bootstrapSuperAdmin() && mayBootstrapPlatformSuperAdmin();
-		profile.setSecurityRoles(grantAdmin ? "ADMIN,CLIENT" : "CLIENT");
+			profile.setPasswordHash(passwordHash);
+			boolean grantAdmin = payload.bootstrapSuperAdmin() && mayBootstrapPlatformSuperAdmin();
+			profile.setSecurityRoles(grantAdmin ? "ADMIN,CLIENT" : "CLIENT");
 		if (payload.phone() != null && !payload.phone().isBlank()) {
 			profile.setPhone(payload.phone().trim());
 		}
 		profile.setCountry(normalizeCountryCode(payload.country()));
+		profile.setPreferredLocale(
+				UiLocaleSupport.resolvePreferredLocale(payload.preferredLocale(), payload.country()));
 		applyLegalAcceptance(profile, payload.legalDocumentVersion());
 		profile.setEmailVerifiedAt(Instant.now());
 		consumerProfileRepository.save(profile);
 
-		if (grantAdmin) {
-			platformSuperAdminCredentialRepository.save(new PlatformSuperAdminCredential(norm, profile.getPasswordHash()));
-		}
+			if (grantAdmin) {
+				rememberSuperAdminCredential(norm, profile.getPasswordHash());
+			}
+		accountLifecycleEmailDispatchService.dispatchWelcome(norm, profile.getDisplayName(), false);
 	}
+
+		private void rememberSuperAdminCredential(String email, String passwordHash) {
+			platformSuperAdminCredentialRepository.save(new PlatformSuperAdminCredential(email, passwordHash));
+		}
 
 	@Transactional
 	public String completeSalonOwnerProfileOnly(
@@ -87,7 +97,9 @@ public class LuxuryRegistrationCompletionService {
 			String phone,
 			String planTier,
 			String legalDocumentVersion,
-			String dpaDocumentVersion) {
+			String dpaDocumentVersion,
+			String preferredLocale,
+			String countryCode) {
 		String norm = normalizeEmail(email);
 		var existing = consumerProfileRepository.findByEmailIgnoreCase(norm);
 		if (existing.isPresent()) {
@@ -108,6 +120,7 @@ public class LuxuryRegistrationCompletionService {
 			if (phone != null && !phone.isBlank()) {
 				profile.setPhone(phone.trim());
 			}
+			applyOwnerLocale(profile, preferredLocale, countryCode);
 			applySalonOwnerLegalAcceptance(profile, legalDocumentVersion, dpaDocumentVersion);
 			if (profile.getEmailVerifiedAt() == null) {
 				profile.setEmailVerifiedAt(Instant.now());
@@ -123,10 +136,20 @@ public class LuxuryRegistrationCompletionService {
 		if (phone != null && !phone.isBlank()) {
 			profile.setPhone(phone.trim());
 		}
+		applyOwnerLocale(profile, preferredLocale, countryCode);
 		applySalonOwnerLegalAcceptance(profile, legalDocumentVersion, dpaDocumentVersion);
 		profile.setEmailVerifiedAt(Instant.now());
 		consumerProfileRepository.save(profile);
 		return ownerSub;
+	}
+
+	private static void applyOwnerLocale(ConsumerProfile profile, String preferredLocale, String countryCode) {
+		if (preferredLocale != null || (countryCode != null && !countryCode.isBlank())) {
+			profile.setPreferredLocale(UiLocaleSupport.resolvePreferredLocale(preferredLocale, countryCode));
+		}
+		if (countryCode != null && !countryCode.isBlank()) {
+			profile.setCountry(normalizeCountryCode(countryCode));
+		}
 	}
 
 	@Transactional
@@ -140,29 +163,26 @@ public class LuxuryRegistrationCompletionService {
 				payload.phone(),
 				payload.provisionPlanTier(),
 				payload.legalDocumentVersion(),
-				payload.dpaDocumentVersion());
+				payload.dpaDocumentVersion(),
+				payload.preferredLocale(),
+				payload.salonCountry());
 
 		List<SalonBusinessType> businessTypes =
 				ConsumerRegistrationValidator.normalizeSalonBusinessTypesOrThrow(payload.salonBusinessTypes());
 		List<SalonClientGender> clientGenders =
 				ConsumerRegistrationValidator.normalizeSalonClientGendersOrThrow(payload.salonClientGenders());
-		RegistrationSalonLocation salon = new RegistrationSalonLocation(
-				payload.salonAddressLine1(),
-				payload.salonPostalCode(),
-				payload.salonCity(),
-				payload.salonProvince(),
-				payload.salonCountry() != null && !payload.salonCountry().isBlank() ? payload.salonCountry() : "IT",
-				payload.salonName());
-		salonDirectoryProvisioningService.provisionAfterPartnerRegistration(
+		salonDirectoryProvisioningService.provisionRegistrationLocations(
 				norm,
 				payload.provisionPlanTier(),
 				payload.salonName(),
-				salon,
+				payload.resolvedLocations(),
 				ownerSub,
 				businessTypes,
 				clientGenders);
 		studioGroupRepository.findByOwnerEmailIgnoreCase(norm).ifPresent(group -> salonBillingProfileRegistrationService
 				.applyRegistrationBilling(group.getId(), payload.billing(), norm));
+		accountLifecycleEmailDispatchService.dispatchWelcome(
+				norm, displayName(payload.firstName(), payload.lastName()), true);
 	}
 
 	public void assertEmailAvailableForNewRegistration(String email) {

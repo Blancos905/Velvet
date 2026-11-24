@@ -18,7 +18,7 @@ class LuxuryProfileMenuWebBridge {
     }
 
     if (session.isSalonOwner) {
-      return _ownerItems(session.isFreeSalonOwner);
+      return _ownerItems();
     }
 
     if (session.isSalonStaff) {
@@ -50,26 +50,16 @@ class LuxuryProfileMenuWebBridge {
   /// Nell'app mobile tutti usano il menu a tendina React (nessun bottom sheet Flutter).
   static bool usesNativeProfileSheet(LuxurySalonSession session) => false;
 
-  static List<LuxuryProfileMenuItem> _ownerItems(bool isFree) {
-    if (isFree) {
-      return const [
-        LuxuryProfileMenuItem(label: 'Agenda', href: '/account/prenotazioni'),
-        LuxuryProfileMenuItem(label: 'Notifiche', href: '/account/notifiche'),
-        LuxuryProfileMenuItem(label: 'Profilo', href: '/account/profilo'),
-        LuxuryProfileMenuItem(label: 'Info e privacy', href: '/account/info-privacy'),
-        LuxuryProfileMenuItem(label: 'Assistenza', href: '/account/assistenza'),
-        LuxuryProfileMenuItem(label: 'Logout', logout: true),
-      ];
-    }
+  static List<LuxuryProfileMenuItem> _ownerItems() {
     return const [
-      LuxuryProfileMenuItem(label: 'Il mio salone', href: '/account/salone'),
+      LuxuryProfileMenuItem(label: 'Il mio salone', href: '/salone'),
       LuxuryProfileMenuItem(label: 'Agenda', href: '/account/prenotazioni'),
       LuxuryProfileMenuItem(label: 'Notifiche', href: '/account/notifiche'),
       LuxuryProfileMenuItem(label: 'Profilo', href: '/account/profilo'),
       LuxuryProfileMenuItem(label: 'Chat', href: '/account/chat'),
-      LuxuryProfileMenuItem(label: 'Clienti', href: '/account/salone/clienti'),
-      LuxuryProfileMenuItem(label: 'Staff', href: '/account/salone/staff'),
-      LuxuryProfileMenuItem(label: 'Statistiche', href: '/account/salone/statistiche'),
+      LuxuryProfileMenuItem(label: 'Clienti', href: '/salone/clienti'),
+      LuxuryProfileMenuItem(label: 'Staff', href: '/salone/staff'),
+      LuxuryProfileMenuItem(label: 'Statistiche', href: '/salone/statistiche'),
       LuxuryProfileMenuItem(label: 'Assistenza', href: '/account/assistenza'),
       LuxuryProfileMenuItem(label: 'Logout', logout: true),
     ];
@@ -148,8 +138,8 @@ class LuxuryProfileMenuWebBridge {
       return;
     }
     var anchor =
-      document.querySelector('.luxury-header-nav a[href="/account/salone"]') ||
-      document.querySelector('.luxury-header-nav a[href^="/account/salone"]') ||
+      document.querySelector('.luxury-header-nav a[href="/salone"]') ||
+      document.querySelector('.luxury-header-nav a[href^="/salone"]') ||
       document.querySelector('.luxury-header-nav a[href="/admin/dashboard"]') ||
       document.querySelector('.luxury-header-nav a.luxury-header-btn-primary[href]');
     if (!anchor) return;

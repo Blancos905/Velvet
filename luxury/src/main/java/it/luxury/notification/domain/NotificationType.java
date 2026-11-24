@@ -19,12 +19,12 @@ public enum NotificationType {
 	BOOKING_CANCELLED_BY_SALON,
 	REMINDER_24H,
 	REMINDER_1H,
-	/** Dopo servizio completato: invito a recensire (default invio T+24h da fine appuntamento). */
+	/** Dopo servizio completato: invito a recensire (email + push/inbox; default T+offset da fine appuntamento). */
 	REVIEW_INVITE,
 	/** Recensione post-visita inviata dal cliente: avviso titolare/operatore in inbox salone. */
 	REVIEW_RECEIVED_FOR_SALON,
 	/** Messaggio in-app per il titolare (centro notifiche salone), creato dal super admin — nessuna email. */
 	ADMIN_PLATFORM_MESSAGE,
-	/** Richiesta dal form Assistenza in area account: inbox in-app del profilo super admin — nessuna email automatica. */
+	/** Richiesta dal form Assistenza in area account: inbox in-app del profilo super admin + email a assistenza@. */
 	SUPPORT_REQUEST_TO_LUXURY,
 }

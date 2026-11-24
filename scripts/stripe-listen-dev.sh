@@ -25,7 +25,7 @@ if [[ ! -x "$STRIPE_BIN" ]]; then
   STRIPE_BIN=/tmp/stripe
 fi
 
-echo "→ Stripe listen → http://127.0.0.1:8080/api/v1/webhooks/stripe"
+echo "→ Stripe listen → http://127.0.0.1:8081/api/v1/webhooks/stripe"
 exec "$STRIPE_BIN" listen \
   --api-key "$STRIPE_SECRET_KEY" \
-  --forward-to localhost:8080/api/v1/webhooks/stripe
+  --forward-to localhost:8081/api/v1/webhooks/stripe

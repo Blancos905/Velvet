@@ -2,6 +2,7 @@ import { apiUrl } from "../config/env";
 import { LEGAL_DOCUMENT_VERSION, LEGAL_DPA_DOCUMENT_VERSION } from "../content/legalEntity";
 import { httpApiErrorMessage } from "./httpApiErrorMessage";
 import { registrationApiHeaders } from "../lib/registrationApiHeaders";
+import { rememberRegistrationPollSecret } from "../lib/emailVerificationConfirmShared";
 import type { SalonPlanTier } from "../data/salonPlans";
 import type { SalonBillingProfilePayload } from "./billing";
 
@@ -20,18 +21,36 @@ export type ConsumerRegistrationPayload = {
   salonCity?: string;
   salonProvince?: string;
   salonCountry?: string;
+  /** Lingua UI scelta in registrazione. */
+  preferredLocale?: string;
   /** Codici tipologia (es. HAIR, BEAUTY); obbligatori per BASE/PREMIUM lato backend. */
   salonBusinessTypes?: string[];
   /** Pubblico di riferimento (MALE, FEMALE); obbligatorio per BASE/PREMIUM lato backend. */
   salonClientGenders?: string[];
   /** Dati fatturazione — obbligatori per PREMIUM. */
   billing?: SalonBillingProfilePayload;
+  /** Sedi da creare. La prima coincide con i campi indirizzo singoli. */
+  salonLocations?: SalonRegistrationLocationPayload[];
+};
+
+export type SalonRegistrationLocationPayload = {
+  addressLine1: string;
+  postalCode: string;
+  city: string;
+  province: string;
+  country: string;
+  displayName?: string;
+  /** Tipologia di questa sede (HAIR, BEAUTY, MASSAGE). */
+  salonBusinessTypes?: string[];
+  /** Pubblico di questa sede (MALE, FEMALE). */
+  salonClientGenders?: string[];
 };
 
 export type RegistrationCreatedResponse = {
   message: string;
   emailVerificationRequired?: boolean;
   premiumCheckoutToken?: string | null;
+  pollSecret?: string | null;
 };
 
 /**
@@ -61,11 +80,25 @@ export async function registerConsumerApi(payload: ConsumerRegistrationPayload):
   add("salonCity", payload.salonCity);
   add("salonProvince", payload.salonProvince);
   add("salonCountry", payload.salonCountry);
+  const preferredLocale = payload.preferredLocale?.trim().toLowerCase();
+  if (preferredLocale) body.preferredLocale = preferredLocale;
   if (payload.salonBusinessTypes != null && payload.salonBusinessTypes.length > 0) {
     body.salonBusinessTypes = payload.salonBusinessTypes;
   }
   if (payload.salonClientGenders != null && payload.salonClientGenders.length > 0) {
     body.salonClientGenders = payload.salonClientGenders;
+  }
+  if (payload.salonLocations != null && payload.salonLocations.length > 0) {
+    body.salonLocations = payload.salonLocations.map((location) => ({
+      addressLine1: location.addressLine1.trim(),
+      postalCode: location.postalCode.trim(),
+      city: location.city.trim(),
+      province: location.province.trim(),
+      country: location.country.trim(),
+      ...(location.displayName?.trim() ? { displayName: location.displayName.trim() } : {}),
+      ...(location.salonBusinessTypes != null ? { salonBusinessTypes: location.salonBusinessTypes } : {}),
+      ...(location.salonClientGenders != null ? { salonClientGenders: location.salonClientGenders } : {}),
+    }));
   }
   if (payload.billing) {
     const b = payload.billing;
@@ -99,7 +132,7 @@ export async function registerConsumerApi(payload: ConsumerRegistrationPayload):
     const name = e && typeof e === "object" && "name" in e ? String((e as { name: unknown }).name) : "";
     if (name === "AbortError") {
       throw new Error(
-        `Nessuna risposta dal backend entro ${timeoutMs / 1000}s. Controlla che Spring sia avviato e che il proxy Vite inoltri /api (porta 8080), oppure imposta VITE_API_BASE_URL.`,
+        `Nessuna risposta dal backend entro ${timeoutMs / 1000}s. Controlla che Spring sia avviato e che il proxy Vite inoltri /api (porta 8081), oppure imposta VITE_API_BASE_URL.`,
       );
     }
     throw e;
@@ -110,6 +143,7 @@ export async function registerConsumerApi(payload: ConsumerRegistrationPayload):
   if (res.ok) {
     try {
       const j = (await res.json()) as RegistrationCreatedResponse;
+      rememberRegistrationPollSecret(payload.email, j.pollSecret);
       if (typeof j.message === "string" && j.message.trim()) {
         return {
           message: j.message.trim(),

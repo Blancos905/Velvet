@@ -6,7 +6,7 @@ import '../session/luxury_session_controller.dart';
 import '../theme/luxury_premium_shell_theme.dart';
 import 'luxury_web_shell.dart';
 
-/// Shell app: tema Premium unificato; vincoli piano Free solo via WebView (paywall, path, nav).
+/// Shell app: WebView del frontend con tema Premium. Non applica vincoli di piano.
 class FreeAccountWrapper extends StatefulWidget {
   const FreeAccountWrapper({super.key});
 

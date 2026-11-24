@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": "bash .cursor/hooks/run-python.sh .cursor/hooks/gate-shell.py",
+        "type": "command",
+        "failClosed": true
+      }
+    ],
+    "beforeReadFile": [
+      {
+        "command": "bash .cursor/hooks/run-python.sh .cursor/hooks/gate-read.py",
+        "type": "command",
+        "failClosed": true
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "bash .cursor/hooks/run-python.sh .cursor/hooks/track-edit.py",
+        "type": "command"
+      }
+    ],
+    "stop": [
+      {
+        "command": "bash .cursor/hooks/run-python.sh .cursor/hooks/stop-verify.py",
+        "type": "command",
+        "loop_limit": 1
+      }
+    ]
+  }
+}

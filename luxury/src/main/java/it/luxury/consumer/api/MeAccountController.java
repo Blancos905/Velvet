@@ -5,11 +5,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.luxury.consumer.service.ConsumerAccountService;
+import jakarta.validation.constraints.Size;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import it.luxury.security.auth.LuxuryUserPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,8 +38,14 @@ public class MeAccountController {
 	@ApiResponse(responseCode = "401", description = "Token non valido (resource server attivo)")
 	@ApiResponse(responseCode = "403", description = "Utente anonimo o JWT senza ROLE_CLIENT / ROLE_OWNER")
 	@PreAuthorize("hasAnyAuthority('ROLE_CLIENT','ROLE_OWNER')")
-	public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal LuxuryUserPrincipal principal) {
-		consumerAccountService.deleteAccount(principal.getSubject());
-		return ResponseEntity.noContent().build();
+		public ResponseEntity<Void> deleteAccount(
+				@AuthenticationPrincipal LuxuryUserPrincipal principal,
+				@RequestBody(required = false) DeleteAccountBody body) {
+			consumerAccountService.deleteOwnAccount(
+					principal.getSubject(), body == null ? null : body.currentPassword());
+			return ResponseEntity.noContent().build();
+		}
+
+		public record DeleteAccountBody(@Size(max = 200) String currentPassword) {
+		}
 	}
-}

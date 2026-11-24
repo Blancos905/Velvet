@@ -1,5 +1,5 @@
 /*
- * Hub account in WebView Flutter (/account/home, /account/salone, /account/staff):
+ * Hub account in WebView Flutter (/account/home, /salone, /account/staff):
  * masthead benvenuto visibile; corpo senza flex-grow vuoto.
  */
 
@@ -19,6 +19,11 @@ html.luxury-native-app .luxury-account-hub--native-hub .luxury-account-hub__body
   flex: 0 0 auto;
 }
 
+/* Cliente: hub `/account` = solo griglia (prenotazioni in overlay) — niente corpo vuoto sotto. */
+html.luxury-native-app[data-luxury-path="/account"] .luxury-account-hub--native-hub .luxury-account-hub__body {
+  display: none;
+}
+
 html.luxury-native-app .luxury-account-hub--native-hub .luxury-salon-free-page {
   flex: 0 0 auto;
 }
@@ -27,11 +32,151 @@ html.luxury-native-app .luxury-account-hub--native-hub .luxury-salon-free-page__
   min-height: 0;
 }
 
-/* Free titolare: su /account/salone corpo = teaser «panoramica intera → Premium» sotto i bottoni. */
-html.luxury-native-app-free[data-luxury-path="/account/salone"] .luxury-salon-panorama-account-shell--free-native-teaser {
+/* Free titolare: su /salone corpo = teaser «panoramica intera → Premium» sotto i bottoni. */
+html.luxury-native-app-free[data-luxury-path="/salone"] .luxury-salon-panorama-account-shell--free-native-teaser {
   padding-top: 0.25rem;
 }
 
 html.luxury-native-app[data-luxury-path^="/account"] .luxury-site-footer {
   display: none !important;
 }
+
+/*
+ * Solo app: box logo compatto (classe da AccountLayout quando isNativeApp).
+ * Non dipende dal timing di html.luxury-native-app.
+ */
+.luxury-account-hub__mark-wrap--compact {
+  padding: 0.2rem 0.35rem !important;
+  border-radius: 10px !important;
+  width: fit-content !important;
+  max-width: 100%;
+  align-self: flex-start;
+  box-sizing: border-box;
+}
+
+html.luxury-native-app .luxury-account-hub__mark-wrap--compact::after,
+.luxury-account-hub--consumer-client .luxury-account-hub__mark-wrap--compact::after,
+.luxury-account-hub--salon-owner .luxury-account-hub__mark-wrap--compact::after,
+.luxury-account-hub--salon-staff .luxury-account-hub__mark-wrap--compact::after {
+  inset: -1px !important;
+  opacity: 0.35 !important;
+}
+
+.luxury-account-hub__mark-wrap--compact .saloni-luxury-mark__logo {
+  width: 42px !important;
+  height: 42px !important;
+}
+
+.luxury-account-hub__mark-wrap--compact .saloni-luxury-mark__text {
+  padding: 2px 6px 2px !important;
+}
+
+.luxury-account-hub__mark-wrap--compact .saloni-luxury-mark__saloni {
+  font-size: 0.4rem !important;
+}
+
+.luxury-account-hub__mark-wrap--compact .saloni-luxury-mark__luxury {
+  font-size: 0.78rem !important;
+}
+
+/* Hub app: masthead più basso — ACCOUNT CLIENTE piccolo, Ciao+nome stessa riga, box ridotti */
+.luxury-account-hub--native-hub .luxury-account-hub__top {
+  margin-bottom: 0.15rem;
+}
+
+.luxury-account-hub--native-hub .luxury-account-hub__plan,
+.luxury-account-hub--native-hub .luxury-account-hub__plan--client,
+.luxury-account-hub--native-hub .luxury-account-hub__plan--staff {
+  padding: 0.28rem 0.7rem !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.1em !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 4px 12px rgba(0, 0, 0, 0.28) !important;
+}
+
+.luxury-account-hub--native-hub .luxury-account-hub__welcome {
+  gap: 0.45rem !important;
+  padding-top: 0.4rem !important;
+  align-items: flex-start !important;
+}
+
+.luxury-account-hub--native-hub .luxury-account-hub__welcome-copy {
+  gap: 0.4rem !important;
+  padding: 0.4rem 0.55rem 0.45rem !important;
+  border-radius: 12px !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.luxury-account-hub--native-hub .luxury-account-hub__welcome-line {
+  padding: 0.2rem 0.5rem !important;
+  font-size: 0.55rem !important;
+  letter-spacing: 0.08em !important;
+}
+
+/* Stesso box: tipografia più grande per riempire lo spazio vuoto a destra/sotto */
+.luxury-account-hub--native-hub .luxury-account-hub__greeting {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0.55rem !important;
+  margin: 0 !important;
+  padding: 0.55rem 0.7rem 0.7rem !important;
+  border-radius: 10px !important;
+  font-size: 1.15rem !important;
+  line-height: 1.05 !important;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 0;
+}
+
+.luxury-account-hub--native-hub .luxury-account-hub__greeting::after {
+  left: 0.7rem !important;
+  bottom: 0.32rem !important;
+  width: min(9rem, 55%) !important;
+  height: 2.5px !important;
+}
+
+.luxury-account-hub--native-hub .luxury-account-hub__greeting-hi {
+  display: inline !important;
+  font-size: 1.85rem !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.03em !important;
+  text-shadow:
+    0 1px 0 #000,
+    0 2px 10px rgba(0, 0, 0, 0.55) !important;
+}
+
+.luxury-account-hub--native-hub.luxury-account-hub--consumer-client .luxury-account-hub__greeting-photo {
+  width: 3.05rem;
+  height: 3.05rem;
+  margin-left: 0.55rem;
+}
+
+.luxury-account-hub--native-hub.luxury-account-hub--consumer-client .luxury-account-hub__greeting-name {
+  max-width: calc(100% - 8.4rem);
+}
+
+.luxury-account-hub--native-hub .luxury-account-hub__greeting-name {
+  display: inline-flex !important;
+  align-items: center;
+  padding: 0.38rem 0.85rem 0.42rem !important;
+  font-size: 1.55rem !important;
+  line-height: 1.1 !important;
+  max-width: calc(100% - 4.5rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.luxury-account-hub--native-hub .luxury-account-hub__masthead {
+  padding-bottom: 0.25rem;
+}
+
+.luxury-account-hub--native-hub .luxury-account-hub__masthead-inner {
+  gap: 0.35rem;
+}
+

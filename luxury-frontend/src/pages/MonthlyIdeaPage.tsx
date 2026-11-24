@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { SalonListLoading } from "../components/SalonListLoading";
 import { apiJson } from "../api/client";
 import type { OrganizationSummary } from "../api/types";
 import { findTrendIdea } from "../data/trendingIdeas";
@@ -10,27 +11,14 @@ import { SearchHitLogoAvatar } from "../components/SearchHitLogoAvatar";
 import { StarRatingDisplay } from "../components/StarRatingDisplay";
 import { formatSalonCityForDisplay } from "../lib/formatSalonCityForDisplay";
 import { formatSalonClientAudienceLabel } from "../lib/formatSalonClientAudience";
+import { goBackOrHome } from "../lib/goBackOrHome";
+import { showResultsLoader } from "../lib/showResultsLoader";
 import { prefetchSalonPublicPage } from "../lib/prefetchSalonPublicPage";
 import type { SalonOrgNavState } from "../lib/publicOrganizationDetail";
+import { formatStarReviewCaption } from "../lib/reviewCaptionForUi";
+import { useLuxuryLocale } from "../i18n/useLuxuryLocale";
 import "../styles/luxury-search-page.css";
 import "../styles/monthly-idea-page.css";
-
-function monthlySalonCaption(o: OrganizationSummary): string | null {
-  const avg = o.averageRating;
-  const n = o.reviewCount;
-  if (typeof avg !== "number" || !Number.isFinite(avg) || n == null || n < 1) return null;
-  const avgLabel = avg.toLocaleString("it-IT", { minimumFractionDigits: 0, maximumFractionDigits: 1 });
-  const recLabel = n === 1 ? "1 recensione" : `${n} recensioni`;
-  return `${avgLabel}/5 · ${recLabel}`;
-}
-
-function goBackOrHome(navigate: ReturnType<typeof useNavigate>) {
-  if (typeof window !== "undefined" && window.history.length > 1) {
-    navigate(-1);
-  } else {
-    navigate("/");
-  }
-}
 
 function ChevronIcon() {
   return (
@@ -64,6 +52,7 @@ export default function MonthlyIdeaPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const isNativeApp = useLuxuryNativeAppShell();
+  const { locale, t } = useLuxuryLocale();
   const { groupId, itemId } = useParams<{ groupId: string; itemId: string }>();
   const resolved = useMemo(
     () =>
@@ -72,27 +61,33 @@ export default function MonthlyIdeaPage() {
         : null,
     [groupId, itemId, isNativeApp],
   );
-
-  if (!resolved) {
-    return <Navigate to="/" replace />;
-  }
-
-  const { group, card } = resolved;
   const editorialMonthKey = useMemo(() => getEditorialMonthKey(), []);
 
   const salonsQ = useQuery({
-    queryKey: ["publicOrganizations", "monthlyIdea", editorialMonthKey, group.id, card.q],
+    queryKey: [
+      "publicOrganizations",
+      "monthlyIdea",
+      editorialMonthKey,
+      resolved?.group.id ?? "",
+      resolved?.card.q ?? "",
+    ],
+    enabled: resolved != null,
     queryFn: () => {
+      if (!resolved) return Promise.resolve([]);
       const p = new URLSearchParams();
-      p.set("monthlyIdea", card.q);
-      p.set("monthlyIdeaSalonKind", group.id);
+      p.set("monthlyIdea", resolved.card.q);
+      p.set("monthlyIdeaSalonKind", resolved.group.id);
       p.set("monthlyIdeaLimit", "5");
       return apiJson<OrganizationSummary[]>(`/api/v1/public/organizations?${p.toString()}`);
     },
   });
 
+  if (!resolved) {
+    return <Navigate to="/" replace />;
+  }
+
   const hits = salonsQ.data ?? [];
-  const showSkeleton = salonsQ.isLoading && hits.length === 0;
+  const showLoader = showResultsLoader(salonsQ, hits.length);
 
   return (
     <main className="luxury-page-main luxury-search-page luxury-monthly-idea-page">
@@ -100,7 +95,7 @@ export default function MonthlyIdeaPage() {
         <button
           type="button"
           className="luxury-search-back"
-          aria-label="Torna indietro"
+          aria-label={t("auth.backAria")}
           onClick={() => goBackOrHome(navigate)}
         >
           <svg className="luxury-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -112,41 +107,39 @@ export default function MonthlyIdeaPage() {
               strokeLinejoin="round"
             />
           </svg>
-          Torna indietro
+          {t("common.back")}
         </button>
       </div>
 
       <header className="luxury-search-hero">
         <div className="luxury-search-hero__glow" aria-hidden />
         <h1 className="luxury-page-title">
-          <span className="luxury-search-hero__title-text">I migliori saloni del mese</span>
+          <span className="luxury-search-hero__title-text">{t("home.monthlyIdea.title")}</span>
         </h1>
       </header>
 
       {salonsQ.isError ? (
         <p className="luxury-alert luxury-alert--error" role="alert">
-          Non siamo riusciti a caricare l&apos;elenco. Riprova tra poco.
+          {t("home.monthlyIdea.loadError")}
         </p>
       ) : null}
 
-      {showSkeleton ? (
-        <div className="luxury-search-skeleton-grid" aria-hidden>
-          {[0, 1, 2, 3, 4].map((k) => (
-            <div key={k} className="luxury-search-skeleton-card" />
-          ))}
-        </div>
-      ) : null}
+      {showLoader ? <SalonListLoading label={t("home.salonResults.loading")} /> : null}
 
-      {!showSkeleton && hits.length > 0 ? (
+      {!showLoader && hits.length > 0 ? (
         <>
           <p className="luxury-search-a11y-live" aria-live="polite" aria-atomic="true">
-            {hits.length} saloni in classifica per questa idea.
+            {t("home.monthlyIdea.resultsLive", { count: hits.length })}
           </p>
           <ul className="luxury-search-grid">
             {hits.map((o, idx) => {
-              const caption = monthlySalonCaption(o);
               const avg = o.averageRating;
-              const showStars = typeof avg === "number" && Number.isFinite(avg) && caption != null;
+              const n = o.reviewCount;
+              const caption =
+                typeof avg === "number" && Number.isFinite(avg) && n != null && n >= 1
+                  ? formatStarReviewCaption(avg, n, locale, t)
+                  : null;
+              const showStars = caption != null;
               const audienceLabel = formatSalonClientAudienceLabel(o.salonClientGenders);
               const pageToneClass =
                 idx === 0 ? " luxury-search-card--page-lead" : " luxury-search-card--page-following";
@@ -167,12 +160,14 @@ export default function MonthlyIdeaPage() {
                     />
                     <div className="luxury-search-card-body">
                       <h3 className="luxury-search-card-name">{o.name}</h3>
-                      {showStars ? (
+                      {showStars && avg != null ? (
                         <div className="luxury-search-card-rating">
                           <StarRatingDisplay rating={avg} caption={caption} />
                         </div>
                       ) : (
-                        <p className="luxury-search-card-rating luxury-monthly-idea-no-reviews">Recensioni in arrivo</p>
+                        <p className="luxury-search-card-rating luxury-monthly-idea-no-reviews">
+                          {t("home.monthlyIdea.reviewsPending")}
+                        </p>
                       )}
                       <div className="luxury-search-card-footer">
                         {audienceLabel ? (
@@ -195,10 +190,10 @@ export default function MonthlyIdeaPage() {
         </>
       ) : null}
 
-      {!showSkeleton && hits.length === 0 && !salonsQ.isError ? (
+      {!showLoader && hits.length === 0 && !salonsQ.isError ? (
         <section className="luxury-search-empty-state" aria-labelledby="luxury-monthly-idea-empty-title">
           <h2 id="luxury-monthly-idea-empty-title" className="luxury-search-empty-title">
-            Nessun salone in evidenza per questa idea
+            {t("home.monthlyIdea.emptyTitle")}
           </h2>
           <div className="luxury-search-empty-actions">
             <button
@@ -206,7 +201,7 @@ export default function MonthlyIdeaPage() {
               className="luxury-search-empty-btn luxury-search-empty-btn--primary"
               onClick={() => navigate("/")}
             >
-              Torna alla home
+              {t("home.monthlyIdea.backHome")}
             </button>
           </div>
         </section>

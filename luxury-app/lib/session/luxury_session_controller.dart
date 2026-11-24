@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../auth/salon_plan_tier.dart';
-import '../shell/luxury_free_web_bridge.dart';
 import 'luxury_salon_session.dart';
+import 'luxury_session_web_bridge.dart';
 
 /// Sincronizza ruolo e piano salone dalla WebView (JWT + `GET /api/v1/me/salon`).
 class LuxurySessionController extends ChangeNotifier {
@@ -13,18 +13,16 @@ class LuxurySessionController extends ChangeNotifier {
 
   LuxurySalonSession get session => _session;
 
-  bool get isFreeSalonOwner => _session.isFreeSalonOwner;
-
   Future<void> syncFromWebView(WebViewController controller) async {
     Object? raw;
     try {
       raw = await controller.runJavaScriptReturningResult(
-        LuxuryFreeWebBridge.readSessionJsonScript,
+        LuxurySessionWebBridge.readSessionJsonScript,
       );
     } catch (_) {
       try {
         raw = await controller.runJavaScriptReturningResult(
-          LuxuryFreeWebBridge.readSessionJsonSyncScript,
+          LuxurySessionWebBridge.readSessionJsonSyncScript,
         );
       } catch (_) {
         raw = null;
@@ -72,9 +70,6 @@ class LuxurySessionController extends ChangeNotifier {
       }
       plan ??= parseSalonPlanTier(map['jwtPlanHint'] as String?);
       plan ??= parseSalonPlanTier(map['sessionPlanHint'] as String?);
-      if (isOwner && plan == null) {
-        plan = SalonPlanTier.base;
-      }
 
       return LuxurySalonSession(
         isAuthenticated: true,

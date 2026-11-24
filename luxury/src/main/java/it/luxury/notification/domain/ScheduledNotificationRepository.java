@@ -261,11 +261,16 @@ public interface ScheduledNotificationRepository extends JpaRepository<Scheduled
 			@Param("status") QueuedNotificationStatus status,
 			@Param("cutoff") Instant cutoff);
 
+	/**
+	 * Elenco messaggi inbox cliente. {@code left join fetch a.operator} obbligatorio con
+	 * {@code spring.jpa.open-in-view=false}: la preview legge l'operatore nella stessa query/transazione.
+	 */
 	@Query(
 			"""
 					select n from ScheduledNotification n
 					join fetch n.appointment a
 					join fetch a.location loc
+					left join fetch a.operator op
 					where a.consumerProfile.id = :consumerProfileId
 					and n.type in :types
 					and n.consumerDeletedAt is null

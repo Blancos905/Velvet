@@ -42,11 +42,83 @@
 }
 
 .luxury-top-operators-lead {
-  margin: 0.75rem 0 0;
-  max-width: 42rem;
-  font-size: 0.98rem;
-  line-height: 1.55;
-  color: rgba(255, 251, 235, 0.78);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  margin: 1.1rem 0 0;
+  max-width: 40rem;
+  padding: 1.05rem 1.25rem 1.15rem 1.55rem;
+  font-size: clamp(1rem, 2.4vw, 1.14rem);
+  font-weight: 500;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  color: rgba(255, 251, 235, 0.9);
+  text-wrap: pretty;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(251, 146, 60, 0.18) 0%, transparent 55%),
+    radial-gradient(80% 70% at 0% 100%, rgba(154, 52, 18, 0.22) 0%, transparent 50%),
+    linear-gradient(165deg, #141414 0%, #050505 48%, #000000 100%);
+  border: 2px solid #000000;
+  border-radius: 1.15rem;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 0 0 1px rgba(251, 146, 60, 0.12),
+    0 3px 0 rgba(0, 0, 0, 0.55),
+    0 18px 44px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(249, 115, 22, 0.08);
+  transition:
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    transform 0.28s ease;
+}
+
+.luxury-top-operators-lead::before {
+  content: "";
+  position: absolute;
+  left: 0.9rem;
+  top: 0.95rem;
+  bottom: 0.95rem;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fb923c 0%, rgba(253, 186, 116, 0.2) 100%);
+  box-shadow: 0 0 16px rgba(249, 115, 22, 0.55);
+}
+
+.luxury-top-operators-lead::after {
+  content: "";
+  position: absolute;
+  right: -18%;
+  top: -40%;
+  width: 55%;
+  height: 90%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.14) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.luxury-top-operators-lead strong {
+  position: relative;
+  z-index: 1;
+  font-weight: 800;
+  letter-spacing: 0.015em;
+  background: linear-gradient(100deg, #fffbeb 0%, #fdba74 50%, #fb923c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (hover: hover) {
+  .luxury-top-operators-lead:hover {
+    border-color: rgba(251, 146, 60, 0.45);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.09),
+      inset 0 0 0 1px rgba(251, 146, 60, 0.2),
+      0 3px 0 rgba(0, 0, 0, 0.5),
+      0 24px 52px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(249, 115, 22, 0.16);
+  }
 }
 
 .luxury-top-operator-avatar {
@@ -85,6 +157,10 @@
 
 .luxury-trend-card--operators.luxury-trend-card--photo {
   background-position: center 35%;
+}
+
+.luxury-trend-card--sponsored.luxury-trend-card--photo {
+  background-position: center 42%;
 }
 
 .luxury-trend-card-sublabel {

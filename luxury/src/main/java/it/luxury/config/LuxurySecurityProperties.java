@@ -9,6 +9,7 @@ public record LuxurySecurityProperties(
 		Integer authJwtTtlHours,
 		Integer authAccessTtlMinutes,
 		Integer refreshTokenTtlDays,
+		Integer sessionMaxHours,
 		Boolean rateLimitEnabled,
 		Integer rateLimitRequestsPerMinute,
 		int reviewTokenTtlDays) {
@@ -27,7 +28,10 @@ public record LuxurySecurityProperties(
 			authAccessTtlMinutes = 15;
 		}
 		if (refreshTokenTtlDays == null || refreshTokenTtlDays <= 0) {
-			refreshTokenTtlDays = 30;
+			refreshTokenTtlDays = 1;
+		}
+		if (sessionMaxHours == null || sessionMaxHours <= 0) {
+			sessionMaxHours = 24;
 		}
 		if (rateLimitEnabled == null) {
 			rateLimitEnabled = true;
@@ -42,5 +46,10 @@ public record LuxurySecurityProperties(
 
 	public long accessTokenTtlSeconds() {
 		return authAccessTtlMinutes() * 60L;
+	}
+
+	/** Durata massima sessione refresh dal login (secondi). */
+	public long sessionMaxSeconds() {
+		return sessionMaxHours() * 3600L;
 	}
 }

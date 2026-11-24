@@ -5,9 +5,13 @@ import { STAFF_MEMBER_AGENDA_PATH } from "../../lib/staffMemberAgendaPath";
 import { apiJson } from "../../api/client";
 import type { AppointmentDto } from "../../api/types";
 import { useLuxuryAuth } from "../../auth/LuxuryAuthProvider";
+import { AgendaSponsorCarousel } from "../../components/AgendaSponsorCarousel";
 import { ClientBookingsHeroHeader } from "../../components/account/ClientBookingsHeroHeader";
 import { SearchHitLogoAvatar, searchHitInitials } from "../../components/SearchHitLogoAvatar";
+import { intlLocaleForUi } from "../../i18n/intlLocaleForUi";
+import { useLuxuryLocale } from "../../i18n/useLuxuryLocale";
 import { CLIENT_ACCOUNT_PAGE_SHELL_CLASS } from "../../lib/clientAccountPageShellClasses";
+import { appointmentStatusLabel } from "../../lib/appointmentStatusLabel";
 import { formatPriceEUR } from "../../lib/format";
 import "../../styles/luxury-consumer-bookings-page.css";
 import "../../styles/luxury-info-privacy-hero.css";
@@ -15,30 +19,16 @@ import "../../styles/luxury-feedback-client.css";
 import "../../styles/luxury-client-account-page.css";
 import PrenotazioniStaffPickPage from "./PrenotazioniStaffPickPage";
 
-function formatAgendaDate(iso: string): { day: string; month: string; weekday: string; time: string; full: string } {
+function formatAgendaDate(iso: string, locale: ReturnType<typeof useLuxuryLocale>["locale"]) {
+  const intl = intlLocaleForUi(locale);
   const d = new Date(iso);
   return {
-    day: new Intl.DateTimeFormat("it-IT", { day: "2-digit" }).format(d),
-    month: new Intl.DateTimeFormat("it-IT", { month: "short" }).format(d),
-    weekday: new Intl.DateTimeFormat("it-IT", { weekday: "short" }).format(d),
-    time: new Intl.DateTimeFormat("it-IT", { hour: "2-digit", minute: "2-digit" }).format(d),
-    full: new Intl.DateTimeFormat("it-IT", { dateStyle: "full", timeStyle: "short" }).format(d),
+    day: new Intl.DateTimeFormat(intl, { day: "2-digit" }).format(d),
+    month: new Intl.DateTimeFormat(intl, { month: "short" }).format(d),
+    weekday: new Intl.DateTimeFormat(intl, { weekday: "short" }).format(d),
+    time: new Intl.DateTimeFormat(intl, { hour: "2-digit", minute: "2-digit" }).format(d),
+    full: new Intl.DateTimeFormat(intl, { dateStyle: "full", timeStyle: "short" }).format(d),
   };
-}
-
-function statusLabel(status: string): string {
-  switch (status) {
-    case "BOOKED":
-      return "In attesa di conferma";
-    case "CONFIRMED":
-      return "Confermata";
-    case "COMPLETED":
-      return "Completata";
-    case "CANCELLED":
-      return "Annullata";
-    default:
-      return status;
-  }
 }
 
 function consumerPendingConfirmation(a: AppointmentDto): boolean {
@@ -51,6 +41,7 @@ function consumerDeadlineExpired(a: AppointmentDto): boolean {
 
 export default function AppointmentsPage() {
   const { accessToken, isSalonTitolare, isSalonStaff } = useLuxuryAuth();
+  const { locale, t } = useLuxuryLocale();
   const [upcoming, setUpcoming] = useState(true);
 
   const q = useQuery({
@@ -79,14 +70,14 @@ export default function AppointmentsPage() {
       <div className="luxury-consumer-bookings-dash__shell">
         <ClientBookingsHeroHeader listCount={q.isLoading ? undefined : listCount ?? 0} upcoming={upcoming} />
 
-        <article className="luxury-feedback-client-page__card luxury-surface-card" aria-label="Elenco prenotazioni cliente">
+        <article className="luxury-feedback-client-page__card luxury-surface-card" aria-label={t("account.booking.listAria")}>
           <div className="luxury-feedback-client-page__card-glow" aria-hidden />
           <header className="luxury-feedback-client-page__card-head">
-            <h2 className="luxury-feedback-client-page__card-title">Agenda e storico</h2>
+            <h2 className="luxury-feedback-client-page__card-title">{t("account.booking.listTitle")}</h2>
           </header>
 
           <div className="luxury-feedback-client-page__card-body">
-            <div className="luxury-consumer-agenda__filters" role="tablist" aria-label="Filtri prenotazioni">
+            <div className="luxury-consumer-agenda__filters" role="tablist" aria-label={t("account.booking.filtersAria")}>
               <button
                 type="button"
                 role="tab"
@@ -94,7 +85,7 @@ export default function AppointmentsPage() {
                 onClick={() => setUpcoming(true)}
                 className={`luxury-consumer-agenda__tab${upcoming ? " is-active" : ""}`}
               >
-                In arrivo
+                {t("account.booking.tab.upcoming")}
               </button>
               <button
                 type="button"
@@ -103,11 +94,11 @@ export default function AppointmentsPage() {
                 onClick={() => setUpcoming(false)}
                 className={`luxury-consumer-agenda__tab${!upcoming ? " is-active" : ""}`}
               >
-                Passate
+                {t("account.booking.tab.past")}
               </button>
             </div>
 
-            {q.isLoading && <p className="luxury-text-muted">Caricamento…</p>}
+            {q.isLoading && <p className="luxury-text-muted">{t("common.loading")}</p>}
             {q.error && (
               <p className="luxury-alert luxury-alert--error" role="alert">
                 {q.error instanceof Error ? q.error.message : "Errore"}
@@ -115,7 +106,7 @@ export default function AppointmentsPage() {
             )}
             {q.data && q.data.length === 0 && (
               <p className="luxury-consumer-agenda__empty">
-                Nessuna prenotazione in questa lista.
+                {t("account.booking.empty")}
                 {upcoming ? (
                   <>
                     {" "}
@@ -129,7 +120,7 @@ export default function AppointmentsPage() {
             )}
             <ul className="luxury-consumer-agenda__list">
               {(q.data ?? []).map((a) => {
-                const agendaDate = formatAgendaDate(a.start);
+                const agendaDate = formatAgendaDate(a.start, locale);
                 const salonLabel = a.locationName?.trim() || "Salone";
                 const salonSlug = a.locationSlug?.trim() || "";
                 const salonLogo = a.locationLogoDataUrl?.trim() || "";
@@ -166,7 +157,7 @@ export default function AppointmentsPage() {
                           <span className="luxury-consumer-agenda__when-time">{agendaDate.time}</span>
                         </span>
                         <span className={`luxury-consumer-agenda__status luxury-consumer-agenda__status--${a.status.toLowerCase()}`}>
-                          {statusLabel(a.status)}
+                          {appointmentStatusLabel(t, a.status)}
                         </span>
                       </p>
                       <Link to={`/account/prenotazioni/${a.id}`} className="luxury-consumer-agenda__title">
@@ -178,19 +169,17 @@ export default function AppointmentsPage() {
                       {upcoming && (a.canConsumerCancel || a.canConsumerReschedule) && (
                         <div className="luxury-consumer-agenda__actions">
                           <Link to={`/account/prenotazioni/${a.id}`} className="luxury-consumer-agenda__manage-link">
-                            Modifica orario o disdici
+                            {t("account.consumer.home.manage")}
                           </Link>
                         </div>
                       )}
                       {upcoming && consumerPendingConfirmation(a) && (
                         <p className="luxury-consumer-agenda__policy-hint">
-                          In attesa di conferma dal salone. Per annullare o cambiare orario contatta {salonLabel}.
+                          {t("account.booking.pendingHint")} {salonLabel}.
                         </p>
                       )}
                       {upcoming && consumerDeadlineExpired(a) && (
-                        <p className="luxury-consumer-agenda__policy-hint">
-                          Per cambiare o annullare questa prenotazione contatta il salone: la finestra online è scaduta.
-                        </p>
+                        <p className="luxury-consumer-agenda__policy-hint">{t("account.booking.deadlineHint")}</p>
                       )}
                     </div>
                   </li>
@@ -199,6 +188,7 @@ export default function AppointmentsPage() {
             </ul>
           </div>
         </article>
+        <AgendaSponsorCarousel />
       </div>
     </main>
   );

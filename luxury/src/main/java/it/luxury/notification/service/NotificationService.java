@@ -46,6 +46,14 @@ public class NotificationService {
 				.setNotification(Notification.builder()
 						.setTitle(title != null ? title : "")
 						.setBody(body != null ? body : "")
+						.build())
+				// Allineato al canale creato in MainActivity (luxury_alerts).
+				.setAndroidConfig(com.google.firebase.messaging.AndroidConfig.builder()
+						.setPriority(com.google.firebase.messaging.AndroidConfig.Priority.HIGH)
+						.setNotification(com.google.firebase.messaging.AndroidNotification.builder()
+								.setChannelId("luxury_alerts")
+								.setPriority(com.google.firebase.messaging.AndroidNotification.Priority.HIGH)
+								.build())
 						.build());
 		if (data != null && !data.isEmpty()) {
 			builder.putAllData(data);

@@ -5,6 +5,8 @@ import it.luxury.appointment.domain.AppointmentRepository;
 import it.luxury.appointment.domain.AppointmentStatus;
 import it.luxury.catalog.domain.SalonClient;
 import it.luxury.catalog.domain.SalonClientRepository;
+import it.luxury.catalog.domain.SalonLuxuryChatReadState;
+import it.luxury.catalog.domain.SalonLuxuryChatReadStateRepository;
 import it.luxury.catalog.domain.SalonService;
 import it.luxury.catalog.domain.SalonServiceRepository;
 import it.luxury.catalog.domain.StaffOperator;
@@ -75,6 +77,9 @@ class MeSalonClientsControllerTest {
 
 	@Autowired
 	private SalonClientMembershipService salonClientMembershipService;
+
+	@Autowired
+	private SalonLuxuryChatReadStateRepository salonLuxuryChatReadStateRepository;
 
 	@Autowired
 	private PremiumEntitlementTestFixture premiumEntitlementTestFixture;
@@ -172,6 +177,34 @@ class MeSalonClientsControllerTest {
 
 		assertThat(salonClientRepository.findByLocation_IdAndConsumerProfile_Id(location.getId(), profile.getId()))
 				.isEmpty();
+	}
+
+	@Test
+	void leaveClient_removesRowWhenChatReadStateExists() throws Exception {
+		String suffix = UUID.randomUUID().toString().substring(0, 8);
+		String email = "client-leave-chat-" + suffix + "@test.com";
+		String slug = "slug-leave-chat-" + suffix;
+		StudioGroup group = studioGroupRepository.save(new StudioGroup("Salone Leave Chat " + suffix));
+		Location location = locationRepository.save(new Location(group, slug, "Salone Leave Chat", "MI"));
+		ConsumerProfile profile = new ConsumerProfile("sub-leave-chat-" + suffix, email, "Michele");
+		profile.setPasswordHash(passwordEncoder.encode("x"));
+		profile.setSecurityRoles("CLIENT");
+		profile = consumerProfileRepository.save(profile);
+		String token = luxuryTokenService.createAccessToken(profile);
+
+		mockMvc.perform(put("/api/v1/me/salon-clients/" + location.getId()).header("Authorization", "Bearer " + token))
+				.andExpect(status().isOk());
+
+		SalonClient sc = salonClientRepository
+				.findByLocation_IdAndConsumerProfile_Id(location.getId(), profile.getId())
+				.orElseThrow();
+		salonLuxuryChatReadStateRepository.save(new SalonLuxuryChatReadState(sc, null));
+
+		mockMvc.perform(post("/api/v1/me/salon-clients/" + location.getId() + "/leave").header("Authorization", "Bearer " + token))
+				.andExpect(status().isNoContent());
+
+		assertThat(salonClientRepository.findById(sc.getId())).isEmpty();
+		assertThat(salonLuxuryChatReadStateRepository.findOwnerThreadReadState(sc.getId())).isEmpty();
 	}
 
 	@Test

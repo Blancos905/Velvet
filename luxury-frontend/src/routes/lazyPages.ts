@@ -18,6 +18,7 @@ export const SalonServicesPage = lazy(() => import("../pages/account/salon/Salon
 export const SalonStaffPage = lazy(() => import("../pages/account/salon/SalonStaffPage"));
 export const SalonClientsPage = lazy(() => import("../pages/account/salon/SalonClientsPage"));
 export const SalonBrandPage = lazy(() => import("../pages/account/salon/SalonBrandPage"));
+export const SalonVetrinaPreviewPage = lazy(() => import("../pages/account/salon/SalonVetrinaPreviewPage"));
 export const SalonBrandLayoutPreviewPage = lazy(
   () => import("../pages/account/salon/SalonBrandLayoutPreviewPage"),
 );
@@ -53,6 +54,7 @@ export const AdminLayout = lazyNamed(() => import("../pages/admin/AdminLayout"),
 export const AdminDashboardPage = lazy(() => import("../pages/admin/AdminDashboardPage"));
 export const AdminAssistenzaPage = lazy(() => import("../pages/admin/AdminAssistenzaPage"));
 export const AdminFiscalInvoicesPage = lazy(() => import("../pages/admin/AdminFiscalInvoicesPage"));
+export const AdminPlacementSponsorsPage = lazy(() => import("../pages/admin/AdminPlacementSponsorsPage"));
 export const AdminSuperAdminProfilePage = lazy(
   () => import("../pages/admin/AdminSuperAdminProfilePage"),
 );
@@ -62,13 +64,13 @@ export const AdminRegisterSuperAdminPage = lazy(
 
 // —— Vetrina / ricerca / piani ——
 export const SalonPlansPage = lazy(() => import("../pages/SalonPlansPage"));
-export const SalonFreePremiumUpgradePage = lazy(() => import("../pages/SalonFreePremiumUpgradePage"));
 export const SearchPage = lazy(() => import("../pages/SearchPage"));
 export const SalonPage = lazy(() => import("../pages/SalonPage"));
 export const SalonExplorePage = lazy(() => import("../pages/SalonExplorePage"));
 export const SalonPersonalPage = lazy(() => import("../pages/SalonPersonalPage"));
 export const MonthlyIdeaPage = lazy(() => import("../pages/MonthlyIdeaPage"));
 export const TopOperatorsPage = lazy(() => import("../pages/TopOperatorsPage"));
+export const SponsoredSalonsPage = lazy(() => import("../pages/SponsoredSalonsPage"));
 export const NationsCupPage = lazy(() => import("../pages/NationsCupPage"));
 export const ReviewPage = lazy(() => import("../pages/ReviewPage"));
 export const PartnerPage = lazy(() => import("../pages/PartnerPage"));
@@ -85,6 +87,7 @@ export const CookiePolicyPage = lazy(() => import("../pages/legal/CookiePolicyPa
 export const PrivacyChoicesPage = lazy(() => import("../pages/legal/PrivacyChoicesPage"));
 export const AccountDeletionPage = lazy(() => import("../pages/legal/AccountDeletionPage"));
 export const TermsOfServicePage = lazy(() => import("../pages/legal/TermsOfServicePage"));
+export const FreeUseLicensePage = lazy(() => import("../pages/legal/FreeUseLicensePage"));
 export const DataProcessingAgreementPage = lazy(
   () => import("../pages/legal/DataProcessingAgreementPage"),
 );

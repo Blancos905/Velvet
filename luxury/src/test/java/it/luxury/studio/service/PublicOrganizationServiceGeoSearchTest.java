@@ -81,6 +81,17 @@ class PublicOrganizationServiceGeoSearchTest {
 	}
 
 	@Test
+	void searchWithReviewSummaries_nearOnly_skipsSalonHiddenFromClients() {
+		Location hidden = premiumLocation("hidden", 45.4642, 9.19);
+		hidden.setVisibleToClients(false);
+		when(locationRepository.findPremiumLocationsWithCoordinates()).thenReturn(List.of(hidden));
+
+		var results = service.searchWithReviewSummaries(null, null, 45.4642, 9.19, 40.0, null);
+
+		assertThat(results).isEmpty();
+	}
+
+	@Test
 	void searchWithReviewSummaries_barbiereQuery_matchesBarbaServiceInCatalog() {
 		Location near = premiumLocation("barber", 45.4642, 9.19);
 		near.setSalonClientGenders("MALE");

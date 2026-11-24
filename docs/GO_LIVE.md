@@ -44,7 +44,7 @@ Combinare con l’audit tecnico:
 
 **LegalBlink:** non adottare come sostituto delle informative custom; eventuale audit esterno una tantum sì.
 
-**Go-live senza Stripe / senza incassi (Free + trial):** vedi checklist dedicata [`GO_LIVE_LEGALE_SENZA_STRIPE.md`](./GO_LIVE_LEGALE_SENZA_STRIPE.md).
+**Go-live senza Stripe / senza incassi (prova Premium):** vedi checklist dedicata [`GO_LIVE_LEGALE_SENZA_STRIPE.md`](./GO_LIVE_LEGALE_SENZA_STRIPE.md).
 
 ### Aruba — tre credenziali diverse (non confondere la Gmail)
 
@@ -75,9 +75,11 @@ cp -r dist ../infrastructure/frontend-web-dist/
 |------------------|------------|
 | `LUXURY_TOKEN_SECRET` | Chiave casuale lunga (mai `luxury-dev-token-secret…`) |
 | `LUXURY_PUBLIC_FRONTEND_URL` | `https://www.saloniluxury.it` |
-| `LUXURY_CORS_ALLOWED_ORIGINS` | Solo domini HTTPS reali |
+| `LUXURY_CORS_ALLOWED_ORIGINS` | `www`, apex, `salone.` e `admin.` — solo HTTPS |
+| `LUXURY_REFRESH_COOKIE_DOMAIN` | `saloniluxury.it` (default prod): la sessione vale sulle tre origini |
+| Certificato TLS | SAN per `salone.saloniluxury.it` e `admin.saloniluxury.it` |
 | Super admin | BCrypt hash; revocare `LUXURY_SUPER_ADMIN_SETUP_TOKEN` dopo setup |
-| Email SMTP | `LUXURY_MAIL_ENABLED=true` + `SPRING_MAIL_*` (Aruba `smtps.aruba.it:465` SSL, user `noreply@saloniluxury.it`) — conferme prenotazione e promemoria |
+| Email SMTP | `LUXURY_MAIL_ENABLED=true` + `SPRING_MAIL_*` (Aruba `smtps.aruba.it:465` SSL, user `noreply@saloniluxury.it`) — auth, prenotazioni, billing, chat, lifecycle account |
 | Refresh token | Documentato come Redis; implementazione attuale su **Postgres** — allineare testi o codice |
 | Chat Premium multi-thread | **Implementato** | Thread separati titolare / operatore su `salon_luxury_chat_*`; su DB esistenti applicare `luxury/deploy/sql/align_salon_luxury_chat_read_state_indexes_postgres.sql` (o riavviare backend: `SalonLuxuryChatSchemaAlignmentRunner` allinea indici all'avvio) |
 

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   fetchBillingProfile,
   saveBillingProfile,
@@ -9,17 +9,21 @@ import {
 import { salonBillingProfileFormKey } from "../lib/salonBillingProfileForm";
 import { SalonBillingProfileForm } from "./SalonBillingProfileForm";
 
+export const BILLING_CHECKOUT_FORM_ID = "luxury-billing-checkout-form";
+
 type SalonBillingProfileEditorProps = {
   accessToken: string | undefined;
   /** checkout = messaggi per attivazione Premium; profile = sezione profilo titolare */
   context?: "checkout" | "profile";
   onSaved?: (profile: SalonBillingProfile) => void;
+  onPendingChange?: (pending: boolean) => void;
 };
 
 export function SalonBillingProfileEditor({
   accessToken,
   context = "checkout",
   onSaved,
+  onPendingChange,
 }: SalonBillingProfileEditorProps) {
   const queryClient = useQueryClient();
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
@@ -34,13 +38,19 @@ export function SalonBillingProfileEditor({
     mutationFn: (payload: SalonBillingProfilePayload) => saveBillingProfile(accessToken, payload),
     onSuccess: (saved) => {
       void queryClient.invalidateQueries({ queryKey: ["me", "billing"] });
-      setSaveNotice("Dati fatturazione salvati nel profilo del salone.");
+      if (context !== "checkout") {
+        setSaveNotice("Dati fatturazione salvati nel profilo del salone.");
+      }
       onSaved?.(saved);
     },
     onError: () => {
       setSaveNotice(null);
     },
   });
+
+  useEffect(() => {
+    onPendingChange?.(saveProfileM.isPending);
+  }, [onPendingChange, saveProfileM.isPending]);
 
   if (billingProfile.isPending) {
     return <p className="luxury-text-muted" aria-live="polite">Caricamento dati fatturazione…</p>;
@@ -58,15 +68,10 @@ export function SalonBillingProfileEditor({
 
   const profile = billingProfile.data;
   const formKey = salonBillingProfileFormKey(profile);
+  const checkout = context === "checkout";
 
   return (
     <>
-      {context === "checkout" && profile && !profile.persisted ? (
-        <p className="luxury-text-muted" style={{ margin: "0 0 1rem", lineHeight: 1.55 }}>
-          Abbiamo precompilato i campi con i dati del salone. Controlla e salva prima di procedere al pagamento.
-        </p>
-      ) : null}
-
       {context === "checkout" && profile?.persisted && profile.complete && !saveProfileM.isPending && !saveNotice ? (
         <p className="luxury-alert luxury-alert--success" role="status" style={{ marginBottom: "1rem" }}>
           Dati fatturazione già salvati nel profilo. Puoi modificarli qui sotto se serve.
@@ -89,7 +94,9 @@ export function SalonBillingProfileEditor({
         key={formKey}
         initial={profile}
         submitting={saveProfileM.isPending}
-        submitLabel={context === "profile" ? "Salva dati fatturazione" : "Salva dati fatturazione"}
+        formId={checkout ? BILLING_CHECKOUT_FORM_ID : undefined}
+        hideSubmit={checkout}
+        submitLabel="Salva dati fatturazione"
         onSubmit={async (payload) => {
           setSaveNotice(null);
           await saveProfileM.mutateAsync(payload);

@@ -1,7 +1,9 @@
 import { Suspense, useEffect } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { LuxuryNotificationPopupHost } from "./components/LuxuryNotificationPopupHost";
+import { ConsumerNotificationAlertPoller } from "./components/ConsumerNotificationAlertPoller";
 import { SalonBookingAlertPoller } from "./components/SalonBookingAlertPoller";
+import { SalonTrialRenewalPrompt } from "./components/salon/SalonTrialRenewalPrompt";
 import { PremiumRegistrationStripeReturnRedirect } from "./components/PremiumRegistrationStripeReturnRedirect";
 import { useLuxuryAuth } from "./auth/LuxuryAuthProvider";
 import { isLuxuryNativeAppShell } from "./hooks/useLuxuryNativeAppShell";
@@ -26,6 +28,7 @@ import {
   AdminAssistenzaPage,
   AdminDashboardPage,
   AdminFiscalInvoicesPage,
+  AdminPlacementSponsorsPage,
   AdminLayout,
   AdminRegisterSuperAdminPage,
   AdminSuperAdminProfilePage,
@@ -35,11 +38,13 @@ import {
   ClientSignupPage,
   CookiePolicyPage,
   DataProcessingAgreementPage,
+  FreeUseLicensePage,
   AccountDeletionPage,
   DevSeedSalonShowcasePage,
   FavoritesPage,
   LegalHubPage,
   MonthlyIdeaPage,
+  SponsoredSalonsPage,
   TopOperatorsPage,
   NationsCupPage,
   NotificationsPage,
@@ -52,6 +57,7 @@ import {
   ReviewPage,
   SalonBrandLayoutPreviewPage,
   SalonBrandPage,
+  SalonVetrinaPreviewPage,
   SalonClientsPage,
   SalonExplorePage,
   SalonLocationPage,
@@ -59,7 +65,6 @@ import {
   SalonPersonalPage,
   SalonPersonalPageBuilder,
   SalonPlansPage,
-  SalonFreePremiumUpgradePage,
   SalonServicesPage,
   SalonStaffAgendaPage,
   SalonStudioAgendaPage,
@@ -77,12 +82,14 @@ import {
 } from "./routes/lazyPages";
 
 import { AccountLayout } from "./pages/account/AccountLayout";
+import { SurfaceBoundary } from "./components/SurfaceBoundary";
+import { currentSurface, readSurfaceLocation } from "./lib/luxurySurfaces";
 import "./styles/luxury-route-loading.css";
 
 /** Super admin: niente hub `/account` — solo pannello `/admin`. */
 function AccountAreaLayout() {
   const { isLuxurySuperAdmin } = useLuxuryAuth();
-  if (isLuxurySuperAdmin) {
+  if (isLuxurySuperAdmin && currentSurface(readSurfaceLocation()) !== "public") {
     return <Navigate to="/admin/dashboard" replace />;
   }
   return <AccountLayout />;
@@ -90,6 +97,10 @@ function AccountAreaLayout() {
 
 function AccountIndexRedirect() {
   const { isSalonTitolare, isSalonStaff, isLuxurySuperAdmin } = useLuxuryAuth();
+  const onClientHome = currentSurface(readSurfaceLocation()) === "public";
+  if (onClientHome && (isLuxurySuperAdmin || isSalonStaff || isSalonTitolare)) {
+    return <Navigate to="/" replace />;
+  }
   if (isLuxurySuperAdmin) {
     return <Navigate to="/admin/dashboard" replace />;
   }
@@ -97,9 +108,18 @@ function AccountIndexRedirect() {
     return <Navigate to="/account/staff" replace />;
   }
   if (isSalonTitolare) {
-    return <Navigate to="/account/salone" replace />;
+    return <Navigate to="/salone" replace />;
   }
-  return <Navigate to="/account/prenotazioni" replace />;
+  // Cliente: resta sull’hub `/account`. Prenotazioni, chat e le altre voci si aprono in overlay.
+  return null;
+}
+
+/** I vecchi indirizzi `/account/salone` restano validi e atterrano sull'admin salone. */
+function LegacyAccountSalonRedirect() {
+  const { pathname, search, hash } = useLocation();
+  const stripped = pathname.replace(/\/+$/, "") || "/";
+  const next = stripped.replace(/^\/account\/salone(?=\/|$)/, "/salone");
+  return <Navigate to={`${next}${search}${hash}`} replace />;
 }
 
 export default function App() {
@@ -111,9 +131,12 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <SurfaceBoundary>
       <PremiumRegistrationStripeReturnRedirect />
       <LuxuryNotificationPopupHost />
       <SalonBookingAlertPoller />
+      <ConsumerNotificationAlertPoller />
+      <SalonTrialRenewalPrompt />
       <Suspense fallback={<RouteLoadingFallback />}>
         <Routes>
           <Route element={<RootLayout />}>
@@ -132,6 +155,7 @@ export default function App() {
               <Route path="assistenza" element={<AdminAssistenzaPage />} />
               <Route path="messaggi" element={<AdminAssistenzaPage />} />
               <Route path="fatture" element={<AdminFiscalInvoicesPage />} />
+              <Route path="sponsor" element={<AdminPlacementSponsorsPage />} />
               <Route path="profilo" element={<AdminSuperAdminProfilePage />} />
             </Route>
             <Route path="/auth/callback" element={<AuthCallbackRedirectPage />} />
@@ -142,12 +166,13 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/partner" element={<LuxuryEntrySplashGate><PartnerPage /></LuxuryEntrySplashGate>} />
             <Route path="/registrati" element={<LuxuryEntrySplashGate><ClientSignupPage /></LuxuryEntrySplashGate>} />
-            <Route path="/piani/premium-prova" element={<SalonFreePremiumUpgradePage />} />
+            <Route path="/piani/premium-prova" element={<Navigate to="/piani?plan=PREMIUM" replace />} />
             <Route path="/piani" element={<SalonPlansPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/idee/:groupId/:itemId" element={<MonthlyIdeaPage />} />
             <Route path="/operatori/migliori" element={<Navigate to="/operatori/migliori/parrucchieri" replace />} />
             <Route path="/operatori/migliori/:kind" element={<TopOperatorsPage />} />
+            <Route path="/saloni/sponsorizzati" element={<SponsoredSalonsPage />} />
             <Route path="/nations-cup" element={<NationsCupPage />} />
             <Route path="/s/:slug/il-tuo-salone" element={<SalonPersonalPage />} />
             <Route path="/s/:slug/esplora" element={<SalonExplorePage />} />
@@ -162,6 +187,7 @@ export default function App() {
             <Route path="/privacy/scelte" element={<PrivacyChoicesPage />} />
             <Route path="/privacy/elimina-account" element={<AccountDeletionPage />} />
             <Route path="/termini" element={<TermsOfServicePage />} />
+            <Route path="/licenza" element={<FreeUseLicensePage />} />
             <Route path="/legale/accordo-trattamento" element={<DataProcessingAgreementPage />} />
             <Route path="/legale" element={<LegalHubPage />} />
             <Route
@@ -176,21 +202,6 @@ export default function App() {
               <Route path="home" element={<AccountHomePage />} />
               <Route path="staff" element={<StaffMemberHomePage />} />
               <Route path="staff/agenda" element={<StaffMemberAgendaPage />} />
-              <Route path="salone/panoramica" element={<AccountSalonHomePage />} />
-              <Route path="salone" element={<AccountSalonHomePage />} />
-              <Route path="salone/servizi" element={<SalonServicesPage />} />
-              <Route path="salone/staff" element={<SalonStaffPage />} />
-              <Route path="salone/clienti" element={<SalonClientsPage />} />
-              <Route path="salone/brand/anteprima-layout" element={<SalonBrandLayoutPreviewPage />} />
-              <Route path="salone/brand" element={<SalonBrandPage />} />
-              <Route path="salone/tuo-salone" element={<SalonPersonalPageBuilder />} />
-              <Route
-                path="salone/layout"
-                element={<Navigate to="/account/salone/brand/anteprima-layout" replace />}
-              />
-              <Route path="salone/strumenti" element={<SalonStandardToolsPage />} />
-              <Route path="salone/statistiche" element={<SalonStatisticsPage />} />
-              <Route path="salone/posizione" element={<SalonLocationPage />} />
               <Route path="prenotazioni/studio/agenda" element={<SalonStudioAgendaPage />} />
               <Route path="prenotazioni/staff/:staffId/agenda" element={<SalonStaffAgendaPage />} />
               <Route path="prenotazioni" element={<AppointmentsPage />} />
@@ -206,10 +217,35 @@ export default function App() {
               <Route path="chat" element={<SalonLuxuryChatPage />} />
               <Route path="feedback-luxury" element={<LuxuryFeedbackPage />} />
             </Route>
+            <Route path="/account/salone" element={<LegacyAccountSalonRedirect />} />
+            <Route path="/account/salone/*" element={<LegacyAccountSalonRedirect />} />
+            <Route
+              path="/salone"
+              element={
+                <ProtectedRoute>
+                  <AccountAreaLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<AccountSalonHomePage />} />
+              <Route path="panoramica" element={<AccountSalonHomePage />} />
+              <Route path="servizi" element={<SalonServicesPage />} />
+              <Route path="staff" element={<SalonStaffPage />} />
+              <Route path="clienti" element={<SalonClientsPage />} />
+              <Route path="brand/anteprima-layout" element={<SalonBrandLayoutPreviewPage />} />
+              <Route path="brand" element={<SalonBrandPage />} />
+              <Route path="anteprima" element={<SalonVetrinaPreviewPage />} />
+              <Route path="tuo-salone" element={<SalonPersonalPageBuilder />} />
+              <Route path="layout" element={<Navigate to="/salone/brand/anteprima-layout" replace />} />
+              <Route path="strumenti" element={<SalonStandardToolsPage />} />
+              <Route path="statistiche" element={<SalonStatisticsPage />} />
+              <Route path="posizione" element={<SalonLocationPage />} />
+            </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
       </Suspense>
+      </SurfaceBoundary>
     </BrowserRouter>
   );
 }

@@ -1094,7 +1094,7 @@
   margin-bottom: 0.85rem;
 }
 
-/* Panoramica salone (`/account/salone`, AccountSalonHomePage) */
+/* Panoramica salone (`/salone`, AccountSalonHomePage) */
 .luxury-salon-services-page.luxury-salon-panorama-account .luxury-salon-services-form-card {
   max-width: min(520px, 100%);
 }

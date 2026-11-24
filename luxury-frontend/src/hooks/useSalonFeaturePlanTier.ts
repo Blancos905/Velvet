@@ -17,7 +17,7 @@ export function useBillingStatusQuery() {
 export function useSalonFeaturePlanTier(): SalonPlanTier {
   const registeredPlan = useEffectiveSalonPlanTier();
   const billingStatus = useBillingStatusQuery();
-  if (registeredPlan === "PREMIUM" && billingStatus.data?.premiumAccess !== true) {
+  if ((registeredPlan === "PREMIUM" || registeredPlan === "PLUS") && billingStatus.data?.premiumAccess !== true) {
     return "BASE";
   }
   return registeredPlan;
@@ -26,7 +26,7 @@ export function useSalonFeaturePlanTier(): SalonPlanTier {
 export function useSalonPremiumActive(): boolean {
   const registeredPlan = useEffectiveSalonPlanTier();
   const billingStatus = useBillingStatusQuery();
-  if (registeredPlan !== "PREMIUM") return false;
+  if (registeredPlan !== "PREMIUM" && registeredPlan !== "PLUS") return false;
   if (billingStatus.isPending || !billingStatus.data) return true;
   return billingStatus.data.premiumAccess === true;
 }

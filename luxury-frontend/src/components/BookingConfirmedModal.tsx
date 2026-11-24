@@ -75,7 +75,11 @@ export function BookingConfirmedModal({
               Il salone riceverà la tua richiesta. Ti invieremo una notifica quando l&apos;appuntamento sarà confermato
               o rifiutato.
             </p>
-          ) : null}
+          ) : (
+            <p className="luxury-booking-confirm-modal__hint">
+              La prenotazione è confermata. La trovi nell&apos;elenco dei tuoi appuntamenti.
+            </p>
+          )}
           <div className="luxury-booking-confirm-modal__actions">
             {onViewAppointment ? (
               <>

@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
-import { premiumTrialGrantedPhrase } from "../data/salonPlans";
+import { useBillingStatusQuery } from "../hooks/useSalonFeaturePlanTier";
+import { useLuxuryT } from "../i18n/useLuxuryLocale";
+import { trialDaysRemaining } from "../lib/salonTrialRenewal";
 import "../styles/luxury-premium-subscription-success-box.css";
 
 type LuxuryPremiumSubscriptionSuccessBoxProps = {
@@ -27,42 +29,37 @@ export function LuxuryPremiumSubscriptionPendingBox() {
 }
 
 export function LuxuryPremiumSubscriptionSuccessBox({
-  salonName,
   activationPending = false,
-  continueTo = "/account/salone",
+  continueTo = "/salone",
   onContinue,
 }: LuxuryPremiumSubscriptionSuccessBoxProps) {
-  const salonLabel = salonName?.trim() ? salonName.trim() : "Il tuo salone";
-  const continuePath = continueTo?.trim() || "/account/salone";
+  const t = useLuxuryT();
+  const billing = useBillingStatusQuery();
+  const continuePath = continueTo?.trim() || "/salone";
+  const days = trialDaysRemaining(billing.data?.promotionalTrialEndsAt, Date.now());
+  const trialStillFree = billing.data?.promotionalTrialActive === true && (days ?? 0) > 0;
+  const title = activationPending
+    ? t("account.premiumSuccess.pending")
+    : billing.isPending
+      ? ""
+      : trialStillFree
+        ? days === 1
+          ? t("account.premiumSuccess.trialDay")
+          : t("account.premiumSuccess.trialDays", { days: days ?? 0 })
+        : t("account.premiumSuccess.premium");
 
   return (
     <section className="luxury-premium-success-box" aria-live="polite">
       <div className="luxury-premium-success-box__glow" aria-hidden />
-      <div className="luxury-premium-success-box__burst" aria-hidden />
+      <div className="luxury-premium-success-box__burst luxury-premium-success-box__burst--check" aria-hidden />
 
-      <div className="luxury-premium-success-box__icon-wrap" aria-hidden>
-        <svg className="luxury-premium-success-box__icon" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M12 2l2.4 6.8H22l-5.8 4.2 2.2 6.8L12 15.6 5.6 19.8l2.2-6.8L2 8.8h7.6L12 2z"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinejoin="round"
-          />
+      <div className="luxury-premium-success-box__icon-wrap luxury-premium-success-box__icon-wrap--check">
+        <svg className="luxury-premium-success-box__icon luxury-premium-success-box__icon--check" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M5 12.5 10 17.5 19 7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
 
-      <p className="luxury-premium-success-box__kicker">Benvenuto in Premium</p>
-      <h2 className="luxury-premium-success-box__title">Grazie, il tuo salone è attivo</h2>
-      <p className="luxury-premium-success-box__lead">
-        {activationPending
-          ? `${salonLabel} ha completato il pagamento. L'attivazione completa può richiedere qualche minuto: troverai tutto aggiornato nel profilo.`
-          : `${salonLabel} è ora su Saloni Luxury Premium: ${premiumTrialGrantedPhrase()} e accesso a tutte le funzionalità avanzate.`}
-      </p>
-
-      <div className="luxury-premium-success-box__badge">
-        <span className="luxury-premium-success-box__badge-dot" aria-hidden />
-        {activationPending ? "Pagamento ricevuto" : "Abbonamento Premium attivo"}
-      </div>
+      <h2 className="luxury-premium-success-box__title luxury-premium-success-box__title--solo">{title}</h2>
 
       <div className="luxury-premium-success-box__actions">
         {onContinue ? (

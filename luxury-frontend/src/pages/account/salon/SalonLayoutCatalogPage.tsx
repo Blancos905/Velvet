@@ -27,7 +27,7 @@ export default function SalonLayoutCatalogPage() {
   return (
     <SalonStandardSectionGuard>
       <div>
-        <Link to="/account/salone" className="luxury-link-back">
+        <Link to="/salone" className="luxury-link-back">
           ← Panoramica salone
         </Link>
         <h1 className="luxury-page-title">Catalogo layout</h1>

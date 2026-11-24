@@ -58,4 +58,12 @@ class SalonQuickSearchCatalogHintsTest {
 		assertThat(SalonQuickSearchCatalogHints.registeredQuickSearchQueries())
 				.contains("taglio uomo", "barbiere", "trattamento viso", "massaggio relax");
 	}
+
+	@Test
+	void isCoveredByCurated_matchesKnownServiceNames() {
+		assertThat(SalonQuickSearchCatalogHints.isCoveredByCuratedQuickSuggest("Taglio uomo classico")).isTrue();
+		assertThat(SalonQuickSearchCatalogHints.isCoveredByCuratedQuickSuggest("Barbiere")).isTrue();
+		assertThat(SalonQuickSearchCatalogHints.isCoveredByCuratedQuickSuggest("Henna brows")).isFalse();
+		assertThat(SalonQuickSearchCatalogHints.isCoveredByCuratedQuickSuggest("Microblading")).isFalse();
+	}
 }

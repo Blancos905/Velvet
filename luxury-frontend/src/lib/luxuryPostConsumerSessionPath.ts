@@ -6,6 +6,6 @@ export function luxuryPostConsumerSessionPath(accessToken: string): string {
   const hasOwner = roles.includes("OWNER");
   const hasStaff = roles.includes("STAFF");
   if (hasStaff && !hasOwner) return "/account/staff";
-  if (hasOwner) return "/account/salone";
-  return "/account/prenotazioni";
+  if (hasOwner) return "/salone";
+  return "/account";
 }

@@ -1,0 +1,28 @@
+---
+description: Usa CodeGraph per esplorare il monorepo Luxury (call graph, impact, route)
+alwaysApply: true
+---
+
+# CodeGraph — memoria strutturale del repo
+
+Questo progetto ha **CodeGraph** indicizzato in `.codegraph/` (704+ file: Java, TS/TSX, Dart).
+
+Prima di refactor o modifiche trasversali (billing, booking, auth, notifiche):
+
+1. Usa il tool MCP **`codegraph_explore`** con una query mirata (es. nome classe/metodo).
+2. Verifica **callers**, **blast radius** e test correlati prima di editare.
+3. Dopo cambi strutturali grossi, suggerisci `codegraph sync` o `codegraph index` dalla root del repo.
+
+Comandi CLI utili (root `my-salon-platform/`):
+
+```bash
+devtools/codegraph/node_modules/.bin/codegraph explore "NomeClasse"
+devtools/codegraph/node_modules/.bin/codegraph sync
+devtools/codegraph/node_modules/.bin/codegraph status
+```
+
+Revisione totale:
+- **manutenzione backend** → `.cursor/rules/luxury-backend-maintenance.mdc` + `./luxury-backend-maintenance.sh` + skill `.cursor/skills/manutenzione-backend/`
+- **manutenzione frontend** → `.cursor/rules/luxury-frontend-maintenance.mdc` + `./luxury-frontend-maintenance.sh` + skill `.cursor/skills/manutenzione-frontend/`
+- **manutenzione app** → `.cursor/rules/luxury-app-maintenance.mdc` + `./luxury-app-maintenance.sh` + skill `.cursor/skills/manutenzione-app/`
+- **manutenzione database** → `.cursor/rules/luxury-database-maintenance.mdc` + `./luxury-database-maintenance.sh` + skill `.cursor/skills/manutenzione-database/`

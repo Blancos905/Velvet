@@ -9,7 +9,9 @@ FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /build
 COPY pom.xml .
 COPY src ./src
-RUN mvn -B clean package -DskipTests
+# Cache Maven sul daemon: un retry non riscarica tutto il repository.
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn -B package -DskipTests -Dmaven.wagon.http.retryHandler.count=5
 
 # ---- Stage 2: runtime ----
 FROM eclipse-temurin:21-jre

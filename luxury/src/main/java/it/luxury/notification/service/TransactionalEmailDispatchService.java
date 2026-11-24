@@ -35,7 +35,8 @@ public class TransactionalEmailDispatchService {
 			NotificationType.BOOKING_CANCELLED_BY_SALON,
 			NotificationType.BOOKING_REQUEST_REJECTED,
 			NotificationType.REMINDER_24H,
-			NotificationType.REMINDER_1H);
+			NotificationType.REMINDER_1H,
+			NotificationType.REVIEW_INVITE);
 
 	private final LuxuryMailProperties mailProperties;
 	private final LuxuryNotificationProperties notificationProperties;
@@ -67,8 +68,16 @@ public class TransactionalEmailDispatchService {
 		String subject = BookingNotificationEmailContent.buildSubject(type, appointment);
 		String body = BookingNotificationEmailContent.buildPlainBody(
 				type, appointment, notificationProperties, appointmentTokenService);
-		String htmlBody = BookingNotificationEmailContent.buildHtmlBody(type, appointment, notificationProperties);
+		String htmlBody = resolveHtmlBody(type, appointment);
 		dispatchForBookingNotification(type, appointment, subject, body, htmlBody);
+	}
+
+	private String resolveHtmlBody(NotificationType type, Appointment appointment) {
+		if (type == NotificationType.REVIEW_INVITE) {
+			return BookingNotificationEmailContent.buildReviewInviteHtmlBody(
+					appointment, notificationProperties, appointmentTokenService);
+		}
+		return BookingNotificationEmailContent.buildHtmlBody(type, appointment, notificationProperties);
 	}
 
 	public void dispatchForBookingNotification(
@@ -177,7 +186,8 @@ public class TransactionalEmailDispatchService {
 				|| type == NotificationType.BOOKING_UPDATED
 				|| type == NotificationType.BOOKING_CANCELLED_BY_CONSUMER
 				|| type == NotificationType.BOOKING_CANCELLED_BY_SALON
-				|| type == NotificationType.BOOKING_REQUEST_REJECTED) {
+				|| type == NotificationType.BOOKING_REQUEST_REJECTED
+				|| type == NotificationType.REVIEW_INVITE) {
 			String fromConsumer = normalizeEmail(consumerEmail(appointment.getConsumerProfile()));
 			if (fromConsumer != null) {
 				return fromConsumer;

@@ -148,14 +148,9 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 ---
 
-## 8. Piani salone (Free vs Premium) — regola importante
+## 8. Piano salone — regola importante
 
-| Piano | Registrazione | Pannello web (`/account`) | App mobile |
-|-------|---------------|---------------------------|------------|
-| **Free (BASE)** | Solo dall'**app** (su `/piani` il web mostra: scarica l'app) | **Nessun pannello**: su `/account` da browser compare la card `SalonFreeWebPanelGate` (invito Premium, senza hub gestionale) | Stessa SPA in WebView con vincoli Free (`luxury_free_web_bridge.dart`) |
-| **Premium** | Web (`/piani`) o app | Pannello completo (vetrina, brand, clienti, chat, statistiche, …) | Stessa SPA in WebView + funzioni Premium |
-
-Anche dopo registrazione Free dall'app, il titolare sul web vede solo `SalonFreeWebPanelGate` in `AccountLayout` (può accedere con le credenziali ma non l'hub account). In app: tema e filtri nav in `luxury_free_web_bridge.dart`.
+L’unico piano commerciale è **Premium** (registrazione web o app su `/piani`). `studio_groups.plan_tier=BASE` è lo stato tecnico «non entitled» (downgrade Stripe o saloni già in DB): il titolare vede il percorso di attivazione Premium, non un secondo prodotto. Chat, vetrina, SEO e statistiche PIN restano gated da `SalonPremiumEntitlementService.hasActivePremium` sul backend. La shell Flutter (`FreeAccountWrapper`) è la WebView di tutta l’app.
 
 ---
 

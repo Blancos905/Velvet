@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 
 /**
- * Accesso alle funzionalità Premium: piano {@code PREMIUM} + abbonamento Stripe attivo
- * oppure ancora dentro la prova promozionale ({@link SalonPromotionalTrialService}).
+ * Accesso alle funzionalità Premium: piano {@code PREMIUM} dentro i 30 giorni di prova,
+ * oppure abbonamento Stripe attivo dopo la prova ({@link SalonPromotionalTrialService}).
  */
 @Service
 public class SalonPremiumEntitlementService {
@@ -31,15 +31,20 @@ public class SalonPremiumEntitlementService {
 		if (group == null) {
 			return false;
 		}
-		if (!"PREMIUM".equals(StudioGroup.canonicalPlanTier(group.getPlanTier()))) {
+		String tier = StudioGroup.canonicalPlanTier(group.getPlanTier());
+		if (!"PREMIUM".equals(tier) && !"PLUS".equals(tier)) {
 			return false;
 		}
-		if (stripeProperties.configured()) {
-			return billingAccountRepository.findByStudioGroup_Id(group.getId())
-					.map(account -> "PREMIUM".equals(
-							StripeSubscriptionSyncService.planTierForStatus(account.getSubscriptionStatus())))
-					.orElse(false);
+		Instant now = Instant.now();
+		if (promotionalTrialService.isWithinPromotionalTrial(group, now)) {
+			return true;
 		}
-		return promotionalTrialService.isWithinPromotionalTrial(group, Instant.now());
+		if (!stripeProperties.configured()) {
+			return false;
+		}
+		return billingAccountRepository.findByStudioGroup_Id(group.getId())
+				.map(account -> "PREMIUM".equals(
+						StripeSubscriptionSyncService.planTierForStatus(account.getSubscriptionStatus())))
+				.orElse(false);
 	}
 }

@@ -1,0 +1,67 @@
+.luxury-salon-trial-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(8, 6, 5, 0.62);
+}
+
+@media (min-width: 720px) {
+  .luxury-salon-trial-prompt {
+    align-items: center;
+  }
+}
+
+.luxury-salon-trial-prompt__card {
+  width: min(28rem, 100%);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(196, 181, 160, 0.34);
+  background:
+    radial-gradient(ellipse 90% 50% at 50% -20%, rgba(196, 181, 160, 0.18), transparent 60%),
+    linear-gradient(168deg, rgba(28, 24, 20, 0.98), rgba(12, 10, 8, 0.99));
+  color: #f5ead8;
+  padding: 1.35rem 1.25rem 1.15rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.luxury-salon-trial-prompt__badge {
+  display: inline-flex;
+  margin-bottom: 0.65rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(196, 181, 160, 0.16);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.luxury-salon-trial-prompt__title {
+  margin: 0 0 0.55rem;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.luxury-salon-trial-prompt__lead {
+  margin: 0 0 1rem;
+  color: rgba(245, 234, 216, 0.82);
+  line-height: 1.5;
+}
+
+.luxury-salon-trial-prompt__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.luxury-salon-trial-prompt__later {
+  border: 0;
+  background: transparent;
+  color: rgba(245, 234, 216, 0.78);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0.65rem 0.4rem;
+}
+

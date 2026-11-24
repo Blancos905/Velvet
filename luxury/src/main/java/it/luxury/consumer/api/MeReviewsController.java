@@ -19,7 +19,9 @@ import jakarta.validation.constraints.Size;
 import org.springframework.security.access.prepost.PreAuthorize;
 import it.luxury.security.auth.LuxuryUserPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,6 +76,14 @@ public class MeReviewsController {
 		return new ReviewResponse(r.getId(), r.getRating(), r.getStaffRating(), r.getComment());
 	}
 
+	@DeleteMapping("/{id}")
+	@Operation(summary = "Cancella una recensione inviata dal cliente")
+	@PreAuthorize("hasAuthority('ROLE_CLIENT')")
+	public void delete(@AuthenticationPrincipal LuxuryUserPrincipal principal, @PathVariable UUID id) {
+		var profile = consumerProfileService.requireActiveProfile(principal);
+		reviewCommandService.deleteAsConsumer(profile, id);
+	}
+
 	@PostMapping("/platform")
 	@Operation(summary = "Valuta Saloni Luxury (solo clienti)")
 	@PreAuthorize("hasAuthority('ROLE_CLIENT')")
@@ -87,9 +97,9 @@ public class MeReviewsController {
 	public record ReviewBody(
 			@NotNull UUID appointmentId,
 			@Min(1) @Max(5) int rating,
-			@Min(1) @Max(5) int staffRating,
-			String comment) {
-	}
+				@Min(1) @Max(5) int staffRating,
+				@Size(max = 4000) String comment) {
+		}
 
 	public record ReviewResponse(UUID id, int rating, Integer staffRating, String comment) {
 	}

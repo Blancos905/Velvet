@@ -158,6 +158,9 @@ export function LegalDocumentLayout({
           <Link to={navLinkTo("/termini")} className={navLinkClass("/termini")}>
             Termini di servizio
           </Link>
+          <Link to={navLinkTo("/licenza")} className={navLinkClass("/licenza")}>
+            Licenza gratuita
+          </Link>
           <Link to={navLinkTo("/privacy/scelte")} className={navLinkClass("/privacy/scelte")}>
             Scelte privacy
           </Link>

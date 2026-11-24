@@ -8,10 +8,10 @@ type Props = {
 };
 
 /**
- * Blocco prova gratuita Premium sulla card `/piani` (allineato a Stripe Checkout: 60 giorni trial).
+ * Blocco prova gratuita sulla card `/piani` (30 giorni a 0 €, poi il canone del piano).
  */
 export function SalonPlanPremiumTrialPanel({ plan, variant = "card" }: Props) {
-  const priceValue = plan.priceValue ?? "20";
+  const priceValue = plan.priceValue ?? "40";
   const pricePeriod = plan.pricePeriod ?? "al mese";
 
   return (

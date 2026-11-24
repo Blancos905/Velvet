@@ -1,53 +1,35 @@
 package it.luxury.billing.service;
 
-import it.luxury.config.LuxuryStripeProperties;
+import it.luxury.common.api.BusinessException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BillingRegistrationPlanPolicyTest {
 
 	@Test
-	void premiumRegistrationStaysPremiumWhenBillingConfigured() {
-		var props = new LuxuryStripeProperties(true, "sk_test_x", "whsec_x", "price_x", null, null, null);
-		var policy = new BillingRegistrationPlanPolicy(props);
-		assertEquals("PREMIUM", policy.effectiveProvisionPlanTier("PREMIUM"));
-		assertTrue(policy.billingCheckoutRequiredForPremiumRegistration("PREMIUM"));
-	}
-
-	@Test
-	void premiumRegistrationUnchangedWhenBillingDisabled() {
-		var props = new LuxuryStripeProperties(false, "", "", "", null, null, null);
-		var policy = new BillingRegistrationPlanPolicy(props);
+	void premiumRegistrationNeverOpensStripeCheckout() {
+		var policy = new BillingRegistrationPlanPolicy();
 		assertEquals("PREMIUM", policy.effectiveProvisionPlanTier("PREMIUM"));
 		assertFalse(policy.billingCheckoutRequiredForPremiumRegistration("PREMIUM"));
+		assertEquals("/salone", policy.salonOwnerPostConfirmPath("PREMIUM"));
 	}
 
 	@Test
-	void premiumRegistrationRequiresCheckoutWithSandboxCliKey() {
-		var props = new LuxuryStripeProperties(
-				true, "rkcs_test_51TrJk57fDTXxuuEN", "whsec_x", "price_x", null, null, null);
-		var policy = new BillingRegistrationPlanPolicy(props);
-		assertTrue(policy.billingCheckoutRequiredForPremiumRegistration("PREMIUM"));
+	void plusRegistrationKeepsPlusAndSkipsCheckout() {
+		var policy = new BillingRegistrationPlanPolicy();
+		assertEquals("PLUS", policy.effectiveProvisionPlanTier("PLUS"));
+		assertFalse(policy.billingCheckoutRequiredForPremiumRegistration("PLUS"));
+		assertEquals("/salone", policy.salonOwnerPostConfirmPath("PLUS"));
 	}
 
 	@Test
-	void premiumRegistrationSkipsCheckoutWhenSecretKeyIsNotOperational() {
-		var props = new LuxuryStripeProperties(true, "not_a_stripe_key", "whsec_x", "price_x", null, null, null);
-		var policy = new BillingRegistrationPlanPolicy(props);
-		assertFalse(policy.billingCheckoutRequiredForPremiumRegistration("PREMIUM"));
-		assertEquals("/account/salone", policy.salonOwnerPostConfirmPath("PREMIUM"));
-	}
-
-	@Test
-	void salonOwnerPostConfirmPathDependsOnBilling() {
-		var enabled = new BillingRegistrationPlanPolicy(
-				new LuxuryStripeProperties(true, "sk_test_x", "whsec_x", "price_x", null, null, null));
-		var disabled = new BillingRegistrationPlanPolicy(
-				new LuxuryStripeProperties(false, "", "", "", null, null, null));
-		assertEquals(BillingRegistrationPlanPolicy.REGISTRATION_CHECKOUT_START_PATH, enabled.salonOwnerPostConfirmPath("PREMIUM"));
-		assertEquals("/account/salone", disabled.salonOwnerPostConfirmPath("PREMIUM"));
+	void registrationRejectsNonPremiumProvisionTier() {
+		var policy = new BillingRegistrationPlanPolicy();
+		assertThrows(BusinessException.class, () -> policy.effectiveProvisionPlanTier("BASE"));
+		assertThrows(BusinessException.class, () -> policy.effectiveProvisionPlanTier("UNKNOWN"));
+		assertThrows(BusinessException.class, () -> policy.effectiveProvisionPlanTier(null));
 	}
 }

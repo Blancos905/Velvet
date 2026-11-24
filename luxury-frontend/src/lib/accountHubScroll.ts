@@ -42,7 +42,7 @@ export function scrollAccountHubToContent(hubBody?: HTMLElement | null): void {
     return;
   }
 
-  // Hub nativo (/account/salone, /account/staff, …): masthead + griglia — sempre in cima.
+  // Hub nativo (/salone, /account/staff, …): masthead + griglia — sempre in cima.
   if (document.querySelector(".luxury-account-hub--native-hub")) {
     ensureNativeAccountHubScrolledToTop();
     return;
@@ -54,17 +54,25 @@ export function scrollAccountHubToContent(hubBody?: HTMLElement | null): void {
   target.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-export function isAccountInternalNavigation(fromPath: string, toPath: string): boolean {
-  return fromPath.startsWith("/account") && toPath.startsWith("/account");
+function privateAreaOf(path: string): "account" | "salone" | null {
+  if (path.startsWith("/salone")) return "salone";
+  if (path.startsWith("/account")) return "account";
+  return null;
 }
 
-/** Navigazione verso hub nativo (es. chiusura overlay Agenda → /account/salone): va in cima. */
+export function isAccountInternalNavigation(fromPath: string, toPath: string): boolean {
+  const fromArea = privateAreaOf(fromPath);
+  const toArea = privateAreaOf(toPath);
+  return fromArea != null && fromArea === toArea;
+}
+
+/** Navigazione verso hub nativo (es. chiusura overlay Agenda → /salone): va in cima. */
 export function isReturnToNativeAccountHub(
   fromPath: string,
   toPath: string,
   role?: NativeAccountHubRole,
 ): boolean {
-  if (!fromPath.startsWith("/account") || !toPath.startsWith("/account")) return false;
+  if (privateAreaOf(fromPath) == null || privateAreaOf(fromPath) !== privateAreaOf(toPath)) return false;
   if (isNativeAccountHubPath(fromPath, role)) return false;
   return isNativeAccountHubPath(toPath, role);
 }

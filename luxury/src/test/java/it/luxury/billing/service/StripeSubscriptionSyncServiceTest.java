@@ -14,6 +14,13 @@ class StripeSubscriptionSyncServiceTest {
 	}
 
 	@Test
+	void planTierToPersist_keepsPlusWhenStripeIsActive() {
+		assertEquals("PLUS", StripeSubscriptionSyncService.planTierToPersist("PLUS", "PREMIUM"));
+		assertEquals("BASE", StripeSubscriptionSyncService.planTierToPersist("PLUS", "BASE"));
+		assertEquals("PREMIUM", StripeSubscriptionSyncService.planTierToPersist("PREMIUM", "PREMIUM"));
+	}
+
+	@Test
 	void planTierForStatus_downgradesOnCanceledOrIncomplete() {
 		assertEquals("BASE", StripeSubscriptionSyncService.planTierForStatus("canceled"));
 		assertEquals("BASE", StripeSubscriptionSyncService.planTierForStatus("incomplete"));

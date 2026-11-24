@@ -1,7 +1,6 @@
 /**
  * Chiede alla shell Flutter di rileggere JWT + `GET /api/v1/me/salon`
- * e di aggiornare vincoli Free / menu profilo (canale `LuxuryProfileMenu`).
- * Usato dopo Free → Premium così i tasti hub Premium si sbloccano.
+ * (canale `LuxuryProfileMenu`) dopo login o attivazione Premium.
  */
 export function notifyNativeSalonSessionSync(): void {
   if (typeof window === "undefined") return;

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.time.Duration;
+import java.time.Instant;
 
 /**
  * Store refresh token su Redis con script Lua per rotazione atomica e rilevamento reuse.
@@ -37,6 +38,7 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
 			    redis.call('DEL', 'luxury:rt:t:' .. hash)
 			  end
 			  redis.call('DEL', familyKey)
+			  redis.call('DEL', 'luxury:rt:fm:' .. familyId)
 			  if profileId then
 			    redis.call('SREM', 'luxury:rt:p:' .. profileId, familyId)
 			  end
@@ -44,13 +46,27 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
 			end
 			local profileId = redis.call('HGET', KEYS[1], 'profileId')
 			local familyId = redis.call('HGET', KEYS[1], 'familyId')
+			local familyMetaKey = 'luxury:rt:fm:' .. familyId
+			local issuedAt = redis.call('HGET', familyMetaKey, 'issuedAt')
+			local maxAge = tonumber(ARGV[3])
+			local now = tonumber(ARGV[4])
+			if issuedAt and maxAge and now and (now - tonumber(issuedAt)) > maxAge then
+			  return {0}
+			end
 			redis.call('HSET', KEYS[1], 'status', 'revoked')
-			local ttl = tonumber(ARGV[3])
+			local remaining = maxAge
+			if issuedAt and maxAge and now then
+			  remaining = maxAge - (now - tonumber(issuedAt))
+			  if remaining < 1 then
+			    remaining = 1
+			  end
+			end
 			local newKey = 'luxury:rt:t:' .. ARGV[1]
 			redis.call('HSET', newKey, 'profileId', profileId, 'familyId', familyId, 'status', 'active', 'tokenId', ARGV[2])
-			redis.call('EXPIRE', newKey, ttl)
+			redis.call('EXPIRE', newKey, remaining)
 			redis.call('SADD', KEYS[2], ARGV[1])
-			redis.call('EXPIRE', KEYS[2], ttl)
+			redis.call('EXPIRE', KEYS[2], remaining)
+			redis.call('EXPIRE', familyMetaKey, remaining)
 			return {1, profileId, familyId, ARGV[2]}
 			""";
 
@@ -61,6 +77,7 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
 			  redis.call('DEL', 'luxury:rt:t:' .. hash)
 			end
 			redis.call('DEL', familyKey)
+			redis.call('DEL', 'luxury:rt:fm:' .. ARGV[1])
 			if ARGV[2] ~= '' then
 			  redis.call('SREM', 'luxury:rt:p:' .. ARGV[2], ARGV[1])
 			end
@@ -79,6 +96,7 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
 			    revoked = revoked + 1
 			  end
 			  redis.call('DEL', familyKey)
+			  redis.call('DEL', 'luxury:rt:fm:' .. familyId)
 			end
 			redis.call('DEL', profileKey)
 			return revoked
@@ -114,6 +132,8 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
 				operations.expire(tokenKey, Duration.ofSeconds(ttlSeconds));
 				operations.opsForSet().add(familyKey, tokenHash);
 				operations.expire(familyKey, Duration.ofSeconds(ttlSeconds));
+				operations.opsForHash().put(familyMetaKey(familyId), "issuedAt", String.valueOf(Instant.now().getEpochSecond()));
+				operations.expire(familyMetaKey(familyId), Duration.ofSeconds(ttlSeconds));
 				operations.opsForSet().add(profileKey, familyId.toString());
 				operations.expire(profileKey, Duration.ofSeconds(ttlSeconds));
 				return operations.exec();
@@ -135,7 +155,8 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
 				List.of(tokenKey, familyKey(UUID.fromString(familyIdValue.toString()))),
 				newTokenHash,
 				newTokenId.toString(),
-				Long.toString(ttlSeconds));
+				Long.toString(ttlSeconds),
+				Long.toString(Instant.now().getEpochSecond()));
 		if (result == null || result.isEmpty()) {
 			return new RotateOutcome(RotateStatus.NOT_FOUND, null, null, null);
 		}
@@ -198,6 +219,10 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
 
 	private static String profileKey(UUID profileId) {
 		return KEY_PREFIX + "p:" + profileId;
+	}
+
+	private static String familyMetaKey(UUID familyId) {
+		return KEY_PREFIX + "fm:" + familyId;
 	}
 
 	private static int toInt(Object value) {

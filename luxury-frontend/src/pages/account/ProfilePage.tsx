@@ -6,18 +6,24 @@ import { apiFetch, apiJson } from "../../api/client";
 import { fetchBillingStatus, openBillingPortal, openCancelSubscriptionPortal } from "../../api/billing";
 import type { MeStaffOperatorSelf, ProfileDto } from "../../api/types";
 import { useLuxuryAuth } from "../../auth/LuxuryAuthProvider";
+import { useLuxuryLocale } from "../../i18n/useLuxuryLocale";
 import { SalonBillingProfileEditor } from "../../components/SalonBillingProfileEditor";
 import { LuxuryPremiumSubscriptionCancellationNoticeBox } from "../../components/LuxuryPremiumSubscriptionCancellationNoticeBox";
 import { LuxuryPremiumSubscriptionCancellationThankYouModal } from "../../components/LuxuryPremiumSubscriptionCancellationThankYouModal";
 import { LEGAL_CONTACT_EMAIL } from "../../content/legalReferences";
 import { SALON_CLIENT_GENDER_OPTIONS } from "../../data/salonClientGenders";
-import { parseSalonPlanTier, planDisplayName } from "../../data/salonPlans";
+import { parseSalonPlanTier } from "../../data/salonPlans";
 import { SUBSCRIPTION_CANCEL_RETURN_STORAGE_KEY } from "../../lib/subscriptionCancelReturn";
 import { useMeProfileQuery } from "../../hooks/useMeProfile";
+import { useMeSalonReviewsQuery } from "../../hooks/useMeSalonReviews";
 import { useMeSalonSummaryQuery } from "../../hooks/useMeSalonSummary";
+import { useMeStaffSalonQuery } from "../../hooks/useMeStaffSalon";
 import { DEFAULT_IT_PHONE_PREFIX, phoneForProfilePatchApi } from "../../lib/itPhoneDefaults";
 import { readImageFileAsStaffPhotoDataUrl } from "../../lib/readImageDataUrl";
 import { staffFallbackAvatar } from "../../lib/salonStaffAvatar";
+import { SalonClientVisibilitySwitch } from "../../components/salon/SalonClientVisibilitySwitch";
+import { AdSoftPlacement } from "../../components/AdSoftPlacement";
+import { ClientProfilePhotoEditor } from "../../components/account/ClientProfilePhotoEditor";
 import { CLIENT_ACCOUNT_ICONS, ClientAccountOptionalContentCard } from "../../components/account/ClientAccountContentCard";
 import { ClientAccountHeroHeader } from "../../components/account/ClientAccountHeroHeader";
 import { CLIENT_ACCOUNT_PAGE_SHELL_CLASS } from "../../lib/clientAccountPageShellClasses";
@@ -64,6 +70,7 @@ function PasswordRevealIcon({ revealed }: { revealed: boolean }) {
 }
 
 export default function ProfilePage() {
+  const { t } = useLuxuryLocale();
   const { accessToken, signOut, isSalonTitolare, isSalonStaff, isLuxurySuperAdmin } = useLuxuryAuth();
   const isConsumerAccount = !isSalonTitolare && !isSalonStaff && !isLuxurySuperAdmin;
   const canSelfDeleteAccount = isSalonTitolare || (!isSalonStaff && !isLuxurySuperAdmin);
@@ -89,6 +96,8 @@ export default function ProfilePage() {
   const [salonMsg, setSalonMsg] = useState<string | null>(null);
   const [salonAudienceMsg, setSalonAudienceMsg] = useState<string | null>(null);
   const [deleteArmed, setDeleteArmed] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [emailChangePassword, setEmailChangePassword] = useState("");
   const [exportBusy, setExportBusy] = useState(false);
   const [exportMsg, setExportMsg] = useState<string | null>(null);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -108,10 +117,16 @@ export default function ProfilePage() {
   const [staffPhotoMsg, setStaffPhotoMsg] = useState<string | null>(null);
   const [staffPhotoDraft, setStaffPhotoDraft] = useState<string | null>(null);
   const [staffPhotoRemovePending, setStaffPhotoRemovePending] = useState(false);
+  const [staffBookingConfirmMsg, setStaffBookingConfirmMsg] = useState<string | null>(null);
   const staffPhotoSuccessTimeoutRef = useRef<number | null>(null);
   const cancelReturnHandledRef = useRef(false);
 
   const q = useMeProfileQuery();
+  const staffSalonQ = useMeStaffSalonQuery();
+  const staffSalonPlanTier = parseSalonPlanTier(staffSalonQ.data?.planTier);
+  const showStaffBookingConfirmSwitch =
+    isSalonStaff && !isSalonTitolare && (staffSalonPlanTier === "PREMIUM" || staffSalonPlanTier === "PLUS");
+  const staffReviewsQ = useMeSalonReviewsQuery(isSalonStaff && !isSalonTitolare);
 
   useEffect(() => {
     if (isSalonTitolare && accessToken) {
@@ -179,7 +194,12 @@ export default function ProfilePage() {
   const saveM = useMutation({
     mutationFn: async () => {
       const body: Record<string, string> = {};
-      if (email.trim()) body.email = email.trim().toLowerCase();
+      const nextEmail = email.trim().toLowerCase();
+      const currentEmail = (q.data?.email ?? "").trim().toLowerCase();
+      if (nextEmail) body.email = nextEmail;
+      if (nextEmail && nextEmail !== currentEmail && emailChangePassword) {
+        body.currentPassword = emailChangePassword;
+      }
       if (displayName.trim()) body.displayName = displayName.trim();
       body.phone = phoneForProfilePatchApi(phone);
       return apiJson<ProfileDto>("/api/v1/me/profile", {
@@ -231,6 +251,24 @@ export default function ProfilePage() {
     },
   });
 
+  const staffBookingConfirmM = useMutation({
+    mutationFn: (requireBookingConfirmation: boolean) =>
+      apiJson<MeStaffOperatorSelf>("/api/v1/me/staff/operator-profile", {
+        method: "PATCH",
+        accessToken,
+        body: JSON.stringify({ requireBookingConfirmation }),
+      }),
+    onSuccess: async (data) => {
+      setStaffBookingConfirmMsg(
+        data.requireBookingConfirmation
+          ? "Alert Accetta/Rifiuta attivo: le prenotazioni restano in attesa di conferma."
+          : "Alert disattivato: le prenotazioni vengono confermate automaticamente e ricevi solo la notifica.",
+      );
+      await qc.invalidateQueries({ queryKey: ["me", "staff", "operator-profile"] });
+    },
+    onError: (e: Error) => setStaffBookingConfirmMsg(e.message),
+  });
+
   const pwdM = useMutation({
     mutationFn: async () =>
       apiJson<void>("/api/v1/me/profile/password", {
@@ -256,7 +294,11 @@ export default function ProfilePage() {
 
   const deleteM = useMutation({
     mutationFn: async () => {
-      const r = await apiFetch("/api/v1/me/account", { method: "DELETE", accessToken });
+      const r = await apiFetch("/api/v1/me/account", {
+        method: "DELETE",
+        accessToken,
+        body: JSON.stringify({ currentPassword: deletePassword }),
+      });
       if (!r.ok) {
         const t = await r.text();
         throw new Error(t || r.statusText);
@@ -340,9 +382,8 @@ export default function ProfilePage() {
   }
 
   const salonPlanTier = parseSalonPlanTier(meSalon.data?.planTier);
-  const salonPlan = salonPlanTier ? planDisplayName(salonPlanTier) : "—";
-  const salonRequiresClientGenders = salonPlanTier === "BASE" || salonPlanTier === "PREMIUM";
-  const showBillingProfileSection = isSalonTitolare && salonPlanTier === "PREMIUM";
+  const salonRequiresClientGenders = salonPlanTier === "BASE" || salonPlanTier === "PREMIUM" || salonPlanTier === "PLUS";
+  const showBillingProfileSection = isSalonTitolare && (salonPlanTier === "PREMIUM" || salonPlanTier === "PLUS");
   const showCancelSubscription =
     isSalonTitolare &&
     Boolean(billingStatus.data?.configured && billingStatus.data.premiumAccess && !billingStatus.data.cancelAtPeriodEnd);
@@ -421,8 +462,8 @@ export default function ProfilePage() {
           kickerChip="Credenziali e privacy"
           subtitle={
             <>
-              Aggiorna <strong>email</strong>, <strong>nome</strong> e <strong>telefono</strong>; gestisci password, export
-              dati e chiusura account.
+              Aggiorna <strong>email</strong>, <strong>nome</strong>, <strong>telefono</strong> e la <strong>foto</strong>; gestisci
+              password, export dati e chiusura account.
             </>
           }
           metaItems={[
@@ -438,7 +479,15 @@ export default function ProfilePage() {
             badgePrimary="Area salone"
             badgeSecondary={isSalonTitolare ? "Titolare" : "Operatore"}
             kickerLabel="Account salone"
-            kickerChip={isSalonTitolare ? `Piano ${salonPlan}` : "Profilo operatore"}
+            kickerChip={
+              isSalonTitolare
+                ? salonPlanTier === "PLUS"
+                  ? "Piano Plus"
+                  : salonPlanTier === "PREMIUM"
+                    ? "Piano Premium"
+                    : "Attiva Premium"
+                : "Profilo operatore"
+            }
             subtitle={
               isSalonTitolare ? (
                 <>
@@ -448,7 +497,8 @@ export default function ProfilePage() {
               ) : (
                 <>
                   Aggiorna <strong>email</strong>, <strong>nome</strong>, <strong>telefono</strong> e la{" "}
-                  <strong>foto in agenda</strong>; gestisci la password.
+                  <strong>foto in agenda</strong>; gestisci la password
+                  {showStaffBookingConfirmSwitch ? <> e l&apos;alert di conferma prenotazioni</> : null}.
                 </>
               )
             }
@@ -457,9 +507,9 @@ export default function ProfilePage() {
               { icon: CLIENT_ACCOUNT_ICONS.support, label: "Dati e sicurezza" },
             ]}
           />
-          {isSalonTitolare && (salonPlanTier === "PREMIUM" || billingStatus.data?.configured) ? (
+          {isSalonTitolare && (salonPlanTier === "PREMIUM" || salonPlanTier === "PLUS" || billingStatus.data?.configured) ? (
             <div className="luxury-profile-page__salon-quick">
-              {salonPlanTier === "PREMIUM" ? (
+              {salonPlanTier === "PREMIUM" || salonPlanTier === "PLUS" ? (
                 <Link
                   to="/account/info-privacy"
                   className="luxury-profile-page__privacy-card"
@@ -526,6 +576,14 @@ export default function ProfilePage() {
           <div className="luxury-profile-insert-panel">
             <h2 className="luxury-section-title luxury-profile-card__title">Dati account</h2>
 
+            {isConsumerAccount ? (
+              <ClientProfilePhotoEditor
+                accessToken={accessToken}
+                displayName={displayName}
+                serverPhoto={q.data.photoDataUrl?.trim() || null}
+              />
+            ) : null}
+
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -545,6 +603,19 @@ export default function ProfilePage() {
                   required
                 />
               </label>
+              {email.trim().toLowerCase() !== (q.data?.email ?? "").trim().toLowerCase() ? (
+                <label className="luxury-form-label">
+                  {t("account.profile.emailChangePassword")}
+                  <input
+                    className="luxury-soft-field"
+                    type="password"
+                    autoComplete="current-password"
+                    value={emailChangePassword}
+                    onChange={(e) => setEmailChangePassword(e.target.value)}
+                    required
+                  />
+                </label>
+              ) : null}
               <label className="luxury-form-label">
                 Nome visualizzato
                 <input className="luxury-soft-field" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
@@ -701,6 +772,162 @@ export default function ProfilePage() {
                   {staffPhotoMsg}
                 </p>
               ) : null}
+
+              {staffOperatorQ.data ? (
+                <div className="luxury-profile-reviews" aria-label="Recensioni ricevute">
+                  <h4 className="luxury-profile-password__title" style={{ margin: "0.85rem 0 0.25rem", fontSize: "1rem" }}>
+                    Recensioni ricevute
+                  </h4>
+                  {staffOperatorQ.data.staffReviewCount != null &&
+                  staffOperatorQ.data.averageStaffRating != null ? (
+                    <p className="luxury-text-muted" style={{ margin: "0 0 0.55rem", lineHeight: 1.45 }}>
+                      Media{" "}
+                      <strong>
+                        {staffOperatorQ.data.averageStaffRating.toLocaleString("it-IT", {
+                          minimumFractionDigits: 1,
+                          maximumFractionDigits: 1,
+                        })}
+                        /5
+                      </strong>{" "}
+                      su {staffOperatorQ.data.staffReviewCount}{" "}
+                      {staffOperatorQ.data.staffReviewCount === 1 ? "recensione" : "recensioni"} verso di te.
+                    </p>
+                  ) : (
+                    <p className="luxury-text-muted" style={{ margin: "0 0 0.55rem", lineHeight: 1.45 }}>
+                      Ancora nessuna valutazione dei clienti sul tuo profilo.
+                    </p>
+                  )}
+                  {staffReviewsQ.isPending ? (
+                    <p className="luxury-text-muted" style={{ margin: 0 }}>
+                      Caricamento recensioni…
+                    </p>
+                  ) : staffReviewsQ.data && staffReviewsQ.data.length > 0 ? (
+                    <ul className="luxury-profile-reviews__list">
+                      {staffReviewsQ.data.slice(0, 5).map((review) => (
+                        <li key={review.id} className="luxury-profile-reviews__item">
+                          <div className="luxury-profile-reviews__head">
+                            <strong>{review.reviewerName?.trim() || "Cliente"}</strong>
+                            <span className="luxury-text-muted">
+                              {new Date(review.createdAt).toLocaleDateString("it-IT")}
+                            </span>
+                          </div>
+                          {review.staffRating != null ? (
+                            <p className="luxury-profile-reviews__rating">
+                              {"★".repeat(Math.max(1, Math.min(5, review.staffRating)))}{" "}
+                              <span className="luxury-text-muted">({review.staffRating}/5)</span>
+                            </p>
+                          ) : null}
+                          <p className="luxury-text-muted" style={{ margin: "0.25rem 0 0", fontSize: "0.88rem" }}>
+                            {review.comment?.trim() || "Nessun commento."}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  <p style={{ margin: "0.65rem 0 0" }}>
+                    <Link to="/account/feedback-luxury" className="luxury-link-inline">
+                      Vedi tutte le recensioni
+                    </Link>
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {showStaffBookingConfirmSwitch && staffOperatorQ.data ? (
+            <div
+              className={
+                "luxury-profile-insert-panel luxury-profile-staff-booking" +
+                ((staffOperatorQ.data.requireBookingConfirmation ?? true)
+                  ? " luxury-profile-staff-booking--on"
+                  : " luxury-profile-staff-booking--off")
+              }
+            >
+              <div className="luxury-profile-staff-booking__head">
+                <span className="luxury-profile-staff-booking__badge" aria-hidden>
+                  Premium
+                </span>
+                <h3 className="luxury-profile-password__title luxury-profile-staff-booking__title">
+                  Conferma prenotazioni
+                </h3>
+              </div>
+              <p className="luxury-profile-staff-booking__lead">
+                Se attivo, quando un cliente prenota ricevi l&apos;alert Accetta/Rifiuta come oggi. Se disattivo,
+                l&apos;appuntamento viene confermato subito: tu ricevi solo la notifica «il cliente ha prenotato» e il
+                cliente vede solo «Appuntamento confermato» (niente popup «il salone ha confermato»).
+              </p>
+              <div
+                className={
+                  "luxury-profile-staff-booking-switch" +
+                  ((staffOperatorQ.data.requireBookingConfirmation ?? true)
+                    ? " luxury-profile-staff-booking-switch--on"
+                    : " luxury-profile-staff-booking-switch--off")
+                }
+              >
+                <div className="luxury-profile-staff-booking-switch__glow" aria-hidden />
+                <div className="luxury-profile-staff-booking-switch__copy">
+                  <span className="luxury-profile-staff-booking-switch__kicker">
+                    {(staffOperatorQ.data.requireBookingConfirmation ?? true)
+                      ? "Modalità alert"
+                      : "Modalità notifica"}
+                  </span>
+                  <span className="luxury-profile-staff-booking-switch__label" id="staff-booking-confirm-label">
+                    Alert Accetta/Rifiuta
+                  </span>
+                  <span className="luxury-profile-staff-booking-switch__hint">
+                    {(staffOperatorQ.data.requireBookingConfirmation ?? true)
+                      ? "Le richieste restano in attesa della tua conferma."
+                      : "Conferma automatica: solo notifica informativa."}
+                  </span>
+                </div>
+                <div className="luxury-profile-staff-booking-switch__aside">
+                  <span
+                    className={
+                      "luxury-profile-staff-booking-switch__state" +
+                      ((staffOperatorQ.data.requireBookingConfirmation ?? true)
+                        ? " luxury-profile-staff-booking-switch__state--on"
+                        : " luxury-profile-staff-booking-switch__state--off")
+                    }
+                  >
+                    {(staffOperatorQ.data.requireBookingConfirmation ?? true) ? "Attivo" : "Disattivo"}
+                  </span>
+                  <button
+                    type="button"
+                    className={
+                      "luxury-profile-staff-booking-switch__control" +
+                      ((staffOperatorQ.data.requireBookingConfirmation ?? true)
+                        ? " luxury-profile-staff-booking-switch__control--on"
+                        : "")
+                    }
+                    role="switch"
+                    aria-checked={staffOperatorQ.data.requireBookingConfirmation ?? true}
+                    aria-labelledby="staff-booking-confirm-label"
+                    disabled={staffBookingConfirmM.isPending}
+                    onClick={() => {
+                      const current = staffOperatorQ.data;
+                      if (!current) return;
+                      setStaffBookingConfirmMsg(null);
+                      staffBookingConfirmM.mutate(!(current.requireBookingConfirmation ?? true));
+                    }}
+                  >
+                    <span className="luxury-profile-staff-booking-switch__track-glow" aria-hidden />
+                    <span className="luxury-profile-staff-booking-switch__knob" aria-hidden />
+                  </button>
+                </div>
+              </div>
+              {staffBookingConfirmMsg ? (
+                <p
+                  className={
+                    "luxury-profile-staff-booking__feedback luxury-alert " +
+                    (staffBookingConfirmMsg.startsWith("Alert")
+                      ? "luxury-alert--success"
+                      : "luxury-alert--error")
+                  }
+                  role="status"
+                >
+                  {staffBookingConfirmMsg}
+                </p>
+              ) : null}
             </div>
           ) : null}
 
@@ -820,6 +1047,7 @@ export default function ProfilePage() {
           <article className="luxury-profile-card luxury-profile-card--salon">
             <div className="luxury-profile-insert-panel">
               <h2 className="luxury-section-title luxury-profile-card__title">Dati salone</h2>
+              <SalonClientVisibilitySwitch />
               {meSalon.isLoading ? (
                 <p className="luxury-profile-page__salon-loading luxury-text-muted">Caricamento dati salone…</p>
               ) : meSalon.error ? (
@@ -882,7 +1110,9 @@ export default function ProfilePage() {
                   </form>
                   <div className="luxury-profile-salon-static-row">
                     <span className="luxury-profile-salon-static-label">Piano</span>
-                    <strong className="luxury-profile-salon-static-value">{salonPlan}</strong>
+                    <strong className="luxury-profile-salon-static-value">
+                      {salonPlanTier === "PLUS" ? "Plus" : salonPlanTier === "PREMIUM" ? "Premium" : "Senza Premium"}
+                    </strong>
                   </div>
                   <div className="luxury-profile-salon-static-row">
                     <span className="luxury-profile-salon-static-label">Vetrina pubblica</span>
@@ -1084,6 +1314,16 @@ export default function ProfilePage() {
                 <p className="luxury-profile-close__confirm-text" role="alert">
                   Conferma finale: chiuderemo l&apos;account e anonimizzeremo i dati personali del profilo.
                 </p>
+                <label className="luxury-form-label">
+                  {t("account.profile.deletePassword")}
+                  <input
+                    className="luxury-soft-field"
+                    type="password"
+                    autoComplete="current-password"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                  />
+                </label>
                 <div className="luxury-profile-close__confirm-actions">
                   <button
                     type="button"
@@ -1096,7 +1336,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     className="luxury-btn luxury-profile-close__danger-btn"
-                    disabled={deleteM.isPending || !accessToken}
+                    disabled={deleteM.isPending || !accessToken || !deletePassword.trim()}
                     onClick={() => {
                       setMsg(null);
                       deleteM.mutate();
@@ -1123,6 +1363,7 @@ export default function ProfilePage() {
         )}
       </section>
       </ClientAccountOptionalContentCard>
+      {isConsumerAccount ? <AdSoftPlacement zone="client_profile" variant="profile" /> : null}
       </div>
     </div>
   );

@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.luxury.publicapi.dto.AppointmentResponses.AppointmentDto;
+import it.luxury.publicapi.dto.PublicDtos.OrganizationDetailDto;
+import it.luxury.studio.dto.MeSalonClientVisibilityRequest;
 import it.luxury.studio.dto.MeSalonStaffCreateRequest;
 import it.luxury.studio.dto.MeSalonStaffDto;
 import it.luxury.studio.dto.MeSalonNotificationInboxDto;
@@ -11,12 +13,14 @@ import it.luxury.studio.dto.MeSalonNotificationMessageDto;
 import it.luxury.studio.dto.MeSalonReviewDto;
 import it.luxury.studio.dto.MeSalonSummaryDto;
 import it.luxury.studio.dto.MeSalonUpdateRequest;
+import it.luxury.studio.dto.SalonRegistrationLocationsUpdateRequest;
 import it.luxury.studio.service.MeSalonAppointmentsService;
 import it.luxury.studio.service.MeSalonNotificationInboxService;
 import it.luxury.studio.service.MeSalonReviewInboxService;
 import it.luxury.studio.service.MeSalonStaffService;
 import it.luxury.studio.service.MeSalonStatisticsPinService;
 import it.luxury.studio.service.MeSalonSummaryService;
+import it.luxury.studio.service.PublicOrganizationService;
 import it.luxury.studio.dto.StatisticsPinChangeRequest;
 import it.luxury.studio.dto.StatisticsPinVerifyRequest;
 import jakarta.validation.Valid;
@@ -51,6 +55,7 @@ import java.util.UUID;
 public class MeSalonController {
 
 	private final MeSalonSummaryService meSalonSummaryService;
+	private final PublicOrganizationService publicOrganizationService;
 	private final MeSalonAppointmentsService meSalonAppointmentsService;
 	private final MeSalonNotificationInboxService meSalonNotificationInboxService;
 	private final MeSalonReviewInboxService meSalonReviewInboxService;
@@ -59,12 +64,14 @@ public class MeSalonController {
 
 	public MeSalonController(
 			MeSalonSummaryService meSalonSummaryService,
+			PublicOrganizationService publicOrganizationService,
 			MeSalonAppointmentsService meSalonAppointmentsService,
 			MeSalonNotificationInboxService meSalonNotificationInboxService,
 			MeSalonReviewInboxService meSalonReviewInboxService,
 			MeSalonStaffService meSalonStaffService,
 			MeSalonStatisticsPinService meSalonStatisticsPinService) {
 		this.meSalonSummaryService = meSalonSummaryService;
+		this.publicOrganizationService = publicOrganizationService;
 		this.meSalonAppointmentsService = meSalonAppointmentsService;
 		this.meSalonNotificationInboxService = meSalonNotificationInboxService;
 		this.meSalonReviewInboxService = meSalonReviewInboxService;
@@ -79,6 +86,15 @@ public class MeSalonController {
 		return meSalonSummaryService.resolve(principal);
 	}
 
+	@PostMapping("/registration-locations")
+	@Operation(summary = "Aggiorna la sede principale e aggiunge sedi prima del checkout Premium")
+	@PreAuthorize("hasAuthority('ROLE_OWNER')")
+	public MeSalonSummaryDto applyRegistrationLocations(
+			@AuthenticationPrincipal LuxuryUserPrincipal principal,
+			@Valid @RequestBody SalonRegistrationLocationsUpdateRequest body) {
+		return meSalonSummaryService.applyRegistrationLocations(principal, body);
+	}
+
 	@PatchMapping
 	@Operation(summary = "Aggiorna dati principali sede salone (nome, slug, città, indirizzo)")
 	@PreAuthorize("hasAuthority('ROLE_OWNER')")
@@ -86,6 +102,29 @@ public class MeSalonController {
 			@AuthenticationPrincipal LuxuryUserPrincipal principal,
 			@Valid @RequestBody MeSalonUpdateRequest body) {
 		return meSalonSummaryService.update(principal, body);
+	}
+
+	@PatchMapping("/client-visibility")
+	@Operation(summary = "Abilita o nasconde il salone in ricerca e sulla vetrina pubblica")
+	@PreAuthorize("hasAuthority('ROLE_OWNER')")
+	public MeSalonSummaryDto updateClientVisibility(
+			@AuthenticationPrincipal LuxuryUserPrincipal principal,
+			@Valid @RequestBody MeSalonClientVisibilityRequest body) {
+		return meSalonSummaryService.setVisibleToClients(principal, Boolean.TRUE.equals(body.enabled()));
+	}
+
+	@GetMapping("/vetrina-preview")
+	@Operation(summary = "Anteprima vetrina del titolare, anche se i clienti non la vedono ancora")
+	@PreAuthorize("hasAuthority('ROLE_OWNER')")
+	public OrganizationDetailDto vetrinaPreview(@AuthenticationPrincipal LuxuryUserPrincipal principal) {
+		MeSalonSummaryDto summary = meSalonSummaryService.resolve(principal);
+		if (summary.primaryLocationSlug() == null || summary.primaryLocationSlug().isBlank()) {
+			throw new it.luxury.common.api.BusinessException(
+					HttpStatus.NOT_FOUND,
+					"NOT_FOUND",
+					"Sede non trovata.");
+		}
+		return publicOrganizationService.organizationDetailIgnoringClientVisibility(summary.primaryLocationSlug());
 	}
 
 	@PostMapping("/statistics/verify-pin")
@@ -130,6 +169,13 @@ public class MeSalonController {
 	@PreAuthorize("isAuthenticated()")
 	public List<MeSalonReviewDto> reviews(@AuthenticationPrincipal LuxuryUserPrincipal principal) {
 		return meSalonReviewInboxService.list(principal);
+	}
+
+	@DeleteMapping("/reviews/{id}")
+	@Operation(summary = "Cancella una recensione ricevuta (titolare: studio; staff: solo le proprie)")
+	@PreAuthorize("isAuthenticated()")
+	public void deleteReview(@AuthenticationPrincipal LuxuryUserPrincipal principal, @PathVariable UUID id) {
+		meSalonReviewInboxService.delete(principal, id);
 	}
 
 	@GetMapping("/notifications/messages")

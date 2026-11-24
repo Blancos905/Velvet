@@ -6,6 +6,44 @@
   padding-top: 0.35rem;
 }
 
+.luxury-profile-client-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0 0 1.15rem;
+}
+
+.luxury-profile-client-photo__lead {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.luxury-profile-client-photo .luxury-profile-staff-photo__preview.is-framing {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.luxury-profile-client-photo__controls {
+  display: grid;
+  gap: 0.45rem;
+  width: min(100%, 22rem);
+}
+
+.luxury-profile-client-photo__controls .luxury-form-label {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.luxury-profile-client-photo .luxury-btn {
+  position: relative;
+}
+
+.luxury-profile-client-photo .luxury-alert {
+  margin: 0.15rem 0 0;
+}
+
 .luxury-client-account-page.luxury-profile-page--consumer .luxury-profile-grid {
   display: flex;
   flex-direction: column;

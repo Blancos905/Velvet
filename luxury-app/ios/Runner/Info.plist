@@ -33,8 +33,12 @@
 	</dict>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Saloni Luxury usa la tua posizione per trovare saloni vicini a te e compilare comune e CAP nella ricerca.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Saloni Luxury usa la fotocamera per impostare l'immagine del profilo.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Saloni Luxury usa la tua posizione per trovare saloni vicini a te e compilare comune e CAP nella ricerca.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Saloni Luxury accede alle foto per impostare l'immagine del profilo.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

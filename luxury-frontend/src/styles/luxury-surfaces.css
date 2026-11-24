@@ -35,7 +35,7 @@
     0 0 22px rgba(196, 181, 253, 0.14);
 }
 
-/** Home titolare piano Free (BASE) — accento caldo (scheda piano Premium). */
+/** Home titolare — accento caldo (scheda piano Premium). */
 .luxury-surface-card--plan-base {
   border: 2px solid #000000;
   box-shadow:
@@ -1263,6 +1263,13 @@ textarea.luxury-soft-field {
   justify-content: space-between;
   gap: 0.75rem;
   flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.luxury-feedback-review-card__head-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .luxury-feedback-review-card__reviewer {

@@ -71,12 +71,13 @@ export function PrivacyPolicyConsumerLayeredContent({ embedded = false }: { embe
             l&apos;appuntamento e mostrarti lo storico in area account.
           </li>
           <li>
-            <strong>Dati di geolocalizzazione:</strong> Posizione GPS del dispositivo <strong>solo se autorizzi</strong> esplicitamente
+            <strong>Dati di geolocalizzazione:</strong> Posizione del dispositivo <strong>solo se autorizzi</strong> esplicitamente
             (browser o modulo GPS dell&apos;app Flutter) per la funzione «Saloni vicino a me» sulla{" "}
             <Link to="/search" className="luxury-legal-public__inline-link">
               pagina di ricerca
             </Link>
-            . Se neghi il consenso, puoi cercare manualmente inserendo città o CAP.
+            . Su computer, o se apri il sito da un indirizzo non protetto, dopo quel tocco possiamo usare una posizione
+            approssimata della connessione di rete. Se neghi il consenso, puoi cercare manualmente inserendo città o CAP.
           </li>
           <li>
             <strong>Recensioni:</strong> Testo e voto assegnati ai saloni, resi pubblici sulla pagina vetrina del salone (es.{" "}

@@ -19,11 +19,11 @@ export function SalonStandardSectionGuard({ children }: { children: ReactNode })
   }
 
   if (
-    registeredPlan === "PREMIUM" &&
+    (registeredPlan === "PREMIUM" || registeredPlan === "PLUS") &&
     billingStatus.isSuccess &&
     !isPremiumActive
   ) {
-    return <Navigate to="/account/salone" replace />;
+    return <Navigate to="/salone" replace />;
   }
 
   if (
@@ -31,7 +31,7 @@ export function SalonStandardSectionGuard({ children }: { children: ReactNode })
       surface: resolveSubscriptionSurface(isLuxuryNativeAppShell()),
     })
   ) {
-    return <Navigate to="/account/salone" replace />;
+    return <Navigate to="/salone" replace />;
   }
 
   return <>{children}</>;

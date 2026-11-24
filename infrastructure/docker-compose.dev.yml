@@ -1,0 +1,129 @@
+# =============================================================================
+# Stack LOCALE — Saloni Luxury
+#
+# Non è il compose di produzione (quello resta docker-compose.prod.yml, con
+# Postgres e Redis chiusi nella rete interna). Qui le porte sono sull'host
+# così puoi aprire il sito e, se serve, collegare il backend nativo al DB.
+#
+#   ./scripts/dev-docker.sh -d
+#
+#   Clienti e ricerca: http://127.0.0.1:8080
+#   Pannello salone:   http://127.0.0.1:8083
+#   Super admin:       http://127.0.0.1:8084
+#   API:               http://127.0.0.1:8082/api/v1/public/health
+#   DB:    PostgreSQL del Mac, localhost:5432, database e schema c1luxury
+#   SMTP:  Aruba, letto a ogni avvio da luxury/spring-dev.local.env.
+#
+# L'API nel container raggiunge quel database via host.docker.internal.
+# Il Postgres del compose (profilo embedded-db, porta 5433) è un volume vuoto
+# separato: non va usato se vuoi i saloni già presenti sul Mac.
+# =============================================================================
+
+name: luxury-dev
+
+networks:
+  dev:
+
+volumes:
+  pg_data:
+  redis_data:
+
+services:
+  postgres:
+    profiles: ["embedded-db"]
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: ${LUXURY_DEV_DB_NAME:-c1luxury}
+      POSTGRES_USER: ${LUXURY_DEV_DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${LUXURY_DEV_DB_PASSWORD:-postgres}
+    ports:
+      - "${LUXURY_DEV_DB_PORT:-5433}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./postgres/init-dev.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    networks:
+      - dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LUXURY_DEV_DB_USER:-postgres} -d ${LUXURY_DEV_DB_NAME:-c1luxury}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--requirepass", "${LUXURY_DEV_REDIS_PASSWORD:-luxury-dev-redis}", "--appendonly", "yes"]
+    ports:
+      - "${LUXURY_DEV_REDIS_PORT:-6380}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - dev
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${LUXURY_DEV_REDIS_PASSWORD:-luxury-dev-redis}", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ../luxury
+      dockerfile: Dockerfile
+    env_file:
+      # Credenziali SMTP locali. Le chiavi sotto in environment restano del container Docker.
+      - path: ../luxury/spring-dev.local.env
+        required: false
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${LUXURY_DEV_DB_HOST:-host.docker.internal}:${LUXURY_DEV_DB_PORT_INTERNAL:-5432}/${LUXURY_DEV_DB_NAME:-c1luxury}?currentSchema=c1luxury
+      SPRING_DATASOURCE_USERNAME: ${LUXURY_DEV_DB_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${LUXURY_DEV_DB_PASSWORD:-postgres}
+      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: c1luxury
+      LUXURY_TOKEN_SECRET: ${LUXURY_DEV_JWT_SECRET:-luxury-dev-token-secret-change-in-production-32b}
+      LUXURY_AUTH_JWT_SECRET: ${LUXURY_DEV_JWT_SECRET:-luxury-dev-token-secret-change-in-production-32b}
+      LUXURY_PUBLIC_FRONTEND_URL: http://127.0.0.1:${LUXURY_DEV_HTTP_PORT:-8080}
+      LUXURY_CORS_ALLOWED_ORIGINS: http://localhost:${LUXURY_DEV_HTTP_PORT:-8080},http://127.0.0.1:${LUXURY_DEV_HTTP_PORT:-8080},http://127.0.0.1:${LUXURY_DEV_SALON_HTTP_PORT:-8083},http://127.0.0.1:${LUXURY_DEV_ADMIN_HTTP_PORT:-8084}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: "6379"
+      SPRING_DATA_REDIS_PASSWORD: ${LUXURY_DEV_REDIS_PASSWORD:-luxury-dev-redis}
+      # Link nelle email: il sito Docker, non l'IP del backend nativo.
+      LUXURY_NOTIFICATIONS_FRONTEND_BASE_URL: http://127.0.0.1:${LUXURY_DEV_HTTP_PORT:-8080}
+      # SMTP e Stripe arrivano da spring-dev.local.env (env_file). Non copiare
+      # infrastructure/.env: quella password Aruba la rifiuta. Non azzerare le
+      # chiavi Stripe qui, altrimenti il checkout resta spento.
+      LUXURY_FATTURAPA_ENABLED: "false"
+      LUXURY_BILLING_PROMOTIONAL_TRIAL_DAYS: "30"
+      MANAGEMENT_HEALTH_MAIL_ENABLED: "false"
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75.0"
+    ports:
+      - "${LUXURY_DEV_API_PORT:-8082}:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - dev
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 90s
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ../luxury-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "${LUXURY_DEV_HTTP_PORT:-8080}:80"
+      - "${LUXURY_DEV_SALON_HTTP_PORT:-8083}:8083"
+      - "${LUXURY_DEV_ADMIN_HTTP_PORT:-8084}:8084"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - dev
+    restart: unless-stopped

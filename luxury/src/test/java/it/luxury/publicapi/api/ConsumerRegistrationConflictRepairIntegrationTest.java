@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Profilo cliente già esistente per email: la registrazione titolare deve promuovere a OWNER e usare lo stesso subject.
  */
-@SpringBootTest
+@SpringBootTest(properties = "luxury.billing.enabled=false")
 @AutoConfigureMockMvc
 class ConsumerRegistrationConflictRepairIntegrationTest {
 
@@ -80,7 +80,7 @@ class ConsumerRegistrationConflictRepairIntegrationTest {
 		payload.put("lastName", "Bianchi");
 		payload.put("phone", "");
 		payload.put("salonName", salonName);
-		payload.put("planTier", "BASE");
+		payload.put("planTier", "PREMIUM");
 		payload.put("salonAddressLine1", "Via Conflict 2");
 		payload.put("salonPostalCode", "10121");
 		payload.put("salonCity", "Torino");

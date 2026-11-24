@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" role="img" aria-label="Amber Brush">
+  <defs>
+    <linearGradient id="ab-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff7ed"/>
+      <stop offset="40%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </linearGradient>
+  </defs>
+  <circle cx="34" cy="36" r="22" fill="rgba(0,0,0,0.28)" stroke="url(#ab-gold)" stroke-width="1.3"/>
+  <path d="M34 16v28" stroke="url(#ab-gold)" stroke-width="1.6"/>
+  <path d="M26 22c4 2 8 2 8 6M42 22c-4 2-8 2-8 6M28 30c3 2 6 2 6 5M40 30c-3 2-6 2-6 5" fill="none" stroke="url(#ab-gold)" stroke-width="1.2"/>
+  <text x="70" y="30" fill="url(#ab-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="11" letter-spacing="0.36em">AMBER</text>
+  <text x="70" y="54" fill="url(#ab-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="24" font-style="italic" letter-spacing="0.06em">Brush</text>
+</svg>

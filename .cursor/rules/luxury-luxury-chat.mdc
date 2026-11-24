@@ -1,0 +1,70 @@
+---
+description: Chat B2C Premium — thread titolare/operatore, API, read state DB, frontend
+globs: luxury/**/SalonLuxuryChat*,luxury/**/MeSalonClientsController*,luxury/**/SalonLuxuryChatSchemaAlignmentRunner*,luxury-frontend/**/SalonLuxuryChat*,luxury-frontend/**/salonLuxuryChat*,luxury-frontend/**/SalonClientsPage*,luxury/deploy/sql/*luxury_chat*
+alwaysApply: false
+---
+
+# Luxury — Chat luxury (B2C Premium)
+
+Prima di refactor: CodeGraph / `codegraph explore "SalonLuxuryChatService"`. Test: `MeSalonClientsControllerTest`.
+
+## Prodotto
+
+- Feature **Premium** (`SalonPremiumEntitlementService.hasActivePremium`). Uno studio `plan_tier=BASE` non è entitled: non è un piano vendibile.
+- Un cliente (`SalonClient`) può avere **più thread** indipendenti:
+  - **Salone generale** → `staffOperatorId = null` (titolare risponde come salone).
+  - **Operatore** → `staffOperatorId = UUID` (solo se appuntamento con quell’operatore o messaggi già presenti nel thread).
+- I messaggi **titolare↔cliente** e **operatore↔cliente** **non** si mescolano: il titolare non legge la chat operatore.
+
+## Ruoli e thread effettivo
+
+| Viewer | Thread usato | `staffOperatorId` in API |
+|--------|--------------|----------------------------|
+| Cliente | parametro (default `null` = salone) | opzionale |
+| Titolare Premium | sempre salone | **sempre omesso** — se passato → `400` |
+| Staff sulla propria sede | sempre il proprio operatore | ignorato/forzato lato server |
+| Staff che è cliente di un'altra sede | thread cliente di quella sede | `null` o l'operatore di quell'altra sede |
+
+Lo staff viene trattato come operatore solo se l'operatore collegato appartiene alla sede del `SalonClient`. L'anteprima inbox legge l'ultimo messaggio con una query limitata a una riga, non lo storico intero.
+
+## API (`MeSalonClientsController`)
+
+Base: `/api/v1/me/salon-clients/chat/*` — `@PreAuthorize("isAuthenticated()")`.
+
+| Endpoint | Note |
+|----------|------|
+| `GET …/messages?salonClientId=&staffOperatorId?` | Marca letto + lista messaggi |
+| `POST …/messages` body `{ salonClientId, staffOperatorId?, body }` | Invio |
+| `GET …/inbox-summaries` | Header `X-Location-Id` per titolare/staff (sede catalogo) |
+| `GET …/unread-count` | `clientUnread` / `ownerUnread` |
+
+Logica: `SalonLuxuryChatService` (`resolveThreadStaffOperatorId`, `assertReadAccess`, `findOrCreateReadState`).
+
+Anagrafica sede: `GET /api/v1/clients` + `X-Location-Id` — `ClientDto.id` **=** `salonClientId` chat (stesso id membership `SalonClientMembershipDto.id`).
+
+## Frontend
+
+- Pagina: `SalonLuxuryChatPage.tsx` — route `/account/chat`.
+- Deep link titolare/staff da Clienti: `/account/chat?salonClientId={uuid}` (`SalonClientsPage`).
+- Cliente: picker «Salone generale» / «Operatore»; helper thread in `salonLuxuryChatThreads.ts` (`chatThreadKey`, `mergeConsumerChatThreads`).
+- Lato salone: `listClientsAsSalonSide` → catalogo clienti + header `X-Location-Id`; **non** mostrare picker operatore al titolare.
+
+## DB — read state (pitfall frequente)
+
+Tabella `salon_luxury_chat_read_state`: una riga **per thread** (`salon_client_id` + `staff_operator_id` nullable).
+
+**Non** reintrodurre unicità su solo `salon_client_id`. Indici corretti (PostgreSQL, parziali):
+
+- `uq_salon_luxury_chat_read_owner_thread` su `(salon_client_id) WHERE staff_operator_id IS NULL`
+- `uq_salon_luxury_chat_read_staff_thread` su `(salon_client_id, staff_operator_id) WHERE staff_operator_id IS NOT NULL`
+
+Su DB esistenti: `luxury/deploy/sql/align_salon_luxury_chat_read_state_indexes_postgres.sql` oppure avvio con `SalonLuxuryChatSchemaAlignmentRunner` (su Postgres: **`DROP INDEX` prima di `DROP CONSTRAINT IF EXISTS`** — altrimenti il vincolo legacy non viene rimosso).
+
+Sintomo bug legacy: `duplicate key … uk_salon_luxury_chat_read_salon_client` quando il cliente apre chat operatore dopo chat salone.
+
+## Errori da evitare
+
+- Permettere al titolare di passare `staffOperatorId` o vedere thread staff.
+- Usare id `organizationId` / `locationId` al posto di `salonClientId` nelle API chat.
+- `findOrCreateReadState`: dopo `DataIntegrityViolationException`, il re-fetch deve usare lo **stesso** `threadStaffOperatorId` (non confondere con la riga titolare già esistente).
+- Duplicare regole accesso: estendere `SalonLuxuryChatService`, non controlli ruolo sparsi nel frontend.

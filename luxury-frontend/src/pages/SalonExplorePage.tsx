@@ -205,7 +205,7 @@ export default function SalonExplorePage() {
       alive = false;
     };
   }, [s]);
-  const services = servicesQ.data ?? [];
+  const services = useMemo(() => servicesQ.data ?? [], [servicesQ.data]);
   const servicePhotoById = useMemo(() => {
     const entries = Object.entries(showcase.servicePhotoDataUrls ?? {});
     const normalized = new Map<string, string>();

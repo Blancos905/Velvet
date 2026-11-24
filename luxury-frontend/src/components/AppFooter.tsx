@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 import { Link } from "react-router-dom";
 import { appStoreUrl, playStoreUrl } from "../config/env";
 import { useLuxuryNativeAppShell } from "../hooks/useLuxuryNativeAppShell";
+import { useLuxuryT } from "../i18n/useLuxuryLocale";
 import "../styles/luxury-site-footer.css";
 
 function AppleStoreIcon() {
@@ -27,9 +28,10 @@ export function AppFooter() {
   const [legalOpen, setLegalOpen] = useState(false);
   const legalLinksId = useId();
   const isNativeApp = useLuxuryNativeAppShell();
+  const t = useLuxuryT();
 
   return (
-    <footer className="luxury-site-footer" aria-label="Piè di pagina">
+    <footer className="luxury-site-footer" aria-label={t("footer.aria")}>
       <div className="luxury-footer-inner">
         {!isNativeApp ? (
         <section className="luxury-footer-app-block luxury-footer-app-block--interactive" aria-labelledby="luxury-footer-app-heading">
@@ -47,12 +49,9 @@ export function AppFooter() {
           <div className="luxury-footer-app-copy">
             <div className="luxury-footer-download-panel">
               <h2 id="luxury-footer-app-heading" className="luxury-footer-app-title">
-                Scarica l&apos;app Saloni Luxury
+                {t("footer.app.title")}
               </h2>
-              <p className="luxury-footer-app-lead">
-                Prenota dal salone preferito, gestisci i tuoi appuntamenti e registrati al piano Free direttamente
-                dall&apos;app ufficiale per Android e iPhone.
-              </p>
+              <p className="luxury-footer-app-lead">{t("footer.app.lead")}</p>
               <div className="luxury-footer-store-row">
                 <a
                   href={playStoreUrl}
@@ -62,8 +61,8 @@ export function AppFooter() {
                 >
                   <GooglePlayIcon />
                   <span className="luxury-footer-store-text">
-                    <span className="luxury-footer-store-line1">Disponibile su</span>
-                    <span className="luxury-footer-store-line2">Google Play</span>
+                    <span className="luxury-footer-store-line1">{t("footer.store.availableOn")}</span>
+                    <span className="luxury-footer-store-line2">{t("footer.store.googlePlay")}</span>
                   </span>
                 </a>
                 <a
@@ -74,8 +73,8 @@ export function AppFooter() {
                 >
                   <AppleStoreIcon />
                   <span className="luxury-footer-store-text">
-                    <span className="luxury-footer-store-line1">Scarica su</span>
-                    <span className="luxury-footer-store-line2">App Store</span>
+                    <span className="luxury-footer-store-line1">{t("footer.store.downloadOn")}</span>
+                    <span className="luxury-footer-store-line2">{t("footer.store.appStore")}</span>
                   </span>
                 </a>
               </div>
@@ -86,7 +85,7 @@ export function AppFooter() {
 
         <nav
           className={`luxury-site-footer__legal${legalOpen ? " luxury-site-footer__legal--open" : ""}`}
-          aria-label="Documenti legali"
+          aria-label={t("footer.legal.navAria")}
         >
           <button
             type="button"
@@ -95,49 +94,54 @@ export function AppFooter() {
             aria-controls={legalLinksId}
             onClick={() => setLegalOpen((open) => !open)}
           >
-            <span className="luxury-site-footer__legal-toggle-label">Documenti legali</span>
+            <span className="luxury-site-footer__legal-toggle-label">{t("footer.legal.toggle")}</span>
             <span className="luxury-site-footer__legal-toggle-chevron" aria-hidden="true" />
           </button>
           <div id={legalLinksId} className="luxury-site-footer__legal-panel" hidden={!legalOpen}>
             <ul className="luxury-site-footer__legal-links">
               <li>
                 <Link to="/privacy/clienti" className="luxury-site-footer__legal-link">
-                  Privacy clienti (B2C)
+                  {t("footer.legal.privacyClient")}
                 </Link>
               </li>
               <li>
                 <Link to="/privacy/staff" className="luxury-site-footer__legal-link">
-                  Privacy staff
+                  {t("footer.legal.privacyStaff")}
                 </Link>
               </li>
               <li>
                 <Link to="/privacy" className="luxury-site-footer__legal-link">
-                  Privacy saloni (B2B)
+                  {t("footer.legal.privacySalon")}
                 </Link>
               </li>
               <li>
                 <Link to="/termini" className="luxury-site-footer__legal-link">
-                  Termini di servizio
+                  {t("footer.legal.terms")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/licenza" className="luxury-site-footer__legal-link">
+                  {t("footer.legal.freeLicense")}
                 </Link>
               </li>
               <li>
                 <Link to="/privacy/scelte" className="luxury-site-footer__legal-link">
-                  Scelte privacy
+                  {t("footer.legal.privacyChoices")}
                 </Link>
               </li>
               <li>
                 <Link to="/privacy/cookie" className="luxury-site-footer__legal-link">
-                  Informativa cookie
+                  {t("footer.legal.cookies")}
                 </Link>
               </li>
               <li>
                 <Link to="/privacy/elimina-account" className="luxury-site-footer__legal-link">
-                  Elimina account
+                  {t("footer.legal.deleteAccount")}
                 </Link>
               </li>
               <li>
                 <Link to="/legale" className="luxury-site-footer__legal-link">
-                  Requisiti store
+                  {t("footer.legal.storeHub")}
                 </Link>
               </li>
             </ul>

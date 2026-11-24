@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { apiJson } from "../api/client";
 import { LuxuryRegistrationEmailConfirmFlow } from "../components/LuxuryRegistrationEmailConfirmFlow";
 import { LuxuryRegistrationEmailConfirmScreen } from "../components/LuxuryRegistrationEmailConfirmScreen";
+import { LuxuryEmailResentBox } from "../components/LuxuryEmailLinkConfirmSuccessBox";
 import { parseSalonPlanTier } from "../data/salonPlans";
 import { useSalonPremiumCheckoutPolicyQuery } from "../hooks/useSalonPremiumCheckoutPolicy";
 import {
@@ -120,7 +121,9 @@ export default function EmailVerificationPage() {
           </div>
         }
         email={resendEmailNorm}
-        accountLabel={salonPlan === "PREMIUM" ? "titolare salone" : "cliente"}
+        accountLabel={
+          salonPlan != null || audienceParam?.trim().toLowerCase() === "salon" ? "titolare salone" : "cliente"
+        }
         loginReturnPath={loginReturnPathForSalonRegistration(salonPlan, premiumCheckoutRequired)}
         onEmailCorrected={(corrected) => setEmail(corrected)}
       />
@@ -143,23 +146,9 @@ export default function EmailVerificationPage() {
 
     return (
       <LuxuryRegistrationEmailConfirmScreen
+        className="luxury-email-link-page"
         heroTitle={heroTitle}
-        backRow={
-          <div className="luxury-search-back-row">
-            <button type="button" className="luxury-search-back" aria-label="Torna indietro" onClick={() => goBackFromEmailVerification(navigate)}>
-              <svg className="luxury-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path
-                  d="M15 18l-6-6 6-6"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Indietro
-            </button>
-          </div>
-        }
+        hideHero
         email={displayEmail}
         accountLabel={accountLabel}
         loginReturnPath={loginReturnPath}
@@ -228,11 +217,7 @@ export default function EmailVerificationPage() {
                 {resendErr}
               </p>
             ) : null}
-            {resendMsg ? (
-              <p className="luxury-alert luxury-alert--success luxury-auth-alert" role="status">
-                {resendMsg}
-              </p>
-            ) : null}
+            {resendMsg ? <LuxuryEmailResentBox /> : null}
             <form
               className="luxury-auth-form"
               noValidate

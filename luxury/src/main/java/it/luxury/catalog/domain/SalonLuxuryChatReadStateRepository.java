@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public interface SalonLuxuryChatReadStateRepository extends JpaRepository<SalonLuxuryChatReadState, UUID> {
 
+	void deleteBySalonClient_Id(UUID salonClientId);
+
 	default Optional<SalonLuxuryChatReadState> findThreadReadState(UUID salonClientId, UUID staffOperatorId) {
 		if (staffOperatorId == null) {
 			return findOwnerThreadReadState(salonClientId);

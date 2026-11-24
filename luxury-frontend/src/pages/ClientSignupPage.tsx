@@ -7,6 +7,8 @@ import { LuxuryRegistrationEmailConfirmScreen } from "../components/LuxuryRegist
 import { LuxuryRegistrationEmailConfirmFlow } from "../components/LuxuryRegistrationEmailConfirmFlow";
 import { registerClientApi } from "../api/registerClient";
 import { useLuxuryAuth } from "../auth/LuxuryAuthProvider";
+import { localeFromCountryCode } from "../i18n/countryToLocale";
+import { useLuxuryLocale } from "../i18n/useLuxuryLocale";
 import {
   DEFAULT_EUROPEAN_COUNTRY_CODE,
   europeanCountryByCode,
@@ -14,14 +16,23 @@ import {
 import { luxuryJwtHintsFromAccessToken } from "../lib/luxuryJwtHintsFromAccessToken";
 import { optionalEuropeanPhoneForRegisterApi } from "../lib/europeanPhone";
 import { setPostLoginReturnPath } from "../lib/postLoginReturnPath";
-import { humanizeAuthNetworkError, humanizePostRegistrationAuthError } from "../utils/authErrors";
+import { humanizeAuthNetworkError, humanizePostRegistrationAuthErrorLocalized } from "../utils/authErrors";
 import {
   CLIENT_POST_EMAIL_CONFIRM_PATH,
   isValidEmailVerificationToken,
   normalizeTokenFromUrl,
+  clearClientSignupAwaiting,
+  clearPendingEmailVerification,
+  hasPendingEmailVerification,
+  markClientSignupAwaiting,
   persistPendingEmailVerification,
+  readClientSignupAwaiting,
+  readPendingEmailVerification,
   readPendingEmailVerificationAt,
+  resolveClientSignupReloadView,
 } from "../lib/emailVerificationConfirmShared";
+import { clearEmailVerifiedCrossTab, readEmailVerifiedCrossTabPayload } from "../lib/emailVerificationCrossTab";
+import { readIntendedSalonPlanFromSession } from "../lib/salonRegistrationPostLogin";
 import { PrivacyPolicyConsumerLayeredContent } from "./legal/PrivacyPolicyConsumerLayeredContent";
 import { TermsOfServiceLayeredContent } from "./legal/TermsOfServiceLayeredContent";
 import "../styles/luxury-search-page.css";
@@ -35,6 +46,34 @@ import "../styles/luxury-legal-public.css";
  * `docs/INGRESSI-RUOLI-E-PORTALI.md` §5.2. Stesso modello della registrazione salone su `/piani`.
  */
 const LUXURY_ACCESS_TOKEN_KEY = "luxury_access_token";
+
+function readRestoredClientSignup() {
+  const storedAwaiting = readClientSignupAwaiting();
+  const awaiting =
+    storedAwaiting ??
+    (!readIntendedSalonPlanFromSession() && hasPendingEmailVerification()
+      ? { email: readPendingEmailVerification(), at: readPendingEmailVerificationAt() }
+      : null);
+  const verified = readEmailVerifiedCrossTabPayload();
+  const view = resolveClientSignupReloadView({
+    awaiting,
+    verified: verified
+      ? { email: verified.email, audience: verified.audience, registrationAt: verified.registrationAt }
+      : null,
+  });
+  return {
+    view,
+    email: awaiting?.email ?? "",
+    at: awaiting?.at ?? 0,
+    message: view === "thank-you" ? verified?.message?.trim() || null : null,
+  };
+}
+
+function leaveClientSignupConfirm(): void {
+  clearClientSignupAwaiting();
+  clearPendingEmailVerification();
+  clearEmailVerifiedCrossTab();
+}
 
 type ConsumerSignupLegalTab = "terms" | "privacy";
 
@@ -150,6 +189,7 @@ export default function ClientSignupPage() {
   const superAdminIntent = searchParams.get("superadmin") === "1" || searchParams.get("superadmin") === "true";
   const formId = useId();
   const { signInWithPassword } = useLuxuryAuth();
+  const { setLocaleFromCountryForRegistration, t } = useLuxuryLocale();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -167,13 +207,21 @@ export default function ClientSignupPage() {
   const [submitting, setSubmitting] = useState(false);
   const [errorHint, setErrorHint] = useState<string | null>(null);
   const [superAdminNote, setSuperAdminNote] = useState<string | null>(null);
-  const [registrationComplete, setRegistrationComplete] = useState(false);
-  const [registeredEmail, setRegisteredEmail] = useState("");
-  const [pendingVerificationAt, setPendingVerificationAt] = useState(0);
-  const [registrationSuccessMessage, setRegistrationSuccessMessage] = useState<string | null>(null);
+  const [restoredSignup] = useState(readRestoredClientSignup);
+  const [registrationComplete, setRegistrationComplete] = useState(restoredSignup.view !== "form");
+  const [registeredEmail, setRegisteredEmail] = useState(restoredSignup.email);
+  const [pendingVerificationAt, setPendingVerificationAt] = useState(restoredSignup.at);
+  const [registrationSuccessMessage, setRegistrationSuccessMessage] = useState<string | null>(restoredSignup.message);
   const [postSignupHeroTitle, setPostSignupHeroTitle] = useState("Controlla la tua email");
   const [privacyNoticeOpen, setPrivacyNoticeOpen] = useState(false);
   const [legalModalTab, setLegalModalTab] = useState<ConsumerSignupLegalTab>("terms");
+
+  useEffect(() => {
+    if (restoredSignup.view === "form" || readClientSignupAwaiting()) return;
+    if (restoredSignup.email && restoredSignup.at) {
+      markClientSignupAwaiting(restoredSignup.email, restoredSignup.at);
+    }
+  }, [restoredSignup]);
 
   useEffect(() => {
     if (!hasTokenConfirm) return;
@@ -224,6 +272,7 @@ export default function ClientSignupPage() {
           firstName: firstName.trim(),
           lastName: lastName.trim(),
           country: countryCode,
+          preferredLocale: localeFromCountryCode(countryCode),
           phone: optionalEuropeanPhoneForRegisterApi(phoneDialCode, phoneLocal),
           bootstrapSuperAdmin: superAdminIntent,
         });
@@ -243,17 +292,21 @@ export default function ClientSignupPage() {
             setRegistrationComplete(true);
             setRegisteredEmail(emailNorm);
             setRegistrationSuccessMessage(registrationMessage);
-            setPendingVerificationAt(persistPendingEmailVerification(emailNorm));
+            const pendingAt = persistPendingEmailVerification(emailNorm);
+            markClientSignupAwaiting(emailNorm, pendingAt);
+            setPendingVerificationAt(pendingAt);
             return;
           } catch (authErr) {
-            setErrorHint(humanizePostRegistrationAuthError(authErr));
+            setErrorHint(humanizePostRegistrationAuthErrorLocalized(authErr, t));
             return;
           }
         }
         setRegistrationComplete(true);
         setRegisteredEmail(emailNorm);
         setRegistrationSuccessMessage(registrationMessage);
-        setPendingVerificationAt(persistPendingEmailVerification(emailNorm));
+        const pendingAt = persistPendingEmailVerification(emailNorm);
+        markClientSignupAwaiting(emailNorm, pendingAt);
+        setPendingVerificationAt(pendingAt);
       } catch (err) {
         setErrorHint(humanizeAuthNetworkError(err));
       } finally {
@@ -271,9 +324,10 @@ export default function ClientSignupPage() {
       <>
         <LuxuryRegistrationEmailConfirmScreen
           heroTitle={postSignupHeroTitle}
+          hideHero
           backRow={
             <div className="luxury-search-back-row">
-              <Link to="/" className="luxury-search-back">
+              <Link to="/" className="luxury-search-back" onClick={leaveClientSignupConfirm}>
                 <svg className="luxury-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
                   <path
                     d="M15 18l-6-6 6-6"
@@ -305,6 +359,7 @@ export default function ClientSignupPage() {
               audience="client"
               registrationAt={registrationAt}
               thankYouMessage={registrationSuccessMessage}
+              resumeThankYou={restoredSignup.view === "thank-you"}
               onHeroTitleChange={setPostSignupHeroTitle}
               listenForCrossTab={registrationComplete && !hasTokenConfirm}
               surface="registrationTab"
@@ -415,7 +470,10 @@ export default function ClientSignupPage() {
             </label>
             <LuxuryEuropeanContactFields
               countryCode={countryCode}
-              onCountryCodeChange={setCountryCode}
+              onCountryCodeChange={(code) => {
+                setCountryCode(code);
+                setLocaleFromCountryForRegistration(code);
+              }}
               dialCode={phoneDialCode}
               onDialCodeChange={setPhoneDialCode}
               phoneLocal={phoneLocal}

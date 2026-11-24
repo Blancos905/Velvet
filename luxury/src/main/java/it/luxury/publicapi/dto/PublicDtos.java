@@ -61,6 +61,10 @@ public final class PublicDtos {
 		}
 	}
 
+	/** Altra sede pubblica dello stesso salone (stesso studio group), esclusa quella aperta. */
+	public record SiblingLocationDto(String slug, String name, String city, String addressLine) {
+	}
+
 	public record OrganizationDetailDto(
 			UUID id,
 			String slug,
@@ -83,8 +87,14 @@ public final class PublicDtos {
 			/** Inizio pomeriggio (pausa pranzo); {@code null} se fascia continua. */
 			Integer bookingAfternoonStartMinuteOfDay,
 			/** Giorni di apertura prenotabile (`MONDAY` … `SUNDAY`). */
-			List<String> bookingOpenDays) {
-		public static OrganizationDetailDto from(Location loc, String contactEmail, String contactPhone) {
+			List<String> bookingOpenDays,
+			/** Altre sedi Premium dello stesso salone. Vuota se la sede è unica. */
+			List<SiblingLocationDto> siblingLocations) {
+		public static OrganizationDetailDto from(
+				Location loc,
+				String contactEmail,
+				String contactPhone,
+				List<SiblingLocationDto> siblingLocations) {
 			return new OrganizationDetailDto(
 					loc.getId(),
 					loc.getSlug(),
@@ -101,7 +111,8 @@ public final class PublicDtos {
 					loc.getWorkEndMinuteOfDay(),
 					loc.getWorkMorningEndMinuteOfDay(),
 					loc.getWorkAfternoonStartMinuteOfDay(),
-					SalonOpenDays.toApiList(loc.getWorkOpenDaysMask()));
+					SalonOpenDays.toApiList(loc.getWorkOpenDaysMask()),
+					siblingLocations == null ? List.of() : List.copyOf(siblingLocations));
 		}
 	}
 
@@ -156,5 +167,20 @@ public final class PublicDtos {
 			String serviceName,
 			String staffDisplayName,
 			java.time.Instant createdAt) {
+	}
+
+	/**
+	 * Disponibilità tag «Oppure un tocco» nel raggio: query curate con match + servizi listino non già coperti.
+	 */
+	public record QuickSuggestAvailabilityDto(
+			List<String> curatedQueries,
+			List<QuickSuggestExtraTagDto> extras) {
+	}
+
+	/**
+	 * Tag dinamico da listino salone (servizio non presente nei tasti curati home).
+	 * {@code groupId}: {@code parrucchieri} | {@code massaggi-fisio} | {@code estetisti} | {@code altri}.
+	 */
+	public record QuickSuggestExtraTagDto(String label, String q, String groupId) {
 	}
 }

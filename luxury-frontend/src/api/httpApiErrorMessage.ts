@@ -8,7 +8,7 @@ type ApiErrorBody = {
  * Legge il corpo di una risposta errore (JSON {@code ApiError} o testo/HTML) per mostrare un messaggio utile in UI.
  */
 export async function httpApiErrorMessage(res: Response, fallbackPrefix: string): Promise<string> {
-  let msg = `${fallbackPrefix} (${res.status}).`;
+  const msg = `${fallbackPrefix} (${res.status}).`;
   let text: string;
   try {
     text = await res.text();

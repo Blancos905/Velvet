@@ -1,0 +1,36 @@
+---
+description: Avvio locale solo con lo stack Docker di sviluppo. Non avviare Spring sulla 8081 né Vite sulla 5173.
+alwaysApply: true
+---
+
+# Avvio locale — solo Docker
+
+Da novembre 2026 l’ambiente di lavoro è **solo** lo stack Docker di sviluppo. Non avviare il backend nativo né il frontend Vite.
+
+## Come si avvia
+
+```bash
+./scripts/dev-docker.sh -d
+```
+
+| Cosa | Indirizzo |
+|------|-----------|
+| Clienti e ricerca | http://127.0.0.1:8080 |
+| Pannello salone | http://127.0.0.1:8083 |
+| Super admin | http://127.0.0.1:8084 |
+| API | http://127.0.0.1:8082/api/v1/public/health |
+| Database | PostgreSQL del Mac, `localhost:5432`, database e schema `c1luxury` |
+| Redis | container, porta host `6380` |
+
+Verifica: `curl -sf http://127.0.0.1:8082/api/v1/public/health` e `curl -sf -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8080/`.
+
+Compose: `infrastructure/docker-compose.dev.yml`. SMTP: `luxury/spring-dev.local.env`, letto a ogni avvio dell’API.
+
+## Non fare
+
+- Non eseguire `./scripts/dev-backend.sh` (Spring su **8081**) né `./scripts/dev-frontend.sh` (Vite su **5173**).
+- Non tenere Spring sulla 8081 insieme all’API Docker: entrambi usano lo stesso database `c1luxury`.
+- Non aprire il sito su `http://localhost` senza porta: la porta 80 è lo stack di produzione (`docker-compose.prod.yml`) e non va avviato per il lavoro quotidiano.
+- Non usare `localhost:5173`: quella porta è di un altro progetto. I siti Luxury sono `http://127.0.0.1:8080` (clienti), `:8083` (salone) e `:8084` (super admin).
+
+I test (`cd luxury && ./mvnw test`, `./check-all.sh`, `./luxury-audit.sh`) restano comandi di verifica, non un secondo server.

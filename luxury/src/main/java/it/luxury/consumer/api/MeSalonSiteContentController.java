@@ -11,6 +11,7 @@ import it.luxury.studio.dto.SalonSiteContentUpsertRequest;
 import it.luxury.studio.service.SalonSiteContentService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +32,19 @@ public class MeSalonSiteContentController {
 
 	public MeSalonSiteContentController(SalonSiteContentService salonSiteContentService) {
 		this.salonSiteContentService = salonSiteContentService;
+	}
+
+	@GetMapping("/{slug}/{kind}")
+	@Operation(summary = "Legge vetrina/sito della sede (titolare), anche se non è ancora pubblica")
+	@PreAuthorize("hasAuthority('ROLE_OWNER')")
+	public SalonSiteContentDto read(
+			@AuthenticationPrincipal LuxuryUserPrincipal principal,
+			@PathVariable String slug,
+			@PathVariable String kind) {
+		SalonSiteContentKind parsedKind = SalonSiteContentKind.fromToken(kind);
+		return salonSiteContentService.readForOwner(principal, slug, parsedKind)
+				.map(SalonSiteContentDto::from)
+				.orElseGet(() -> new SalonSiteContentDto(parsedKind.token(), null, null));
 	}
 
 	@PutMapping("/{slug}/{kind}")

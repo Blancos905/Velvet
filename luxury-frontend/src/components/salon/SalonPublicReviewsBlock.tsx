@@ -28,7 +28,7 @@ export type SalonPublicReviewsBlockProps = {
 
 export function SalonPublicReviewsBlock({ isLoading, isError, reviews }: SalonPublicReviewsBlockProps) {
   const [expanded, setExpanded] = useState(false);
-  const list = reviews ?? [];
+  const list = useMemo(() => reviews ?? [], [reviews]);
   const stats = useMemo(() => computeReviewStats(list), [list]);
 
   if (isLoading) {

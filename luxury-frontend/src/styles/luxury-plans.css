@@ -541,6 +541,158 @@
   letter-spacing: 0.01em;
 }
 
+.luxury-plan-card__discover {
+  display: block;
+  width: 100%;
+  margin: 0 0 0.75rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(253, 186, 116, 0.45);
+  background: transparent;
+  color: #ffedd5;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.luxury-plan-card__discover:hover {
+  background: rgba(249, 115, 22, 0.16);
+}
+
+.luxury-plus-info-modal {
+  position: relative;
+  isolation: isolate;
+  width: min(540px, 100%);
+  overflow: hidden;
+  border-color: rgba(255, 120, 0, 0.78);
+  background:
+    radial-gradient(120% 70% at 100% -10%, rgba(255, 94, 0, 0.22), transparent 52%),
+    radial-gradient(80% 55% at 0% 110%, rgba(234, 88, 12, 0.16), transparent 58%),
+    linear-gradient(185deg, #1a0c07 0%, #000000 48%, #120c09 100%);
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.48),
+    0 28px 64px rgba(0, 0, 0, 0.58),
+    0 0 0 1px rgba(255, 140, 40, 0.32),
+    0 0 48px rgba(249, 115, 22, 0.28),
+    inset 0 1px 0 rgba(255, 186, 120, 0.28);
+}
+
+.luxury-plus-info-modal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 0%, rgba(255, 237, 213, 0.05) 42%, transparent 68%);
+}
+
+.luxury-plus-info-modal > * {
+  position: relative;
+  z-index: 1;
+}
+
+.luxury-plus-info-modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.luxury-plus-info-modal .luxury-plans-modal__title {
+  background: linear-gradient(105deg, #fffbeb 0%, #fdba74 46%, #fb923c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 16px rgba(249, 115, 22, 0.35));
+}
+
+.luxury-plus-info-modal__lead {
+  margin: 0 0 0.85rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(253, 186, 116, 0.28);
+  background: rgba(255, 247, 237, 0.04);
+  color: rgba(255, 251, 235, 0.88);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.luxury-plus-info-modal__price {
+  display: inline-flex;
+  margin: 0 0 1rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(251, 146, 60, 0.55);
+  background: linear-gradient(180deg, rgba(249, 115, 22, 0.28), rgba(124, 45, 18, 0.35));
+  color: #ffedd5;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0 18px rgba(249, 115, 22, 0.22);
+}
+
+.luxury-plus-info-modal__panel {
+  margin: 0 0 0.75rem;
+  padding: 0.85rem 0.9rem 0.7rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.luxury-plus-info-modal__panel--added {
+  border-color: rgba(251, 146, 60, 0.5);
+  background:
+    radial-gradient(90% 80% at 100% 0%, rgba(249, 115, 22, 0.2), transparent 60%),
+    rgba(40, 16, 6, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 214, 170, 0.12);
+}
+
+.luxury-plus-info-modal__section {
+  margin: 0 0 0.55rem;
+  color: #fff7ed;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.luxury-plus-info-modal__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: rgba(255, 251, 235, 0.86);
+  line-height: 1.45;
+}
+
+.luxury-plus-info-modal__list li {
+  position: relative;
+  margin: 0 0 0.4rem;
+  padding: 0.45rem 0.65rem 0.45rem 1.7rem;
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.luxury-plus-info-modal__list li::before {
+  content: "";
+  position: absolute;
+  left: 0.7rem;
+  top: 0.72rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: #fdba74;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.7);
+}
+
+.luxury-plus-info-modal__list--added li {
+  border: 1px solid rgba(251, 146, 60, 0.28);
+  background: rgba(249, 115, 22, 0.1);
+  font-weight: 650;
+}
+
 .luxury-plan-card__tagline--base .luxury-plan-card__tagline-pill {
   border-color: rgba(34, 197, 94, 0.22);
   background:
@@ -552,20 +704,23 @@
   background: rgba(34, 197, 94, 0.14);
 }
 
-.luxury-plan-card__tagline--premium .luxury-plan-card__tagline-lead {
+.luxury-plan-card__tagline--premium .luxury-plan-card__tagline-lead,
+.luxury-plan-card__tagline--plus .luxury-plan-card__tagline-lead {
   background: linear-gradient(105deg, #fff7ed 0%, #fed7aa 52%, #fdba74 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-.luxury-plan-card__tagline--premium .luxury-plan-card__tagline-pill {
+.luxury-plan-card__tagline--premium .luxury-plan-card__tagline-pill,
+.luxury-plan-card__tagline--plus .luxury-plan-card__tagline-pill {
   border-color: rgba(251, 146, 60, 0.28);
   background:
     linear-gradient(165deg, rgba(249, 115, 22, 0.16) 0%, rgba(12, 10, 9, 0.45) 100%);
 }
 
-.luxury-plan-card__tagline--premium .luxury-plan-card__tagline-pill-icon {
+.luxury-plan-card__tagline--premium .luxury-plan-card__tagline-pill-icon,
+.luxury-plan-card__tagline--plus .luxury-plan-card__tagline-pill-icon {
   color: #fdba74;
   background: rgba(249, 115, 22, 0.18);
   box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
@@ -754,9 +909,13 @@
     }
 
     .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview,
+    .luxury-plan-card[data-tier="PLUS"]:hover .luxury-plan-premium-preview,
     .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__chip,
+    .luxury-plan-card[data-tier="PLUS"]:hover .luxury-plan-premium-preview__chip,
     .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__item,
-    .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__icon {
+    .luxury-plan-card[data-tier="PLUS"]:hover .luxury-plan-premium-preview__item,
+    .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__icon,
+    .luxury-plan-card[data-tier="PLUS"]:hover .luxury-plan-premium-preview__icon {
       transform: none;
     }
   }
@@ -817,7 +976,8 @@
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
-.luxury-plan-card[data-tier="PREMIUM"] .luxury-plan-card__cta-plan {
+.luxury-plan-card[data-tier="PREMIUM"] .luxury-plan-card__cta-plan,
+.luxury-plan-card[data-tier="PLUS"] .luxury-plan-card__cta-plan {
   background: rgba(0, 0, 0, 0.22);
   box-shadow:
     inset 0 1px 0 rgba(255, 220, 180, 0.22),
@@ -1597,9 +1757,11 @@
 }
 
 @media (max-width: 520px) {
-  .luxury-plan-card--featured::before {
+  .luxury-plan-card--featured::before,
+  .luxury-plan-card[data-tier="PLUS"] .luxury-plan-card__trial-badge {
     position: static;
     display: inline-block;
+    align-self: flex-start;
     margin-bottom: 8px;
   }
 
@@ -1618,10 +1780,93 @@
   text-decoration: none;
 }
 
+/* Fine registrazione: colonna dall'alto. Lo scroll-anchoring non deve tenere il riquadro basso e tagliare il titolo. */
+.luxury-page-main.luxury-registration-confirm-page {
+  align-self: flex-start;
+  width: 100%;
+  overflow-anchor: none;
+}
+
+/* Link email: Registrati, Diventa partner, Accedi e il resto di header e footer non si cliccano. */
+.luxury-site-header.luxury-chrome--email-link-locked,
+.luxury-site-footer.luxury-chrome--email-link-locked {
+  opacity: 0.42;
+  filter: grayscale(0.45);
+  cursor: default;
+}
+
+.luxury-site-header.luxury-chrome--email-link-locked a,
+.luxury-site-header.luxury-chrome--email-link-locked button,
+.luxury-site-footer.luxury-chrome--email-link-locked a,
+.luxury-site-footer.luxury-chrome--email-link-locked button {
+  cursor: default;
+}
+
+/* Pagina del link email: niente velo a tutto schermo, altrimenti copre header e footer. */
+.luxury-page-main.luxury-email-link-page {
+  z-index: 0;
+}
+
+.luxury-page-main.luxury-email-link-page::before,
+.luxury-page-main.luxury-email-link-page::after {
+  content: none;
+  display: none;
+}
+
+.luxury-registration-confirm-page__sr-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.luxury-registration-confirm-page .luxury-search-back-row,
+.luxury-registration-confirm-page .luxury-search-hero,
+.luxury-registration-confirm-page .luxury-plans-wrap,
+.luxury-registration-confirm-page .luxury-email-confirm-box {
+  overflow-anchor: none;
+}
+
+.luxury-plans-page .luxury-search-hero {
+  margin: 0 0 1.15rem;
+  padding: clamp(1.15rem, 3vw, 1.65rem) clamp(1.1rem, 3.2vw, 1.6rem) clamp(1.05rem, 2.4vw, 1.35rem);
+  border-radius: 1.2rem;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, transparent 42%),
+    radial-gradient(ellipse 90% 80% at 100% -10%, rgba(249, 115, 22, 0.18), transparent 52%),
+    linear-gradient(165deg, #101010 0%, #0a0a0a 48%, #070707 100%);
+  border: 2px solid #000000;
+  box-shadow:
+    0 1px 0 rgba(255, 247, 237, 0.07) inset,
+    inset 4px 0 0 rgba(249, 115, 22, 0.72),
+    0 4px 0 rgba(0, 0, 0, 0.55),
+    0 22px 48px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(251, 146, 60, 0.28);
+}
+
+.luxury-plans-page .luxury-search-hero__glow {
+  inset: -30% -10% auto;
+  height: 68%;
+  opacity: 0.45;
+  background: radial-gradient(ellipse 70% 80% at 18% 0%, rgba(249, 115, 22, 0.42), transparent 68%);
+}
+
 .luxury-plans-page .luxury-search-hero .saloni-luxury-mark {
   position: relative;
   z-index: 1;
   margin: 0 0 clamp(0.65rem, 2vw, 0.9rem);
+}
+
+.luxury-plans-page .luxury-search-hero .luxury-page-title {
+  color: #fffbeb;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
 }
 
 .luxury-plans-page__kicker {
@@ -1633,10 +1878,8 @@
   font-style: italic;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #0a0a0a;
-  text-shadow:
-    0 1px 0 rgba(255, 251, 235, 0.35),
-    0 0 1px rgba(255, 251, 235, 0.2);
+  color: #fdba74;
+  text-shadow: 0 0 18px rgba(249, 115, 22, 0.28);
 }
 
 .luxury-plans-page__lead-box {
@@ -1734,44 +1977,36 @@
   color: rgba(254, 243, 199, 0.82);
 }
 
-.luxury-plans-page__lead-note {
-  position: relative;
-  z-index: 1;
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  margin: 0.65rem 0 0;
-  padding: 0.38rem 0.72rem;
-  border-radius: 999px;
-  font-size: 0.76rem;
-  font-weight: 700;
-  line-height: 1.4;
-  color: rgba(67, 20, 7, 0.82);
-  background: rgba(255, 255, 255, 0.42);
-  border: 1px solid rgba(10, 10, 10, 0.12);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) inset;
-}
-
-.luxury-plans-page__lead-note::before {
-  content: "";
-  flex-shrink: 0;
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
-}
-
 /* Badge featured Premium: enfatizza la prova gratuita */
-.luxury-plan-card[data-tier="PREMIUM"].luxury-plan-card--featured::before {
-  content: "60 giorni gratis";
+.luxury-plan-card[data-tier="PREMIUM"].luxury-plan-card--featured::before,
+.luxury-plan-card[data-tier="PLUS"] .luxury-plan-card__trial-badge {
+  content: "30 giorni gratis";
   font-size: 0.62rem;
   letter-spacing: 0.07em;
 }
 
-.luxury-plan-card[data-tier="PREMIUM"] .luxury-plan-trial-panel {
+.luxury-plan-card[data-tier="PLUS"] .luxury-plan-card__trial-badge {
+  content: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: linear-gradient(165deg, #fdba74, #fb923c 55%, #ea580c);
+  color: #0a0a0a;
+  border: 1px solid #0a0a0a;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    0 6px 18px rgba(243, 112, 33, 0.35);
+}
+
+.luxury-plan-card[data-tier="PREMIUM"] .luxury-plan-trial-panel,
+.luxury-plan-card[data-tier="PLUS"] .luxury-plan-trial-panel {
   margin: 0.25rem 0 0.75rem;
 }
 
@@ -2105,7 +2340,7 @@
 .luxury-native-app .luxury-plans-page .luxury-search-hero {
   align-items: flex-start;
   text-align: left;
-  padding: 0;
+  padding: 0.95rem 0.9rem 0.85rem;
   margin: 0 0 0.65rem;
 }
 
@@ -2145,6 +2380,14 @@
 .luxury-plans-page .luxury-plans-grid {
   position: relative;
   z-index: 1;
+  width: min(100%, 32rem);
+  margin-inline: auto;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.luxury-plans-page .luxury-plans-grid--with-plus {
+  width: min(100%, 68rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 }
 
 .luxury-plans-page .luxury-alert {
@@ -2210,7 +2453,8 @@
   text-shadow: 0 0 28px rgba(249, 115, 22, 0.22);
 }
 
-.luxury-plan-card[data-tier="PREMIUM"] .luxury-plan-card__tagline {
+.luxury-plan-card[data-tier="PREMIUM"] .luxury-plan-card__tagline,
+.luxury-plan-card[data-tier="PLUS"] .luxury-plan-card__tagline {
   margin-bottom: 0.75rem;
   min-height: 0;
   font-size: 0.84rem;
@@ -2254,6 +2498,37 @@
     border-color 0.25s ease,
     background 0.28s ease,
     box-shadow 0.32s ease;
+}
+
+.luxury-plan-premium-preview__extra {
+  position: relative;
+  margin: 0.85rem 0 0;
+  padding: 0.85rem 0.95rem 0.9rem 0.95rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(251, 146, 60, 0.62);
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(249, 115, 22, 0.28), transparent 58%),
+    linear-gradient(165deg, rgba(255, 237, 213, 0.1) 0%, rgba(28, 10, 6, 0.72) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 237, 213, 0.2),
+    0 0 22px rgba(249, 115, 22, 0.2);
+  color: #fff7ed;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 18px rgba(249, 115, 22, 0.28);
+}
+
+.luxury-plan-premium-preview__extra::before {
+  content: "";
+  display: block;
+  width: 2.4rem;
+  height: 3px;
+  margin-bottom: 0.55rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fff7ed, #fb923c 55%, transparent);
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.65);
 }
 
 .luxury-plan-premium-preview__grid {
@@ -2333,7 +2608,8 @@
 }
 
 @media (hover: hover) {
-  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview {
+  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview,
+  .luxury-plan-card[data-tier="PLUS"]:hover .luxury-plan-premium-preview {
     border-color: rgba(253, 186, 116, 0.42);
     transform: translateY(-2px);
     box-shadow:
@@ -2342,38 +2618,45 @@
       0 0 32px rgba(249, 115, 22, 0.16);
   }
 
-  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__chip {
+  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__chip,
+  .luxury-plan-card[data-tier="PLUS"]:hover .luxury-plan-premium-preview__chip {
     transform: scale(1.04);
     border-color: rgba(253, 186, 116, 0.5);
     box-shadow: 0 0 16px rgba(249, 115, 22, 0.18);
   }
 
-  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__item {
+  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__item,
+  .luxury-plan-card[data-tier="PLUS"]:hover .luxury-plan-premium-preview__item {
     border-color: rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.28);
   }
 
-  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__item:nth-child(1) {
+  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__item:nth-child(1),
+  .luxury-plan-card[data-tier="PLUS"]:hover .luxury-plan-premium-preview__item:nth-child(1) {
     transform: translateY(-1px);
     transition-delay: 0s;
   }
 
-  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__item:nth-child(2) {
+  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__item:nth-child(2),
+  .luxury-plan-card[data-tier="PLUS"]:hover .luxury-plan-premium-preview__item:nth-child(2) {
     transform: translateY(-1px);
     transition-delay: 0.03s;
   }
 
-  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__item:nth-child(3) {
+  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__item:nth-child(3),
+  .luxury-plan-card[data-tier="PLUS"]:hover .luxury-plan-premium-preview__item:nth-child(3) {
     transform: translateY(-1px);
     transition-delay: 0.06s;
   }
 
-  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__item:nth-child(4) {
+  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__item:nth-child(4),
+  .luxury-plan-card[data-tier="PLUS"]:hover .luxury-plan-premium-preview__item:nth-child(4) {
     transform: translateY(-1px);
     transition-delay: 0.09s;
   }
 
-  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__icon {
+  .luxury-plan-card[data-tier="PREMIUM"]:hover .luxury-plan-premium-preview__icon,
+  .luxury-plan-card[data-tier="PLUS"]:hover .luxury-plan-premium-preview__icon {
     transform: scale(1.06);
     background: rgba(249, 115, 22, 0.28);
     box-shadow: 0 0 12px rgba(249, 115, 22, 0.2);

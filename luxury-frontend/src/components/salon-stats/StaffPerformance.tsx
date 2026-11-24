@@ -69,7 +69,7 @@ export default function StaffPerformance({ rows, loading }: StaffPerformanceProp
           ))}
         </ul>
       )}
-      <Link to="/account/salone/staff" className="luxury-stats-pro-link luxury-stats-pro-link--dark">
+      <Link to="/salone/staff" className="luxury-stats-pro-link luxury-stats-pro-link--dark">
         Gestisci staff →
       </Link>
     </section>

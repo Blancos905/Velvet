@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = "luxury.billing.enabled=false")
 @AutoConfigureMockMvc
 class ConsumerRegistrationProvisioningIntegrationTest {
 
@@ -44,6 +44,31 @@ class ConsumerRegistrationProvisioningIntegrationTest {
 	private ConsumerProfileRepository consumerProfileRepository;
 
 	@Test
+	void basePlanRegistrationIsRejected() throws Exception {
+		Map<String, Object> payload = new LinkedHashMap<>();
+		payload.put("email", "owner-base-" + UUID.randomUUID() + "@example.com");
+		payload.put("password", "Password1!");
+		payload.put("firstName", "Luigi");
+		payload.put("lastName", "Verdi");
+		payload.put("salonName", "Salone Rifiutato");
+		payload.put("planTier", "BASE");
+		payload.put("salonAddressLine1", "Via QA 1");
+		payload.put("salonPostalCode", "20121");
+		payload.put("salonCity", "Milano");
+		payload.put("salonProvince", "MI");
+		payload.put("salonCountry", "IT");
+		payload.put("salonBusinessTypes", List.of("HAIR"));
+		payload.put("salonClientGenders", List.of("FEMALE"));
+		payload.put("acceptedTermsAndPrivacy", true);
+		payload.put("acceptedDataProcessingAgreement", true);
+
+		mockMvc.perform(post("/api/v1/public/consumer-registration")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(payload)))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
 	void partnerRegistrationCreatesLocationSearchableByName() throws Exception {
 		long before = locationRepository.count();
 		String email = "owner-" + UUID.randomUUID() + "@example.com";
@@ -56,7 +81,7 @@ class ConsumerRegistrationProvisioningIntegrationTest {
 		payload.put("lastName", "Verdi");
 		payload.put("phone", "");
 		payload.put("salonName", salonName);
-		payload.put("planTier", "BASE");
+		payload.put("planTier", "PREMIUM");
 		payload.put("salonAddressLine1", "Via QA 1");
 		payload.put("salonPostalCode", "20121");
 		payload.put("salonCity", "Milano");
@@ -79,9 +104,63 @@ class ConsumerRegistrationProvisioningIntegrationTest {
 		assertThat(hits.stream().filter(l -> l.getName().equals(salonName)).findFirst())
 				.hasValueSatisfying(l -> assertThat(l.getSalonBusinessTypes()).isEqualTo("BEAUTY,HAIR"));
 		assertThat(studioGroupRepository.findByOwnerEmailIgnoreCase(email))
-				.hasValueSatisfying(g -> assertThat(g.getOwnerAuthSub()).isNotNull().isNotBlank());
+				.hasValueSatisfying(g -> {
+					assertThat(g.getOwnerAuthSub()).isNotNull().isNotBlank();
+					assertThat(g.getPlanTier()).isEqualTo("PREMIUM");
+				});
 		assertThat(consumerProfileRepository.findByEmailIgnoreCase(email))
 				.hasValueSatisfying(p -> assertThat(p.getDisplayName()).isEqualTo("Luigi Verdi"));
+	}
+
+	@Test
+	void partnerRegistrationCreatesOneLocationPerSeat() throws Exception {
+		long before = locationRepository.count();
+		String email = "owner-multi-" + UUID.randomUUID() + "@example.com";
+		String salonName = "Salone Multisede QA " + UUID.randomUUID().toString().substring(0, 8);
+
+		Map<String, Object> milano = new LinkedHashMap<>();
+		milano.put("addressLine1", "Via Roma 1");
+		milano.put("postalCode", "20121");
+		milano.put("city", "Milano");
+		milano.put("province", "MI");
+		milano.put("country", "IT");
+		Map<String, Object> roma = new LinkedHashMap<>();
+		roma.put("addressLine1", "Via del Corso 2");
+		roma.put("postalCode", "00186");
+		roma.put("city", "Roma");
+		roma.put("province", "RM");
+		roma.put("country", "IT");
+
+		Map<String, Object> payload = new LinkedHashMap<>();
+		payload.put("email", email);
+		payload.put("password", "Password1!");
+		payload.put("firstName", "Chiara");
+		payload.put("lastName", "Neri");
+		payload.put("salonName", salonName);
+		payload.put("planTier", "PREMIUM");
+		payload.put("salonAddressLine1", "Via Roma 1");
+		payload.put("salonPostalCode", "20121");
+		payload.put("salonCity", "Milano");
+		payload.put("salonProvince", "MI");
+		payload.put("salonCountry", "IT");
+		payload.put("salonLocations", List.of(milano, roma));
+		payload.put("salonBusinessTypes", List.of("HAIR"));
+		payload.put("salonClientGenders", List.of("FEMALE"));
+		payload.put("acceptedTermsAndPrivacy", true);
+		payload.put("acceptedDataProcessingAgreement", true);
+
+		mockMvc.perform(post("/api/v1/public/consumer-registration")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(payload)))
+				.andExpect(status().isCreated());
+
+		assertThat(locationRepository.count()).isEqualTo(before + 2);
+		assertThat(studioGroupRepository.findByOwnerEmailIgnoreCase(email)).hasValueSatisfying(group -> {
+			var locations = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId());
+			assertThat(locations).hasSize(2);
+			assertThat(locations).anyMatch(l -> "Milano".equals(l.getCity()));
+			assertThat(locations).anyMatch(l -> "Roma".equals(l.getCity()));
+		});
 	}
 
 	@Test
@@ -100,7 +179,7 @@ class ConsumerRegistrationProvisioningIntegrationTest {
 		payload.put("firstName", "Anna");
 		payload.put("lastName", "Cliente");
 		payload.put("salonName", salonName);
-		payload.put("planTier", "BASE");
+		payload.put("planTier", "PREMIUM");
 		payload.put("salonAddressLine1", "Via Upgrade 1");
 		payload.put("salonPostalCode", "20121");
 		payload.put("salonCity", "Milano");

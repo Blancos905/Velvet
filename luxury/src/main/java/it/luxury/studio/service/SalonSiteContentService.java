@@ -34,10 +34,23 @@ public class SalonSiteContentService {
 		this.salonSiteContentRepository = salonSiteContentRepository;
 	}
 
-	/** Lettura pubblica: vuoto se la sede non ha ancora salvato contenuto per questo tipo. */
+	/** Lettura pubblica: vuoto se la sede non ha ancora salvato contenuto, o se non è visibile ai clienti. */
 	@Transactional(readOnly = true)
 	public Optional<SalonSiteContent> readPublic(String slug, SalonSiteContentKind kind) {
 		String normalizedSlug = normalizeSlug(slug);
+		Optional<Location> location = locationRepository.findBySlug(normalizedSlug);
+		if (location.isPresent() && !location.get().isVisibleToClients()) {
+			return Optional.empty();
+		}
+		return salonSiteContentRepository.findBySlugAndKind(normalizedSlug, kind);
+	}
+
+	/** Lettura titolare: la vetrina resta disponibile in anteprima anche se i clienti non la vedono. */
+	@Transactional(readOnly = true)
+	public Optional<SalonSiteContent> readForOwner(
+			LuxuryUserPrincipal principal, String slug, SalonSiteContentKind kind) {
+		String normalizedSlug = normalizeSlug(slug);
+		assertOwnerLocation(principal, normalizedSlug);
 		return salonSiteContentRepository.findBySlugAndKind(normalizedSlug, kind);
 	}
 
@@ -46,6 +59,17 @@ public class SalonSiteContentService {
 	public SalonSiteContent upsertForOwner(
 			LuxuryUserPrincipal principal, String slug, SalonSiteContentKind kind, String payload) {
 		String normalizedSlug = normalizeSlug(slug);
+		assertOwnerLocation(principal, normalizedSlug);
+		SalonSiteContent content = salonSiteContentRepository.findBySlugAndKind(normalizedSlug, kind)
+				.map(existing -> {
+					existing.updatePayload(payload);
+					return existing;
+				})
+				.orElseGet(() -> new SalonSiteContent(normalizedSlug, kind, payload));
+		return salonSiteContentRepository.save(content);
+	}
+
+	private void assertOwnerLocation(LuxuryUserPrincipal principal, String normalizedSlug) {
 		StudioGroup group = studioGroupOwnerResolver.resolveStudioGroupForOwner(principal)
 				.orElseThrow(() -> new BusinessException(
 						HttpStatus.NOT_FOUND,
@@ -62,13 +86,6 @@ public class SalonSiteContentService {
 					"FORBIDDEN",
 					"Questa sede non appartiene al tuo account.");
 		}
-		SalonSiteContent content = salonSiteContentRepository.findBySlugAndKind(normalizedSlug, kind)
-				.map(existing -> {
-					existing.updatePayload(payload);
-					return existing;
-				})
-				.orElseGet(() -> new SalonSiteContent(normalizedSlug, kind, payload));
-		return salonSiteContentRepository.save(content);
 	}
 
 	private static String normalizeSlug(String slug) {

@@ -6,10 +6,16 @@ const FEATURE_ICONS: LucideIcon[] = [Globe, Bell, Users, BarChart2];
 
 const FEATURE_LABELS = ["Brand & vetrina", "Notifiche", "Staff & agenda", "Statistiche"] as const;
 
+type Props = {
+  /** Riga in più, solo sulla card Plus. La card Premium non la passa. */
+  extraNote?: string;
+};
+
 /**
- * Anteprima statica (pagina `/piani`, card Premium) allineata ai blocchi della panoramica salone Premium.
+ * Anteprima statica (pagina `/piani`) allineata ai blocchi della panoramica salone.
+ * Le quattro aree restano quelle Premium. `extraNote` aggiunge solo il vantaggio Plus.
  */
-export function SalonPremiumPlanCardPreview() {
+export function SalonPremiumPlanCardPreview({ extraNote }: Props = {}) {
   return (
     <div className="luxury-plan-premium-preview">
       <header className="luxury-plan-premium-preview__head">
@@ -35,6 +41,7 @@ export function SalonPremiumPlanCardPreview() {
           );
         })}
       </ul>
+      {extraNote ? <p className="luxury-plan-premium-preview__extra">{extraNote}</p> : null}
     </div>
   );
 }

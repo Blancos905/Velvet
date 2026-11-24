@@ -3,13 +3,11 @@ package it.luxury.billing.service;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.param.CustomerCreateParams;
-import com.stripe.param.CustomerTaxIdCreateParams;
 import com.stripe.param.CustomerUpdateParams;
 import it.luxury.billing.domain.BillingAccount;
 import it.luxury.billing.domain.BillingAccountRepository;
 import it.luxury.billing.domain.SalonBillingProfile;
 import it.luxury.billing.dto.RegistrationSalonBillingDetails;
-import it.luxury.billing.validation.SalonBillingProfileValidator;
 import it.luxury.consumer.domain.PendingRegistration;
 import it.luxury.consumer.domain.PendingRegistrationRepository;
 import it.luxury.consumer.service.PendingSalonRegistrationPayload;
@@ -90,7 +88,6 @@ public class StripeBillingCustomerSyncService {
 		try {
 			Customer customer = stripeClient.customers().create(buildCreateParams(group, ownerProfile, billingProfile));
 			billingAccountRepository.save(new BillingAccount(group, customer.getId()));
-			syncTaxId(customer.getId(), billingProfile);
 			return customer.getId();
 		}
 		catch (StripeException ex) {
@@ -107,7 +104,6 @@ public class StripeBillingCustomerSyncService {
 
 	private void updateCustomer(String customerId, SalonBillingProfile profile) throws StripeException {
 		stripeClient.customers().update(customerId, buildUpdateParams(profile));
-		syncTaxId(customerId, profile);
 	}
 
 	private CustomerCreateParams buildCreateParamsForPending(
@@ -213,28 +209,6 @@ public class StripeBillingCustomerSyncService {
 			metadata.put("luxury_billing_subject_type", profile.getSubjectType());
 		}
 		return metadata;
-	}
-
-	private void syncTaxId(String customerId, SalonBillingProfile profile) {
-		String euVat = SalonBillingProfileValidator.stripeEuVatValue(profile);
-		if (euVat == null) {
-			return;
-		}
-		try {
-			stripeClient.customers().taxIds().create(
-					customerId,
-					CustomerTaxIdCreateParams.builder()
-							.setType(CustomerTaxIdCreateParams.Type.EU_VAT)
-							.setValue(euVat)
-							.build());
-		}
-		catch (StripeException ex) {
-			String msg = ex.getMessage() != null ? ex.getMessage().toLowerCase() : "";
-			if (msg.contains("already") || msg.contains("duplicate")) {
-				return;
-			}
-			LOG.debug("Tax ID Stripe non sincronizzato per customer {}: {}", customerId, ex.getMessage());
-		}
 	}
 
 	private static String stripeErrorSummary(StripeException ex) {

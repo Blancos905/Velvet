@@ -1,0 +1,41 @@
+---
+description: Prenotazione online solo profilo cliente; titolare/staff usano agenda salone, mai flusso B2C
+globs: luxury-frontend/src/**/*{Salon,Booking,Appointment,Prenot*,PendingBooking}*,luxury-frontend/src/lib/luxuryConsumerBooking.ts,luxury/src/main/java/it/luxury/consumer/**,luxury/src/main/java/it/luxury/appointment/**
+alwaysApply: false
+---
+
+# Prenotazione: profilo cliente vs profilo salone
+
+## Regola prodotto (non invertire)
+
+| Profilo JWT | Prenotazione online pubblica | Gestione appuntamenti |
+|-------------|------------------------------|------------------------|
+| `CLIENT` (solo cliente) | Sì — scheda salone, `POST /api/v1/me/appointments` | `/account/prenotazioni` (liste cliente) |
+| `OWNER` (titolare) | **No** | `/account/prenotazioni` → agenda salone; inserimento manuale da agenda |
+| `STAFF` (operatore) | **No** | Agenda operatore assegnata |
+
+Il titolare **non** prenota con il profilo salone. Gli appuntamenti online li creano solo utenti registrati come **clienti**.
+
+## Backend
+
+- Gate unico: `ConsumerB2CEligibility.assertMayActAsConsumer(ConsumerProfile)` — richiede `CLIENT`, rifiuta `OWNER` e `STAFF`.
+- Usarlo in: `AppointmentBookingService.createForConsumer`, `SalonClientMembershipService.becomeClient`.
+- `POST /api/v1/me/appointments` → `@PreAuthorize("hasAuthority('ROLE_CLIENT')")`.
+- `PUT /api/v1/me/salon-clients/{id}` (Diventa cliente) → solo `ROLE_CLIENT`. `leave` può restare anche per `OWNER` (pulizia legami legacy).
+- Inserimento da titolare: `POST /api/v1/me/salon/appointments` + `SalonAgendaBookClientDialog` (cliente in anagrafica), **non** il flusso pubblico.
+
+## Frontend
+
+- Helper condiviso: `canBookOnlineAsConsumer(isSalonTitolare, isSalonStaff)` in `luxury-frontend/src/lib/luxuryConsumerBooking.ts`.
+- Se loggato come titolare/staff sulla scheda salone:
+  - **non** mostrare calendario/slot/operatori del flusso B2C;
+  - **non** passare `onBookService` / `onSelectService` a `SalonPublicShowcase`;
+  - mostrare messaggio + link a `/account/prenotazioni` (agenda);
+  - **non** mostrare «Diventa cliente di questo salone» (eccezione: consentire solo `leave` se legame legacy già presente).
+- `PendingBookingResume`: scarta prenotazioni in sospeso per titolare/staff.
+
+## Errori da evitare
+
+- Riaprire `becomeClient` o prenotazione online al titolare «per comodità».
+- Duplicare controlli ruolo sparsi: estendere `ConsumerB2CEligibility` / `canBookOnlineAsConsumer`.
+- Confondere `/account/prenotazioni`: per cliente = «Le mie prenotazioni»; per titolare = «Agenda» (`PrenotazioniStaffPickPage`).

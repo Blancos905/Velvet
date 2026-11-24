@@ -14,6 +14,9 @@ public class LuxuryMailProperties {
 
 	private String fromDisplayName = "Saloni Luxury";
 
+	/** Destinatario email interne per form Assistenza area account. */
+	private String supportNotificationTo = "assistenza@saloniluxury.it";
+
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -36,5 +39,15 @@ public class LuxuryMailProperties {
 
 	public void setFromDisplayName(String fromDisplayName) {
 		this.fromDisplayName = fromDisplayName;
+	}
+
+	public String getSupportNotificationTo() {
+		return supportNotificationTo == null || supportNotificationTo.isBlank()
+				? "assistenza@saloniluxury.it"
+				: supportNotificationTo.trim();
+	}
+
+	public void setSupportNotificationTo(String supportNotificationTo) {
+		this.supportNotificationTo = supportNotificationTo;
 	}
 }

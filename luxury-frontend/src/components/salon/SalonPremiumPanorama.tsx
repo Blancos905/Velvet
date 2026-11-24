@@ -19,6 +19,7 @@ import {
   SALON_PREMIUM_PANORAMA_PLAN_SUBLINE,
   SALON_PREMIUM_PANORAMA_STEPS,
 } from "../../data/salonPremiumPanoramaContent";
+import { useLuxuryT } from "../../i18n/useLuxuryLocale";
 import { SaloniLuxuryLogoMark } from "../SaloniLuxuryLogoMark";
 import "../../styles/salon-premium-panorama.css";
 
@@ -249,6 +250,7 @@ export function SalonPremiumPanorama({
   salonSide = false,
   checklistStorageKey = CHECKLIST_STORAGE_KEY,
 }: SalonPremiumPanoramaProps) {
+  const t = useLuxuryT();
   const [done, setDone] = useState<Set<string>>(() => readStoredChecklist(checklistStorageKey));
   const [celebrated, setCelebrated] = useState(false);
   const [openFeature, setOpenFeature] = useState<number | null>(null);
@@ -338,7 +340,7 @@ export function SalonPremiumPanorama({
                   to="/piani"
                   className="salon-premium-panorama__cta salon-premium-panorama__cta--plan-pick inline-flex w-full justify-center py-3 text-sm font-extrabold sm:py-3.5 sm:text-base"
                 >
-                  Scegli il tuo piano
+                  {t("header.partnerProceed")}
                   <ArrowRight className="relative z-[1] h-3.5 w-3.5 shrink-0" aria-hidden />
                 </Link>
               </section>

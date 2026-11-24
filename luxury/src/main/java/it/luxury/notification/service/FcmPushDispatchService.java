@@ -103,7 +103,7 @@ public class FcmPushDispatchService {
 		NotificationType type = n.getType();
 		Map<String, String> data = pushData(n);
 		switch (type) {
-			case BOOKING_CREATED_FOR_SALON, BOOKING_CANCELLED_BY_CONSUMER, REVIEW_RECEIVED_FOR_SALON -> {
+			case BOOKING_CREATED_FOR_SALON, BOOKING_CANCELLED_BY_CONSUMER, REVIEW_RECEIVED_FOR_SALON, BOOKING_UPDATED -> {
 				dispatchSalonSidePushSplit(appointment, ownerTitle, ownerBody, operatorTitle, operatorBody, data);
 			}
 			case BOOKING_RESCHEDULED_BY_CONSUMER -> {
@@ -262,6 +262,9 @@ public class FcmPushDispatchService {
 			if (!operatorName.isEmpty()) {
 				data.put("operatorName", operatorName);
 			}
+		}
+		if (appointment != null && appointment.getStatus() != null) {
+			data.put("appointmentStatus", appointment.getStatus().name());
 		}
 		return data;
 	}

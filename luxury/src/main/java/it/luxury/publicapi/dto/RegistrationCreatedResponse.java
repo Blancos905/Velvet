@@ -6,13 +6,18 @@ package it.luxury.publicapi.dto;
 public record RegistrationCreatedResponse(
 		String message,
 		boolean emailVerificationRequired,
-		String premiumCheckoutToken) {
+		String premiumCheckoutToken,
+		String pollSecret) {
+
+	public RegistrationCreatedResponse(String message, boolean emailVerificationRequired, String premiumCheckoutToken) {
+		this(message, emailVerificationRequired, premiumCheckoutToken, null);
+	}
 
 	public RegistrationCreatedResponse(String message, boolean emailVerificationRequired) {
-		this(message, emailVerificationRequired, null);
+		this(message, emailVerificationRequired, null, null);
 	}
 
 	public RegistrationCreatedResponse(String message) {
-		this(message, true, null);
+		this(message, true, null, null);
 	}
 }

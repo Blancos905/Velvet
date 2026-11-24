@@ -121,7 +121,7 @@ export default function DevSeedSalonShowcasePage() {
         <Link className="luxury-btn luxury-btn--secondary" to={`/s/${encodeURIComponent(slug)}/il-tuo-salone`}>
           Apri Il tuo sito
         </Link>
-        <Link className="luxury-btn luxury-btn--secondary" to="/account/salone/tuo-salone">
+        <Link className="luxury-btn luxury-btn--secondary" to="/salone/tuo-salone">
           Editor account
         </Link>
       </div>

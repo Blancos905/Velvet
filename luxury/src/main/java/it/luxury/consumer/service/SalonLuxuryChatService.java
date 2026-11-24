@@ -102,9 +102,8 @@ public class SalonLuxuryChatService {
 		SalonClient sc = loadSalonClient(salonClientId);
 		UUID threadStaffOperatorId = resolveThreadStaffOperatorId(principal, sc, requestedStaffOperatorId);
 		assertReadAccess(principal, sc, threadStaffOperatorId);
-		boolean viewerIsClient = canAccessAsLinkedConsumer(principal, sc)
-				&& consumerCanAccessStaffThread(principal, sc, threadStaffOperatorId);
-		Instant now = Instant.now();
+			boolean viewerIsClient = viewerUsesClientThread(principal, sc, threadStaffOperatorId);
+			Instant now = Instant.now();
 		SalonLuxuryChatReadState state = findOrCreateReadState(sc, threadStaffOperatorId);
 		if (viewerIsClient) {
 			state.setClearedAtClient(now);
@@ -153,21 +152,15 @@ public class SalonLuxuryChatService {
 		for (ChatThreadRef thread : threads) {
 			SalonClient sc = thread.salonClient();
 			UUID staffOperatorId = thread.staffOperatorId();
-			int unread = unreadCountForViewer(principal, sc, staffOperatorId);
-			Instant clearedAt = clearedWatermarkForViewer(principal, sc, staffOperatorId);
-			List<SalonLuxuryChatMessage> messages = chatMessageRepository.findThreadMessages(sc.getId(), staffOperatorId);
-			Instant lastAt = null;
-			String lastSender = null;
-			String preview = "";
-			SalonLuxuryChatMessage lastVisible = null;
-			for (int i = messages.size() - 1; i >= 0; i--) {
-				SalonLuxuryChatMessage m = messages.get(i);
-				if (clearedAt == null || m.getCreatedAt().isAfter(clearedAt)) {
-					lastVisible = m;
-					break;
-				}
-			}
-			if (lastVisible != null) {
+				int unread = unreadCountForViewer(principal, sc, staffOperatorId);
+				Instant clearedAt = clearedWatermarkForViewer(principal, sc, staffOperatorId);
+				SalonLuxuryChatMessage lastVisible = chatMessageRepository
+						.findLatestThreadMessage(sc.getId(), staffOperatorId, clearedAt)
+						.orElse(null);
+				Instant lastAt = null;
+				String lastSender = null;
+				String preview = "";
+				if (lastVisible != null) {
 				lastAt = lastVisible.getCreatedAt();
 				lastSender = lastVisible.getSender() == SalonLuxuryChatSender.CLIENT ? "CLIENT" : "OWNER";
 				preview = truncatePreview(lastVisible.getBody());
@@ -188,11 +181,25 @@ public class SalonLuxuryChatService {
 					.toList();
 		}
 		if (principal.hasAppRole("STAFF")) {
-			return resolveStaffOperator(principal)
-					.map(op -> listBookedSalonClientsForStaffOperator(op, xLocationId).stream()
-							.map(sc -> new ChatThreadRef(sc, op.getId()))
-							.toList())
-					.orElseGet(List::of);
+			List<ChatThreadRef> out = new ArrayList<>();
+			Optional<StaffOperator> linked = resolveStaffOperator(principal);
+			linked.ifPresent(op -> out.addAll(listBookedSalonClientsForStaffOperator(op, xLocationId).stream()
+					.map(sc -> new ChatThreadRef(sc, op.getId()))
+					.toList()));
+			ConsumerProfile me = consumerProfileService.requireActiveProfile(principal);
+			UUID ownLocationId = linked.map(op -> op.getLocation().getId()).orElse(null);
+			for (SalonClient sc : salonClientRepository.findByConsumerProfile_IdOrderByCreatedAtDesc(me.getId())) {
+				if (ownLocationId != null && ownLocationId.equals(sc.getLocation().getId())) {
+					continue;
+				}
+				out.add(new ChatThreadRef(sc, null));
+				for (UUID staffOperatorId : consumerStaffThreadOperatorIds(sc)) {
+					if (consumerCanAccessStaffThread(principal, sc, staffOperatorId)) {
+						out.add(new ChatThreadRef(sc, staffOperatorId));
+					}
+				}
+			}
+			return out;
 		}
 		ConsumerProfile me = consumerProfileService.requireActiveProfile(principal);
 		List<SalonClient> memberships = salonClientRepository.findByConsumerProfile_IdOrderByCreatedAtDesc(me.getId());
@@ -240,8 +247,32 @@ public class SalonLuxuryChatService {
 		return locs.get(0).getId();
 	}
 
-	private int unreadCountForViewer(LuxuryUserPrincipal principal, SalonClient sc, UUID threadStaffOperatorId) {
-		if (canAccessAsLinkedConsumer(principal, sc) && consumerCanAccessStaffThread(principal, sc, threadStaffOperatorId)) {
+		private boolean isStaffOfThisLocation(
+				LuxuryUserPrincipal principal, SalonClient sc, UUID threadStaffOperatorId) {
+			if (!principal.hasAppRole("STAFF") || threadStaffOperatorId == null) {
+				return false;
+			}
+			return resolveStaffOperator(principal)
+					.map(op -> op.getId().equals(threadStaffOperatorId)
+							&& op.getLocation().getId().equals(sc.getLocation().getId()))
+					.orElse(false);
+		}
+
+		private boolean viewerUsesClientThread(
+				LuxuryUserPrincipal principal, SalonClient sc, UUID threadStaffOperatorId) {
+			if (isStaffOfThisLocation(principal, sc, threadStaffOperatorId)) {
+				return false;
+			}
+			if (principal.hasAppRole("OWNER") && ownerPremiumMatchesLocation(principal, sc.getLocation().getId())
+					&& threadStaffOperatorId == null) {
+				return false;
+			}
+			return canAccessAsLinkedConsumer(principal, sc)
+					&& consumerCanAccessStaffThread(principal, sc, threadStaffOperatorId);
+		}
+
+		private int unreadCountForViewer(LuxuryUserPrincipal principal, SalonClient sc, UUID threadStaffOperatorId) {
+			if (viewerUsesClientThread(principal, sc, threadStaffOperatorId)) {
 			Instant watermark = readStateRepository.findThreadReadState(sc.getId(), threadStaffOperatorId)
 					.map(SalonLuxuryChatReadState::getLastReadAtClient)
 					.orElse(UNREAD_WATERMARK_START);
@@ -366,8 +397,7 @@ public class SalonLuxuryChatService {
 
 	private void markThreadReadForCurrentViewer(LuxuryUserPrincipal principal, SalonClient sc, UUID threadStaffOperatorId) {
 		Instant now = Instant.now();
-		boolean markClient = canAccessAsLinkedConsumer(principal, sc)
-				&& consumerCanAccessStaffThread(principal, sc, threadStaffOperatorId);
+		boolean markClient = viewerUsesClientThread(principal, sc, threadStaffOperatorId);
 		boolean markOwnerAsSalonOwner = principal.hasAppRole("OWNER")
 				&& ownerPremiumMatchesLocation(principal, sc.getLocation().getId())
 				&& threadStaffOperatorId == null;
@@ -428,11 +458,14 @@ public class SalonLuxuryChatService {
 		throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Accesso negato alla conversazione.");
 	}
 
-	private SalonLuxuryChatSender resolveWriteSender(
-			LuxuryUserPrincipal principal, SalonClient sc, UUID threadStaffOperatorId) {
-		if (canAccessAsLinkedConsumer(principal, sc) && consumerCanAccessStaffThread(principal, sc, threadStaffOperatorId)) {
-			return SalonLuxuryChatSender.CLIENT;
-		}
+		private SalonLuxuryChatSender resolveWriteSender(
+				LuxuryUserPrincipal principal, SalonClient sc, UUID threadStaffOperatorId) {
+			if (isStaffOfThisLocation(principal, sc, threadStaffOperatorId)) {
+				return SalonLuxuryChatSender.OWNER;
+			}
+			if (canAccessAsLinkedConsumer(principal, sc) && consumerCanAccessStaffThread(principal, sc, threadStaffOperatorId)) {
+				return SalonLuxuryChatSender.CLIENT;
+			}
 		if (principal.hasAppRole("OWNER") && ownerPremiumMatchesLocation(principal, sc.getLocation().getId())
 				&& threadStaffOperatorId == null) {
 			return SalonLuxuryChatSender.OWNER;
@@ -447,33 +480,34 @@ public class SalonLuxuryChatService {
 	 * Thread effettivo per il viewer: titolare → sempre titolare ({@code null}); staff → il proprio operatore;
 	 * cliente → parametro esplicito (default titolare).
 	 */
-	private UUID resolveThreadStaffOperatorId(
-			LuxuryUserPrincipal principal, SalonClient sc, UUID requestedStaffOperatorId) {
-		if (principal.hasAppRole("OWNER") && ownerPremiumMatchesLocation(principal, sc.getLocation().getId())) {
-			if (requestedStaffOperatorId != null) {
-				throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Il titolare usa solo la chat del salone.");
-			}
-			return null;
-		}
-		if (principal.hasAppRole("STAFF")) {
-			StaffOperator op = resolveStaffOperator(principal)
-					.orElseThrow(() -> new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Operatore non collegato."));
-			if (requestedStaffOperatorId != null && !requestedStaffOperatorId.equals(op.getId())) {
-				throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Accesso negato alla conversazione.");
-			}
-			return op.getId();
-		}
-		if (canAccessAsLinkedConsumer(principal, sc)) {
-			if (requestedStaffOperatorId == null) {
+		private UUID resolveThreadStaffOperatorId(
+				LuxuryUserPrincipal principal, SalonClient sc, UUID requestedStaffOperatorId) {
+			if (principal.hasAppRole("OWNER") && ownerPremiumMatchesLocation(principal, sc.getLocation().getId())) {
+				if (requestedStaffOperatorId != null) {
+					throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Il titolare usa solo la chat del salone.");
+				}
 				return null;
 			}
-			if (!consumerCanAccessStaffThread(principal, sc, requestedStaffOperatorId)) {
-				throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Accesso negato alla conversazione.");
+			Optional<StaffOperator> linkedHere = resolveStaffOperator(principal)
+					.filter(op -> op.getLocation().getId().equals(sc.getLocation().getId()));
+			if (principal.hasAppRole("STAFF") && linkedHere.isPresent()) {
+				StaffOperator op = linkedHere.get();
+				if (requestedStaffOperatorId != null && !requestedStaffOperatorId.equals(op.getId())) {
+					throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Accesso negato alla conversazione.");
+				}
+				return op.getId();
 			}
-			return requestedStaffOperatorId;
+			if (canAccessAsLinkedConsumer(principal, sc)) {
+				if (requestedStaffOperatorId == null) {
+					return null;
+				}
+				if (!consumerCanAccessStaffThread(principal, sc, requestedStaffOperatorId)) {
+					throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Accesso negato alla conversazione.");
+				}
+				return requestedStaffOperatorId;
+			}
+			throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Accesso negato alla conversazione.");
 		}
-		throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Accesso negato alla conversazione.");
-	}
 
 	private Set<UUID> consumerStaffThreadOperatorIds(SalonClient sc) {
 		Set<UUID> operatorIds = new LinkedHashSet<>();
@@ -570,6 +604,15 @@ public class SalonLuxuryChatService {
 	}
 
 	private String resolveCounterpartyLabel(LuxuryUserPrincipal principal, SalonClient sc, UUID threadStaffOperatorId) {
+		if (viewerUsesClientThread(principal, sc, threadStaffOperatorId)) {
+			if (threadStaffOperatorId == null) {
+				Location loc = sc.getLocation();
+				return firstNonBlank(loc.getName(), loc.getSlug(), "Salone");
+			}
+			return staffOperatorRepository.findById(threadStaffOperatorId)
+					.map(StaffOperator::getDisplayName)
+					.orElse("Operatore");
+		}
 		if (principal.hasAppRole("OWNER") || principal.hasAppRole("STAFF")) {
 			return sc.getDisplayName();
 		}
@@ -607,9 +650,8 @@ public class SalonLuxuryChatService {
 		if (state.isEmpty()) {
 			return null;
 		}
-		boolean viewerIsClient = canAccessAsLinkedConsumer(principal, sc)
-				&& consumerCanAccessStaffThread(principal, sc, threadStaffOperatorId);
-		return viewerIsClient ? state.get().getClearedAtClient() : state.get().getClearedAtOwner();
+			boolean viewerIsClient = viewerUsesClientThread(principal, sc, threadStaffOperatorId);
+			return viewerIsClient ? state.get().getClearedAtClient() : state.get().getClearedAtOwner();
 	}
 
 	private record ChatThreadRef(SalonClient salonClient, UUID staffOperatorId) {

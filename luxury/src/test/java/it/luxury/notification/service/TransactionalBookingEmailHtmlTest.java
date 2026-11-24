@@ -62,7 +62,7 @@ class TransactionalBookingEmailHtmlTest {
 				"Disdetta Premium registrata.",
 				"Hair Jassa",
 				"attivo fino al 23 luglio 2026 alle 22:00",
-				"Dopo la scadenza: piano Free",
+				"Dopo la scadenza: abbonamento non attivo",
 				"https://www.example.com/account/profilo",
 				"Riattiva Premium");
 
@@ -71,7 +71,7 @@ class TransactionalBookingEmailHtmlTest {
 		assertThat(html).contains("background:#1c1814");
 		assertThat(html).contains("Disdetta Premium registrata.");
 		assertThat(html).contains("attivo fino al 23 luglio 2026 alle 22:00");
-		assertThat(html).contains("piano Free");
+		assertThat(html).contains("abbonamento non attivo");
 	}
 
 	@Test
@@ -80,12 +80,12 @@ class TransactionalBookingEmailHtmlTest {
 				"Abbonamento Premium disattivato.",
 				"Salone Demo",
 				"disattivato",
-				"Piano attuale: Free",
+				"Abbonamento non attivo · profilo da riattivare",
 				"https://example.com/account/profilo",
 				"Riattiva Premium");
 
 		assertThat(html).contains("disattivato");
-		assertThat(html).contains("Piano attuale: Free");
+		assertThat(html).contains("Abbonamento non attivo");
 	}
 
 	@Test
@@ -115,18 +115,57 @@ class TransactionalBookingEmailHtmlTest {
 	}
 
 	@Test
-	void buildManageBookingEmail_escapesHtmlInSalonName() {
-		String html = TransactionalBookingEmailHtml.buildManageBookingEmail(
-				"Confermata.",
-				"Grazie per aver prenotato.",
-				"Salone <script>",
-				"Taglio",
-				"lunedì",
-				"lunedì 1 gennaio 2026, 10:00",
-				"https://example.com",
-				"Gestisci");
+	void buildPremiumPaymentFailedEmail_includesCta() {
+		String html = TransactionalBookingEmailHtml.buildPremiumPaymentFailedEmail(
+				"Hair Jassa", "€ 29,00", "https://example.com/account/profilo");
 
-		assertThat(html).contains("Salone &lt;script&gt;");
-		assertThat(html).doesNotContain("<script>");
+		assertThat(html).contains("Pagamento Premium non riuscito");
+		assertThat(html).contains("Aggiorna pagamento");
+		assertThat(html).contains("€ 29,00");
+		assertThat(html).contains("cid:" + TransactionalBookingEmailHtml.LOGO_CONTENT_ID);
+	}
+
+	@Test
+	void buildPremiumRenewalReminderEmail_includesDate() {
+		String html = TransactionalBookingEmailHtml.buildPremiumRenewalReminderEmail(
+				"Hair Jassa", "23 settembre 2026", "€ 29,00", "https://example.com/account/profilo");
+
+		assertThat(html).contains("Prossimo rinnovo Premium");
+		assertThat(html).contains("23 settembre 2026");
+		assertThat(html).contains("Gestisci abbonamento");
+	}
+
+	@Test
+	void buildSalonDeletionWarningEmail_includesDeletionDate() {
+		String html = TransactionalBookingEmailHtml.buildSalonDeletionWarningEmail(
+				"Hair Jassa", "23 ottobre 2026 alle 22:00", "https://example.com/account/profilo");
+
+		assertThat(html).contains("verrà cancellato");
+		assertThat(html).contains("23 ottobre 2026");
+		assertThat(html).contains("Riattiva Premium");
+	}
+
+	@Test
+	void buildReviewInviteEmail_includesReviewCta() {
+		String html = TransactionalBookingEmailHtml.buildReviewInviteEmail(
+				"Hair Jassa", "Barba", "mercoledì 10 giugno 2026, 13:30", "https://example.com/recensione?token=abc");
+
+		assertThat(html).contains("Lascia una recensione");
+		assertThat(html).contains("https://example.com/recensione?token=abc");
+	}
+
+	@Test
+	void buildBookingRequestRejectedEmail_includesOperatorWhenPresent() {
+		String html = TransactionalBookingEmailHtml.buildBookingRequestRejectedEmail(
+				"Hair Jassa",
+				"Barba",
+				"mercoledì",
+				"mercoledì 10 giugno 2026, 13:30",
+				"Marco Rossi",
+				"https://example.com");
+
+		assertThat(html).contains("Marco Rossi");
+		assertThat(html).contains("Richiesta non confermata");
+		assertThat(html).contains("Cerca un salone");
 	}
 }

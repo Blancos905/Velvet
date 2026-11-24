@@ -1,5 +1,5 @@
 /**
- * «Posizione del salone» (`/account/salone/posizione`) — hero `ClientAccountHeroHeader` +
+ * «Posizione del salone» (`/salone/posizione`) — hero `ClientAccountHeroHeader` +
  * contenuto con accento AZZURRO (form card via `luxury-salon-services-salon.css`).
  * Importato DOPO `salon-location-map.css` e `luxury-salon-services-salon.css`.
  */

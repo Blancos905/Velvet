@@ -144,7 +144,7 @@ export function PrivacyPolicyStaffLayeredContent({ embedded = false }: { embedde
       <LegalPrivacyAccordion title="Conservazione dei dati e fine rapporto">
         <p className="luxury-legal-public__text">
           I dati operativi restano nel database finché il salone mantiene attivo il tuo profilo operatore (es. da{" "}
-          <Link to="/account/salone/staff" className="luxury-legal-public__inline-link">
+          <Link to="/salone/staff" className="luxury-legal-public__inline-link">
             gestione team
           </Link>{" "}
           lato titolare).

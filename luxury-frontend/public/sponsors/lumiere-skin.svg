@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" role="img" aria-label="Lumiere Skin">
+  <defs>
+    <linearGradient id="ls-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="40%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+  </defs>
+  <circle cx="36" cy="36" r="26" fill="rgba(0,0,0,0.28)" stroke="url(#ls-gold)" stroke-width="1.35"/>
+  <circle cx="36" cy="36" r="9" fill="url(#ls-gold)"/>
+  <g stroke="url(#ls-gold)" stroke-width="1.6" stroke-linecap="round">
+    <path d="M36 16v6M36 50v6M16 36h6M50 36h6M22 22l4 4M46 46l4 4M46 22l-4 4M22 46l-4 4"/>
+  </g>
+  <text x="74" y="28" fill="url(#ls-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="10" letter-spacing="0.38em">LUMIERE</text>
+  <text x="74" y="52" fill="url(#ls-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="24" letter-spacing="0.28em">SKIN</text>
+  <path d="M74 34h130" stroke="url(#ls-gold)" stroke-width="0.6" opacity="0.4"/>
+</svg>

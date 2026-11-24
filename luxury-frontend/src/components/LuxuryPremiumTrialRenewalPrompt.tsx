@@ -25,7 +25,6 @@ function formatTrialEnd(iso: string | null | undefined): string | null {
 export function LuxuryPremiumTrialRenewalPrompt({
   salonName,
   trialEndsAt,
-  checkoutAvailable: _checkoutAvailable,
 }: LuxuryPremiumTrialRenewalPromptProps) {
   const premiumPlan = SALON_PLANS.find((p) => p.tier === "PREMIUM");
   const trialEndLabel = formatTrialEnd(trialEndsAt);

@@ -1,5 +1,5 @@
 /**
- * «Aggiungi servizi» (`/account/salone/servizi`) — stessa struttura delle altre pagine
+ * «Aggiungi servizi» (`/salone/servizi`) — stessa struttura delle altre pagine
  * salone (hero `ClientAccountHeroHeader` + shell), con accento AZZURRO al posto dell'arancio.
  * Agganciato ai modificatori `--salon-side` così le altre pagine che condividono
  * `luxury-salon-services-page` / `luxury-account-salon-services.css` (brand, sede, staff,

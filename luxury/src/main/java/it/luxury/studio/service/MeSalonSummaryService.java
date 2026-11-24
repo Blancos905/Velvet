@@ -10,8 +10,10 @@ import it.luxury.studio.domain.SalonBusinessType;
 import it.luxury.studio.domain.SalonClientGender;
 import it.luxury.studio.domain.StudioGroup;
 import it.luxury.studio.domain.StudioGroupRepository;
+import it.luxury.publicapi.dto.RegistrationSalonLocation;
 import it.luxury.studio.dto.MeSalonSummaryDto;
 import it.luxury.studio.dto.MeSalonUpdateRequest;
+import it.luxury.studio.dto.SalonRegistrationLocationsUpdateRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,18 +30,51 @@ public class MeSalonSummaryService {
 	private final LocationRepository locationRepository;
 	private final MeSalonOwnerOrphanRepairService meSalonOwnerOrphanRepairService;
 	private final SalonLocationGeocodingAsyncService salonLocationGeocodingAsyncService;
+	private final SalonDirectoryProvisioningService salonDirectoryProvisioningService;
 
 	public MeSalonSummaryService(
 			StudioGroupOwnerResolver studioGroupOwnerResolver,
 			StudioGroupRepository studioGroupRepository,
 			LocationRepository locationRepository,
 			MeSalonOwnerOrphanRepairService meSalonOwnerOrphanRepairService,
-			SalonLocationGeocodingAsyncService salonLocationGeocodingAsyncService) {
+			SalonLocationGeocodingAsyncService salonLocationGeocodingAsyncService,
+			SalonDirectoryProvisioningService salonDirectoryProvisioningService) {
 		this.studioGroupOwnerResolver = studioGroupOwnerResolver;
 		this.studioGroupRepository = studioGroupRepository;
 		this.locationRepository = locationRepository;
 		this.meSalonOwnerOrphanRepairService = meSalonOwnerOrphanRepairService;
 		this.salonLocationGeocodingAsyncService = salonLocationGeocodingAsyncService;
+		this.salonDirectoryProvisioningService = salonDirectoryProvisioningService;
+	}
+
+	@Transactional
+	public MeSalonSummaryDto applyRegistrationLocations(
+			LuxuryUserPrincipal principal, SalonRegistrationLocationsUpdateRequest body) {
+		StudioGroup group = studioGroupOwnerResolver.resolveStudioGroupForOwner(principal)
+				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Salone non trovato."));
+		RegistrationSalonLocation primary = body.primaryLocation();
+		ConsumerRegistrationValidator.requireSalonLocation(primary);
+		List<RegistrationSalonLocation> additional =
+				body.additionalLocations() == null ? List.of() : body.additionalLocations();
+		int savedLocations = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId()).size();
+		int firstNewSede = Math.max(savedLocations, 1);
+		for (int i = 0; i < additional.size(); i++) {
+			ConsumerRegistrationValidator.requireSalonLocation(additional.get(i));
+			ConsumerRegistrationValidator.requireLocationAudienceIfPresent(additional.get(i), firstNewSede + i + 1);
+		}
+		ConsumerRegistrationValidator.requireLocationAudienceIfPresent(primary, 1);
+		List<SalonBusinessType> types =
+				ConsumerRegistrationValidator.normalizeSalonBusinessTypesOrThrow(body.salonBusinessTypes());
+		List<SalonClientGender> genders =
+				ConsumerRegistrationValidator.normalizeSalonClientGendersOrThrow(body.salonClientGenders());
+		salonDirectoryProvisioningService.applyOwnerRegistrationLocations(
+				group,
+				firstNonBlank(group.getName(), primary.displayName(), "Salone"),
+				primary,
+				additional,
+				types,
+				genders);
+		return toDto(studioGroupRepository.findById(group.getId()).orElse(group), principal);
 	}
 
 	public MeSalonSummaryDto resolve(LuxuryUserPrincipal principal) {
@@ -84,11 +119,17 @@ public class MeSalonSummaryService {
 				loc != null ? loc.getWorkMorningEndMinuteOfDay() : null,
 				loc != null ? loc.getWorkAfternoonStartMinuteOfDay() : null,
 				loc != null ? SalonOpenDays.toApiList(loc.getWorkOpenDaysMask()) : null,
-				statisticsPinRequired(g));
+				statisticsPinRequired(g),
+				!locs.isEmpty() && locs.stream().allMatch(Location::isVisibleToClients),
+				locs.size());
 	}
 
 	private static boolean statisticsPinRequired(StudioGroup g) {
-		if (g == null || !"PREMIUM".equals(StudioGroup.canonicalPlanTier(g.getPlanTier()))) {
+		if (g == null) {
+			return false;
+		}
+		String tier = StudioGroup.canonicalPlanTier(g.getPlanTier());
+		if (!"PREMIUM".equals(tier) && !"PLUS".equals(tier)) {
 			return false;
 		}
 		String hash = g.getStatisticsPinHash();
@@ -184,6 +225,21 @@ public class MeSalonSummaryService {
 		studioGroupRepository.save(group);
 		Location saved = locationRepository.save(loc);
 		salonLocationGeocodingAsyncService.scheduleGeocode(saved.getId());
+		return toDto(group, principal);
+	}
+
+	@Transactional
+	public MeSalonSummaryDto setVisibleToClients(LuxuryUserPrincipal principal, boolean enabled) {
+		StudioGroup group = studioGroupOwnerResolver.resolveStudioGroupForOwner(principal)
+				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Salone non trovato."));
+		List<Location> locs = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId());
+		if (locs.isEmpty()) {
+			throw new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Sede principale non trovata.");
+		}
+		for (Location location : locs) {
+			location.setVisibleToClients(enabled);
+		}
+		locationRepository.saveAll(locs);
 		return toDto(group, principal);
 	}
 

@@ -585,7 +585,7 @@
   outline-offset: 3px;
 }
 
-/* «Scegli il tuo piano» — arancio pieno, testo nero (`/partner`) */
+/* «Procedi» — arancio pieno, testo nero (`/partner`) */
 .salon-premium-panorama__cta--plan-pick {
   border: 2px solid #0a0a0a;
   background: linear-gradient(185deg, #fdba74 0%, #fb923c 35%, #f97316 72%, #ea580c 100%);

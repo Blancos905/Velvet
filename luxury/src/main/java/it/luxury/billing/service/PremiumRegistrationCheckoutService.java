@@ -35,7 +35,6 @@ public class PremiumRegistrationCheckoutService {
 
 	private static final Logger log = LoggerFactory.getLogger(PremiumRegistrationCheckoutService.class);
 
-	private static final long PREMIUM_TRIAL_PERIOD_DAYS = 60L;
 
 	private final LuxuryStripeProperties stripeProperties;
 	private final LuxuryStripeCheckoutBrandingProperties checkoutBranding;
@@ -70,18 +69,15 @@ public class PremiumRegistrationCheckoutService {
 		String customerId = stripeBillingCustomerSyncService.ensureCustomerForPendingRegistration(pending, payload);
 		String frontendBase = frontendBaseUrl();
 		String encodedCheckoutToken = URLEncoder.encode(plainCheckoutToken.trim().toLowerCase(Locale.ROOT), StandardCharsets.UTF_8);
-		Map<String, String> metadata = registrationMetadata(pending.getId());
+		int locationCount = SalonMultiLocationPricing.requireCount(Math.max(1, payload.billableLocationCount()));
+		Map<String, String> metadata = registrationMetadata(pending.getId(), locationCount);
 		try {
 			Session session = stripeClient.checkout().sessions().create(
 					SessionCreateParams.builder()
 							.setMode(SessionCreateParams.Mode.SUBSCRIPTION)
 							.setCustomer(customerId)
 							.setClientReferenceId(pending.getId().toString())
-							.addLineItem(
-									SessionCreateParams.LineItem.builder()
-											.setPrice(stripeProperties.premiumPriceId())
-											.setQuantity(1L)
-											.build())
+							.addLineItem(PremiumCheckoutLineItems.subscription(stripeProperties.premiumPriceId(), locationCount))
 							.setSuccessUrl(
 									frontendBase
 											+ BillingRegistrationPlanPolicy.REGISTRATION_CHECKOUT_SUCCESS_PATH
@@ -95,7 +91,6 @@ public class PremiumRegistrationCheckoutService {
 							.setCustomText(StripeCheckoutBrandingSupport.customText())
 							.setSubscriptionData(
 									SessionCreateParams.SubscriptionData.builder()
-											.setTrialPeriodDays(PREMIUM_TRIAL_PERIOD_DAYS)
 											.putAllMetadata(metadata)
 											.build())
 							.setBillingAddressCollection(SessionCreateParams.BillingAddressCollection.REQUIRED)
@@ -152,11 +147,12 @@ public class PremiumRegistrationCheckoutService {
 		return pending;
 	}
 
-	private static Map<String, String> registrationMetadata(java.util.UUID pendingRegistrationId) {
+	private static Map<String, String> registrationMetadata(java.util.UUID pendingRegistrationId, int locationCount) {
 		Map<String, String> metadata = new HashMap<>();
 		metadata.put("luxury_pending_registration_id", pendingRegistrationId.toString());
 		metadata.put("luxury_plan", "PREMIUM");
 		metadata.put("luxury_registration_checkout", "true");
+		metadata.put("luxury_location_count", Integer.toString(locationCount));
 		return metadata;
 	}
 

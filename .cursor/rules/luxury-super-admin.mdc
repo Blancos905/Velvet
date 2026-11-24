@@ -1,0 +1,39 @@
+---
+description: Pannello super admin, overview, impersonazione titolare e gestione saloni/consumatori
+globs: luxury/src/main/java/it/luxury/admin/**,luxury-frontend/src/pages/admin/**
+alwaysApply: false
+---
+
+# Luxury — Super admin
+
+## Autenticazione
+
+- JWT con ruolo `ADMIN`; token separato in `luxury_super_admin_access_token` (**localStorage**, persistenza tra chiusure browser).
+- Il rinnovo usa solo il cookie HttpOnly `luxury_rt`. Il refresh non viene scritto in `localStorage` né in `sessionStorage`. L'access token admin resta in `luxury_super_admin_access_token`. La sessione resta attiva finché il super admin non preme «Esci» (revoca refresh lato server).
+- Bootstrap: `LuxurySuperAdminAuthService`, registrazione setup via `/admin/register`.
+- Status pubblico: `GET /api/v1/admin/status`. Non include la versione del runtime Java.
+
+## Dashboard (`SuperAdminOverviewService`)
+
+- Conteggi piattaforma, saloni recenti, billing category (`SalonSubscriptionBillingCategory`).
+- Sezioni frontend: `AdminSalonPlanSection` (solo PREMIUM), `AdminSalonSubscriptionSection`, consumer clients.
+- Filtro lista saloni creabili: `?planTier=PREMIUM`. I conteggi delle righe `plan_tier=BASE` si etichettano «senza Premium» e non creano saloni.
+
+## Azioni sensibili (`SuperAdminOverviewActionsService`)
+
+- Creazione/eliminazione saloni e staff operator
+- **Impersonazione titolare**: `POST .../salons/{id}/owner-session` → `signInWithIssuedToken(..., { preserveAdminSession: true })`
+- Flag `luxury_admin_impersonating` (`sessionStorage`): senza di esso, JWT admin in `localStorage` non apre `/admin` se la sessione app è OWNER/STAFF/CLIENT
+- Login titolare/staff/cliente (`signInWithPassword`) invalida sempre la sessione admin persistita
+- Notifiche sistema ai titolari selezionati
+- **Saloni sponsorizzati**: `PATCH .../salons/{id}/sponsored-placement` con `{ "enabled": true|false }` accende o spegne lo spazio a pagamento su tutte le sedi dello studio. In home compare solo se la sede è visibile e il Premium è attivo.
+- Fatture fiscal i: `AdminFiscalInvoicesPage` + `SuperAdminFiscalInvoiceController`
+- **Sponsor per posto**: `/admin/sponsor`. Oggi il posto `client_bookings` è il carousel di 5 marchi in fondo all’agenda cliente (`AgendaSponsorCarousel`). Altri posti restano distinti: non riusare questi sponsor nell’header o nel profilo. API `GET /api/v1/public/placement-sponsors?placement=client_bookings` e CRUD `/api/v1/admin/placement-sponsors`. Se l’agenda è vuota, il seed inserisce cinque marchi di prova.
+
+## Regole modifica
+
+- Endpoint admin: sempre `@PreAuthorize` con ADMIN; non esporre dati cross-tenant senza filtro.
+- Impersonazione: non sovrascrivere token admin se JWT emesso non contiene ADMIN (`LuxuryAuthProvider.signInWithIssuedToken`); usare `preserveAdminSession: true` solo da pannello admin.
+- Impersonazione consumatore (`issueConsumerLuxurySession`): bloccare profili con ruolo `ADMIN` anche in formato legacy `ROLE_ADMIN` — parsing allineato a `LuxuryUserPrincipal.parseRoleStrings` / frontend `parseLuxurySecurityRoles`.
+- ⚠️ `SuperAdminOverviewService` senza test unitari — preferire test integrazione controller per nuove azioni.
+- Dopo modifiche conteggi/statistiche: allineare `superAdminPlatformStats.ts` e `SuperAdminStatisticsSection`.

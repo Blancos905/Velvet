@@ -6,3 +6,6 @@ dist
 !.env.lab.example
 *.local
 .DS_Store
+# APK sideload locale (publish-dev-apk.sh) — non committare
+public/dev/*.apk
+public/dev/apk-meta.json

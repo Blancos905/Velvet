@@ -1,0 +1,22 @@
+---
+description: Manutenzione backend — analisi CodeGraph completa di luxury/ (Java). Usa quando l'utente dice «manutenzione backend», «manutenzione BE», «backend maintenance» o chiede controllo totale del backend.
+alwaysApply: false
+---
+
+# Manutenzione backend Luxury
+
+Quando l'utente dice **manutenzione backend**, **manutenzione BE**, **backend maintenance**, **controllo backend**, **revisione backend** o **scan backend**:
+
+1. Leggi e segui **per intero** la skill di progetto:
+   `.cursor/skills/manutenzione-backend/SKILL.md`
+2. Usa la checklist package-by-package:
+   `.cursor/skills/manutenzione-backend/CHECKLIST.md`
+3. Dalla root del repo esegui subito:
+   ```bash
+   ./luxury-backend-maintenance.sh
+   ```
+4. Poi, con CodeGraph (`codegraph_explore` MCP o CLI), esplora **ogni package** `it.luxury.*` e tutti i simboli ad alto blast radius elencati nella checklist — non fermarti allo script automatico.
+5. Produci un report strutturato (vedi skill) **dopo** aver applicato automaticamente le correzioni sicure e locali compatibili con le regole del repo.
+6. Rilancia script/check/test dopo ogni correzione rilevante fino a ridurre i finding residui.
+
+Non sostituire questa manutenzione con un audit monorepo generico (`luxury-audit.sh`) se l'utente ha chiesto specificamente il backend.

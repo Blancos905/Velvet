@@ -13,6 +13,7 @@ import it.luxury.consumer.domain.PendingRegistration;
 import it.luxury.consumer.domain.PendingRegistrationKind;
 import it.luxury.consumer.domain.PendingRegistrationRepository;
 import it.luxury.notification.service.RegistrationEmailAudience;
+import it.luxury.studio.domain.StudioGroup;
 import it.luxury.notification.service.RegistrationEmailDispatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,12 +72,13 @@ public class LuxuryPendingRegistrationService {
 	}
 
 	@Transactional
-	public void queueClientRegistration(
+	public String queueClientRegistration(
 			String email,
 			String password,
 			String firstName,
 			String lastName,
 			String country,
+			String preferredLocale,
 			String phone,
 			boolean bootstrapSuperAdmin,
 			String legalDocumentVersion) {
@@ -85,16 +87,17 @@ public class LuxuryPendingRegistrationService {
 				firstName,
 				lastName,
 				country,
+				preferredLocale,
 				phone,
 				bootstrapSuperAdmin,
 				legalDocumentVersion);
-		savePending(email, password, PendingRegistrationKind.CLIENT, payload, displayName(firstName, lastName));
+		return savePending(email, password, PendingRegistrationKind.CLIENT, payload, displayName(firstName, lastName));
 	}
 
 	@Transactional
-	public void queueSalonRegistration(String email, String password, PendingSalonRegistrationPayload payload) {
+	public String queueSalonRegistration(String email, String password, PendingSalonRegistrationPayload payload) {
 		assertMayQueue(email, PendingRegistrationKind.SALON_OWNER);
-		savePending(
+		return savePending(
 				email,
 				password,
 				PendingRegistrationKind.SALON_OWNER,
@@ -148,6 +151,7 @@ public class LuxuryPendingRegistrationService {
 				pendingRegistrationRepository.save(pending);
 			}
 			else {
+				attachPollSecretToProfile(pending);
 				pendingRegistrationRepository.delete(pending);
 			}
 			log.info(
@@ -255,7 +259,15 @@ public class LuxuryPendingRegistrationService {
 	 * App mobile: la conferma email avviene spesso nel browser di sistema; la WebView resta su «Controlla email».
 	 * Restituisce pending già verificato se email e timestamp registrazione coincidono.
 	 */
-	public Optional<PendingRegistration> findEmailVerifiedPendingForSync(String rawEmail, long registrationAtMs) {
+		public Optional<PendingRegistration> findPendingByEmail(String rawEmail) {
+			String norm = normalizeEmail(rawEmail);
+			if (norm == null || norm.isBlank()) {
+				return Optional.empty();
+			}
+			return pendingRegistrationRepository.findByEmailIgnoreCase(norm);
+		}
+
+		public Optional<PendingRegistration> findEmailVerifiedPendingForSync(String rawEmail, long registrationAtMs) {
 		if (rawEmail == null || rawEmail.isBlank() || registrationAtMs <= 0) {
 			return Optional.empty();
 		}
@@ -348,6 +360,7 @@ public class LuxuryPendingRegistrationService {
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Registrazione non valida.");
 		}
 		catch (JsonProcessingException ex) {
+			log.warn("[Luxury conferma email] payload non leggibile: {}", ex.getOriginalMessage());
 			throw new BusinessException(
 					HttpStatus.INTERNAL_SERVER_ERROR,
 					"PENDING_REGISTRATION_CORRUPT",
@@ -425,6 +438,7 @@ public class LuxuryPendingRegistrationService {
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Registrazione non valida.");
 		}
 		catch (JsonProcessingException ex) {
+			log.warn("[Luxury conferma email] payload non leggibile in materialize: {}", ex.getOriginalMessage());
 			throw new BusinessException(
 					HttpStatus.INTERNAL_SERVER_ERROR,
 					"PENDING_REGISTRATION_CORRUPT",
@@ -440,7 +454,7 @@ public class LuxuryPendingRegistrationService {
 		registrationCompletionService.assertEmailAvailableForNewRegistration(email);
 	}
 
-	private void savePending(
+	private String savePending(
 			String email,
 			String password,
 			PendingRegistrationKind kind,
@@ -454,6 +468,7 @@ public class LuxuryPendingRegistrationService {
 		});
 		PendingRegistration pending =
 				new PendingRegistration(norm, passwordEncoder.encode(password), kind, payloadJson, displayName);
+		String pollSecret = assignPollSecret(pending);
 		try {
 			pendingRegistrationRepository.save(pending);
 		}
@@ -464,6 +479,39 @@ public class LuxuryPendingRegistrationService {
 					"Esiste già una registrazione in corso o un account con questa email.");
 		}
 		issueVerification(pending);
+		return pollSecret;
+	}
+
+	private String assignPollSecret(PendingRegistration pending) {
+		byte[] raw = new byte[32];
+		secureRandom.nextBytes(raw);
+		String plain = toHex(raw);
+		pending.setPollSyncSecretHash(LuxuryPasswordResetService.sha256Hex(plain));
+		return plain;
+	}
+
+	private void attachPollSecretToProfile(PendingRegistration pending) {
+		String hash = pending.getPollSyncSecretHash();
+		if (hash == null || hash.isBlank() || pending.getEmail() == null) {
+			return;
+		}
+		consumerProfileRepository
+				.findFirstByEmailIgnoreCaseAndDeletedAtIsNullOrderByCreatedAtDesc(pending.getEmail())
+				.ifPresent(profile -> {
+					profile.setRegistrationPollSecretHash(hash);
+					consumerProfileRepository.save(profile);
+				});
+	}
+
+	public boolean pollSecretMatches(String rawSecret, String storedHash) {
+		if (rawSecret == null || rawSecret.isBlank() || storedHash == null || storedHash.isBlank()) {
+			return false;
+		}
+		String trimmed = rawSecret.trim().toLowerCase(Locale.ROOT);
+		if (!trimmed.matches("[a-f0-9]{64}")) {
+			return false;
+		}
+		return storedHash.equals(LuxuryPasswordResetService.sha256Hex(trimmed));
 	}
 
 	private String serialize(Object payload) {
@@ -548,12 +596,22 @@ public class LuxuryPendingRegistrationService {
 				PendingSalonRegistrationPayload payload =
 						objectMapper.readValue(pending.getPayloadJson(), PendingSalonRegistrationPayload.class);
 				String plan = payload.provisionPlanTier();
-				if (plan != null && !plan.isBlank()) {
-					url.append("&plan=").append(URLEncoder.encode(plan.trim(), StandardCharsets.UTF_8));
+				if (plan != null
+						&& !plan.isBlank()
+						&& "PREMIUM".equals(StudioGroup.canonicalPlanTier(plan))) {
+					url.append("&plan=").append(URLEncoder.encode("PREMIUM", StandardCharsets.UTF_8));
+				}
+				else if (plan != null
+						&& !plan.isBlank()
+						&& "PLUS".equals(StudioGroup.canonicalPlanTier(plan))) {
+					url.append("&plan=").append(URLEncoder.encode("PLUS", StandardCharsets.UTF_8));
 				}
 			}
 			catch (JsonProcessingException ex) {
-				log.warn("[Luxury conferma email] impossibile allegare planTier al link email={}", pending.getEmail());
+				log.warn(
+						"[Luxury conferma email] impossibile allegare planTier al link email={}: {}",
+						pending.getEmail(),
+						ex.getOriginalMessage());
 			}
 		}
 		else if (pending.getKind() == PendingRegistrationKind.CLIENT) {
@@ -587,7 +645,7 @@ public class LuxuryPendingRegistrationService {
 		Instant expires =
 				Instant.now().plus(notificationProperties.getEmailVerificationTokenTtlMinutes(), ChronoUnit.MINUTES);
 		pending.setVerificationTokenHash(tokenHash);
-		pending.setVerificationTokenPlain(plainToken);
+		pending.setVerificationTokenPlain(null);
 		pending.setVerificationExpiresAt(expires);
 		pendingRegistrationRepository.save(pending);
 		return plainToken;

@@ -1,0 +1,44 @@
+---
+description: Esegui l'audit Luxury (bug, test, flussi API, App Store/Play Store) con luxury-audit.sh
+alwaysApply: false
+---
+
+# Audit Luxury (bug, test, flussi, store)
+
+Quando l'utente chiede **audit**, **compliance**, **controllo bug**, **allineamento flussi**, **App Store**, **Play Store**, **pre-release** o **verifica completa** del monorepo:
+
+1. Dalla root del repo esegui:
+   ```bash
+   ./luxury-audit.sh
+   ```
+2. Se serve solo un controllo rapido (senza test lunghi):
+   ```bash
+   ./luxury-audit.sh --fast
+   ```
+3. In caso di FAIL, correggi il codice e rilancia fino a exit 0.
+
+## Cosa copre lo script
+
+| Sezione | Contenuto |
+|--------|-----------|
+| Statici | SpotBugs, Checkstyle, `tsc -b`, `flutter analyze` |
+| Test | Delega a `check-all.sh` (Maven + Vitest + `flutter test`) |
+| Flussi | Auth, locate, booking pubblico, DELETE `/api/v1/me/account`, GDPR export, radar `@RequestMapping` |
+| Store | Account deletion in-app, domain guard WebView, pagine legali, test Flutter shell |
+
+## Script correlati
+
+- `./check-all.sh` — gate tecnico minimo (solo test/type-check, senza compliance store)
+- `./luxury-audit.sh --help` — opzioni (`--fast`, `--flows`, `--store`)
+- `./go-live-check.sh` — **promemoria e scan pre-produzione** (TODO legali, segreti dev, `.env` Docker, checklist go-live)
+- `docs/GO_LIVE.md` — checklist estesa in Markdown
+
+Quando l'utente chiede **go-live**, **produzione**, **deploy**, **placeholder legali** o **cosa cambiare prima della pubblicazione**:
+
+```bash
+./go-live-check.sh
+```
+
+Per solo il promemoria senza scan automatico: `./go-live-check.sh --reminder`
+
+Non sostituire l'audit con controlli manuali sparsi se esiste `luxury-audit.sh`.

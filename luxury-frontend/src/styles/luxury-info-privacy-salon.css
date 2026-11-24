@@ -1,5 +1,5 @@
 /**
- * Info e privacy lato salone (titolare Free/Premium + operatore staff) — stessa struttura
+ * Info e privacy lato salone (titolare + operatore staff) — stessa struttura
  * delle altre pagine account (hero `InfoPrivacyAccountHeroHeader`), con accento AZZURRO
  * al posto del viola (cliente B2C) o dell'arancio (contenuto Premium titolare prima dell'override).
  * Agganciato a `--salon-side`; la versione cliente B2C resta viola.
@@ -197,7 +197,7 @@
     0 0 0 3px rgba(56, 189, 248, 0.12);
 }
 
-/* Badge Piano Free: stesso shell Premium ma etichetta Free (accento azzurro già da salon-side). */
+/* Badge piano titolare: stesso shell Premium (accento azzurro già da salon-side). */
 .luxury-info-privacy-free-owner-page .luxury-info-privacy-premium__badge:not(.luxury-info-privacy-premium__badge--muted) {
   border-color: rgba(56, 189, 248, 0.45);
   background: linear-gradient(160deg, rgba(3, 105, 161, 0.65), rgba(8, 20, 28, 0.5));

@@ -1,0 +1,33 @@
+---
+description: Accesso staff per sede (X-Location-Id), catalogo filtrato e API legacy /api/v1/clients
+globs: luxury/src/main/java/it/luxury/staff/**,luxury/src/main/java/it/luxury/studio/service/MeStaff*.java
+alwaysApply: false
+---
+
+# Luxury — Accesso staff per sede
+
+## `SalonLocationAccessService`
+
+Tutte le API staff con header **`X-Location-Id`** passano da qui:
+
+1. `requireAccessibleLocation(principal, locationId)` — 404 se sede assente, 403 se non titolare/operatore
+2. `resolveCatalogAccess` → `CatalogAccess(fullCatalog, staffOperatorId?)`
+   - **Titolare** dello `StudioGroup` della sede → catalogo completo
+   - **Operatore** collegato alla stessa sede → catalogo filtrato (solo clienti con appuntamenti assegnati)
+
+## API interessate
+
+- `SalonClientStaffController` (`/api/v1/clients`) — list/get filtrati per staff; **create** richiede solo accesso sede (anche staff può creare)
+- `SalonCatalogStaffController` (`/services`, `/operators`) — catalogo completo sede per chi ha accesso
+
+## Staff app (`/me/staff`)
+
+- `MeStaffContextService` — risolve operatore via `profileId` + `subject` (fallback auth_sub)
+- `MeStaffAgendaService` — agenda filtrata per `operator.id`
+- ⚠️ Nessun test dedicato: aggiungere test integrazione se si modifica il legame operatore↔profilo
+
+## Regole modifica
+
+- Non usare solo `ROLE_STAFF` senza verificare sede/operatore su endpoint multi-sede.
+- Per nuove API staff-sede: copiare pattern `X-Location-Id` + `SalonLocationAccessService`.
+- Test esistente: `SalonCatalogStaffControllerSecurityTest`.

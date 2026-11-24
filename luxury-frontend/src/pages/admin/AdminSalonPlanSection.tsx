@@ -7,6 +7,7 @@ import { useLuxuryAuth } from "../../auth/LuxuryAuthProvider";
 import { SalonPremiumOwnerInfoPrivacyModal } from "../../components/salon/SalonPremiumOwnerInfoPrivacyModal";
 import { partnerContactEmail } from "../../config/env";
 import { LEGAL_DOCUMENT_VERSION, LEGAL_DPA_DOCUMENT_VERSION } from "../../content/legalEntity";
+import { useLuxuryLocale } from "../../i18n/useLuxuryLocale";
 import { formatSalonCityForDisplay } from "../../lib/formatSalonCityForDisplay";
 import { DEFAULT_IT_PHONE_PREFIX, optionalPhoneForRegisterApi } from "../../lib/itPhoneDefaults";
 import { luxuryPostConsumerSessionPath } from "../../lib/luxuryPostConsumerSessionPath";
@@ -29,7 +30,7 @@ type SalonOwnerSessionResponse = {
   expiresInSeconds: number;
 };
 
-export type AdminSalonPlanApiTier = "PREMIUM" | "BASE";
+export type AdminSalonPlanApiTier = "PREMIUM";
 
 function validateRequiredSalonLocation(s: {
   salonAddressLine1: string;
@@ -91,6 +92,7 @@ export function AdminSalonPlanSection({
 }: AdminSalonPlanSectionProps) {
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { t } = useLuxuryLocale();
   const { signInWithIssuedToken } = useLuxuryAuth();
   const { confirm, showSuccess, confirmDialog, actionBanner } = useAdminConfirmAction();
 
@@ -137,6 +139,7 @@ export function AdminSalonPlanSection({
   const slice = salonsQ.data?.content ?? [];
   const filteredSlice = slice.filter((row) => adminSalonRowMatchesSearch(row, salonSearch));
   const filteredIds = filteredSlice.map((row) => row.studioGroupId);
+  const filteredIdsKey = filteredIds.join(",");
   const allFilteredSelected = filteredIds.length > 0 && filteredIds.every((id) => selectedSalonIds.includes(id));
 
   const createSalonM = useMutation({
@@ -225,6 +228,21 @@ export function AdminSalonPlanSection({
     },
   });
 
+  const sponsoredM = useMutation({
+    mutationFn: async (input: { studioGroupId: string; enabled: boolean }) => {
+      await apiJson<void>(`/api/v1/admin/overview/salons/${input.studioGroupId}/sponsored-placement`, {
+        method: "PATCH",
+        accessToken,
+        body: JSON.stringify({ enabled: input.enabled }),
+      });
+    },
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["admin", "overview", "salons"] });
+      await qc.invalidateQueries({ queryKey: ["admin", "overview"] });
+      await qc.invalidateQueries({ queryKey: ["publicOrganizations", "sponsored"] });
+    },
+  });
+
   const sendNotificationM = useMutation({
     mutationFn: async () =>
       apiJson<{ deliveredCount: number }>("/api/v1/admin/overview/system-notifications", {
@@ -250,14 +268,17 @@ export function AdminSalonPlanSection({
   }, [page, totalPages]);
 
   useEffect(() => {
-    setSelectedSalonIds((prev) => prev.filter((id) => filteredIds.includes(id)));
-  }, [page, salonSearch, filteredIds.join(",")]);
+    const allowed = new Set(filteredIdsKey.split(",").filter((id) => id.length > 0));
+    setSelectedSalonIds((prev) => prev.filter((id) => allowed.has(id)));
+  }, [page, salonSearch, filteredIdsKey]);
 
   useEffect(() => {
-    if (expandedSalonId && !filteredIds.includes(expandedSalonId)) {
+    if (!expandedSalonId) return;
+    const allowed = new Set(filteredIdsKey.split(",").filter((id) => id.length > 0));
+    if (!allowed.has(expandedSalonId)) {
       setExpandedSalonId(null);
     }
-  }, [expandedSalonId, filteredIds.join(",")]);
+  }, [expandedSalonId, filteredIdsKey]);
 
   const submitCreateSalon = (ev: FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
@@ -529,46 +550,16 @@ export function AdminSalonPlanSection({
                                   {isOpen ? "▲" : "▼"}
                                 </span>
                               </button>
-                              {apiPlanTier === "BASE" ? (
-                                <>
-                                  <button
-                                    type="button"
-                                    className="luxury-admin-btn luxury-admin-premium-card__action-btn luxury-admin-premium-card__salon-row-login"
-                                    title={
-                                      row.ownerEmail
-                                        ? "Apri l’account titolare nell’area salone (sessione Luxury)"
-                                        : "Email titolare assente: impossibile aprire la sessione"
-                                    }
-                                    disabled={!row.ownerEmail || salonOwnerLoginM.isPending || deleteSalonM.isPending}
-                                    onClick={() => salonOwnerLoginM.mutate(row.studioGroupId)}
-                                  >
-                                    {salonOwnerLoginM.isPending && salonOwnerLoginM.variables === row.studioGroupId
-                                      ? "Login…"
-                                      : "Login"}
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="luxury-admin-btn luxury-admin-btn--danger luxury-admin-premium-card__action-btn luxury-admin-premium-card__salon-row-login"
-                                    disabled={deleteSalonM.isPending || salonOwnerLoginM.isPending}
-                                    onClick={() => askDeleteSalon(row)}
-                                  >
-                                    {deleteSalonM.isPending && deleteSalonM.variables === row.studioGroupId
-                                      ? "Eliminazione…"
-                                      : "Elimina"}
-                                  </button>
-                                </>
-                              ) : (
-                                <button
-                                  type="button"
-                                  className="luxury-admin-btn luxury-admin-btn--danger luxury-admin-premium-card__action-btn luxury-admin-premium-card__salon-row-login"
-                                  disabled={deleteSalonM.isPending || salonOwnerLoginM.isPending}
-                                  onClick={() => askDeleteSalon(row)}
-                                >
-                                  {deleteSalonM.isPending && deleteSalonM.variables === row.studioGroupId
-                                    ? "Eliminazione…"
-                                    : "Elimina"}
-                                </button>
-                              )}
+                              <button
+                                type="button"
+                                className="luxury-admin-btn luxury-admin-btn--danger luxury-admin-premium-card__action-btn luxury-admin-premium-card__salon-row-login"
+                                disabled={deleteSalonM.isPending || salonOwnerLoginM.isPending}
+                                onClick={() => askDeleteSalon(row)}
+                              >
+                                {deleteSalonM.isPending && deleteSalonM.variables === row.studioGroupId
+                                  ? "Eliminazione…"
+                                  : "Elimina"}
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -623,6 +614,14 @@ export function AdminSalonPlanSection({
                                       {row.provider ? "Sì — senza pagamento" : "No — a pagamento"}
                                     </span>
                                   </div>
+                                  <div>
+                                    <span className="luxury-admin-premium-card__detail-label">
+                                      {t("home.sponsoredSalons.adminLabel")}
+                                    </span>
+                                    <span className="luxury-admin-premium-card__detail-value">
+                                      {row.sponsoredPlacement ? t("home.sponsoredSalons.badge") : "—"}
+                                    </span>
+                                  </div>
                                 </div>
                                 <div className="luxury-admin-premium-card__actions-cell">
                                   <button
@@ -632,6 +631,28 @@ export function AdminSalonPlanSection({
                                   >
                                     Modifica
                                   </button>
+                                  <button
+                                    type="button"
+                                    className="luxury-admin-btn luxury-admin-premium-card__action-btn"
+                                    disabled={sponsoredM.isPending || deleteSalonM.isPending}
+                                    onClick={() =>
+                                      sponsoredM.mutate({
+                                        studioGroupId: row.studioGroupId,
+                                        enabled: !row.sponsoredPlacement,
+                                      })
+                                    }
+                                  >
+                                    {sponsoredM.isPending && sponsoredM.variables?.studioGroupId === row.studioGroupId
+                                      ? t("home.sponsoredSalons.adminWorking")
+                                      : row.sponsoredPlacement
+                                        ? t("home.sponsoredSalons.adminOff")
+                                        : t("home.sponsoredSalons.adminOn")}
+                                  </button>
+                                  {sponsoredM.isError && sponsoredM.variables?.studioGroupId === row.studioGroupId ? (
+                                    <p className="luxury-alert luxury-alert--error" role="alert">
+                                      {t("home.sponsoredSalons.adminError")}
+                                    </p>
+                                  ) : null}
                                   <button
                                     type="button"
                                     className="luxury-admin-btn luxury-admin-btn--danger luxury-admin-premium-card__action-btn"

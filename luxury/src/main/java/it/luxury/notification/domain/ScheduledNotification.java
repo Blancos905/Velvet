@@ -155,7 +155,7 @@ public class ScheduledNotification {
 		return n;
 	}
 
-	/** Richiesta assistenza da form account: consegnata in-app al super admin, senza coda email. */
+	/** Richiesta assistenza da form account: inbox super admin + email SMTP a assistenza@. */
 	public static ScheduledNotification supportRequestToLuxuryInbox(
 			ConsumerProfile recipient,
 			String subject,

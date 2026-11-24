@@ -6,6 +6,7 @@ import type { AppointmentDto, DayAvailability, MeSalonService, SalonCatalogClien
 import { useLuxuryAuth } from "../../auth/LuxuryAuthProvider";
 import { useMeSalonSummaryQuery } from "../../hooks/useMeSalonSummary";
 import { notifySalonCatalogClientsChanged } from "../../lib/salonCatalogClientsSync";
+import { refreshOrgAvailabilityAfterBooking } from "../../lib/orgAvailabilityRefresh";
 import { isSlotWithinBookingWindow, resolveBookingHoursWindow } from "../../lib/salonOpeningHours";
 import { isSalonOpenOnYmd, salonClosedMessageForYmd } from "../../lib/salonOpenDays";
 import { formatLocalYmd } from "./SalonAgendaBoard";
@@ -207,10 +208,13 @@ export function SalonAgendaBookClientDialog({
         accessToken,
         body: JSON.stringify(body),
       }),
-    onSuccess: async () => {
+    onSuccess: async (_row, vars) => {
       await qc.invalidateQueries({ queryKey: ["me", "salon", "agenda"] });
       void qc.invalidateQueries({ queryKey: ["me", "salon", "notifications"] });
       void qc.invalidateQueries({ queryKey: ["me", "salon", "notifications", "messages"] });
+      if (slug) {
+        refreshOrgAvailabilityAfterBooking(qc, slug, vars.start, selectedService?.durationMinutes);
+      }
       onClose();
     },
   });

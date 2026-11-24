@@ -36,7 +36,7 @@ async function probeBackendOnce(): Promise<boolean> {
 }
 
 /**
- * In dev browser, avvisa se le API non passano dal proxy Vite → Spring (:8080).
+ * In dev browser, avvisa se le API non passano dal proxy Vite → Spring (:8081 locale).
  * Nell'app mobile (WebView) è nascosto: lo script dev verifica già backend + proxy.
  */
 export function LuxuryDevBackendBanner() {
@@ -110,7 +110,7 @@ export function LuxuryDevBackendBanner() {
   return (
     <div className="luxury-dev-backend-banner" role="alert">
       <strong>Backend non raggiungibile.</strong> Le API via proxy Vite (
-      <code>/api</code> → <code>http://127.0.0.1:8080</code>) non rispondono: l&apos;app resta lenta
+      <code>/api</code> → <code>http://127.0.0.1:8081</code>) non rispondono: l&apos;app resta lenta
       finché Spring Boot non è avviato. In un altro terminale:{" "}
       <code>cd luxury &amp;&amp; ./mvnw spring-boot:run</code>
       <span className="luxury-dev-backend-banner__hint"> — oppure usa </span>

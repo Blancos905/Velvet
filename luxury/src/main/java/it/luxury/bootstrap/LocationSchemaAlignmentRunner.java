@@ -50,6 +50,14 @@ public class LocationSchemaAlignmentRunner implements ApplicationRunner {
 					c,
 					"salon_client_genders",
 					"ALTER TABLE " + TABLE + " ADD COLUMN salon_client_genders VARCHAR(80) NULL");
+			ensureColumn(
+					c,
+					"visible_to_clients",
+					"ALTER TABLE " + TABLE + " ADD COLUMN visible_to_clients BOOLEAN NOT NULL DEFAULT TRUE");
+			ensureColumn(
+					c,
+					"sponsored_placement",
+					"ALTER TABLE " + TABLE + " ADD COLUMN sponsored_placement BOOLEAN NOT NULL DEFAULT FALSE");
 		}
 	}
 

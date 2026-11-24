@@ -250,8 +250,9 @@ public class MeSalonNotificationInboxService {
 	}
 
 	/**
-	 * Operatore: non mostrare richieste Accetta/Rifiuta già risolte (appuntamento non più BOOKED).
-	 * Copre anche notifiche legacy non ancora soft-deleted con {@code staffDeletedAt}.
+	 * Operatore: non mostrare richieste Accetta/Rifiuta già risolte (appuntamento non più BOOKED),
+	 * salvo prenotazioni auto-confermate ({@code CONFIRMED} senza {@code staffDeletedAt}) che restano
+	 * come notifica informativa «il cliente ha prenotato».
 	 */
 	private static boolean keepBookingRequestForStaff(ScheduledNotification n) {
 		NotificationType type = n.getType();
@@ -260,7 +261,15 @@ public class MeSalonNotificationInboxService {
 			return true;
 		}
 		Appointment a = n.getAppointment();
-		return a == null || a.getStatus() == AppointmentStatus.BOOKED;
+		if (a == null) {
+			return true;
+		}
+		AppointmentStatus status = a.getStatus();
+		if (status == AppointmentStatus.BOOKED) {
+			return true;
+		}
+		// Auto-accept: BOOKING_CREATED resta in inbox come info (nessun dismiss staff).
+		return type == NotificationType.BOOKING_CREATED_FOR_SALON && status == AppointmentStatus.CONFIRMED;
 	}
 
 	private MeSalonNotificationMessageDto toMessageDto(ScheduledNotification n, boolean ownerView) {
@@ -319,6 +328,7 @@ public class MeSalonNotificationInboxService {
 				n.getType() == NotificationType.BOOKING_RESCHEDULED_BY_CONSUMER
 						? n.getPreviousAppointmentStart()
 						: null;
+		String appointmentStatus = a.getStatus() != null ? a.getStatus().name() : null;
 		return new MeSalonNotificationMessageDto(
 				n.getId(),
 				n.getType().name(),
@@ -332,7 +342,7 @@ public class MeSalonNotificationInboxService {
 				operatorName,
 				appointmentStart,
 				previousAppointmentStart,
-				a.getStatus().name());
+				appointmentStatus);
 	}
 
 	private static String previewWithoutAppointment(NotificationType type) {
@@ -457,12 +467,15 @@ public class MeSalonNotificationInboxService {
 									operatorName)
 							+ ".";
 			case BOOKING_CREATED_FOR_SALON ->
-					withOperator(clientName + " ha richiesto il " + dateStr + " alle " + timeStr, operatorName)
-							+ (stillPending
-									? " — in attesa di conferma."
-									: appointmentStatus == AppointmentStatus.CONFIRMED
-											? " — confermata."
-											: " — già gestita.");
+					stillPending
+							? withOperator(clientName + " ha richiesto il " + dateStr + " alle " + timeStr, operatorName)
+									+ " — in attesa di conferma."
+							: appointmentStatus == AppointmentStatus.CONFIRMED
+									? withOperator(
+													clientName + " ha prenotato il " + dateStr + " alle " + timeStr, operatorName)
+											+ "."
+									: withOperator(clientName + " ha richiesto il " + dateStr + " alle " + timeStr, operatorName)
+											+ " — già gestita.";
 			case BOOKING_RESCHEDULED_BY_CONSUMER ->
 					withOperator(
 									clientName + " ha cambiato l'orario della prenotazione al " + dateStr + " alle " + timeStr,

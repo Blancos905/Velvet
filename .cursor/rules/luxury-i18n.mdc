@@ -1,0 +1,60 @@
+---
+description: i18n frontend — ogni testo UI in italiano va tradotto in IT/EN/FR/DE/ES/PT; niente stringhe hardcoded nei componenti.
+globs: luxury-frontend/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Luxury — i18n frontend (testi UI)
+
+## Regola obbligatoria
+
+**Non aggiungere mai testo utente in italiano hardcoded** in `luxury-frontend/` (JSX, `aria-label`, `title`, toast, placeholder, …).
+
+Ogni nuova stringa UI deve:
+
+1. Avere una **chiave** in `luxury-frontend/src/i18n/messages/it.ts` (o modulo esteso: `messages/homeExtended/it.ts`, `messages/account/it.ts`, …) — **italiano = sorgente**.
+2. Essere tradotta **subito nello stesso task** in **tutte** le lingue supportate: `en`, `fr`, `de`, `es`, `pt` (vedi `UI_LOCALES` in `i18n/locales.ts`).
+3. Essere usata in componente con `t("namespace.key")` da `useLuxuryLocale()` / `useLuxuryT()`.
+
+**Se aggiungi italiano senza le altre 5 lingue, il task non è completo.**
+
+## Dove mettere le traduzioni
+
+| Area | File sorgente (IT) | Altri locale |
+|------|-------------------|--------------|
+| Core header/home/comuni | `messages/it.ts` | `messages/en.ts`, `fr.ts`, `de.ts`, `es.ts`, `pt.ts` |
+| Home estesa (carousel, Nations Cup, partner) | `messages/homeExtended/it.ts` | `homeExtended/en.ts` + `fr-de-es-pt.ts` |
+| Account (hub, nav, prenotazioni) | `messages/account/it.ts` | `account/en.ts` + `fr-de-es-pt.ts` |
+| Card trending (titolo + alt) | `i18n/homeTrendTranslations.ts` | chiavi per ogni voce in `en`, `fr`, `de`, `es`, `pt` |
+| Quick suggest (tag) | `i18n/homeQuickTranslations.ts` | pack per ogni locale |
+
+Estensioni parziali: in `fr-de-es-pt.ts` si può fare `...enHomeExtended` e sovrascrivere le chiavi tradotte — ma **ogni chiave nuova in IT deve esistere in EN** al minimo, e comparire in tutti i cataloghi finali (`MESSAGE_CATALOGS`).
+
+## Convenzioni chiavi
+
+- Prefisso per area: `home.*`, `header.*`, `account.*`, `common.*`
+- Placeholder variabili: `{name}`, `{km}`, `{country}` — stessi nomi in tutte le lingue
+- `MessageKey` = `keyof typeof itMessages` — se TypeScript segnala chiave mancante in `enMessages`, aggiungila
+
+## Cosa non va tradotto via i18n (eccezioni)
+
+- Copy **legale vincolato** (termini, privacy IT-only) — documentare se resta solo IT
+- Nomi propri brand («Saloni Luxury», «Nations Cup») se prodotto li lascia invariati
+- Query di ricerca backend (`q` nei tag quick suggest) — solo **etichette** visibili
+- Email HTML backend / messaggi API — flusso separato (non questo catalogo)
+
+## Date e numeri
+
+Usare `intlLocaleForUi(locale)` (`i18n/intlLocaleForUi.ts`) con `Intl.DateTimeFormat`, non `"it-IT"` hardcoded.
+
+## Account loggato
+
+Lingua da `consumer_profiles.preferred_locale` (`ProfileLocaleSync`). Registrazione: inviare `preferredLocale` derivato dal paese scelto.
+
+## Checklist prima di chiudere il task
+
+- [ ] Nessuna stringa italiana nuova in TSX/TS (salvo eccezioni sopra)
+- [ ] Chiave aggiunta in `it.ts` (o modulo IT esteso)
+- [ ] Stessa chiave in `en`, `fr`, `de`, `es`, `pt`
+- [ ] Componente usa `t()`; `aria-label` / `title` inclusi
+- [ ] Se mappe sidecar (`homeTrendTranslations`, …): tutte e 5 le lingue non-IT

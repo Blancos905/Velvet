@@ -12,7 +12,9 @@ import type { PreviewAmbientUiTone } from "../../data/previewAnimatedBackgrounds
 import { vetPaletteHueFromTemplateId, vetPaletteSkinIndexFromTemplateId } from "../../data/standardLayoutCatalog";
 import { isLuxuryNativeAppShell } from "../../hooks/useLuxuryNativeAppShell";
 import { formatPriceEUR } from "../../lib/format";
+import type { SalonSiblingLocation } from "../../api/types";
 import { formatSalonCityForDisplay } from "../../lib/formatSalonCityForDisplay";
+import { SalonLocationSwitch } from "./SalonLocationSwitch";
 import { normalizeShowcaseHexColor, type SalonShowcaseStored } from "../../lib/salonShowcaseStorage";
 import { salonShowcaseHasContent } from "../../lib/salonShowcaseStorage";
 import "../../styles/app-header.css";
@@ -59,6 +61,10 @@ type Props = {
   cardAmbientClass?: string;
   /** Abbinato allo sfondo: testi/controlli chiari o scuri per leggibilità. */
   cardAmbientUiTone?: PreviewAmbientUiTone;
+  /** Altre sedi dello stesso salone. Il tasto compare solo se l’elenco non è vuoto. */
+  siblingLocations?: SalonSiblingLocation[];
+  /** Anteprima titolare: i servizi partono aperti, così la scheda non finisce sul pulsante. */
+  servicesInitiallyOpen?: boolean;
 };
 
 function sectionClass(themeClass?: string): string {
@@ -140,13 +146,15 @@ export function SalonPublicShowcase({
   allowEmptyPreview,
   cardAmbientClass,
   cardAmbientUiTone,
+  siblingLocations = [],
+  servicesInitiallyOpen = false,
 }: Props) {
   const detailTitleId = useId();
   const servicesStripRegionId = useId();
   const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
   const [detailServiceId, setDetailServiceId] = useState<string | null>(null);
   /** Scheda pubblica detached: servizi nascosti fino a «I nostri servizi». */
-  const [publicServicesStripOpen, setPublicServicesStripOpen] = useState(false);
+  const [publicServicesStripOpen, setPublicServicesStripOpen] = useState(servicesInitiallyOpen);
   const effectiveSelectedId = selectedServiceId ?? internalSelectedId;
   const sectionExtraClass = [
     detachedPublicLayout ? "luxury-salon-showcase--detached-public" : "",
@@ -167,8 +175,10 @@ export function SalonPublicShowcase({
     return { hue, skin };
   }, [themeClass]);
 
-  const paletteSectionStyle: CSSProperties | undefined =
-    paletteTheme !== null ? { ["--showcase-h" as string]: paletteTheme.hue } : undefined;
+  const paletteSectionStyle = useMemo((): CSSProperties | undefined => {
+    if (paletteTheme === null) return undefined;
+    return { ["--showcase-h" as string]: paletteTheme.hue };
+  }, [paletteTheme]);
 
   const customShowcaseColors = useMemo((): CSSProperties | undefined => {
     const ambientActive =
@@ -234,8 +244,10 @@ export function SalonPublicShowcase({
 
   const cityDisplay = formatSalonCityForDisplay(city);
 
-  const stripServices =
-    services.length > 0 ? services : allowEmptyPreview && embedHeading && !hasAnyContent ? DEMO_SERVICES : [];
+  const stripServices = useMemo(
+    () => (services.length > 0 ? services : allowEmptyPreview && embedHeading && !hasAnyContent ? DEMO_SERVICES : []),
+    [services, allowEmptyPreview, embedHeading, hasAnyContent],
+  );
 
   const selectedService = useMemo(
     () => stripServices.find((x) => x.id === effectiveSelectedId) ?? null,
@@ -492,7 +504,11 @@ export function SalonPublicShowcase({
         (!hasCarousel && (hasLogo || Boolean(embedHeading)));
       return (
         <div className="luxury-salon-showcase__page luxury-salon-showcase__page--detached">
-          <div className="luxury-salon-showcase__brand-top luxury-salon-showcase__brand-top--detached-centered">
+          <div
+            className={`luxury-salon-showcase__brand-top luxury-salon-showcase__brand-top--detached-centered${
+              siblingLocations.length > 0 ? " luxury-salon-showcase__brand-top--with-locations" : ""
+            }`}
+          >
             <div className="luxury-salon-showcase__brand-logo-side">
               <div className="luxury-salon-showcase__logo-frame luxury-salon-showcase__logo-frame--hero luxury-salon-showcase__logo-frame--detached luxury-salon-showcase__logo-frame--public-hero">
                 {hasLogo ? (
@@ -509,12 +525,24 @@ export function SalonPublicShowcase({
               {cityDisplay ? (
                 <p className="luxury-salon-showcase__page-sub luxury-salon-showcase__page-sub--detached">{cityDisplay}</p>
               ) : null}
-              <SalonSiteDescription
-                text={hasSiteDesc ? siteDesc : SALON_SITE_DESC_PLACEHOLDER}
-                detached
-                isPlaceholder={!hasSiteDesc}
-              />
+              {siblingLocations.length === 0 ? (
+                <SalonSiteDescription
+                  text={hasSiteDesc ? siteDesc : SALON_SITE_DESC_PLACEHOLDER}
+                  detached
+                  isPlaceholder={!hasSiteDesc}
+                />
+              ) : null}
             </div>
+            {siblingLocations.length > 0 ? <SalonLocationSwitch locations={siblingLocations} /> : null}
+            {siblingLocations.length > 0 ? (
+              <div className="luxury-salon-showcase__brand-text">
+                <SalonSiteDescription
+                  text={hasSiteDesc ? siteDesc : SALON_SITE_DESC_PLACEHOLDER}
+                  detached
+                  isPlaceholder={!hasSiteDesc}
+                />
+              </div>
+            ) : null}
           </div>
 
           {showCarouselSection ? (

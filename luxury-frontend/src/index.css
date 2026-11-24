@@ -135,6 +135,22 @@ a.luxury-search-hit:hover {
  * App mobile (WebView): pseudo-elementi con inset negativo (hero, header) allargano
  * scrollWidth oltre lo schermo → fascia vuota a destra (sfondo shell Flutter).
  */
+/* Web stretto: stessi bleed (pseudo, slide, banner) che su iPhone fanno scorrere la pagina di lato. */
+@media (max-width: 900px) {
+  html {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  body,
+  #root,
+  .luxury-layout-main {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+
 html.luxury-native-app {
   width: 100%;
   overflow-x: hidden;

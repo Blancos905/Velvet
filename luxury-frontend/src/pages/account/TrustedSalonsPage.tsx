@@ -68,7 +68,7 @@ export default function TrustedSalonsPage() {
     return <Navigate to="/account" replace />;
   }
   if (isSalonTitolare) {
-    return <Navigate to="/account/salone" replace />;
+    return <Navigate to="/salone" replace />;
   }
 
   const rows = q.data ?? [];

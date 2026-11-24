@@ -96,7 +96,7 @@ public class PremiumRegistrationCompletionService {
 					tokens.accessToken(),
 					tokens.refreshToken(),
 					tokens.expiresInSeconds(),
-					"/account/salone");
+					"/salone");
 		}
 		catch (StripeException ex) {
 			throw new BusinessException(HttpStatus.BAD_GATEWAY, "STRIPE_ERROR", "Impossibile verificare il pagamento Stripe.");

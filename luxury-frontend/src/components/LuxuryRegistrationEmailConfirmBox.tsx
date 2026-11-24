@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect, useId, useState } from "react";
 import { apiJson } from "../api/client";
 import { PREMIUM_SALON_POST_LOGIN_PATH } from "../lib/salonRegistrationPostLogin";
+import { LuxuryEmailResentBox } from "./LuxuryEmailLinkConfirmSuccessBox";
 import "../styles/luxury-email-confirm-box.css";
 
 type EmailVerificationResendResponse = {
@@ -153,11 +154,7 @@ export function LuxuryRegistrationEmailConfirmBox({
           {resendErr}
         </p>
       ) : null}
-      {resendMsg ? (
-        <p className="luxury-alert luxury-alert--success luxury-email-confirm-box__alert" role="status">
-          {resendMsg}
-        </p>
-      ) : null}
+      {resendMsg ? <LuxuryEmailResentBox /> : null}
 
       <ol className="luxury-email-confirm-box__steps">
         <li>Apri il messaggio nella casella di posta</li>

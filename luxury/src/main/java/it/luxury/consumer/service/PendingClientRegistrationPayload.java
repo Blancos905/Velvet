@@ -7,6 +7,7 @@ public record PendingClientRegistrationPayload(
 		String firstName,
 		String lastName,
 		String country,
+		String preferredLocale,
 		String phone,
 		boolean bootstrapSuperAdmin,
 		String legalDocumentVersion) {

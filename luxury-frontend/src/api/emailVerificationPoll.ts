@@ -1,5 +1,8 @@
 import { apiJson } from "./client";
-import type { EmailVerificationConfirmResponse } from "../lib/emailVerificationConfirmShared";
+import {
+  readRegistrationPollSecret,
+  type EmailVerificationConfirmResponse,
+} from "../lib/emailVerificationConfirmShared";
 
 /** Sincronizza conferma fatta in un'altra scheda (link email) con la pagina registrazione. */
 export async function pollEmailVerificationSync(
@@ -10,7 +13,11 @@ export async function pollEmailVerificationSync(
     "/api/v1/auth/email-verification/poll",
     {
       method: "POST",
-      body: JSON.stringify({ email: email.trim().toLowerCase(), registrationAt }),
+      body: JSON.stringify({
+        email: email.trim().toLowerCase(),
+        registrationAt,
+        pollSecret: readRegistrationPollSecret(email) ?? "",
+      }),
     },
   );
   return body ?? null;

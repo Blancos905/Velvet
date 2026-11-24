@@ -6,6 +6,8 @@ export type QuickSuggestTag = {
   q: string;
   /** Pubblico salone (maschile/femminile) per filtrare i risultati geolocalizzati. */
   clientGenders?: SalonClientGenderId[];
+  /** Tag dinamico da listino salone (non presente nei tasti curati). */
+  dynamic?: boolean;
 };
 
 export type QuickSuggestGroup = {
@@ -14,7 +16,18 @@ export type QuickSuggestGroup = {
   tags: QuickSuggestTag[];
 };
 
-/** Suggerimenti rapidi: si aprono dopo il click su «Oppure un tocco». */
+export type QuickSuggestExtraFromApi = {
+  label: string;
+  q: string;
+  groupId: string;
+};
+
+export type QuickSuggestAvailability = {
+  curatedQueries: string[];
+  extras: QuickSuggestExtraFromApi[];
+};
+
+/** Suggerimenti rapidi curati: si aprono dopo il click su «Oppure un tocco». */
 export const QUICK_SUGGEST_GROUPS: QuickSuggestGroup[] = [
   {
     id: "parrucchieri",
@@ -59,3 +72,59 @@ export const QUICK_SUGGEST_GROUPS: QuickSuggestGroup[] = [
     ],
   },
 ];
+
+const KNOWN_GROUP_IDS = new Set(QUICK_SUGGEST_GROUPS.map((g) => g.id));
+
+function normalizeQuickQ(q: string): string {
+  return q.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+/**
+ * Unisce tasti curati (eventualmente filtrati da disponibilità nel raggio) e tag dinamici da listino.
+ */
+export function mergeQuickSuggestGroups(
+  availability: QuickSuggestAvailability | null,
+): QuickSuggestGroup[] {
+  const curatedSet = availability
+    ? new Set(availability.curatedQueries.map(normalizeQuickQ))
+    : null;
+
+  const groups: QuickSuggestGroup[] = QUICK_SUGGEST_GROUPS.map((g) => ({
+    ...g,
+    tags: curatedSet
+      ? g.tags.filter((t) => curatedSet.has(normalizeQuickQ(t.q)))
+      : [...g.tags],
+  }));
+
+  const extras = availability?.extras ?? [];
+  if (extras.length === 0) {
+    return groups.filter((g) => g.tags.length > 0);
+  }
+
+  const byId = new Map(groups.map((g) => [g.id, g]));
+  let altri = byId.get("altri");
+  if (!altri) {
+    altri = { id: "altri", label: "Altri servizi vicino a te", tags: [] };
+    byId.set("altri", altri);
+    groups.push(altri);
+  }
+
+  for (const extra of extras) {
+    const groupId = KNOWN_GROUP_IDS.has(extra.groupId) ? extra.groupId : "altri";
+    let target = byId.get(groupId);
+    if (!target) {
+      target = altri;
+    }
+    const nq = normalizeQuickQ(extra.q);
+    if (target.tags.some((t) => normalizeQuickQ(t.q) === nq)) {
+      continue;
+    }
+    target.tags.push({
+      label: extra.label.trim() || extra.q.trim(),
+      q: extra.q.trim(),
+      dynamic: true,
+    });
+  }
+
+  return groups.filter((g) => g.tags.length > 0);
+}

@@ -2,16 +2,23 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { localeFromCountryCode } from "../i18n/countryToLocale";
+import { useLuxuryLocale } from "../i18n/useLuxuryLocale";
 import { useLuxuryAuth } from "../auth/LuxuryAuthProvider";
 import { saveBillingProfile } from "../api/billing";
-import { registerConsumerApi } from "../api/registerConsumer";
+import { registerConsumerApi, type SalonRegistrationLocationPayload } from "../api/registerConsumer";
+import { saveSalonRegistrationLocations } from "../api/salonRegistrationLocations";
 import { SaloniLuxuryLogoMark } from "../components/SaloniLuxuryLogoMark";
+import { SalonPlusPlanInfoModal } from "../components/salon/SalonPlusPlanInfoModal";
 import { SalonPremiumPlanCardPreview } from "../components/salon/SalonPremiumPlanCardPreview";
 import { SalonPlanCardTagline } from "../components/salon/SalonPlanCardTagline";
 import { SalonPlanPremiumTrialPanel } from "../components/salon/SalonPlanPremiumTrialPanel";
+import {
+  SalonRegistrationLocationFields,
+  type SalonRegistrationLocationDraft,
+} from "../components/salon/SalonRegistrationLocationFields";
 import { SalonPremiumOwnerInfoPrivacyModal } from "../components/salon/SalonPremiumOwnerInfoPrivacyModal";
 import { LuxuryEuropeanContactFields } from "../components/LuxuryEuropeanContactFields";
-import { LuxuryFreePlanAppNoticeBox } from "../components/LuxuryFreePlanAppNoticeBox";
 import { LuxuryRegistrationEmailConfirmSection } from "../components/LuxuryRegistrationEmailConfirmScreen";
 import { LuxuryRegistrationEmailConfirmFlow } from "../components/LuxuryRegistrationEmailConfirmFlow";
 import { LuxuryEmailVerifiedSuccessBox } from "../components/LuxuryEmailVerifiedSuccessBox";
@@ -20,12 +27,13 @@ import {
   type SalonBillingProfileFieldValues,
 } from "../components/SalonBillingProfileFields";
 import { partnerContactEmail } from "../config/env";
-import { SALON_BUSINESS_TYPE_OPTIONS, normalizeSalonBusinessTypeIds } from "../data/salonBusinessTypes";
+import { normalizeSalonBusinessTypeIds } from "../data/salonBusinessTypes";
 import { SALON_CLIENT_GENDER_OPTIONS } from "../data/salonClientGenders";
-import { SALON_PLANS, premiumTrialDurationLabel, premiumTrialFreeLabel, premiumTrialLeadFootnote, parseSalonPlanTier, planDisplayName, type SalonPlanTier } from "../data/salonPlans";
+import { SALON_PLANS, premiumTrialDurationLabel, premiumTrialFreeLabel, parseSalonPlanTier, planDisplayName, SALON_PREMIUM_TRIAL_DAYS, type SalonPlanTier } from "../data/salonPlans";
+import { parseInlineBold } from "../lib/parseInlineBold";
+import { SALON_MAX_LOCATIONS, salonLocationMonthlyTotalEuros, salonLocationUnitEuros } from "../data/salonLocationPricing";
 import {
   DEFAULT_EUROPEAN_COUNTRY_CODE,
-  EUROPEAN_PHONE_COUNTRIES,
   europeanCountryByCode,
 } from "../data/europeanPhonePrefixes";
 import { optionalEuropeanPhoneForRegisterApi, splitStoredEuropeanPhone } from "../lib/europeanPhone";
@@ -41,10 +49,10 @@ import { useEffectiveSalonPlanTier } from "../hooks/useEffectiveSalonPlanTier";
 import { useMeProfileQuery } from "../hooks/useMeProfile";
 import { useMeSalonSummaryQuery } from "../hooks/useMeSalonSummary";
 import { toBillingProfilePayload, validateSalonBillingProfileForm } from "../lib/salonBillingProfileValidation";
-import { isFeatureEnabled, resolveSubscriptionSurface } from "../lib/subscription-guards";
 import { useLuxuryNativeAppShell } from "../hooks/useLuxuryNativeAppShell";
 import { humanizeAuthNetworkError } from "../utils/authErrors";
 import {
+  clearClientSignupAwaiting,
   clearPendingEmailVerification,
   clearSalonRegistrationPostSignupActive,
   hasPendingEmailVerification,
@@ -53,8 +61,10 @@ import {
   markSalonRegistrationPostSignupActive,
   normalizeTokenFromUrl,
   persistPendingEmailVerification,
+  readClientSignupAwaiting,
   readPendingEmailVerification,
   readPendingEmailVerificationAt,
+  shouldResumeSalonRegistrationEmailConfirm,
 } from "../lib/emailVerificationConfirmShared";
 import "../styles/luxury-email-confirm-box.css";
 import "../styles/luxury-salon-plans-register.css";
@@ -93,6 +103,23 @@ function SalonPlansBackIcon() {
   );
 }
 
+function toggleId(ids: readonly string[], id: string): string[] {
+  return ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id];
+}
+
+function emptyExtraLocation(country: string): SalonRegistrationLocationDraft {
+  return {
+    name: "",
+    addressLine1: "",
+    postalCode: "",
+    city: "",
+    province: "",
+    country,
+    businessTypes: [],
+    clientGenders: [],
+  };
+}
+
 export default function SalonPlansPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -101,6 +128,7 @@ export default function SalonPlansPage() {
   const hasTokenConfirm = isValidEmailVerificationToken(tokenFromUrl);
   const queryClient = useQueryClient();
   const { signUpForSalon, signInWithPassword, isAuthenticated, isSalonTitolare, accessToken } = useLuxuryAuth();
+  const { setLocaleFromCountryForRegistration, t } = useLuxuryLocale();
   const isNativeApp = useLuxuryNativeAppShell();
   const effectivePlan = useEffectiveSalonPlanTier();
   const meProfile = useMeProfileQuery();
@@ -108,11 +136,11 @@ export default function SalonPlansPage() {
   const checkoutPolicy = useSalonPremiumCheckoutPolicyQuery();
   const premiumCheckoutRequired = isSalonPremiumCheckoutRequired(checkoutPolicy.data);
   const [modalPlan, setModalPlan] = useState<SalonPlanTier | null>(null);
+  const [plusInfoOpen, setPlusInfoOpen] = useState(false);
   const upgradePrefillDoneRef = useRef(false);
-  /** Titolare Free già registrato: form Premium = upgrade (prefill), non nuova iscrizione. */
-  const isFreeOwnerPremiumUpgrade =
+  /** Titolare già registrato senza Premium: form precompilato, non una nuova iscrizione. */
+  const isExistingOwnerPremiumActivation =
     isAuthenticated && isSalonTitolare && effectivePlan === "BASE" && meSalon.data?.provisioned === true;
-  const [freePlanNoticeOpen, setFreePlanNoticeOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorHint, setErrorHint] = useState<string | null>(null);
   const [registrationComplete, setRegistrationComplete] = useState(false);
@@ -122,6 +150,17 @@ export default function SalonPlansPage() {
   const [registrationNeedsEmailConfirm, setRegistrationNeedsEmailConfirm] = useState(true);
   const [registrationSuccessMessage, setRegistrationSuccessMessage] = useState<string | null>(null);
   const [postSignupHeroTitle, setPostSignupHeroTitle] = useState("Controlla la tua email");
+
+  useEffect(() => {
+    if (registrationComplete) return;
+    if (!isSalonRegistrationPostSignupActive()) return;
+    const pending = readPendingEmailVerification();
+    const awaiting = readClientSignupAwaiting()?.email ?? "";
+    const pendingIsClientSignup = Boolean(awaiting) && (!pending || pending === awaiting);
+    if (pendingIsClientSignup || !pending) {
+      clearSalonRegistrationPostSignupActive();
+    }
+  }, [registrationComplete]);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -145,6 +184,9 @@ export default function SalonPlansPage() {
   const [salonCity, setSalonCity] = useState("");
   const [salonProvince, setSalonProvince] = useState("");
   const [salonCountry, setSalonCountry] = useState(DEFAULT_EUROPEAN_COUNTRY_CODE);
+  const [locationCount, setLocationCount] = useState(1);
+  const [locationsConfirmed, setLocationsConfirmed] = useState(false);
+  const [extraLocations, setExtraLocations] = useState<SalonRegistrationLocationDraft[]>([]);
   const [salonBusinessTypes, setSalonBusinessTypes] = useState<Set<string>>(() => new Set());
   const [salonClientGenders, setSalonClientGenders] = useState<Set<string>>(() => new Set());
   const [billingSameAsSalon, setBillingSameAsSalon] = useState(true);
@@ -174,6 +216,9 @@ export default function SalonPlansPage() {
   /** App WebView: ripristina «Controlla email» dopo reload o ritorno da Safari/Mail. */
   useEffect(() => {
     if (!isNativeApp || !hasPendingEmailVerification()) return;
+    const pending = readPendingEmailVerification();
+    const awaiting = readClientSignupAwaiting()?.email ?? "";
+    if (awaiting && (!pending || pending === awaiting)) return;
 
     /* Salone già attivo fuori dal flow live: pending stale → non riaprire confirm. */
     if (isAuthenticated) {
@@ -213,17 +258,12 @@ export default function SalonPlansPage() {
   ]);
 
   const formId = useId();
-  const salonTypesLegendId = `${formId}-salon-types-legend`;
-  const salonClientGendersLegendId = `${formId}-salon-client-genders-legend`;
   const billingLegendId = `${formId}-billing-legend`;
   const titleId = `${formId}-title`;
 
   const openRegistration = (tier: SalonPlanTier) => {
     setErrorHint(null);
-    if (!isFeatureEnabled("owner.web.freeRegistration", tier, { surface: resolveSubscriptionSurface(isNativeApp) })) {
-      setFreePlanNoticeOpen(true);
-      return;
-    }
+    if (tier !== "PREMIUM" && tier !== "PLUS") return;
     signUpForSalon(tier);
     upgradePrefillDoneRef.current = false;
     setModalPlan(tier);
@@ -260,6 +300,9 @@ export default function SalonPlansPage() {
     setSalonCity("");
     setSalonProvince("");
     setSalonCountry(DEFAULT_EUROPEAN_COUNTRY_CODE);
+    setLocationCount(1);
+    setLocationsConfirmed(false);
+    setExtraLocations([]);
     setSalonBusinessTypes(new Set());
     setSalonClientGenders(new Set());
     setBillingSameAsSalon(true);
@@ -279,9 +322,9 @@ export default function SalonPlansPage() {
     });
   };
 
-  /** Free → Premium: ripristina i campi già compilati in registrazione Free. */
+  /** Titolare già registrato senza Premium: ripristina i campi salone per l’attivazione. */
   useEffect(() => {
-    if (modalPlan !== "PREMIUM" || !isFreeOwnerPremiumUpgrade) return;
+    if (modalPlan !== "PREMIUM" || !isExistingOwnerPremiumActivation) return;
     if (meProfile.isPending || meSalon.isPending) return;
     const profile = meProfile.data;
     const salon = meSalon.data;
@@ -315,6 +358,9 @@ export default function SalonPlansPage() {
     setSalonPostalCode((salon.primaryLocationPostalCode ?? "").trim());
     setSalonCity((salon.primaryLocationCity ?? "").trim());
     setSalonProvince(province);
+    setLocationCount(Math.max(1, salon.locationCount ?? 1));
+    setLocationsConfirmed(false);
+    setExtraLocations([]);
     setSalonBusinessTypes(new Set(businessTypes));
     setSalonClientGenders(new Set(clientGenders));
     setBillingSameAsSalon(true);
@@ -334,7 +380,7 @@ export default function SalonPlansPage() {
     });
   }, [
     modalPlan,
-    isFreeOwnerPremiumUpgrade,
+    isExistingOwnerPremiumActivation,
     meProfile.isPending,
     meProfile.data,
     meSalon.isPending,
@@ -347,22 +393,31 @@ export default function SalonPlansPage() {
   useEffect(() => {
     if (hasTokenConfirm || registrationComplete || modalPlan != null) return;
     if (parseSalonPlanTier(planParam) !== "PREMIUM") return;
-    if (isAuthenticated && !isFreeOwnerPremiumUpgrade) return;
+    if (isAuthenticated && !isExistingOwnerPremiumActivation) return;
     if (hasPendingEmailVerification()) return;
     openRegistration("PREMIUM");
     // eslint-disable-next-line react-hooks/exhaustive-deps -- deep link: apri il form una sola volta
-  }, [hasTokenConfirm, registrationComplete, modalPlan, planParam, isAuthenticated, isFreeOwnerPremiumUpgrade]);
+  }, [hasTokenConfirm, registrationComplete, modalPlan, planParam, isAuthenticated, isExistingOwnerPremiumActivation]);
+
+  useEffect(() => {
+    if (hasTokenConfirm || registrationComplete || modalPlan != null) return;
+    if (parseSalonPlanTier(planParam) !== "PLUS") return;
+    if (isAuthenticated) return;
+    if (hasPendingEmailVerification()) return;
+    openRegistration("PLUS");
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deep link Plus: apri il form una sola volta
+  }, [hasTokenConfirm, registrationComplete, modalPlan, planParam, isAuthenticated]);
 
   /**
    * Rientro su `/piani` con salone già attivo (fuori dal flow post-signup):
    * non riaprire registrazione/confirm — vai all'hub.
-   * Durante celebration / thank-you Free non navigare via (registrationComplete o flag sessione).
+   * Durante celebration / thank-you non navigare via (registrationComplete o flag sessione).
    */
   useEffect(() => {
     if (hasTokenConfirm) return;
     if (registrationComplete || isSalonRegistrationPostSignupActive()) return;
     if (!isAuthenticated || !isSalonTitolare || !meSalon.data?.provisioned) return;
-    if (parseSalonPlanTier(planParam) === "PREMIUM" && isFreeOwnerPremiumUpgrade) return;
+    if (parseSalonPlanTier(planParam) === "PREMIUM" && isExistingOwnerPremiumActivation) return;
 
     clearPendingEmailVerification();
     clearSalonRegistrationPostSignupActive();
@@ -374,7 +429,7 @@ export default function SalonPlansPage() {
     setRegistrationSuccessMessage(null);
     setRegistrationNeedsEmailConfirm(true);
     setModalPlan(null);
-    navigate("/account/salone", { replace: true });
+    navigate("/salone", { replace: true });
   }, [
     hasTokenConfirm,
     registrationComplete,
@@ -382,7 +437,7 @@ export default function SalonPlansPage() {
     isSalonTitolare,
     meSalon.data?.provisioned,
     planParam,
-    isFreeOwnerPremiumUpgrade,
+    isExistingOwnerPremiumActivation,
     navigate,
   ]);
 
@@ -409,6 +464,54 @@ export default function SalonPlansPage() {
     return base;
   };
 
+  const savedLocationCount = isExistingOwnerPremiumActivation ? Math.max(1, meSalon.data?.locationCount ?? 1) : 0;
+  const minLocationCount = Math.max(1, savedLocationCount);
+  const newLocationStart = Math.max(savedLocationCount, 1);
+
+  const normalizeLocationCount = (raw: number) =>
+    Math.min(SALON_MAX_LOCATIONS, Math.max(minLocationCount, Math.floor(raw) || minLocationCount));
+
+  const onLocationCountChange = (raw: number) => {
+    setLocationCount(normalizeLocationCount(raw));
+    setLocationsConfirmed(false);
+  };
+
+  const confirmLocations = () => {
+    const next = normalizeLocationCount(locationCount);
+    setLocationCount(next);
+    const extraNeeded = Math.max(0, next - newLocationStart);
+    setExtraLocations((prev) => {
+      const copy = prev.slice(0, extraNeeded);
+      while (copy.length < extraNeeded) {
+        copy.push(emptyExtraLocation(salonCountry || DEFAULT_EUROPEAN_COUNTRY_CODE));
+      }
+      return copy;
+    });
+    setLocationsConfirmed(true);
+  };
+
+  const locationPayload = (draft: SalonRegistrationLocationDraft): SalonRegistrationLocationPayload => ({
+    displayName: draft.name.trim(),
+    addressLine1: draft.addressLine1.trim(),
+    postalCode: draft.postalCode.trim(),
+    city: draft.city.trim(),
+    province: draft.province.trim(),
+    country: (draft.country || DEFAULT_EUROPEAN_COUNTRY_CODE).trim(),
+    salonBusinessTypes: [...draft.businessTypes].sort(),
+    salonClientGenders: [...draft.clientGenders].sort(),
+  });
+
+  const primaryLocationDraft = (): SalonRegistrationLocationDraft => ({
+    name: salonName,
+    addressLine1: salonAddressLine1,
+    postalCode: salonPostalCode,
+    city: salonCity,
+    province: salonProvince,
+    country: salonCountry || DEFAULT_EUROPEAN_COUNTRY_CODE,
+    businessTypes: [...salonBusinessTypes],
+    clientGenders: [...salonClientGenders],
+  });
+
   const closeModal = () => {
     if (submitting) return;
     setShowPassword(false);
@@ -416,15 +519,11 @@ export default function SalonPlansPage() {
     upgradePrefillDoneRef.current = false;
     setModalPlan(null);
   };
-  const closeFreePlanNotice = () => {
-    setFreePlanNoticeOpen(false);
-  };
-
   const onSubmitRegistration = (e: React.FormEvent) => {
     e.preventDefault();
     if (modalPlan == null) return;
     setErrorHint(null);
-    const upgradingFreeOwner = isFreeOwnerPremiumUpgrade && modalPlan === "PREMIUM";
+    const upgradingExistingOwner = isExistingOwnerPremiumActivation && modalPlan === "PREMIUM";
 
     /* Evitiamo di dipendere dalla validazione HTML5: con modale overlay il browser spesso non mostra il tooltip nativo
        e sembra che il pulsante «non faccia nulla». */
@@ -433,7 +532,7 @@ export default function SalonPlansPage() {
       return;
     }
 
-    if (!upgradingFreeOwner) {
+    if (!upgradingExistingOwner) {
       if (password.length < 8) {
         setErrorHint("La password deve avere almeno 8 caratteri.");
         return;
@@ -455,20 +554,21 @@ export default function SalonPlansPage() {
       setErrorHint("Per registrarti devi confermare di avere almeno 16 anni.");
       return;
     }
-    if (!salonName.trim()) {
-      setErrorHint("Indica il nome del salone (come lo vedono i clienti in ricerca e in vetrina).");
-      return;
-    }
-
-    if (modalPlan === "BASE" || modalPlan === "PREMIUM") {
+    if (modalPlan === "PREMIUM" || modalPlan === "PLUS") {
+      if (!salonName.trim()) {
+        setErrorHint(t("plans.locations.salonNameRequired", { n: 1 }));
+        return;
+      }
+      if (!locationsConfirmed) {
+        setErrorHint(t("plans.locations.confirmRequired"));
+        return;
+      }
       if (salonBusinessTypes.size === 0) {
-        setErrorHint(
-          "Seleziona almeno una tipologia: parrucchiere, estetista e/o massaggio / fisioterapia (puoi combinarle).",
-        );
+        setErrorHint(t("plans.locations.businessTypesRequired", { n: 1 }));
         return;
       }
       if (salonClientGenders.size === 0) {
-        setErrorHint("Seleziona almeno un pubblico di riferimento: maschile e/o femminile (puoi indicare entrambi).");
+        setErrorHint(t("plans.locations.clientGendersRequired", { n: 1 }));
         return;
       }
       const salonErr = validateRequiredSalonLocation({
@@ -478,8 +578,33 @@ export default function SalonPlansPage() {
         salonProvince,
       });
       if (salonErr) {
-        setErrorHint(salonErr);
+        setErrorHint(t("plans.locations.missing", { n: 1 }));
         return;
+      }
+      for (let i = 0; i < extraLocations.length; i++) {
+        const sedeNumber = newLocationStart + i + 1;
+        if (!extraLocations[i].name.trim()) {
+          setErrorHint(t("plans.locations.salonNameRequired", { n: sedeNumber }));
+          return;
+        }
+        if (extraLocations[i].businessTypes.length === 0) {
+          setErrorHint(t("plans.locations.businessTypesRequired", { n: sedeNumber }));
+          return;
+        }
+        if (extraLocations[i].clientGenders.length === 0) {
+          setErrorHint(t("plans.locations.clientGendersRequired", { n: sedeNumber }));
+          return;
+        }
+        const extraErr = validateRequiredSalonLocation({
+          salonAddressLine1: extraLocations[i].addressLine1,
+          salonPostalCode: extraLocations[i].postalCode,
+          salonCity: extraLocations[i].city,
+          salonProvince: extraLocations[i].province,
+        });
+        if (extraErr) {
+          setErrorHint(t("plans.locations.missing", { n: newLocationStart + i + 1 }));
+          return;
+        }
       }
     }
 
@@ -495,11 +620,18 @@ export default function SalonPlansPage() {
     setSubmitting(true);
     void (async () => {
       try {
-        if (upgradingFreeOwner) {
+        if (upgradingExistingOwner) {
           if (!accessToken) {
             setErrorHint("Sessione scaduta. Accedi di nuovo per passare a Premium.");
             return;
           }
+          await saveSalonRegistrationLocations(accessToken, {
+            primaryLocation: locationPayload(primaryLocationDraft()),
+            additionalLocations: extraLocations.map(locationPayload),
+            salonBusinessTypes: [...salonBusinessTypes].sort(),
+            salonClientGenders: [...salonClientGenders].sort(),
+          });
+          await queryClient.invalidateQueries({ queryKey: ["me", "salon"] });
           if (premiumCheckoutRequired) {
             await saveBillingProfile(accessToken, toBillingProfilePayload(resolveBillingForSubmit()));
             await queryClient.invalidateQueries({ queryKey: ["me", "billing"] });
@@ -522,15 +654,17 @@ export default function SalonPlansPage() {
           phone: optionalEuropeanPhoneForRegisterApi(phoneDialCode, phoneLocal),
           salonName: salonName.trim(),
           planTier: modalPlan,
-          ...(modalPlan === "BASE" || modalPlan === "PREMIUM"
+          ...(modalPlan === "PREMIUM" || modalPlan === "PLUS"
             ? {
                 salonAddressLine1: salonAddressLine1.trim(),
                 salonPostalCode: salonPostalCode.trim(),
                 salonCity: salonCity.trim(),
                 salonProvince: salonProvince.trim(),
                 salonCountry: salonCountry.trim() || DEFAULT_EUROPEAN_COUNTRY_CODE,
+                preferredLocale: localeFromCountryCode(salonCountry.trim() || DEFAULT_EUROPEAN_COUNTRY_CODE),
                 salonBusinessTypes: [...salonBusinessTypes].sort(),
                 salonClientGenders: [...salonClientGenders].sort(),
+                salonLocations: [locationPayload(primaryLocationDraft()), ...extraLocations.map(locationPayload)],
               }
             : {}),
           ...(modalPlan === "PREMIUM" && billingPayload ? { billing: billingPayload } : {}),
@@ -557,6 +691,7 @@ export default function SalonPlansPage() {
         setRegistrationNeedsEmailConfirm(true);
         setRegistrationSuccessMessage(result.message);
         setModalPlan(null);
+        clearClientSignupAwaiting();
         markSalonRegistrationPostSignupActive();
         setRegistrationComplete(true);
         setRegisteredEmail(emailNorm);
@@ -571,39 +706,14 @@ export default function SalonPlansPage() {
   };
 
   const modalPlanName = modalPlan != null ? planDisplayName(modalPlan) : "";
-  const showLocationSection = modalPlan === "BASE" || modalPlan === "PREMIUM";
+  const showLocationSection = modalPlan === "PREMIUM" || modalPlan === "PLUS";
   const wideModal = showLocationSection;
-
-  const visiblePlans = SALON_PLANS.filter(
-    (p) => !isNativeApp || p.tier === "BASE" || (p.tier === "PREMIUM" && premiumCheckoutRequired),
-  );
-  const displayPlans = isNativeApp
-    ? [...visiblePlans].sort((a, b) => (a.tier === "PREMIUM" ? -1 : b.tier === "PREMIUM" ? 1 : 0))
-    : visiblePlans;
+  const displayPlans = SALON_PLANS;
 
   const planModals =
     typeof document !== "undefined"
       ? createPortal(
           <>
-            {freePlanNoticeOpen ? (
-              <div
-                className="luxury-plans-modal-root luxury-plans-modal-root--free-notice"
-                role="presentation"
-                onMouseDown={(ev) => ev.target === ev.currentTarget && closeFreePlanNotice()}
-              >
-                <div
-                  role="dialog"
-                  aria-modal="true"
-                  aria-labelledby={`${titleId}-free-notice`}
-                  onMouseDown={(ev) => ev.stopPropagation()}
-                >
-                  <LuxuryFreePlanAppNoticeBox
-                    titleId={`${titleId}-free-notice`}
-                    onClose={closeFreePlanNotice}
-                  />
-                </div>
-              </div>
-            ) : null}
             {modalPlan != null ? (
               <div
                 className="luxury-plans-modal-root luxury-plans-modal-root--salon-register"
@@ -611,7 +721,7 @@ export default function SalonPlansPage() {
                 onMouseDown={(ev) => ev.target === ev.currentTarget && closeModal()}
               >
                 <section
-                  className={`luxury-email-confirm-box luxury-salon-register-box${modalPlan === "PREMIUM" ? " luxury-salon-register-box--premium" : ""}${wideModal ? " luxury-salon-register-box--wide" : ""}`}
+                  className={`luxury-email-confirm-box luxury-salon-register-box${modalPlan === "PREMIUM" || modalPlan === "PLUS" ? " luxury-salon-register-box--premium" : ""}${wideModal ? " luxury-salon-register-box--wide" : ""}`}
                   role="dialog"
                   aria-modal="true"
                   aria-labelledby={titleId}
@@ -627,34 +737,27 @@ export default function SalonPlansPage() {
                   >
                     ×
                   </button>
-                  <div className="luxury-email-confirm-box__icon-wrap" aria-hidden>
-                    <svg className="luxury-email-confirm-box__icon" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M4 8.5V18a2 2 0 002 2h12a2 2 0 002-2V8.5M4 8.5L12 13l8-4.5M4 8.5l8-4.5 8 4.5"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M9 14h6M9 17h4"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                      />
-                    </svg>
+                  <div className="luxury-email-confirm-box__icon-wrap luxury-salon-register-box__logo-wrap" aria-hidden>
+                    <img
+                      className="luxury-salon-register-box__logo"
+                      src="/logo-saloni-luxury.png"
+                      alt=""
+                      width={88}
+                      height={88}
+                      decoding="async"
+                    />
                   </div>
                   <p className="luxury-email-confirm-box__kicker">
-                    {isFreeOwnerPremiumUpgrade && modalPlan === "PREMIUM"
+                    {isExistingOwnerPremiumActivation && modalPlan === "PREMIUM"
                       ? "Passaggio a Premium"
                       : "Registrazione titolare"}
                   </p>
                   <h2 id={titleId} className="luxury-email-confirm-box__title">
                     Piano {modalPlanName}
                   </h2>
-                  {isFreeOwnerPremiumUpgrade && modalPlan === "PREMIUM" ? (
+                  {isExistingOwnerPremiumActivation && modalPlan === "PREMIUM" ? (
                     <p className="luxury-email-confirm-box__lead" style={{ marginBottom: "1rem" }}>
-                      Abbiamo ripreso i dati della registrazione Free. Controlla, completa fatturazione e provincia sede,
+                      Abbiamo ripreso i dati del salone. Controlla, completa fatturazione e provincia sede,
                       poi continua al pagamento.
                     </p>
                   ) : null}
@@ -693,12 +796,15 @@ export default function SalonPlansPage() {
                         maxLength={320}
                         value={email}
                         onChange={(ev) => setEmail(ev.target.value)}
-                        disabled={submitting || (isFreeOwnerPremiumUpgrade && modalPlan === "PREMIUM")}
+                        disabled={submitting || (isExistingOwnerPremiumActivation && modalPlan === "PREMIUM")}
                       />
                     </label>
                     <LuxuryEuropeanContactFields
                       countryCode={salonCountry}
-                      onCountryCodeChange={setSalonCountry}
+                      onCountryCodeChange={(code) => {
+                        setSalonCountry(code);
+                        setLocaleFromCountryForRegistration(code);
+                      }}
                       dialCode={phoneDialCode}
                       onDialCodeChange={setPhoneDialCode}
                       phoneLocal={phoneLocal}
@@ -709,162 +815,142 @@ export default function SalonPlansPage() {
                       phoneInputId={`${formId}-phone-local`}
                     />
                     <label className="luxury-plans-field luxury-plans-field--full">
-                      <span>Nome del salone</span>
+                      <span>{t("plans.locations.count")}</span>
                       <input
-                        name="salonName"
-                        autoComplete="organization"
+                        name="locationCount"
+                        type="number"
+                        inputMode="numeric"
+                        min={minLocationCount}
+                        max={SALON_MAX_LOCATIONS}
+                        step={1}
                         required
-                        maxLength={200}
-                        value={salonName}
-                        onChange={(ev) => setSalonName(ev.target.value)}
+                        value={locationCount}
+                        onChange={(ev) => onLocationCountChange(Number(ev.target.value))}
                         disabled={submitting}
-                        placeholder="Es. Studio Hair Verdi"
                       />
                     </label>
-
+                    <button
+                      type="button"
+                      className="luxury-salon-register-locations__confirm"
+                      onClick={confirmLocations}
+                      disabled={submitting || locationsConfirmed}
+                    >
+                      {t("plans.locations.confirmCta")}
+                    </button>
+                    {locationsConfirmed ? (
+                      <article className="luxury-salon-register-locations__price" role="status">
+                        <p className="luxury-salon-register-locations__price-kicker">
+                          {t("plans.locations.priceAfter", { days: SALON_PREMIUM_TRIAL_DAYS })}
+                        </p>
+                        <p className="luxury-salon-register-locations__price-total">
+                          <span className="luxury-salon-register-locations__price-amount">
+                            {salonLocationMonthlyTotalEuros(locationCount)}
+                          </span>
+                          <span className="luxury-salon-register-locations__price-currency">€</span>
+                          <span className="luxury-salon-register-locations__price-period">
+                            {t("plans.locations.pricePerMonth")}
+                          </span>
+                        </p>
+                        <p className="luxury-salon-register-locations__price-breakdown">
+                          {t("plans.locations.priceBreakdown", {
+                            unit: salonLocationUnitEuros(locationCount),
+                            count: locationCount,
+                          })}
+                        </p>
+                      </article>
+                    ) : null}
+                    {savedLocationCount > 1 ? (
+                      <p className="luxury-salon-register-locations__quote">
+                        {t("plans.locations.savedHint", { count: savedLocationCount })}
+                      </p>
+                    ) : null}
                     {showLocationSection ? (
                       <>
-                        <fieldset
-                          className="luxury-plans-fieldset luxury-plans-salon-types luxury-plans-field--full"
-                          aria-labelledby={salonTypesLegendId}
-                        >
-                          <legend id={salonTypesLegendId} className="luxury-plans-salon-types__legend">
-                            Di che salone si tratta?
-                          </legend>
-                          <div className="luxury-plans-salon-types__chips">
-                            {SALON_BUSINESS_TYPE_OPTIONS.map((opt) => {
-                              const selected = salonBusinessTypes.has(opt.id);
-                              return (
-                                <label
-                                  key={opt.id}
-                                  className={`luxury-plans-salon-type-chip${selected ? " luxury-plans-salon-type-chip--selected" : ""}`}
-                                >
-                                  <input
-                                    type="checkbox"
-                                    className="luxury-plans-salon-type-chip__check"
-                                    checked={selected}
-                                    disabled={submitting}
-                                    onChange={() => {
-                                      setSalonBusinessTypes((prev) => {
-                                        const next = new Set(prev);
-                                        if (next.has(opt.id)) next.delete(opt.id);
-                                        else next.add(opt.id);
-                                        return next;
-                                      });
-                                    }}
-                                  />
-                                  {opt.label}
-                                </label>
-                              );
-                            })}
-                          </div>
-                        </fieldset>
-                        <fieldset
-                          className="luxury-plans-fieldset luxury-plans-salon-types luxury-plans-field--full"
-                          aria-labelledby={salonClientGendersLegendId}
-                        >
-                          <legend id={salonClientGendersLegendId} className="luxury-plans-salon-types__legend">
-                            Per chi è il salone?
-                          </legend>
-                          <div className="luxury-plans-salon-types__chips">
-                            {SALON_CLIENT_GENDER_OPTIONS.map((opt) => {
-                              const selected = salonClientGenders.has(opt.id);
-                              return (
-                                <label
-                                  key={opt.id}
-                                  className={`luxury-plans-salon-type-chip${selected ? " luxury-plans-salon-type-chip--selected" : ""}`}
-                                >
-                                  <input
-                                    type="checkbox"
-                                    className="luxury-plans-salon-type-chip__check"
-                                    checked={selected}
-                                    disabled={submitting}
-                                    onChange={() => {
-                                      setSalonClientGenders((prev) => {
-                                        const next = new Set(prev);
-                                        if (next.has(opt.id)) next.delete(opt.id);
-                                        else next.add(opt.id);
-                                        return next;
-                                      });
-                                    }}
-                                  />
-                                  {opt.label}
-                                </label>
-                              );
-                            })}
-                          </div>
-                        </fieldset>
-                        <label className="luxury-plans-field luxury-plans-field--full">
-                          <span>Indirizzo sede (via e civico)</span>
-                          <input
-                            name="salonAddressLine1"
-                            autoComplete="street-address"
-                            required
-                            maxLength={200}
-                            value={salonAddressLine1}
-                            onChange={(ev) => setSalonAddressLine1(ev.target.value)}
-                            disabled={submitting}
-                          />
-                        </label>
-                        <label className="luxury-plans-field">
-                          <span>CAP</span>
-                          <input
-                            name="salonPostalCode"
-                            autoComplete="postal-code"
-                            required
-                            maxLength={12}
-                            value={salonPostalCode}
-                            onChange={(ev) => setSalonPostalCode(ev.target.value)}
-                            disabled={submitting}
-                          />
-                        </label>
-                        <label className="luxury-plans-field">
-                          <span>Città</span>
-                          <input
-                            name="salonCity"
-                            autoComplete="address-level2"
-                            required
-                            maxLength={100}
-                            value={salonCity}
-                            onChange={(ev) => setSalonCity(ev.target.value)}
-                            disabled={submitting}
-                          />
-                        </label>
-                        <label className="luxury-plans-field">
-                          <span>Provincia (sigla)</span>
-                          <input
-                            name="salonProvince"
-                            autoComplete="address-level1"
-                            required
-                            maxLength={5}
-                            value={salonProvince}
-                            onChange={(ev) => setSalonProvince(ev.target.value)}
-                            disabled={submitting}
-                            placeholder="es. MI"
-                          />
-                        </label>
-                        <label className="luxury-plans-field">
-                          <span>Paese</span>
-                          <select
-                            name="salonCountry"
-                            className="luxury-eu-contact-select"
-                            value={salonCountry || DEFAULT_EUROPEAN_COUNTRY_CODE}
-                            onChange={(ev) => {
-                              const nextCode = ev.target.value;
-                              setSalonCountry(nextCode);
-                              const country = europeanCountryByCode(nextCode);
+                        <SalonRegistrationLocationFields
+                          title={t("plans.locations.sedeTitle", { n: 1 })}
+                          nameLabel={t("plans.locations.salonName")}
+                          namePlaceholder={t("plans.locations.salonNamePlaceholder")}
+                          addressLabel={t("plans.locations.address")}
+                          capLabel={t("plans.locations.cap")}
+                          cityLabel={t("plans.locations.city")}
+                          provinceLabel={t("plans.locations.province")}
+                          countryLabel={t("plans.locations.country")}
+                          provincePlaceholder={t("plans.locations.provincePlaceholder")}
+                          value={primaryLocationDraft()}
+                          disabled={submitting}
+                          audience={
+                            locationsConfirmed
+                              ? {
+                                  businessTypeLegend: t("plans.locations.businessTypeLegend"),
+                                  clientGenderLegend: t("plans.locations.clientGenderLegend"),
+                                  businessTypes: [...salonBusinessTypes],
+                                  clientGenders: [...salonClientGenders],
+                                  onToggleBusinessType: (id) =>
+                                    setSalonBusinessTypes((prev) => new Set(toggleId([...prev], id))),
+                                  onToggleClientGender: (id) =>
+                                    setSalonClientGenders((prev) => new Set(toggleId([...prev], id))),
+                                }
+                              : undefined
+                          }
+                          onChange={(patch) => {
+                            if (patch.name != null) setSalonName(patch.name);
+                            if (patch.addressLine1 != null) setSalonAddressLine1(patch.addressLine1);
+                            if (patch.postalCode != null) setSalonPostalCode(patch.postalCode);
+                            if (patch.city != null) setSalonCity(patch.city);
+                            if (patch.province != null) setSalonProvince(patch.province);
+                            if (patch.country != null) {
+                              setSalonCountry(patch.country);
+                              setLocaleFromCountryForRegistration(patch.country);
+                              const country = europeanCountryByCode(patch.country);
                               if (country) setPhoneDialCode(country.dialCode);
-                            }}
+                            }
+                          }}
+                        />
+                        {locationsConfirmed
+                          ? extraLocations.map((location, index) => (
+                          <SalonRegistrationLocationFields
+                            key={`sede-${newLocationStart + index + 1}`}
+                            title={t("plans.locations.sedeTitle", { n: newLocationStart + index + 1 })}
+                            nameLabel={t("plans.locations.salonName")}
+                            namePlaceholder={t("plans.locations.salonNamePlaceholder")}
+                            addressLabel={t("plans.locations.address")}
+                            capLabel={t("plans.locations.cap")}
+                            cityLabel={t("plans.locations.city")}
+                            provinceLabel={t("plans.locations.province")}
+                            countryLabel={t("plans.locations.country")}
+                            provincePlaceholder={t("plans.locations.provincePlaceholder")}
+                            value={location}
                             disabled={submitting}
-                            autoComplete="country"
-                          >
-                            {EUROPEAN_PHONE_COUNTRIES.map((c) => (
-                              <option key={c.code} value={c.code}>
-                                {c.name} ({c.code})
-                              </option>
-                            ))}
-                          </select>
-                        </label>
+                            audience={{
+                              businessTypeLegend: t("plans.locations.businessTypeLegend"),
+                              clientGenderLegend: t("plans.locations.clientGenderLegend"),
+                              businessTypes: location.businessTypes,
+                              clientGenders: location.clientGenders,
+                              onToggleBusinessType: (id) =>
+                                setExtraLocations((prev) =>
+                                  prev.map((item, itemIndex) =>
+                                    itemIndex === index
+                                      ? { ...item, businessTypes: toggleId(item.businessTypes, id) }
+                                      : item,
+                                  ),
+                                ),
+                              onToggleClientGender: (id) =>
+                                setExtraLocations((prev) =>
+                                  prev.map((item, itemIndex) =>
+                                    itemIndex === index
+                                      ? { ...item, clientGenders: toggleId(item.clientGenders, id) }
+                                      : item,
+                                  ),
+                                ),
+                            }}
+                            onChange={(patch) => {
+                              setExtraLocations((prev) =>
+                                prev.map((item, itemIndex) => (itemIndex === index ? { ...item, ...patch } : item)),
+                              );
+                            }}
+                          />
+                        ))
+                          : null}
                       </>
                     ) : null}
 
@@ -903,7 +989,7 @@ export default function SalonPlansPage() {
                       </>
                     ) : null}
 
-                    {!(isFreeOwnerPremiumUpgrade && modalPlan === "PREMIUM") ? (
+                    {!(isExistingOwnerPremiumActivation && modalPlan === "PREMIUM") ? (
                     <div className="luxury-plans-password-pair">
                       <label className="luxury-plans-field">
                         <span>Password</span>
@@ -1115,10 +1201,10 @@ export default function SalonPlansPage() {
                         disabled={submitting}
                       >
                         {submitting
-                          ? isFreeOwnerPremiumUpgrade && modalPlan === "PREMIUM"
+                          ? isExistingOwnerPremiumActivation && modalPlan === "PREMIUM"
                             ? "Salvataggio…"
                             : "Creazione account…"
-                          : isFreeOwnerPremiumUpgrade && modalPlan === "PREMIUM"
+                          : isExistingOwnerPremiumActivation && modalPlan === "PREMIUM"
                             ? "Continua a Premium"
                             : "Crea account e continua"}
                       </button>
@@ -1142,18 +1228,30 @@ export default function SalonPlansPage() {
     );
   }
 
-  const showPostSignupFlow =
-    registrationNeedsEmailConfirm &&
-    (registrationComplete ||
-      isSalonRegistrationPostSignupActive() ||
-      (isNativeApp && hasPendingEmailVerification()));
-  const emailConfirmPlan = parseSalonPlanTier(planParam) ?? registeredPlanTier ?? undefined;
   const displayEmail =
     registeredEmail || readPendingEmailVerification() || searchParams.get("email")?.trim().toLowerCase() || "";
+  const staleOwnerPostSignup =
+    isSalonTitolare &&
+    !registrationComplete &&
+    !displayEmail &&
+    !hasPendingEmailVerification() &&
+    isSalonRegistrationPostSignupActive();
+  const showPostSignupFlow =
+    !staleOwnerPostSignup &&
+    registrationNeedsEmailConfirm &&
+    shouldResumeSalonRegistrationEmailConfirm({
+      registrationComplete,
+      salonPostSignupActive: isSalonRegistrationPostSignupActive(),
+      nativeApp: isNativeApp,
+      pendingEmail: readPendingEmailVerification(),
+      clientAwaitingEmail: readClientSignupAwaiting()?.email ?? "",
+    });
+  const emailConfirmPlan = parseSalonPlanTier(planParam) ?? registeredPlanTier ?? undefined;
   const registrationAt = pendingVerificationAt || readPendingEmailVerificationAt();
 
   const returnToSalonPlanSelection = () => {
     clearPendingEmailVerification();
+    clearSalonRegistrationPostSignupActive();
     setRegistrationComplete(false);
     setRegisteredEmail("");
     setPendingVerificationAt(0);
@@ -1218,13 +1316,9 @@ export default function SalonPlansPage() {
                 <div className="luxury-plans-page__lead-glow" aria-hidden />
                 <p className="luxury-plans-page__lead-eyebrow">
                   <span className="luxury-plans-page__lead-badge">{premiumTrialFreeLabel()}</span>
-                  <span className="luxury-plans-page__lead-eyebrow-text">Prova Premium senza rischio</span>
+                  <span className="luxury-plans-page__lead-eyebrow-text">{t("plans.lead.eyebrow")}</span>
                 </p>
-                <p className="luxury-plans-page__lead">
-                  Metti online il tuo salone con <strong>sito dedicato</strong> e <strong>galleria servizi</strong>: tieni
-                  le <strong>statistiche</strong> sotto controllo e gestisci lo <strong>staff</strong> da un unico pannello.
-                </p>
-                <p className="luxury-plans-page__lead-note">{premiumTrialLeadFootnote()}</p>
+                <p className="luxury-plans-page__lead">{parseInlineBold(t("plans.lead.body"))}</p>
               </div>
             ) : null}
           </>
@@ -1267,29 +1361,24 @@ export default function SalonPlansPage() {
           <LuxuryEmailVerifiedSuccessBox
               message={
                 registrationSuccessMessage ??
-                (registeredPlanTier === "PREMIUM"
-                  ? premiumCheckoutRequired
-                    ? "Salone registrato. Conferma il metodo di pagamento per attivare Premium."
-                    : "Salone registrato. Accedi per iniziare con Premium."
-                  : "Salone registrato. Accedi con le credenziali del salone.")
+                (premiumCheckoutRequired
+                  ? "Salone registrato. Conferma il metodo di pagamento per attivare Premium."
+                  : "Salone registrato. Accedi per iniziare con Premium.")
               }
               loginReturnPath={loginReturnPathForSalonRegistration(
-                registeredPlanTier ?? undefined,
+                registeredPlanTier ?? "PREMIUM",
                 premiumCheckoutRequired,
               )}
               primaryCtaLabel={
-                registeredPlanTier === "PREMIUM"
-                  ? !premiumCheckoutRequired
-                    ? "Vai al tuo salone"
-                    : "Conferma metodo di pagamento"
-                  : "Vai all'accesso"
+                !premiumCheckoutRequired ? "Vai al tuo salone" : "Conferma metodo di pagamento"
               }
             />
         </div>
       ) : (
-      <div className="luxury-plans-grid">
+      <div className={`luxury-plans-grid${displayPlans.some((p) => p.tier === "PLUS") ? " luxury-plans-grid--with-plus" : ""}`}>
         {displayPlans.map((p) => {
           const name = planDisplayName(p.tier);
+          const trialCard = p.tier === "PREMIUM" || p.tier === "PLUS";
           return (
             <article
               key={p.tier}
@@ -1297,7 +1386,7 @@ export default function SalonPlansPage() {
               className={`luxury-plan-card${p.highlighted ? " luxury-plan-card--featured" : ""}`}
             >
               <h2 className="luxury-plan-card__name">{name}</h2>
-              {p.tier === "PREMIUM" ? (
+              {trialCard ? (
                 <SalonPlanPremiumTrialPanel plan={p} variant="card" />
               ) : (
                 <div
@@ -1321,8 +1410,8 @@ export default function SalonPlansPage() {
                 </div>
               )}
               <SalonPlanCardTagline tier={p.tier} content={p.taglineContent} />
-              {p.tier === "PREMIUM" ? (
-                <SalonPremiumPlanCardPreview />
+              {trialCard ? (
+                <SalonPremiumPlanCardPreview extraNote={p.tier === "PLUS" ? t("plans.plus.extra") : undefined} />
               ) : (
                 <ul className="luxury-plan-card__list">
                   {p.features.map((f) => (
@@ -1330,11 +1419,22 @@ export default function SalonPlansPage() {
                   ))}
                 </ul>
               )}
+              {p.tier === "PLUS" ? (
+                <button type="button" className="luxury-plan-card__discover" onClick={() => setPlusInfoOpen(true)}>
+                  {t("plans.plus.discover")}
+                </button>
+              ) : null}
               <button type="button" className="luxury-plan-cta" onClick={() => openRegistration(p.tier)}>
                 <span className="luxury-plan-card__cta-line">
                   {p.tier === "PREMIUM" ? (
                     <>
                       <span className="luxury-plan-card__cta-lead">Prova gratis</span>{" "}
+                      <span className="luxury-plan-card__cta-mid">{premiumTrialDurationLabel()}</span>{" "}
+                      <span className="luxury-plan-card__cta-plan">{name}</span>
+                    </>
+                  ) : p.tier === "PLUS" ? (
+                    <>
+                      <span className="luxury-plan-card__cta-lead">{t("plans.plus.ctaLead")}</span>{" "}
                       <span className="luxury-plan-card__cta-mid">{premiumTrialDurationLabel()}</span>{" "}
                       <span className="luxury-plan-card__cta-plan">{name}</span>
                     </>
@@ -1355,6 +1455,7 @@ export default function SalonPlansPage() {
 
     </main>
     {planModals}
+    <SalonPlusPlanInfoModal open={plusInfoOpen} onClose={() => setPlusInfoOpen(false)} />
     <SalonPremiumOwnerInfoPrivacyModal
       open={privacyNoticeOpen}
       onClose={() => setPrivacyNoticeOpen(false)}

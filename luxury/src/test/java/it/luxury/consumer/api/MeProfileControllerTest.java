@@ -11,12 +11,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -57,7 +60,59 @@ class MeProfileControllerTest {
 		mockMvc.perform(get("/api/v1/me/profile").header("Authorization", "Bearer " + token))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.email").value("owner@example.com"))
-				.andExpect(jsonPath("$.displayName").value("Titolare"));
+				.andExpect(jsonPath("$.displayName").value("Titolare"))
+				.andExpect(jsonPath("$.photoDataUrl").value(nullValue()));
+	}
+
+	@Test
+	void patchProfilePhoto_setsClearsAndSurvivesProfilePatch() throws Exception {
+		ConsumerProfile p = new ConsumerProfile(SUB + "-photo", "client-photo@example.com", "Mario Rossi");
+		p.setPasswordHash(passwordEncoder.encode("x"));
+		p.setSecurityRoles("CLIENT");
+		consumerProfileRepository.save(p);
+		String token = luxuryTokenService.createAccessToken(p);
+		String photo = "data:image/png;base64,iVBORw0KGgo=";
+
+		mockMvc.perform(patch("/api/v1/me/profile/photo")
+						.header("Authorization", "Bearer " + token)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"photoDataUrl\":\"" + photo + "\"}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.photoDataUrl").value(photo));
+
+		mockMvc.perform(patch("/api/v1/me/profile")
+						.header("Authorization", "Bearer " + token)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"displayName\":\"Mario\"}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.displayName").value("Mario"))
+				.andExpect(jsonPath("$.photoDataUrl").value(photo));
+
+		mockMvc.perform(patch("/api/v1/me/profile/photo")
+						.header("Authorization", "Bearer " + token)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"photoDataUrl\":\"\"}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.photoDataUrl").value(nullValue()));
+	}
+
+	@Test
+	void patchProfilePhoto_rejectsNonImage() throws Exception {
+		ConsumerProfile p = new ConsumerProfile(SUB + "-photo-bad", "client-photo-bad@example.com", "Lucia");
+		p.setPasswordHash(passwordEncoder.encode("x"));
+		p.setSecurityRoles("CLIENT");
+		consumerProfileRepository.save(p);
+		String token = luxuryTokenService.createAccessToken(p);
+
+		mockMvc.perform(patch("/api/v1/me/profile/photo")
+						.header("Authorization", "Bearer " + token)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"photoDataUrl\":\"data:image/svg+xml;base64,PHN2Zy8+\"}"))
+				.andExpect(status().isBadRequest());
+
+		mockMvc.perform(get("/api/v1/me/profile").header("Authorization", "Bearer " + token))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.photoDataUrl").value(nullValue()));
 	}
 
 	@Test

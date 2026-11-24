@@ -43,9 +43,16 @@ public class PendingRegistration {
 	@Column(name = "verification_token_hash", length = 64)
 	private String verificationTokenHash;
 
-	/** Token in chiaro solo per reinvio email mentre il link è ancora valido (cancellato alla conferma). */
-	@Column(name = "verification_token_plain", length = 64)
-	private String verificationTokenPlain;
+		/**
+		 * Colonna storica. Il token di conferma non viene più persistito in chiaro: il reinvio ne emette uno nuovo.
+		 * Le righe già presenti vengono azzerate all'avvio.
+		 */
+		@Column(name = "verification_token_plain", length = 64)
+		private String verificationTokenPlain;
+
+		/** SHA-256 del segreto di poll tenuto dal client che ha avviato la registrazione. */
+		@Column(name = "poll_sync_secret_hash", length = 64)
+		private String pollSyncSecretHash;
 
 	@Column(name = "verification_expires_at")
 	private Instant verificationExpiresAt;
@@ -131,9 +138,17 @@ public class PendingRegistration {
 		return verificationTokenPlain;
 	}
 
-	public void setVerificationTokenPlain(String verificationTokenPlain) {
-		this.verificationTokenPlain = verificationTokenPlain;
-	}
+		public void setVerificationTokenPlain(String verificationTokenPlain) {
+			this.verificationTokenPlain = verificationTokenPlain;
+		}
+
+		public String getPollSyncSecretHash() {
+			return pollSyncSecretHash;
+		}
+
+		public void setPollSyncSecretHash(String pollSyncSecretHash) {
+			this.pollSyncSecretHash = pollSyncSecretHash;
+		}
 
 	public Instant getVerificationExpiresAt() {
 		return verificationExpiresAt;

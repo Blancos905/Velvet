@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#141414</color>
+    <!-- Allineato a LuxuryPremiumShellTheme.surface — splash senza bianco. -->
+    <color name="luxury_splash_background">#1C0A06</color>
 </resources>

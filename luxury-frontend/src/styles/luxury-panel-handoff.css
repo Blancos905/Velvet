@@ -1,0 +1,150 @@
+.luxury-panel-handoff {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: grid;
+  place-items: center;
+  padding:
+    max(1.25rem, env(safe-area-inset-top))
+    max(1.25rem, env(safe-area-inset-right))
+    max(1.25rem, env(safe-area-inset-bottom))
+    max(1.25rem, env(safe-area-inset-left));
+  background:
+    radial-gradient(80% 60% at 50% 40%, rgba(154, 52, 18, 0.28), transparent 70%),
+    rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(14px);
+}
+
+.luxury-panel-handoff__card {
+  width: min(100%, 24.5rem);
+  padding: 1.15rem 1.05rem 1.05rem;
+  border-radius: 28px;
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(255, 237, 213, 0.55), transparent 42%),
+    linear-gradient(165deg, #ffb067 0%, #f97316 46%, #c2410c 100%);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 247, 237, 0.45);
+  animation: luxury-panel-handoff-in 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes luxury-panel-handoff-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.luxury-panel-handoff__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.85rem;
+  padding: 0.28rem 0.7rem 0.28rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.88);
+  color: #fdba74;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.luxury-panel-handoff__eyebrow::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: #fb923c;
+  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.25);
+}
+
+.luxury-panel-handoff__title {
+  margin: 0;
+  color: #140800;
+  font-size: clamp(1.55rem, 5vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.luxury-panel-handoff__sheet {
+  margin-top: 1rem;
+  padding: 1.15rem 1rem 1rem;
+  border-radius: 22px;
+  border: 1px solid rgba(251, 146, 60, 0.35);
+  background:
+    radial-gradient(90% 80% at 100% 0%, rgba(249, 115, 22, 0.22), transparent 55%),
+    linear-gradient(180deg, #161616 0%, #070707 100%);
+  box-shadow:
+    0 10px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(253, 186, 116, 0.18);
+}
+
+.luxury-panel-handoff__body {
+  margin: 0;
+  color: #ffedd5;
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.luxury-panel-handoff__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 1.15rem;
+}
+
+.luxury-panel-handoff__go,
+.luxury-panel-handoff__exit {
+  appearance: none;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 3.05rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.luxury-panel-handoff__go {
+  border: 0;
+  color: #1c0a00;
+  background: linear-gradient(180deg, #ffedd5 0%, #fdba74 48%, #fb923c 100%);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.luxury-panel-handoff__go:hover {
+  filter: brightness(1.05);
+}
+
+.luxury-panel-handoff__exit {
+  border: 1.5px solid rgba(253, 186, 116, 0.55);
+  color: #fdba74;
+  background: transparent;
+}
+
+.luxury-panel-handoff__exit:hover {
+  border-color: #ffedd5;
+  color: #ffedd5;
+  background: rgba(255, 237, 213, 0.06);
+}

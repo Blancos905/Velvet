@@ -10,6 +10,7 @@ import it.luxury.publicapi.dto.PublicDtos.TopOperatorSummaryDto;
 import it.luxury.publicapi.dto.PublicDtos.OrganizationDetailDto;
 import it.luxury.publicapi.dto.PublicDtos.PublicSalonReviewDto;
 import it.luxury.publicapi.dto.PublicDtos.OrganizationSummaryDto;
+import it.luxury.publicapi.dto.PublicDtos.QuickSuggestAvailabilityDto;
 import it.luxury.publicapi.dto.PublicDtos.ServicePublicDto;
 import it.luxury.studio.domain.SalonSiteContentKind;
 import it.luxury.studio.dto.SalonSiteContentDto;
@@ -48,15 +49,15 @@ public class PublicOrganizationController {
 	}
 
 	@GetMapping("/quick-suggest-availability")
-	@Operation(summary = "Query rapide home con almeno un salone nel raggio (listino servizi)")
-	public List<String> quickSuggestAvailability(
+	@Operation(summary = "Tag «Oppure un tocco»: query curate disponibili nel raggio + servizi listino extra")
+	public QuickSuggestAvailabilityDto quickSuggestAvailability(
 			@RequestParam Double nearLat,
 			@RequestParam Double nearLng,
 			@RequestParam(required = false) Double nearKm) {
 		if (nearLat == null || nearLng == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nearLat e nearLng sono obbligatori");
 		}
-		return publicOrganizationService.availableQuickSuggestQueries(nearLat, nearLng, nearKm);
+		return publicOrganizationService.quickSuggestAvailability(nearLat, nearLng, nearKm);
 	}
 
 	@GetMapping
@@ -114,6 +115,13 @@ public class PublicOrganizationController {
 			}
 		}
 		return out.isEmpty() ? null : out;
+	}
+
+	@GetMapping("/sponsored")
+	@Operation(summary = "Saloni sponsorizzati: spazio a pagamento in evidenza, non una classifica")
+	public List<OrganizationSummaryDto> sponsored(@RequestParam(required = false) Integer limit) {
+		int lim = limit != null ? limit : 20;
+		return publicOrganizationService.sponsoredPlacementSummaries(lim);
 	}
 
 	@GetMapping("/top-rated-operators")

@@ -107,7 +107,7 @@ public class LuxuryRefreshTokenService {
 	}
 
 	private long refreshTtlSeconds() {
-		return securityProperties.refreshTokenTtlDays() * 86400L;
+		return securityProperties.sessionMaxSeconds();
 	}
 
 	private BusinessException invalidRefresh() {

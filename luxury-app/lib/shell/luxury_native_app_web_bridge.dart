@@ -29,17 +29,22 @@ class LuxuryNativeAppWebBridge {
       overflow: hidden !important;
       pointer-events: none !important;
     }
-    /* Area account (sotto-pagine): nascondi checklist panoramica duplicata; su /account/salone resta visibile. */
+    /* Sotto-pagine account e admin salone: nascondi checklist panoramica duplicata; su /salone resta visibile. */
     html.luxury-native-app[data-luxury-path="/account"] .salon-premium-panorama,
-    html.luxury-native-app[data-luxury-path^="/account/"]:not([data-luxury-path="/account/salone"]) .salon-premium-panorama,
+    html.luxury-native-app[data-luxury-path^="/account/"] .salon-premium-panorama,
+    html.luxury-native-app[data-luxury-path^="/salone/"]:not([data-luxury-path="/salone"]) .salon-premium-panorama,
     html.luxury-native-app[data-luxury-path="/account"] .salon-premium-panorama section[aria-label="Checklist attivazione salone"],
-    html.luxury-native-app[data-luxury-path^="/account/"]:not([data-luxury-path="/account/salone"]) .salon-premium-panorama section[aria-label="Checklist attivazione salone"],
+    html.luxury-native-app[data-luxury-path^="/account/"] .salon-premium-panorama section[aria-label="Checklist attivazione salone"],
+    html.luxury-native-app[data-luxury-path^="/salone/"]:not([data-luxury-path="/salone"]) .salon-premium-panorama section[aria-label="Checklist attivazione salone"],
     html.luxury-native-app[data-luxury-path="/account"] .salon-premium-panorama__progress-track,
-    html.luxury-native-app[data-luxury-path^="/account/"]:not([data-luxury-path="/account/salone"]) .salon-premium-panorama__progress-track,
+    html.luxury-native-app[data-luxury-path^="/account/"] .salon-premium-panorama__progress-track,
+    html.luxury-native-app[data-luxury-path^="/salone/"]:not([data-luxury-path="/salone"]) .salon-premium-panorama__progress-track,
     html.luxury-native-app[data-luxury-path="/account"] .salon-premium-panorama__step-wrap,
-    html.luxury-native-app[data-luxury-path^="/account/"]:not([data-luxury-path="/account/salone"]) .salon-premium-panorama__step-wrap,
+    html.luxury-native-app[data-luxury-path^="/account/"] .salon-premium-panorama__step-wrap,
+    html.luxury-native-app[data-luxury-path^="/salone/"]:not([data-luxury-path="/salone"]) .salon-premium-panorama__step-wrap,
     html.luxury-native-app[data-luxury-path="/account"] .salon-premium-panorama__toast,
-    html.luxury-native-app[data-luxury-path^="/account/"]:not([data-luxury-path="/account/salone"]) .salon-premium-panorama__toast {
+    html.luxury-native-app[data-luxury-path^="/account/"] .salon-premium-panorama__toast,
+    html.luxury-native-app[data-luxury-path^="/salone/"]:not([data-luxury-path="/salone"]) .salon-premium-panorama__toast {
       display: none !important;
       visibility: hidden !important;
       height: 0 !important;
@@ -49,32 +54,7 @@ class LuxuryNativeAppWebBridge {
       pointer-events: none !important;
     }
 
-    /* /piani — card Free: WebView iOS a volte azzera il gradiente del <button> */
-    .luxury-plan-card[data-tier="BASE"] .luxury-plan-cta {
-      -webkit-appearance: none;
-      appearance: none;
-      color: #0a0a0a !important;
-      background-color: #fb923c !important;
-      background-image: linear-gradient(180deg, #fdba74, #fb923c) !important;
-      border: 1px solid rgba(0, 0, 0, 0.65) !important;
-      box-shadow:
-        0 2px 0 rgba(0, 0, 0, 0.35),
-        0 8px 24px rgba(243, 112, 33, 0.35) !important;
-    }
-    .luxury-plan-card[data-tier="BASE"] .luxury-plan-cta .luxury-plan-card__cta-lead,
-    .luxury-plan-card[data-tier="BASE"] .luxury-plan-cta .luxury-plan-card__cta-mid,
-    .luxury-plan-card[data-tier="BASE"] .luxury-plan-cta .luxury-plan-card__cta-plan {
-      color: #0a0a0a !important;
-    }
-    .luxury-plan-card[data-tier="BASE"] .luxury-plan-card__cta-plan {
-      background: rgba(0, 0, 0, 0.14) !important;
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.22),
-        0 1px 2px rgba(0, 0, 0, 0.2) !important;
-      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.28) !important;
-    }
-
-    /* /piani — card Premium: stesso fix visibilità CTA su WebView iOS */
+    /* /piani — card Premium: fix visibilità CTA su WebView iOS */
     .luxury-plan-card[data-tier="PREMIUM"] .luxury-plan-cta {
       -webkit-appearance: none;
       appearance: none;

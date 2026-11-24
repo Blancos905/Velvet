@@ -43,7 +43,8 @@ public interface LocationRepository extends JpaRepository<Location, UUID> {
 	@Query("""
 			select l from Location l join fetch l.studioGroup g
 			where l.latitude is not null and l.longitude is not null
-			  and upper(trim(g.planTier)) in ('PREMIUM', 'STANDARD', 'FULL')
+			  and upper(trim(g.planTier)) in ('PREMIUM', 'PLUS', 'STANDARD', 'FULL')
+			  and l.visibleToClients = true
 			""")
 	List<Location> findPremiumLocationsWithCoordinates();
 
@@ -55,6 +56,7 @@ public interface LocationRepository extends JpaRepository<Location, UUID> {
 					SELECT TRIM(l.city) AS city, COUNT(DISTINCT l.studio_group_id) AS salon_count
 					FROM locations l
 					WHERE l.city IS NOT NULL AND TRIM(l.city) <> ''
+					  AND l.visible_to_clients = TRUE
 					GROUP BY TRIM(l.city)
 					ORDER BY salon_count DESC
 					LIMIT 10
@@ -69,7 +71,8 @@ public interface LocationRepository extends JpaRepository<Location, UUID> {
 	@Query(
 			"""
 					select distinct l from Location l join fetch l.studioGroup g
-					where upper(trim(g.planTier)) in ('PREMIUM', 'STANDARD', 'FULL')
+					where upper(trim(g.planTier)) in ('PREMIUM', 'PLUS', 'STANDARD', 'FULL')
+					  and l.visibleToClients = true
 					  and l.salonBusinessTypes is not null and trim(l.salonBusinessTypes) <> ''
 					  and (
 					    upper(trim(l.salonBusinessTypes)) = upper(trim(:code))
@@ -82,8 +85,21 @@ public interface LocationRepository extends JpaRepository<Location, UUID> {
 
 	@Query("""
 			select l from Location l join fetch l.studioGroup g
-			where upper(trim(g.planTier)) in ('PREMIUM', 'STANDARD', 'FULL')
+			where upper(trim(g.planTier)) in ('PREMIUM', 'PLUS', 'STANDARD', 'FULL')
+			  and l.visibleToClients = true
 			order by l.slug asc
 			""")
 	List<Location> findAllPremiumLocationsOrderBySlug();
+
+	/**
+	 * Sedi visibili con spazio a pagamento («Saloni sponsorizzati»).
+	 * Il filtro Premium effettivo resta in {@code PublicOrganizationService}.
+	 */
+	@Query("""
+			select l from Location l join fetch l.studioGroup
+			where l.sponsoredPlacement = true
+			  and l.visibleToClients = true
+			order by l.name asc
+			""")
+	List<Location> findSponsoredVisibleLocations();
 }

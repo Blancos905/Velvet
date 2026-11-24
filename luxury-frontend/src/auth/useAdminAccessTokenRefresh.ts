@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { isLuxuryAccessTokenExpired, readJwtExpirationEpochMs } from "../lib/luxuryAccessTokenExpiry";
+import { isLuxuryLoginSessionExpired } from "../lib/luxurySessionStartedAt";
 import { refreshAdminAccessToken } from "./adminRefreshSession";
 
 const REFRESH_LEAD_MS = 60_000;
@@ -17,6 +18,10 @@ export function useAdminAccessTokenRefresh(
     let timer: number | undefined;
 
     const attemptRefresh = async (): Promise<boolean> => {
+      if (isLuxuryLoginSessionExpired()) {
+        onRefreshFailed();
+        return false;
+      }
       const next = await refreshAdminAccessToken();
       if (cancelled) return false;
       if (next && !isLuxuryAccessTokenExpired(next)) {

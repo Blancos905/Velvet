@@ -31,7 +31,10 @@ export default function SuperAdminStatisticsSection({ overviewQ }: Props) {
     ? parseSuperAdminPlatformInsights(overviewQ.data.platformInsights)
     : null;
 
-  const monthlyTrend = platformInsights?.monthlyTrend ?? [];
+  const monthlyTrend = useMemo(() => {
+    if (!overviewQ.data) return [];
+    return parseSuperAdminPlatformInsights(overviewQ.data.platformInsights)?.monthlyTrend ?? [];
+  }, [overviewQ.data]);
 
   const userSeries = useMemo(
     () => monthlyTrendFieldToSeries(monthlyTrend, "consumersCreated"),
@@ -119,7 +122,7 @@ export default function SuperAdminStatisticsSection({ overviewQ }: Props) {
                 <li className="luxury-sa-stats-legend__chip">
                   <span className="luxury-sa-stats-legend__dot" aria-hidden />
                   <span>
-                    <strong>A pagamento</strong> — BASE o Premium
+                    <strong>Premium</strong> — abbonamento attivo · le altre righe sono senza Premium
                   </span>
                 </li>
                 <li className="luxury-sa-stats-legend__chip">
@@ -135,7 +138,7 @@ export default function SuperAdminStatisticsSection({ overviewQ }: Props) {
                   icon={Store}
                   label="Saloni"
                   value={String(counts.studioGroups)}
-                  subValue={`${counts.studioGroupsProvider} partner · ${counts.studioGroupsPaying} a pagamento (${counts.studioGroupsPayingPremium} Premium, ${counts.studioGroupsPayingBase} BASE)`}
+                  subValue={`${counts.studioGroupsProvider} partner · ${counts.studioGroupsPayingPremium} Premium · ${counts.studioGroupsPayingBase} senza Premium`}
                   trend={null}
                 />
                 <StatCard

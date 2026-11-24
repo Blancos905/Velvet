@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useLuxuryAuth } from "../../auth/LuxuryAuthProvider";
 
-/** `/account/home` — compatibilità link legacy: titolare → dashboard salone; altri → prenotazioni. */
+/** `/account/home` — compatibilità link legacy: titolare → salone; cliente → hub profilo. */
 export default function AccountHomePage() {
   const { isSalonTitolare, isSalonStaff, isLuxurySuperAdmin } = useLuxuryAuth();
 
@@ -12,7 +12,7 @@ export default function AccountHomePage() {
     return <Navigate to="/account/staff" replace />;
   }
   if (isSalonTitolare) {
-    return <Navigate to="/account/salone" replace />;
+    return <Navigate to="/salone" replace />;
   }
-  return <Navigate to="/account/prenotazioni" replace />;
+  return <Navigate to="/account" replace />;
 }

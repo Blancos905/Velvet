@@ -55,6 +55,9 @@ export default function PartnerPage() {
         <Link to="/termini" className="luxury-legal-public__nav-link">
           Termini di servizio
         </Link>
+        <Link to="/licenza" className="luxury-legal-public__nav-link">
+          Licenza gratuita
+        </Link>
         <Link to="/privacy/scelte" className="luxury-legal-public__nav-link">
           Scelte privacy
         </Link>

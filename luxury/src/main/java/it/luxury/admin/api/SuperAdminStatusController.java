@@ -29,22 +29,18 @@ public class SuperAdminStatusController {
 
 	@GetMapping
 	@Operation(summary = "Versione runtime e flag configurazione super admin")
-	public SuperAdminStatusResponse status() {
-		return new SuperAdminStatusResponse(
-				"luxury",
-				Runtime.version().toString(),
-				System.getProperty("java.version", ""),
-				superAdminAuthService.isConfigured(),
-				accountRegistrationService.isClientSuperAdminBootstrapAvailable(),
-				selfRegistrationService.registrationAvailable());
-	}
+		public SuperAdminStatusResponse status() {
+			return new SuperAdminStatusResponse(
+					"luxury",
+					superAdminAuthService.isConfigured(),
+					accountRegistrationService.isClientSuperAdminBootstrapAvailable(),
+					selfRegistrationService.registrationAvailable());
+		}
 
-	public record SuperAdminStatusResponse(
-			String application,
-			String javaRuntimeVersion,
-			String javaVersionProperty,
-			boolean superAdminConfigured,
-			boolean clientSuperAdminBootstrapAvailable,
-			boolean setupTokenRegisterAvailable) {
-	}
+		public record SuperAdminStatusResponse(
+				String application,
+				boolean superAdminConfigured,
+				boolean clientSuperAdminBootstrapAvailable,
+				boolean setupTokenRegisterAvailable) {
+		}
 }

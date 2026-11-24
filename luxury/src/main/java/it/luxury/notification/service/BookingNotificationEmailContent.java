@@ -116,6 +116,9 @@ final class BookingNotificationEmailContent {
 								details.salon());
 			}
 			case REVIEW_INVITE -> {
+				if (appointmentTokenService == null) {
+					yield "";
+				}
 				String reviewToken = appointmentTokenService.mintReviewToken(appointment.getId());
 				String reviewUrl = buildReviewUrl(reviewToken, notificationProperties);
 				yield """
@@ -174,15 +177,35 @@ final class BookingNotificationEmailContent {
 					details.weekday(),
 					details.when(),
 					notificationProperties.getFrontendBaseUrl().replaceAll("/+$", ""));
+			case BOOKING_REQUEST_REJECTED -> TransactionalBookingEmailHtml.buildBookingRequestRejectedEmail(
+					details.salon(),
+					details.service(),
+					details.weekday(),
+					details.when(),
+					details.operatorName(),
+					notificationProperties.getFrontendBaseUrl().replaceAll("/+$", ""));
+			case REVIEW_INVITE -> null;
 			default -> null;
 		};
 	}
 
+	static String buildReviewInviteHtmlBody(
+			Appointment appointment,
+			LuxuryNotificationProperties notificationProperties,
+			AppointmentTokenService appointmentTokenService) {
+		if (appointmentTokenService == null) {
+			return null;
+		}
+		AppointmentDetails details = AppointmentDetails.from(appointment);
+		String reviewToken = appointmentTokenService.mintReviewToken(appointment.getId());
+		String reviewUrl = buildReviewUrl(reviewToken, notificationProperties);
+		return TransactionalBookingEmailHtml.buildReviewInviteEmail(
+				details.salon(), details.service(), details.when(), reviewUrl);
+	}
+
 	private static String headline(NotificationType type, AppointmentDetails details) {
 		return switch (type) {
-			case BOOKING_CONFIRMATION -> details.operatorName() != null
-					? details.operatorName() + " ha accettato il tuo appuntamento"
-					: details.salon() + " ha confermato il tuo appuntamento";
+			case BOOKING_CONFIRMATION -> "Prenotazione confermata";
 			case REMINDER_24H -> "Promemoria: appuntamento tra 24 ore";
 			case REMINDER_1H -> "Promemoria: appuntamento tra circa 2 ore";
 			default -> "La tua prenotazione";
@@ -200,9 +223,7 @@ final class BookingNotificationEmailContent {
 
 	private static String introLine(NotificationType type, AppointmentDetails details) {
 		return switch (type) {
-			case BOOKING_CONFIRMATION -> details.operatorName() != null
-					? details.operatorName() + " ha accettato il tuo appuntamento presso " + details.salon() + "."
-					: details.salon() + " ha confermato il tuo appuntamento.";
+			case BOOKING_CONFIRMATION -> "La tua prenotazione presso " + details.salon() + " è confermata.";
 			case BOOKING_UPDATED -> "La tua prenotazione presso " + details.salon() + " è stata aggiornata.";
 			case REMINDER_24H -> "Ti ricordiamo l'appuntamento tra 24 ore.";
 			case REMINDER_1H -> "Ti ricordiamo l'appuntamento tra circa 2 ore.";

@@ -614,7 +614,7 @@
 }
 
 /* ============================================================
-   Centro notifiche titolare (SalonStandardToolsPage, `/account/salone/strumenti`).
+   Centro notifiche titolare (SalonStandardToolsPage, `/salone/strumenti`).
    Stessa struttura ricca delle notifiche cliente (`luxury-notifications-client.css`):
    freccetta apri/chiudi, barra accento a sinistra, pill «Apri», meta di stato,
    pulsante elimina rosso — ma in palette AZZURRO (#38bdf8) + ambra (#f59e0b),

@@ -2,6 +2,7 @@ package it.luxury.studio.service;
 
 import it.luxury.common.api.BusinessException;
 import it.luxury.publicapi.dto.RegistrationSalonLocation;
+import it.luxury.publicapi.validation.ConsumerRegistrationValidator;
 import it.luxury.studio.domain.Location;
 import it.luxury.studio.domain.LocationRepository;
 import it.luxury.studio.domain.SalonBusinessType;
@@ -95,6 +96,135 @@ public class SalonDirectoryProvisioningService {
 	}
 
 	/**
+	 * Crea il gruppo (se manca) e una {@link Location} per ogni sede della registrazione.
+	 */
+	@Transactional
+	public void provisionRegistrationLocations(
+			String ownerEmailNormalized,
+			String planTier,
+			String salonPublicName,
+			List<RegistrationSalonLocation> locations,
+			String ownerAuthSub,
+			List<SalonBusinessType> salonBusinessTypes,
+			List<SalonClientGender> salonClientGenders) {
+		if (locations == null || locations.isEmpty()) {
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Indica almeno una sede.");
+		}
+		for (RegistrationSalonLocation location : locations) {
+			provisionAfterPartnerRegistration(
+					ownerEmailNormalized,
+					planTier,
+					salonPublicName,
+					location,
+					ownerAuthSub,
+					typesFor(location, salonBusinessTypes),
+					gendersFor(location, salonClientGenders));
+		}
+	}
+
+	/**
+	 * Aggiorna l’indirizzo della prima sede e aggiunge le sedi nuove (attivazione Premium di un titolare già in DB).
+	 */
+	@Transactional
+	public int applyOwnerRegistrationLocations(
+			StudioGroup group,
+			String salonPublicName,
+			RegistrationSalonLocation primary,
+			List<RegistrationSalonLocation> additional,
+			List<SalonBusinessType> salonBusinessTypes,
+			List<SalonClientGender> salonClientGenders) {
+		List<Location> existing = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId());
+		int extra = additional == null ? 0 : additional.size();
+		int total = existing.size() + extra;
+		if (existing.isEmpty()) {
+			total = 1 + extra;
+		}
+		if (total < 1 || total > it.luxury.billing.service.SalonMultiLocationPricing.MAX_LOCATIONS) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"VALIDATION_ERROR",
+					"Puoi registrare al massimo " + it.luxury.billing.service.SalonMultiLocationPricing.MAX_LOCATIONS + " sedi.");
+		}
+		if (!existing.isEmpty() && primary != null) {
+			applyAddress(existing.get(0), primary);
+			List<SalonBusinessType> primaryTypes = typesFor(primary, salonBusinessTypes);
+			List<SalonClientGender> primaryGenders = gendersFor(primary, salonClientGenders);
+			if (!primaryTypes.isEmpty()) {
+				existing.get(0).setSalonBusinessTypes(SalonBusinessType.toCsv(primaryTypes));
+			}
+			if (!primaryGenders.isEmpty()) {
+				existing.get(0).setSalonClientGenders(SalonClientGender.toCsv(primaryGenders));
+			}
+			locationRepository.save(existing.get(0));
+			salonLocationGeocodingAsyncService.scheduleGeocode(existing.get(0).getId());
+		}
+		if (additional != null) {
+			int base = existing.isEmpty() ? 1 : existing.size();
+			for (int i = 0; i < additional.size(); i++) {
+				RegistrationSalonLocation location = additional.get(i);
+				int index = base + i + (existing.isEmpty() ? 1 : 1);
+				String display = it.luxury.publicapi.dto.SalonRegistrationLocations
+						.withDisplayName(salonPublicName, location, index, total)
+						.displayName();
+				appendLocation(
+						group,
+						display,
+						trimToEmpty(location.city()),
+						location.withDisplayName(display),
+						typesFor(location, salonBusinessTypes),
+						gendersFor(location, salonClientGenders));
+			}
+		}
+		if (existing.isEmpty() && primary != null) {
+			String display = it.luxury.publicapi.dto.SalonRegistrationLocations
+					.withDisplayName(salonPublicName, primary, 1, total)
+					.displayName();
+			appendLocation(
+					group,
+					display,
+					trimToEmpty(primary.city()),
+					primary.withDisplayName(display),
+					typesFor(primary, salonBusinessTypes),
+					gendersFor(primary, salonClientGenders));
+		}
+		return total;
+	}
+
+	/** Liste sulla sede, se inviate; altrimenti quelle condivise della richiesta. */
+	private static List<SalonBusinessType> typesFor(RegistrationSalonLocation salon, List<SalonBusinessType> fallback) {
+		if (salon == null || salon.salonBusinessTypes() == null) {
+			return fallback == null ? List.of() : fallback;
+		}
+		return ConsumerRegistrationValidator.normalizeSalonBusinessTypesOrThrow(salon.salonBusinessTypes());
+	}
+
+	private static List<SalonClientGender> gendersFor(RegistrationSalonLocation salon, List<SalonClientGender> fallback) {
+		if (salon == null || salon.salonClientGenders() == null) {
+			return fallback == null ? List.of() : fallback;
+		}
+		return ConsumerRegistrationValidator.normalizeSalonClientGendersOrThrow(salon.salonClientGenders());
+	}
+
+	private static void applyAddress(Location loc, RegistrationSalonLocation salon) {
+		String addr = trimToEmpty(salon.addressLine1());
+		String postal = trimToEmpty(salon.postalCode());
+		String city = trimToEmpty(salon.city());
+		String province = trimToEmpty(salon.province());
+		if (!addr.isEmpty()) {
+			loc.setAddressLine(addr);
+		}
+		if (!postal.isEmpty()) {
+			loc.setPostalCode(postal);
+		}
+		if (!city.isEmpty()) {
+			loc.setCity(city);
+		}
+		if (!province.isEmpty()) {
+			loc.setProvince(province.toUpperCase(Locale.ROOT));
+		}
+	}
+
+	/**
 	 * Idempotente: se lo {@link StudioGroup} esiste ma non ha sedi (provisioning parziale), crea la prima sede.
 	 */
 	@Transactional
@@ -156,6 +286,9 @@ public class SalonDirectoryProvisioningService {
 		String baseSlug = slugify(firstNonBlank(salon.displayName(), displayName));
 		String slug = uniqueSlug(baseSlug);
 		Location loc = new Location(group, slug, displayName, city);
+		boolean studioAlreadyListed = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId()).stream()
+				.anyMatch(Location::isVisibleToClients);
+		loc.setVisibleToClients(studioAlreadyListed);
 		String addr = trimToEmpty(salon.addressLine1());
 		String postal = trimToEmpty(salon.postalCode());
 		String province = trimToEmpty(salon.province());
@@ -173,6 +306,9 @@ public class SalonDirectoryProvisioningService {
 		}
 		if (salonClientGenders != null && !salonClientGenders.isEmpty()) {
 			loc.setSalonClientGenders(SalonClientGender.toCsv(salonClientGenders));
+		}
+		if ("PLUS".equals(StudioGroup.canonicalPlanTier(group.getPlanTier()))) {
+			loc.setSponsoredPlacement(true);
 		}
 		Location saved = locationRepository.save(loc);
 		salonLocationGeocodingAsyncService.scheduleGeocode(saved.getId());

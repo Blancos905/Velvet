@@ -102,6 +102,20 @@ public class Location {
 	@Column
 	private Double longitude;
 
+	/**
+	 * {@code false}: la sede non compare in ricerca, sitemap né sulla vetrina pubblica.
+	 * I saloni già in elenco restano visibili; una sede nuova nasce nascosta finché il titolare non la pubblica.
+	 */
+	@Column(name = "visible_to_clients", nullable = false)
+	private boolean visibleToClients = true;
+
+	/**
+	 * Spazio a pagamento in home ricerca («Saloni sponsorizzati»).
+	 * Non è una classifica: la sede compare perché ha acquistato la messa in evidenza.
+	 */
+	@Column(name = "sponsored_placement", nullable = false)
+	private boolean sponsoredPlacement = false;
+
 	protected Location() {
 	}
 
@@ -294,5 +308,21 @@ public class Location {
 
 	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
+	}
+
+	public boolean isVisibleToClients() {
+		return visibleToClients;
+	}
+
+	public void setVisibleToClients(boolean visibleToClients) {
+		this.visibleToClients = visibleToClients;
+	}
+
+	public boolean isSponsoredPlacement() {
+		return sponsoredPlacement;
+	}
+
+	public void setSponsoredPlacement(boolean sponsoredPlacement) {
+		this.sponsoredPlacement = sponsoredPlacement;
 	}
 }

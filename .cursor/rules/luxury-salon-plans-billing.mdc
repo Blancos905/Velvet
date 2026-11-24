@@ -1,0 +1,43 @@
+---
+description: Piano salone PREMIUM, stato BASE non entitled, entitlement Stripe, lifecycle disdetta e cancellazione account
+globs: luxury/src/main/java/it/luxury/billing/**,luxury/src/main/java/it/luxury/studio/domain/StudioGroup.java,luxury-frontend/src/data/salonPlans.ts,luxury-frontend/src/hooks/useEffectiveSalonPlanTier.ts,luxury-frontend/src/pages/account/ProfilePage.tsx
+alwaysApply: false
+---
+
+# Luxury — Piani salone e billing
+
+## Tier canonici
+
+- Piano commerciale **`PREMIUM`**, dopo i 30 giorni di prova. Listino per sede (`SalonMultiLocationPricing` / `salonLocationPricing.ts`): **1 sede 40 €**, **2 sedi 35 €** a sede, **da 3 sedi 30 €** a sede. Il form `/piani` chiede il numero di sedi sotto il telefono. Il tasto «Conferma sedi per calcolare lo sconto» applica il numero, mostra il totale post-prova e i campi delle sedi aggiuntive. Checkout: 1 sede sul Price Stripe `STRIPE_PREMIUM_PRICE_ID` (in dashboard 40 €); da 2 sedi importo unitario di fascia × quantity. La registrazione pubblica e la creazione admin del ramo Premium accettano `PREMIUM`.
+- Piano **`PLUS`**: stesso flusso di registrazione di Premium (form, sedi, conferma email, prova 30 giorni, checkout Stripe a fine prova). Prezzo fisso **60 € al mese**, non il listino per sede. Sulla card `/piani` il pannello è quello della prova: 0 € per 30 giorni, poi 60 € al mese, con le stesse aree di Premium e la vetrina nei Saloni sponsorizzati. Alla creazione delle sedi `locations.sponsored_placement` è acceso: il salone compare nei Saloni sponsorizzati quando la sede è visibile e l’abbonamento è attivo. Il webhook Stripe non riscrive `PLUS` in `PREMIUM`.
+- DB `studio_groups.plan_tier`: **`PREMIUM`** oppure **`BASE`** come stato tecnico «non entitled» (downgrade Stripe: `canceled` / `incomplete` / `unpaid`, e saloni già salvati). Non è un piano vendibile e non va chiamato Free in UI, email o docs.
+- Legacy `STANDARD`/`FULL` → normalizzati a `PREMIUM` (`StudioGroup.canonicalPlanTier`). Non mapparli a BASE e non cancellare questa normalizzazione.
+- Non migrare in massa le righe `plan_tier=BASE` esistenti. Un titolare ancora BASE va al flusso di attivazione Premium (`/piani?plan=PREMIUM`), non a un hub di un altro prodotto.
+- Admin: lista e creazione solo Premium. I conteggi delle righe BASE si etichettano «senza Premium».
+
+## Entitlement Premium (`SalonPremiumEntitlementService.hasActivePremium`)
+
+1. `plan_tier == PREMIUM` (canonico, quindi anche `STANDARD`/`FULL`)
+2. Dentro i 30 giorni di prova (`SalonPromotionalTrialService`, da `studio_groups.created_at`) il Premium è attivo anche se Stripe è configurato e non c’è ancora un abbonamento
+3. A prova scaduta, se Stripe è configurato → serve `BillingAccount` con status mappato a PREMIUM (`active` | `trialing` | `past_due`)
+4. A prova scaduta, se Stripe non è configurato → niente Premium
+
+La registrazione **non** apre Stripe e **non** chiede Partita IVA. In header, in alto a destra, il cerchio dei giorni rimasti apre `/account/billing/checkout`: il modulo di fatturazione resta sullo sfondo e un popup con il logo Saloni Luxury chiede di compilarlo; Prosegui chiude solo il popup. Il checkout ha un solo tasto «Vai al pagamento»: salva il profilo fiscale e apre Stripe. Il tasto indietro di Stripe torna a `/account/billing/checkout`, non a `/piani`. La Partita IVA non viene verificata prima del redirect: la raccoglie la pagina Stripe. In Docker di sviluppo le chiavi restano in `luxury/spring-dev.local.env`: il compose non deve azzerarle. Se restano almeno 49 ore, Checkout incassa la carta e l’addebito parte a fine prova (`trial_end`). Da 48 ore alla scadenza un popup chiede il rinnovo; nelle ultime 24 ore torna ogni 4 ore.
+
+Usato per: SEO pubblico, statistiche PIN, chat B2C, ricerca geo, vetrina `requireBySlug`. La vetrina e la ricerca richiedono anche `locations.visible_to_clients` (default acceso sui saloni già esistenti; spento sulle sedi create dopo). Non spostare questi permessi solo sul frontend.
+
+## Stato billing titolare
+
+- `GET /api/v1/me/billing/status` → `BillingStatusService` (solo `ROLE_OWNER`).
+- Disdetta: `subscriptionCancelRequestedAt`, `cancelAtPeriodEnd`, `accountDeletionScheduledAt`.
+- Job: `CancelledSalonSubscriptionExpiryJob` elimina saloni dopo N giorni post-scadenza (`luxury.billing.cancelled-subscription-deletion-days`, default 30).
+- Prova Premium `SALON_PREMIUM_TRIAL_DAYS` / `SalonPromotionalTrialService`: 30 giorni senza addebito, poi Stripe. Non è un piano gratuito separato. Lo status Stripe `trialing` resta solo per abbonamenti già aperti con prova sul checkout.
+
+## Regole modifica
+
+- Le funzioni Premium si verificano con `hasActivePremium` sul backend.
+- Titolare senza Premium: percorso di attivazione (form `/piani?plan=PREMIUM` precompilato da `GET /me/salon` + profilo, poi checkout Stripe se richiesto). La shell Flutter (`FreeAccountWrapper`) è la WebView di tutta l’app, non un piano.
+- Allineare costanti frontend (`SALON_PREMIUM_ACCOUNT_DELETION_DAYS_AFTER_BLOCK`) con property Java.
+- Webhook Stripe → `StripeWebhookProcessor` → `SalonSubscriptionLifecycleService` (blast radius alto: usa CodeGraph).
+- FatturaPA: `FatturaPaInvoiceService` + `luxury.billing.issuer.*` — XML email **solo admin**.
+- Ricevuta PDF commerciale al titolare (oltre thank-you HTML) su `invoice.paid`: `SalonBillingEmailDispatchService.dispatchPaymentReceiptPdf`.

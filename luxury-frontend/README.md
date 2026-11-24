@@ -9,8 +9,17 @@ npm install
 npm run dev
 ```
 
-- Dev server: **http://localhost:5173** (porta fissa in `vite.config.ts`).  
-- Le chiamate a **`/api`** sono proxate verso Spring: default **`http://127.0.0.1:8080`**. Se l’API è su un’altra porta o sulla VM (es. **8082**), imposta **`VITE_PROXY_API_TARGET`** in **`.env.development`** (vedi `.env.lab.example`). Avvia il backend raggiungibile da quel target, altrimenti vedrai errori di rete o **401** se la richiesta finisce su un altro servizio sulla 8080.
+- Dev server: **http://localhost:5173** (porta fissa in `vite.config.ts`; `host: true` → raggiungibile da telefono in LAN).  
+- Le chiamate a **`/api`** sono proxate verso Spring: default **`http://127.0.0.1:8081`** (profilo `local`). Se l’API è su un’altra porta o sulla VM (es. **8082**), imposta **`VITE_PROXY_API_TARGET`** in **`.env.development`** (vedi `.env.lab.example`). Avvia il backend raggiungibile da quel target, altrimenti vedrai errori di rete o **401** se la richiesta finisce su un altro servizio.
+
+### APK debug su telefono (LAN)
+
+```bash
+./scripts/publish-dev-apk.sh --build   # build arm64 + copia in public/dev/
+```
+
+Poi sul telefono (Chrome, stesso Wi‑Fi del Mac): **`http://<IP-LAN>:5173/dev/install.html`**.  
+L’APK punta la WebView a quell’host Vite; file `public/dev/*.apk` è gitignored.
 
 ## Variabili d’ambiente (Vite)
 
@@ -18,7 +27,7 @@ File di riferimento: **`.env.example`**. Copia in **`.env.development`** (non co
 
 | Variabile | Uso |
 |-----------|-----|
-| **`VITE_PROXY_API_TARGET`** | Solo **`npm run dev`**: URL base del backend per il proxy **`/api`** (es. `http://192.168.1.64:8082`). Se assente, default **`http://127.0.0.1:8080`**. |
+| **`VITE_PROXY_API_TARGET`** | Solo **`npm run dev`**: URL base del backend per il proxy **`/api`** (es. `http://192.168.1.64:8082`). Se assente, default **`http://127.0.0.1:8081`**. |
 | **`VITE_API_BASE_URL`** | Base URL dell’API senza slash finale. **Vuoto** in locale → path relativi `/api/...` e proxy Vite. Se valorizzato, le richieste vanno direttamente a quell’host (in dev serve **`luxury.cors.allowed-origins`** sul backend verso `http://localhost:5173`). In produzione, se la SPA è su un dominio diverso dall’API, impostare l’URL completo dell’API e **`luxury.cors.allowed-origins`**. |
 | **`VITE_PARTNER_SIGNUP_URL`** | Destinazione del pulsante «Diventa partner». Default: pagina interna **`/partner`**. |
 | **`VITE_PARTNER_CONTACT_EMAIL`** | Opzionale: email per pulsante mailto sulla pagina partner. |
@@ -43,7 +52,8 @@ Config letta da `src/config/env.ts`.
 | `/registrati` | Registrazione cliente. |
 | `/account/prenotazioni/:id` | Dettaglio prenotazione consumatore (link dalle email di conferma). |
 | `/recensione` | Recensione con **token** (query). |
-| `/account/*` | **Protetto:** layout account; redirect index → `/account/home` (cliente) o `/account/salone` (titolare). Sottoroute: prenotazioni, profilo, preferiti, assistenza; per **OWNER**: salone (home, servizi, brand, layout catalogo, strumenti Standard). |
+| `/account/*` | **Protetto:** area cliente e staff. Redirect index → prenotazioni (cliente) o `/account/staff` (operatore). Il titolare viene mandato a `/salone`. |
+| `/salone` | **Protetto:** admin del salone (hub, servizi, staff, clienti, brand, anteprima, strumenti, statistiche, posizione). `/account/salone` reindirizza qui. |
 
 ## Struttura `src/`
 

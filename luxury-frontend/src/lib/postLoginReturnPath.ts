@@ -5,6 +5,7 @@ export const LUXURY_POST_LOGIN_RETURN_KEY = "luxury_post_login_return";
 
 const ALLOWED_PREFIXES = [
   "/account",
+  "/salone",
   "/admin",
   "/search",
   "/s/",

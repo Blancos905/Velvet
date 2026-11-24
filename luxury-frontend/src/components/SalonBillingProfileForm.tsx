@@ -11,6 +11,9 @@ type SalonBillingProfileFormProps = {
   initial: SalonBillingProfile | undefined;
   submitting: boolean;
   submitLabel?: string;
+  /** Se valorizzato, un tasto esterno può inviare il form con l'attributo form. */
+  formId?: string;
+  hideSubmit?: boolean;
   onSubmit: (payload: ReturnType<typeof toBillingProfilePayload>) => Promise<void>;
 };
 
@@ -18,6 +21,8 @@ export function SalonBillingProfileForm({
   initial,
   submitting,
   submitLabel = "Salva dati fatturazione",
+  formId,
+  hideSubmit = false,
   onSubmit,
 }: SalonBillingProfileFormProps) {
   const [values, setValues] = useState<SalonBillingProfileFieldValues>(() =>
@@ -41,16 +46,18 @@ export function SalonBillingProfileForm({
   };
 
   return (
-    <form className="luxury-profile-form luxury-profile-form--account" noValidate onSubmit={handleSubmit}>
+    <form id={formId} className="luxury-profile-form luxury-profile-form--account" noValidate onSubmit={handleSubmit}>
       {errorHint ? (
         <p className="luxury-alert luxury-alert--error" role="alert">
           {errorHint}
         </p>
       ) : null}
       <SalonBillingProfileFields values={values} onChange={onChange} disabled={submitting} variant="account" />
-      <button type="submit" className="luxury-btn luxury-btn--primary luxury-profile-form__submit" disabled={submitting}>
-        {submitting ? "Salvataggio…" : submitLabel}
-      </button>
+      {hideSubmit ? null : (
+        <button type="submit" className="luxury-btn luxury-btn--primary luxury-profile-form__submit" disabled={submitting}>
+          {submitting ? "Salvataggio…" : submitLabel}
+        </button>
+      )}
     </form>
   );
 }

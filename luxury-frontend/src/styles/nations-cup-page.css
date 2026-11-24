@@ -648,22 +648,69 @@
   background: linear-gradient(90deg, #fde68a, #fdba74);
 }
 
-@media (max-width: 520px) {
+/* Web stretto: la card assoluta copre titolo, epigrafe e ricerca.
+   In flusso resta un chip sopra l’hero e non sposta il resto. */
+@media (max-width: 900px) {
+  .luxury-hero-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .luxury-hero-wrap > .luxury-home-inner,
+  .luxury-hero-wrap > .luxury-hero-carousel {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
   .luxury-nations-cup-floater {
-    top: 0.65rem;
-    right: 0.55rem;
-    width: 7.75rem;
-    padding: 0.85rem 0.55rem 0.75rem;
+    position: static;
+    z-index: auto;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    align-self: center;
+    column-gap: 0.7rem;
+    row-gap: 0.22rem;
+    width: min(100%, 22rem);
+    max-width: 100%;
+    margin: 0 auto 1rem;
+    padding: 0.55rem 0.9rem 0.55rem 0.6rem;
+    box-sizing: border-box;
+  }
+
+  .luxury-nations-cup-floater:hover {
+    transform: none;
   }
 
   .luxury-nations-cup-floater__cup {
-    width: 4.5rem;
+    grid-row: 1 / span 2;
+    width: 2.85rem;
+  }
+
+  .luxury-nations-cup-floater__title {
+    font-size: 0.78rem;
+    line-height: 1.15;
+    text-align: left;
+  }
+
+  .luxury-nations-cup-floater__badge {
+    justify-self: start;
+    max-width: 100%;
+    font-size: 0.62rem;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
   }
 
   .luxury-hero-wrap .luxury-home-inner {
-    padding-right: 8.5rem;
+    padding-right: 0;
   }
+}
 
+@media (max-width: 520px) {
   .luxury-nations-cup-hero {
     border-radius: 18px;
     padding-top: 1.25rem;

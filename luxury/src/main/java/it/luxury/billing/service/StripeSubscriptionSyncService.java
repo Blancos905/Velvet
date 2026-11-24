@@ -74,7 +74,7 @@ public class StripeSubscriptionSyncService {
 		account.setSyncedAt(Instant.now());
 		billingAccountRepository.save(account);
 
-		String planTier = planTierForStatus(account.getSubscriptionStatus());
+		String planTier = planTierToPersist(group.getPlanTier(), planTierForStatus(account.getSubscriptionStatus()));
 		group.applyPlanTier(planTier);
 		studioGroupRepository.save(group);
 	}
@@ -95,6 +95,17 @@ public class StripeSubscriptionSyncService {
 			return "PREMIUM";
 		}
 		return "BASE";
+	}
+
+	/**
+	 * Uno stato Stripe attivo vale {@code PREMIUM}. Un salone Plus resta {@code PLUS}:
+	 * il webhook non lo riscrive sul piano Premium. La disdetta resta {@code BASE}.
+	 */
+	public static String planTierToPersist(String currentTier, String statusTier) {
+		if ("PLUS".equals(StudioGroup.canonicalPlanTier(currentTier)) && "PREMIUM".equals(statusTier)) {
+			return "PLUS";
+		}
+		return statusTier;
 	}
 
 	public Optional<BillingAccount> findByStudioGroupId(UUID studioGroupId) {

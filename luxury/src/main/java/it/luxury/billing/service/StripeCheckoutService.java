@@ -13,6 +13,7 @@ import it.luxury.config.LuxuryStripeProperties;
 import it.luxury.consumer.domain.ConsumerProfile;
 import it.luxury.consumer.domain.ConsumerProfileRepository;
 import it.luxury.security.auth.LuxuryUserPrincipal;
+import it.luxury.studio.domain.LocationRepository;
 import it.luxury.studio.domain.StudioGroup;
 import it.luxury.studio.service.StudioGroupOwnerResolver;
 import it.luxury.billing.config.ConditionalOnStripeBillingOperational;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -27,9 +29,6 @@ import java.util.UUID;
 @Service
 @ConditionalOnStripeBillingOperational
 public class StripeCheckoutService {
-
-	/** Allineato a {@code SALON_PREMIUM_TRIAL_DAYS} nel frontend ({@code salonPlans.ts}). */
-	private static final long PREMIUM_TRIAL_PERIOD_DAYS = 60L;
 
 	private final LuxuryStripeProperties stripeProperties;
 	private final LuxuryStripeCheckoutBrandingProperties checkoutBranding;
@@ -41,6 +40,8 @@ public class StripeCheckoutService {
 	private final StripeBillingCustomerSyncService stripeBillingCustomerSyncService;
 	private final StripeSubscriptionSyncService subscriptionSyncService;
 	private final SalonBillingNotificationService billingNotificationService;
+	private final LocationRepository locationRepository;
+	private final SalonPromotionalTrialService promotionalTrialService;
 	private final com.stripe.StripeClient stripeClient;
 
 	public StripeCheckoutService(
@@ -54,6 +55,8 @@ public class StripeCheckoutService {
 			StripeBillingCustomerSyncService stripeBillingCustomerSyncService,
 			StripeSubscriptionSyncService subscriptionSyncService,
 			SalonBillingNotificationService billingNotificationService,
+			LocationRepository locationRepository,
+			SalonPromotionalTrialService promotionalTrialService,
 			com.stripe.StripeClient stripeClient) {
 		this.stripeProperties = stripeProperties;
 		this.checkoutBranding = checkoutBranding;
@@ -65,6 +68,8 @@ public class StripeCheckoutService {
 		this.stripeBillingCustomerSyncService = stripeBillingCustomerSyncService;
 		this.subscriptionSyncService = subscriptionSyncService;
 		this.billingNotificationService = billingNotificationService;
+		this.locationRepository = locationRepository;
+		this.promotionalTrialService = promotionalTrialService;
 		this.stripeClient = stripeClient;
 	}
 
@@ -79,6 +84,12 @@ public class StripeCheckoutService {
 				throw new BusinessException(HttpStatus.CONFLICT, "ALREADY_SUBSCRIBED", "Il salone ha già un abbonamento Premium attivo.");
 			}
 		}
+		if ("PLUS".equals(StudioGroup.canonicalPlanTier(group.getPlanTier()))) {
+			BillingAccount existing = billingAccountRepository.findByStudioGroup_Id(group.getId()).orElse(null);
+			if (existing != null && StripeSubscriptionSyncService.planTierForStatus(existing.getSubscriptionStatus()).equals("PREMIUM")) {
+				throw new BusinessException(HttpStatus.CONFLICT, "ALREADY_SUBSCRIBED", "Il salone ha già un abbonamento Plus attivo.");
+			}
+		}
 		ConsumerProfile profile = consumerProfileRepository.findByAuthSub(principal.getSubject())
 				.filter(p -> p.getDeletedAt() == null)
 				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Profilo non trovato."));
@@ -86,31 +97,36 @@ public class StripeCheckoutService {
 		SalonBillingProfile billingProfile = salonBillingProfileService.requireCompleteProfile(principal);
 
 		String customerId = stripeBillingCustomerSyncService.ensureCustomerWithProfile(group, profile, billingProfile);
-		stripeBillingCustomerSyncService.syncProfileToStripeCustomer(group, billingProfile);
 
-		Map<String, String> metadata = billingMetadata(group.getId(), profile.getId());
+		int locationCount = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId()).size();
+		if (locationCount < 1) {
+			locationCount = 1;
+		}
+		Map<String, String> metadata = billingMetadata(
+				group.getId(),
+				profile.getId(),
+				locationCount,
+				"PLUS".equals(StudioGroup.canonicalPlanTier(group.getPlanTier())) ? "PLUS" : "PREMIUM");
 		String frontendBase = frontendBaseUrl();
+		SessionCreateParams.SubscriptionData.Builder subscriptionData =
+				SessionCreateParams.SubscriptionData.builder().putAllMetadata(metadata);
+		Long trialEnd = promotionalTrialService.deferredStripeChargeEpochSecond(group, Instant.now());
+		if (trialEnd != null) {
+			subscriptionData.setTrialEnd(trialEnd);
+		}
 		try {
 			Session session = stripeClient.checkout().sessions().create(
 					SessionCreateParams.builder()
 							.setMode(SessionCreateParams.Mode.SUBSCRIPTION)
 							.setCustomer(customerId)
 							.setClientReferenceId(group.getId().toString())
-							.addLineItem(
-									SessionCreateParams.LineItem.builder()
-											.setPrice(stripeProperties.premiumPriceId())
-											.setQuantity(1L)
-											.build())
+							.addLineItem(checkoutLineItem(group, locationCount))
 							.setSuccessUrl(frontendBase + stripeProperties.checkoutSuccessPath() + "?session_id={CHECKOUT_SESSION_ID}")
 							.setCancelUrl(frontendBase + stripeProperties.checkoutCancelPath())
 							.putAllMetadata(metadata)
 							.setBrandingSettings(StripeCheckoutBrandingSupport.brandingSettings(checkoutBranding, frontendBase))
 							.setCustomText(StripeCheckoutBrandingSupport.customText())
-							.setSubscriptionData(
-									SessionCreateParams.SubscriptionData.builder()
-											.setTrialPeriodDays(PREMIUM_TRIAL_PERIOD_DAYS)
-											.putAllMetadata(metadata)
-											.build())
+							.setSubscriptionData(subscriptionData.build())
 							.setBillingAddressCollection(SessionCreateParams.BillingAddressCollection.REQUIRED)
 							.setTaxIdCollection(
 									SessionCreateParams.TaxIdCollection.builder()
@@ -132,11 +148,20 @@ public class StripeCheckoutService {
 		}
 	}
 
-	private static Map<String, String> billingMetadata(UUID studioGroupId, UUID consumerProfileId) {
+	private SessionCreateParams.LineItem checkoutLineItem(StudioGroup group, int locationCount) {
+		if ("PLUS".equals(StudioGroup.canonicalPlanTier(group.getPlanTier()))) {
+			return PlusCheckoutLineItems.flatMonthly();
+		}
+		return PremiumCheckoutLineItems.subscription(stripeProperties.premiumPriceId(), locationCount);
+	}
+
+	private static Map<String, String> billingMetadata(
+			UUID studioGroupId, UUID consumerProfileId, int locationCount, String plan) {
 		Map<String, String> metadata = new HashMap<>();
 		metadata.put("luxury_studio_group_id", studioGroupId.toString());
 		metadata.put("luxury_consumer_profile_id", consumerProfileId.toString());
-		metadata.put("luxury_plan", "PREMIUM");
+		metadata.put("luxury_plan", plan);
+		metadata.put("luxury_location_count", Integer.toString(locationCount));
 		return metadata;
 	}
 
@@ -172,11 +197,10 @@ public class StripeCheckoutService {
 			if (subscriptionId != null && !subscriptionId.isBlank()) {
 				subscriptionSyncService.syncFromSubscriptionId(subscriptionId, group.getId());
 			}
+			/* Pagamento con importo: email «grazie» solo da webhook invoice.paid (una sola).
+			 * Trial / €0: email attivazione da checkout.session.completed. */
 			Long amountTotal = session.getAmountTotal();
-			if (amountTotal != null && amountTotal > 0) {
-				billingNotificationService.onCheckoutSessionConfirmedPaid(session, group.getId());
-			}
-			else {
+			if (amountTotal == null || amountTotal <= 0) {
 				billingNotificationService.onCheckoutSessionCompleted(session, group.getId());
 			}
 		}

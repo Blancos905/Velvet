@@ -86,4 +86,27 @@ public interface BillingAccountRepository extends JpaRepository<BillingAccount, 
 			""")
 	List<BillingAccount> findPendingCancellationWithPeriodEnded(
 			@org.springframework.data.repository.query.Param("periodEndCutoff") Instant periodEndCutoff);
+
+	@Query("""
+			select b from BillingAccount b
+			join fetch b.studioGroup g
+			where g.provider = false
+			and b.cancelAtPeriodEnd = false
+			and lower(b.subscriptionStatus) in ('active', 'trialing', 'past_due')
+			and b.currentPeriodEnd is not null
+			and b.currentPeriodEnd > :fromInclusive
+			and b.currentPeriodEnd <= :toInclusive
+			""")
+	List<BillingAccount> findUpcomingRenewals(
+			@org.springframework.data.repository.query.Param("fromInclusive") Instant fromInclusive,
+			@org.springframework.data.repository.query.Param("toInclusive") Instant toInclusive);
+
+	@Query("""
+			select b from BillingAccount b
+			join fetch b.studioGroup g
+			where g.provider = false
+			and b.subscriptionCancelRequestedAt is not null
+			and b.currentPeriodEnd is not null
+			""")
+	List<BillingAccount> findAllPendingCancellationWithPeriodEnd();
 }

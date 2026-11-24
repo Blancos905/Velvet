@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -18,10 +19,11 @@ import { isLuxuryAccessTokenExpired } from "../lib/luxuryAccessTokenExpiry";
 import { normalizePostLoginReturnPath, setPostLoginReturnPath } from "../lib/postLoginReturnPath";
 import { notifyLuxurySessionEnded } from "../lib/luxuryLoginFormReset";
 import { redirectAfterLuxuryLogout } from "../lib/postLogoutRedirect";
+import { beginLuxuryAuthenticatedSession, clearLuxurySessionStartedAt, isLuxuryLoginSessionExpired } from "../lib/luxurySessionStartedAt";
 import { luxuryJwtHintsFromAccessToken } from "../lib/luxuryJwtHintsFromAccessToken";
-import { humanizePostRegistrationAuthError } from "../utils/authErrors";
 import { clearMeNotificationsQueryGateFlags } from "../lib/meNotificationsQueryGate";
 import { primeInAppAlertSound } from "../lib/luxuryInAppSoundBus";
+import { currentSurface, panelKindForRoles, readSurfaceLocation } from "../lib/luxurySurfaces";
 import { clearAdminSession, markAdminImpersonationActive, writeAdminAccessToken } from "./adminSession";
 import { syncAdminRefreshTokenFromLuxurySession, writeAdminRefreshToken } from "./adminRefreshSession";
 import {
@@ -36,6 +38,20 @@ import { unregisterLuxuryFcmDevice } from "../api/fcmDevice";
 import { useLuxurySessionExpiryWatchdog } from "./useLuxurySessionExpiryWatchdog";
 
 import { LUXURY_ACCESS_TOKEN_KEY } from "./adminSession";
+import {
+  clearSessionMarkerCookie,
+  clearStoredEpoch,
+  readSessionMarker,
+  readStoredEpoch,
+  rememberSessionEpoch,
+  sessionBootAction,
+} from "../lib/luxurySessionMarker";
+import {
+  clearPublicSurfaceSessionReleased,
+  isPublicSurfaceSessionReleased,
+  markPublicSurfaceSessionReleased,
+  shouldSkipSharedSessionRestore,
+} from "../lib/publicSurfaceSessionRelease";
 
 const ACCESS_TOKEN_STORAGE_KEY = LUXURY_ACCESS_TOKEN_KEY;
 
@@ -79,6 +95,11 @@ export type LuxuryAuthContextValue = {
   signOut: () => Promise<void>;
   /** Chiude la sessione app senza redirect post-logout (es. passaggio da super admin a titolare salone). */
   signOutForAccountSwitch: () => Promise<void>;
+  /**
+   * La home di ricerca lascia il pannello sull'altra origine.
+   * Toglie solo la sessione di questa scheda: il cookie condiviso resta per la finestra del pannello.
+   */
+  releasePublicSurfaceAfterPanelOpen: () => void;
   accessToken: string | undefined;
   userEmail: string | undefined;
   userDisplayLabel: string | undefined;
@@ -99,14 +120,42 @@ export function useLuxuryAuth(): LuxuryAuthContextValue {
   return v;
 }
 
+function discardSharedSession(): void {
+  if (typeof sessionStorage !== "undefined") {
+    sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+  }
+  clearStoredRefreshToken();
+  clearStoredEpoch();
+  clearAdminSession();
+}
+
+function readBootSession(): { token: string | undefined; restore: boolean } {
+  if (shouldSkipSharedSessionRestore(currentSurface(readSurfaceLocation()), isPublicSurfaceSessionReleased())) {
+    discardSharedSession();
+    return { token: undefined, restore: false };
+  }
+  const marker = readSessionMarker();
+  const epoch = readStoredEpoch();
+  const token = readStoredAccessToken();
+  const action = sessionBootAction(marker, epoch, Boolean(token));
+  if (action === "clear") {
+    discardSharedSession();
+    return { token: undefined, restore: false };
+  }
+  return { token, restore: action === "restore" };
+}
+
 export function LuxuryAuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
-  const [accessToken, setAccessToken] = useState<string | undefined>(() => readStoredAccessToken());
-  const [isLoading, setIsLoading] = useState(false);
+  const [boot] = useState(readBootSession);
+  const restorePending = useRef(boot.restore);
+  const [accessToken, setAccessToken] = useState<string | undefined>(boot.token);
+  const [isLoading, setIsLoading] = useState(boot.restore);
 
   const persistToken = useCallback((token: string) => {
     clearMeNotificationsQueryGateFlags();
     sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, token);
+    rememberSessionEpoch();
     if (luxuryJwtHintsFromAccessToken(token).realmRoles.includes("ADMIN")) {
       writeAdminAccessToken(token);
     }
@@ -119,6 +168,10 @@ export function LuxuryAuthProvider({ children }: { children: ReactNode }) {
       (typeof sessionStorage !== "undefined" && sessionStorage.getItem(ACCESS_TOKEN_STORAGE_KEY));
     sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
     clearStoredRefreshToken();
+    clearStoredEpoch();
+    clearPublicSurfaceSessionReleased();
+    clearSessionMarkerCookie();
+    clearLuxurySessionStartedAt();
     setAccessToken(undefined);
     if (hadSession) {
       notifyLuxurySessionEnded();
@@ -133,30 +186,63 @@ export function LuxuryAuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+    const marker = readSessionMarker();
+    const epoch = readStoredEpoch();
+    const markerMismatch = Boolean(marker) && epoch !== marker;
+    const needsRefresh =
+      markerMismatch
+      || ((!accessToken || isLuxuryAccessTokenExpired(accessToken))
+        && (Boolean(accessToken) || Boolean(readStoredRefreshToken()) || Boolean(marker)));
+    const finishRestore = () => {
+      if (!restorePending.current) return;
+      restorePending.current = false;
+      setIsLoading(false);
+    };
+    if (shouldSkipSharedSessionRestore(currentSurface(readSurfaceLocation()), isPublicSurfaceSessionReleased())) {
+      finishRestore();
+      return;
+    }
+    if (!needsRefresh) {
       if (accessToken && !isLuxuryAccessTokenExpired(accessToken)) {
-        return;
+        rememberSessionEpoch();
       }
-      // Evita POST /refresh (401 in console) quando non c'è alcuna sessione da rinnovare.
-      if (!accessToken && !readStoredRefreshToken()) {
-        return;
-      }
+      finishRestore();
+      return;
+    }
+    // Evita POST /refresh (401 in console) quando non c'è alcuna sessione da rinnovare.
+    if (!accessToken && !readStoredRefreshToken() && !marker) {
+      finishRestore();
+      return;
+    }
+    if (isLuxuryLoginSessionExpired()) {
+      if (!cancelled) expireSession();
+      finishRestore();
+      return;
+    }
+    void (async () => {
       const refreshed = await refreshLuxuryAccessToken();
-      if (!cancelled && refreshed && !isLuxuryAccessTokenExpired(refreshed)) {
+      if (cancelled) return;
+      if (refreshed && !isLuxuryAccessTokenExpired(refreshed)) {
+        if (shouldSkipSharedSessionRestore(currentSurface(readSurfaceLocation()), isPublicSurfaceSessionReleased())) {
+          finishRestore();
+          return;
+        }
         persistToken(refreshed);
         if (luxuryJwtHintsFromAccessToken(refreshed).realmRoles.includes("ADMIN")) {
           syncAdminRefreshTokenFromLuxurySession();
         }
+        finishRestore();
         return;
       }
-      if (!cancelled && accessToken && luxuryJwtHintsFromAccessToken(accessToken).realmRoles.includes("ADMIN")) {
+      if (accessToken && luxuryJwtHintsFromAccessToken(accessToken).realmRoles.includes("ADMIN")) {
         writeAdminAccessToken(accessToken);
       }
+      finishRestore();
     })();
     return () => {
       cancelled = true;
     };
-  }, [accessToken, persistToken]);
+  }, [accessToken, persistToken, expireSession]);
 
   useLuxurySessionExpiryWatchdog(accessToken, expireSession);
 
@@ -248,6 +334,8 @@ export function LuxuryAuthProvider({ children }: { children: ReactNode }) {
             body: JSON.stringify({ email: normalizedUsername, password }),
           });
           queryClient.removeQueries({ queryKey: ["me"] });
+          clearPublicSurfaceSessionReleased();
+          beginLuxuryAuthenticatedSession();
           persistToken(body.accessToken);
           const token = body.accessToken;
           const rolesAfterLogin = luxuryJwtHintsFromAccessToken(token).realmRoles;
@@ -299,16 +387,16 @@ export function LuxuryAuthProvider({ children }: { children: ReactNode }) {
           if (
             token
             && (rolesAfterLogin.includes("STAFF") || rolesAfterLogin.includes("OWNER"))
+            && currentSurface(readSurfaceLocation()) !== "public"
           ) {
             void primeInAppAlertSound(true);
           }
-        } catch (e: unknown) {
-          throw new Error(humanizePostRegistrationAuthError(e));
         } finally {
           setIsLoading(false);
         }
       },
       signInWithIssuedToken: async (token: string, options?: SignInWithIssuedTokenOptions) => {
+        clearPublicSurfaceSessionReleased();
         if (options?.preserveAdminSession) {
           markAdminImpersonationActive();
         } else {
@@ -317,6 +405,7 @@ export function LuxuryAuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(true);
         try {
           queryClient.removeQueries({ queryKey: ["me"] });
+          beginLuxuryAuthenticatedSession();
           persistToken(token);
           await yieldToBrowser();
           await yieldToBrowser();
@@ -357,6 +446,7 @@ export function LuxuryAuthProvider({ children }: { children: ReactNode }) {
           if (
             token
             && (rolesAfterLogin.includes("STAFF") || rolesAfterLogin.includes("OWNER"))
+            && currentSurface(readSurfaceLocation()) !== "public"
           ) {
             void primeInAppAlertSound(true);
           }
@@ -365,12 +455,17 @@ export function LuxuryAuthProvider({ children }: { children: ReactNode }) {
         }
       },
       signOut: async () => {
+        const panel = panelKindForRoles({
+          admin: isLuxurySuperAdmin,
+          owner: isSalonTitolare,
+          staff: isSalonStaff,
+        });
         await unregisterLuxuryFcmDevice(accessToken);
         await logoutLuxurySession();
         clearToken();
         clearAdminSession();
         queryClient.removeQueries({ queryKey: ["me"] });
-        redirectAfterLuxuryLogout();
+        redirectAfterLuxuryLogout(panel);
       },
       signOutForAccountSwitch: async () => {
         await unregisterLuxuryFcmDevice(accessToken);
@@ -378,6 +473,17 @@ export function LuxuryAuthProvider({ children }: { children: ReactNode }) {
         clearToken();
         clearAdminSession();
         queryClient.removeQueries({ queryKey: ["me"] });
+      },
+      releasePublicSurfaceAfterPanelOpen: () => {
+        markPublicSurfaceSessionReleased();
+        if (typeof sessionStorage !== "undefined") {
+          sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+        }
+        clearStoredRefreshToken();
+        clearStoredEpoch();
+        clearAdminSession();
+        queryClient.removeQueries({ queryKey: ["me"] });
+        setAccessToken(undefined);
       },
       accessToken,
       userEmail,

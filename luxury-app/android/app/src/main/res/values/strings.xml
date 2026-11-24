@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Saloni Luxury</string>
+    <string name="luxury_fcm_channel_id">luxury_alerts</string>
+    <string name="luxury_fcm_channel_name">Avvisi Saloni Luxury</string>
+    <string name="luxury_fcm_channel_description">Prenotazioni, chat e aggiornamenti salone</string>
+</resources>

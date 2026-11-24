@@ -101,6 +101,7 @@ public class MePersonalDataExportService {
 		row.put("phone", dto.phone());
 		row.put("country", dto.country());
 		row.put("preferredLocale", dto.preferredLocale());
+		row.put("photoDataUrl", profile.getPhotoDataUrl());
 		row.put("planTier", profile.getPlanTier());
 		row.put("securityRoles", profile.getSecurityRoles());
 		row.put("createdAt", profile.getCreatedAt());

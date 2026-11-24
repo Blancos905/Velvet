@@ -555,7 +555,36 @@ class MeSalonControllerTest {
 				.andExpect(jsonPath("$.firstName").value("Mario"))
 				.andExpect(jsonPath("$.lastName").value("Rossi"))
 				.andExpect(jsonPath("$.role").value("Stylist"))
-				.andExpect(jsonPath("$.photoDataUrl", nullValue()));
+				.andExpect(jsonPath("$.photoDataUrl", nullValue()))
+				.andExpect(jsonPath("$.requireBookingConfirmation").value(true))
+				.andExpect(jsonPath("$.averageStaffRating", nullValue()))
+				.andExpect(jsonPath("$.staffReviewCount", nullValue()));
+	}
+
+	@Test
+	void staffOperatorProfile_patch_updatesRequireBookingConfirmation() throws Exception {
+		String suffix = UUID.randomUUID().toString().substring(0, 8);
+		String ownerEmail = "owner-staff-reqconf-" + suffix + "@test.com";
+		String slug = "slug-staff-reqconf-" + suffix;
+		StudioGroup group = studioGroupRepository.save(new StudioGroup("Studio Req Conf", ownerEmail, "PREMIUM"));
+		Location location = locationRepository.save(new Location(group, slug, "Sede", "MI"));
+		StaffOperator operator = staffOperatorRepository.save(new StaffOperator(location, "Anna", "Bianchi", "Stylist", null));
+		ConsumerProfile staff = saveStaff("sub-staff-reqconf-" + suffix, "staff-reqconf-" + suffix + "@test.com");
+		operator.setConsumerProfile(staff);
+		staffOperatorRepository.save(operator);
+
+		mockMvc.perform(
+						patch("/api/v1/me/staff/operator-profile")
+								.header("Authorization", bearer(staff))
+								.contentType(MediaType.APPLICATION_JSON)
+								.content("{\"requireBookingConfirmation\":false}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.requireBookingConfirmation").value(false))
+				.andExpect(jsonPath("$.firstName").value("Anna"));
+
+		mockMvc.perform(get("/api/v1/me/staff/operator-profile").header("Authorization", bearer(staff)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.requireBookingConfirmation").value(false));
 	}
 
 	@Test

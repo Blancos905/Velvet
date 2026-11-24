@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" role="img" aria-label="Maison Vert">
+  <defs>
+    <linearGradient id="mv-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ecfccb"/>
+      <stop offset="40%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+  </defs>
+  <rect x="10" y="12" width="48" height="48" rx="10" fill="rgba(0,0,0,0.28)" stroke="url(#mv-gold)" stroke-width="1.4"/>
+  <path d="M34 20c8 8 10 16 10 22 0 8-4.5 14-10 16-5.5-2-10-8-10-16 0-6 2-14 10-22z" fill="url(#mv-gold)"/>
+  <path d="M34 28v24" stroke="#431407" stroke-width="1.2" opacity="0.55"/>
+  <text x="74" y="28" fill="url(#mv-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="10" letter-spacing="0.38em">MAISON</text>
+  <text x="74" y="52" fill="url(#mv-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="24" letter-spacing="0.2em">VERT</text>
+  <path d="M74 34h130" stroke="url(#mv-gold)" stroke-width="0.6" opacity="0.4"/>
+</svg>

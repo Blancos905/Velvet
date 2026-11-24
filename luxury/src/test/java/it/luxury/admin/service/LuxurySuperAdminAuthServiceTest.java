@@ -18,7 +18,7 @@ class LuxurySuperAdminAuthServiceTest {
 	void login_plaintext_password_ok() {
 		var props = new LuxurySuperAdminProperties("admin", "secret", "", "", "", "");
 		var enc = new BCryptPasswordEncoder();
-		var sec = new LuxurySecurityProperties("tok", null, 72, 15, 30, false, 30, 30);
+		var sec = new LuxurySecurityProperties("tok", null, 72, 15, 30, 24, false, 30, 30);
 		var tokenService = new LuxuryTokenService(sec);
 		PlatformSuperAdminCredentialSource noDb = Optional::empty;
 		var svc = new LuxurySuperAdminAuthService(props, noDb, enc, tokenService, sec);
@@ -33,7 +33,7 @@ class LuxurySuperAdminAuthServiceTest {
 		var enc = new BCryptPasswordEncoder();
 		String hash = enc.encode("xxyyzz");
 		var props = new LuxurySuperAdminProperties("root", "", hash, "", "", "");
-		var sec = new LuxurySecurityProperties("tok", null, 72, 15, 30, false, 30, 30);
+		var sec = new LuxurySecurityProperties("tok", null, 72, 15, 30, 24, false, 30, 30);
 		var tokenService = new LuxuryTokenService(sec);
 		PlatformSuperAdminCredentialSource noDb = Optional::empty;
 		var svc = new LuxurySuperAdminAuthService(props, noDb, enc, tokenService, sec);
@@ -45,7 +45,7 @@ class LuxurySuperAdminAuthServiceTest {
 	void login_wrong_password() {
 		var props = new LuxurySuperAdminProperties("admin", "secret", "", "", "", "");
 		var enc = new BCryptPasswordEncoder();
-		var sec = new LuxurySecurityProperties("tok", null, 72, 15, 30, false, 30, 30);
+		var sec = new LuxurySecurityProperties("tok", null, 72, 15, 30, 24, false, 30, 30);
 		var tokenService = new LuxuryTokenService(sec);
 		PlatformSuperAdminCredentialSource noDb = Optional::empty;
 		var svc = new LuxurySuperAdminAuthService(props, noDb, enc, tokenService, sec);

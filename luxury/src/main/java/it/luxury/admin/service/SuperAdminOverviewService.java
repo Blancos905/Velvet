@@ -158,7 +158,8 @@ public class SuperAdminOverviewService {
 					billingAccount != null ? billingAccount.getSubscriptionStatus() : null,
 					billingAccount != null ? billingAccount.isCancelAtPeriodEnd() : null,
 					billingAccount != null ? billingAccount.getCurrentPeriodEnd() : null,
-					category != null ? category.name() : null));
+					category != null ? category.name() : null,
+					locs.stream().anyMatch(Location::isSponsoredPlacement)));
 		}
 
 		var sortClients = Sort.by(Sort.Order.desc("createdAt").nullsLast()).and(Sort.by(Sort.Order.desc("id")));

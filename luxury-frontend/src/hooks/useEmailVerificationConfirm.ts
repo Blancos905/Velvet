@@ -24,6 +24,7 @@ import { setPostLoginReturnPath, clearPostLoginReturnPath } from "../lib/postLog
 import {
   cacheConfirmMessage,
   cacheConfirmSession,
+  clearClientSignupAwaiting,
   clearPendingEmailVerification,
   clearSalonRegistrationPostSignupActive,
   markSalonRegistrationPostSignupActive,
@@ -114,7 +115,9 @@ function isPremiumCheckoutPostConfirmPath(path: string): boolean {
  */
 function isPremiumSalonRegistrationInProgress(pendingCheckoutToken?: string | null): boolean {
   return (
-    readIntendedSalonPlanFromSession() === "PREMIUM" || Boolean(pendingCheckoutToken?.trim())
+    readIntendedSalonPlanFromSession() === "PREMIUM" ||
+    readIntendedSalonPlanFromSession() === "PLUS" ||
+    Boolean(pendingCheckoutToken?.trim())
   );
 }
 
@@ -247,7 +250,9 @@ export function useEmailVerificationConfirm({
 
       const rawNext = payload.nextPath?.trim() ?? "";
       const nextPath =
-        rawNext === SALON_OWNER_HOME_PATH || rawNext.startsWith("/account/")
+        rawNext === SALON_OWNER_HOME_PATH ||
+        rawNext.startsWith("/salone") ||
+        rawNext.startsWith("/account/")
           ? rawNext
           : SALON_OWNER_HOME_PATH;
       setPremiumPaidContinueTo(nextPath);
@@ -291,9 +296,9 @@ export function useEmailVerificationConfirm({
       setCrossTabConfirmed(true);
       setConfirmMsg(payload.message);
       setConfirmErr(null);
-      markSalonRegistrationPostSignupActive();
 
       if (payload.premiumCheckoutToken?.trim()) {
+        if (audience === "salon") markSalonRegistrationPostSignupActive();
         beginPremiumCheckoutCelebration(payload.premiumCheckoutToken, payload.message);
         return;
       }
@@ -328,6 +333,8 @@ export function useEmailVerificationConfirm({
         setConfirmedNextPath(CLIENT_POST_EMAIL_CONFIRM_PATH);
         return;
       }
+
+      if (audience === "salon") markSalonRegistrationPostSignupActive();
 
       const nextPath = resolvePostConfirmNextPath(payload, premiumCheckoutRequired);
       setConfirmedNextPath(nextPath);
@@ -418,7 +425,7 @@ export function useEmailVerificationConfirm({
 
       return "success";
     },
-    [beginPremiumCheckoutCelebration, navigate, premiumCheckoutRequired, registeredEmail, registrationAt, signInWithIssuedToken],
+    [beginPremiumCheckoutCelebration, premiumCheckoutRequired, signInWithIssuedToken],
   );
 
   const broadcastConfirm = useCallback(
@@ -526,7 +533,9 @@ export function useEmailVerificationConfirm({
   const goToClientHomeAfterCelebration = useCallback(async () => {
     setRedirectingAfterConfirm(true);
     clearPendingEmailVerification();
+    clearClientSignupAwaiting();
     clearEmailVerifiedCrossTab();
+    clearSalonRegistrationPostSignupActive();
 
     let token =
       issuedAccessTokenRef.current?.trim() ||
@@ -829,6 +838,7 @@ export function useEmailVerificationConfirm({
     completeClientPostConfirmSession,
     completePostConfirmSession,
     beginPremiumCheckoutCelebration,
+    audience,
     navigate,
     registeredEmail,
     registrationAt,

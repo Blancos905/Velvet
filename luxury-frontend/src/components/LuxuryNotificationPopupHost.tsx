@@ -24,6 +24,7 @@ import {
   type LuxuryNotificationPopupPayload,
 } from "../lib/luxuryNotificationPopup";
 import {
+  clearAllSalonAlertPopupsActive,
   clearSalonAlertPopupActive,
   markSalonAlertNotificationSeen,
   markSalonAlertPopupActive,
@@ -274,6 +275,11 @@ export function LuxuryNotificationPopupHost() {
 
     return () => {
       registerLuxuryNotificationPopupListener(null);
+      // Remount Host (Strict Mode / HMR / auth): senza clear, gli ID restano «attivi» e
+      // useSalonBookingRequestAlerts non ripropone più Accetta/Rifiuta.
+      const currentId = payloadRef.current?.id;
+      if (currentId) clearSalonAlertPopupActive(currentId);
+      else clearAllSalonAlertPopupsActive();
     };
   }, [show]);
 
@@ -355,6 +361,12 @@ export function LuxuryNotificationPopupHost() {
   const typeLabel = payload.notificationType ? humanizeNotificationType(payload.notificationType) : null;
   const appointmentHref = payload.appointmentId
     ? `/account/prenotazioni/${encodeURIComponent(payload.appointmentId)}`
+    : null;
+  const isReviewInvite = payload.notificationType === "REVIEW_INVITE";
+  const reviewsHref = isReviewInvite
+    ? payload.appointmentId
+      ? `/account/feedback-luxury?invite=${encodeURIComponent(payload.appointmentId)}`
+      : "/account/feedback-luxury"
     : null;
   const canDelete = Boolean(payload.id?.trim() && accessToken);
   const isBookingRequest = Boolean(payload.canRespond);
@@ -656,16 +668,22 @@ export function LuxuryNotificationPopupHost() {
                     Apri agenda
                   </button>
                 ) : null}
-                {appointmentHref && !canRespondToBookingRequest && !(isCancellationAlert && salonSide) ? (
+                {(reviewsHref || appointmentHref) &&
+                !canRespondToBookingRequest &&
+                !(isCancellationAlert && salonSide) ? (
                   <button
                     type="button"
                     className="luxury-notif-popup__btn luxury-notif-popup__btn--primary"
                     onClick={() => {
                       close();
-                      navigate(appointmentHref);
+                      navigate(reviewsHref ?? appointmentHref!);
                     }}
                   >
-                    {salonSide && isAppointmentAlert ? "Vai all'appuntamento" : "Vai alla prenotazione"}
+                    {isReviewInvite
+                      ? "Vai a recensioni"
+                      : salonSide && isAppointmentAlert
+                        ? "Vai all'appuntamento"
+                        : "Vai alla prenotazione"}
                   </button>
                 ) : null}
                 {appointmentHref && canRespondToBookingRequest ? (

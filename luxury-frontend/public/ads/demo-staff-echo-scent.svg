@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img">
+  <defs>
+    <linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#581c87"/><stop offset="100%" stop-color="#3b0764"/></linearGradient>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f3e8ff"/><stop offset="100%" stop-color="#c084fc"/></linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#a)"/>
+  <circle cx="320" cy="140" r="40" fill="none" stroke="url(#g)" stroke-width="2"/>
+  <circle cx="320" cy="140" r="8" fill="url(#g)"/>
+  <text x="320" y="250" text-anchor="middle" fill="url(#g)" font-family="Georgia,serif" font-size="30" letter-spacing="0.14em">ECHO SCENT</text>
+  <text x="320" y="288" text-anchor="middle" fill="#e9d5ff" font-family="Georgia,serif" font-size="12" letter-spacing="0.24em">CABINA</text>
+</svg>

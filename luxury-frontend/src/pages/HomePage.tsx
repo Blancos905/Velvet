@@ -1,51 +1,48 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useLuxuryAuth } from "../auth/LuxuryAuthProvider";
 import { apiJson } from "../api/client";
 import type { OrganizationSummary } from "../api/types";
 import { locateByPlace, locateByPostal, locateByPostalSuggestions, reverseLocate } from "../api/locate";
 import {
   COUNTRIES,
+  countryFlagEmoji,
   getStaticCityEntries,
   type CountryCode,
   expectedCapLength,
+  isFreeformPostalCountry,
+  isPostalComplete,
+  isSearchCountryCode,
   italianLocalitiesByCapPrefix,
-  normalizeCapInput,
+  minPostalResolveLength,
+  normalizePostalInput,
   resolveItalianCityForCap,
 } from "../data/searchLocations";
 import { trendIdeaGroupsForHome } from "../data/trendingIdeas";
-import { TOP_OPERATORS_FEATURED_CARD } from "../data/topOperatorsFeatured";
-import { NATIONS_CUP_FEATURED_CARD } from "../data/nationsCupFeatured";
+import { SPONSORED_SALONS_FEATURED_CARD, TOP_OPERATORS_FEATURED_CARD } from "../data/topOperatorsFeatured";
 import { NationsCupTrophyIcon } from "../components/NationsCupTrophyIcon";
 import { useLuxuryNativeAppShell } from "../hooks/useLuxuryNativeAppShell";
-import { QUICK_SUGGEST_GROUPS } from "../data/quickSuggestGroups";
+import { mergeQuickSuggestGroups, type QuickSuggestAvailability } from "../data/quickSuggestGroups";
 import { PartnerSignupLink } from "../components/PartnerSignupLink";
 import { SearchHitLogoAvatar } from "../components/SearchHitLogoAvatar";
 import { formatSalonCityForDisplay } from "../lib/formatSalonCityForDisplay";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { useEditorialCookieAllowed, useMapsCookieAllowed } from "../hooks/useCookieConsent";
 import { editorialBackgroundImage } from "../lib/editorialMedia";
-import {
-  checkGeolocationEnvironment,
-  geolocationErrorMessage,
-  grantMapsConsentForExplicitGeolocation,
-  requestGeolocationCoords,
-} from "../lib/geolocationRequest";
+import { geolocationErrorMessage, requestGeolocationCoords } from "../lib/geolocationRequest";
 import { prefetchSalonPublicPage } from "../lib/prefetchSalonPublicPage";
 import type { SalonOrgNavState } from "../lib/publicOrganizationDetail";
 import type { SalonClientGenderId } from "../data/salonClientGenders";
 import { SALON_BUSINESS_TYPE_OPTIONS, type SalonBusinessTypeId } from "../data/salonBusinessTypes";
+import { useLuxuryLocale } from "../i18n/useLuxuryLocale";
+import { localizedCountryName } from "../i18n/localizedCountryName";
+import { persistSearchCountry, readStoredSearchCountry } from "../i18n/searchCountryStorage";
+import { storySlidesForHome, type StorySlide } from "../i18n/homeCarouselContent";
+import { localizedTrendGroupHeading, localizedTrendText } from "../i18n/homeTrendTranslations";
+import { localizeQuickSuggestGroups } from "../i18n/homeQuickTranslations";
 import "../styles/luxury-home.css";
 import "../styles/top-operators-page.css";
 import "../styles/nations-cup-page.css";
-
-/** Etichette plurali per il filtro tipologia in home («Affina la zona»). */
-const HOME_BUSINESS_TYPE_FILTER_LABELS: Record<SalonBusinessTypeId, string> = {
-  HAIR: "Parrucchieri",
-  BEAUTY: "Estetisti",
-  MASSAGE: "Massaggiatori",
-};
 
 /** Raggio (km) per i tag «Oppure un tocco»: saloni con coordinate entro questo raggio dalla posizione GPS. */
 const QUICK_NEAR_RADIUS_KM = 25;
@@ -58,123 +55,9 @@ type CityPlaceSuggestionRow = {
   detail?: string;
 };
 
-type StorySlide =
-  | { kind: "brand"; id: string }
-  | {
-      kind: "image";
-      id: string;
-      eyebrow: string;
-      titleBefore: string;
-      titleHighlight: string;
-      titleAfter: string;
-      body: string;
-      image: string;
-      imageAlt: string;
-    };
-
-const STORY_SLIDES: StorySlide[] = [
-  { kind: "brand", id: "brand" },
-  {
-    kind: "image",
-    id: "hair",
-    eyebrow: "Parrucchieri & barber",
-    titleBefore: "Stile che ti ",
-    titleHighlight: "ispira",
-    titleAfter: ".",
-    body: "Taglio, colore e barba: professionisti vicino a te, prenotazione chiara e veloce.",
-    image: "/editorial/photo-1560066984-138dadb4c035.webp",
-    imageAlt: "Salone parrucchiere",
-  },
-  {
-    kind: "image",
-    id: "beauty",
-    eyebrow: "Estetica & skincare",
-    titleBefore: "Cura che si ",
-    titleHighlight: "vede",
-    titleAfter: ".",
-    body: "Trattamenti viso, unghie e rituali di bellezza: scegli la sede e il momento giusto.",
-    image: "/editorial/photo-1570172619644-dfd03ed5d881.webp",
-    imageAlt: "Trattamento estetico viso",
-  },
-  {
-    kind: "image",
-    id: "wellness",
-    eyebrow: "Benessere & massaggi",
-    titleBefore: "Corpo e mente in ",
-    titleHighlight: "equilibrio",
-    titleAfter: ".",
-    body: "Massaggi e terapie olistiche: ritagliati una pausa e prenota con pochi click.",
-    image: "/editorial/photo-1544161515-4ab6ce6db874.webp",
-    imageAlt: "Massaggio terapeutico",
-  },
-];
-
-/** Carousel home — solo app mobile: 5 foto, autoplay, senza frecce né pallini. */
-const STORY_SLIDES_NATIVE_APP: StorySlide[] = [
-  {
-    kind: "image",
-    id: "saloni",
-    eyebrow: "Saloni",
-    titleBefore: "Trova il ",
-    titleHighlight: "salone",
-    titleAfter: " per te.",
-    body: "Hair, beauty e benessere: scopri le sedi vicino a te e prenota in pochi tap.",
-    image:
-      "/editorial/photo-1527799820374-dcf8d9d4a388.webp",
-    imageAlt: "Interno di un salone accogliente",
-  },
-  {
-    kind: "image",
-    id: "hair",
-    eyebrow: "Parrucchieri",
-    titleBefore: "Taglio e colore che ",
-    titleHighlight: "ispirano",
-    titleAfter: ".",
-    body: "Piega, barba e styling: professionisti pronti per la tua prossima visita.",
-    image:
-      "/editorial/photo-1560066984-138dadb4c035.webp",
-    imageAlt: "Parrucchiere al lavoro in salone",
-  },
-  {
-    kind: "image",
-    id: "beauty",
-    eyebrow: "Estetisti",
-    titleBefore: "Bellezza che si ",
-    titleHighlight: "vede",
-    titleAfter: ".",
-    body: "Viso, unghie e trucco: rituali di cura per sentirti al meglio ogni giorno.",
-    image:
-      "/editorial/photo-1570172619644-dfd03ed5d881.webp",
-    imageAlt: "Trattamento viso in istituto estetico",
-  },
-  {
-    kind: "image",
-    id: "massaggi",
-    eyebrow: "Massaggiatori",
-    titleBefore: "Relax e ",
-    titleHighlight: "benessere",
-    titleAfter: ".",
-    body: "Massaggi rilassanti e trattamenti decontratturanti: ritagliati la pausa che meriti.",
-    image:
-      "/editorial/photo-1544161515-4ab6ce6db874.webp",
-    imageAlt: "Massaggio rilassante in studio benessere",
-  },
-  {
-    kind: "image",
-    id: "unghie",
-    eyebrow: "Estetica & nail",
-    titleBefore: "Dettagli che fanno la ",
-    titleHighlight: "differenza",
-    titleAfter: ".",
-    body: "Manicure, nail art e piccoli gesti di cura per un look curato in ogni occasione.",
-    image:
-      "/editorial/photo-1604654894610-df63bc536371.webp",
-    imageAlt: "Manicure e nail art",
-  },
-];
-
 function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { nativeApp?: boolean; editorialAllowed?: boolean }) {
-  const slides = nativeApp ? STORY_SLIDES_NATIVE_APP : STORY_SLIDES;
+  const { t } = useLuxuryLocale();
+  const slides = useMemo(() => storySlidesForHome(t, nativeApp), [t, nativeApp]);
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const n = slides.length;
@@ -182,14 +65,14 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
 
   useEffect(() => {
     setIndex(0);
-  }, [nativeApp]);
+  }, [nativeApp, slides]);
 
   useEffect(() => {
     if (paused && !nativeApp) return;
-    const t = window.setInterval(() => {
+    const timer = window.setInterval(() => {
       setIndex((i) => (i + 1) % n);
     }, autoplayMs);
-    return () => window.clearInterval(t);
+    return () => window.clearInterval(timer);
   }, [paused, n, nativeApp, autoplayMs]);
 
   const go = (delta: number) => {
@@ -210,7 +93,7 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
               color: "var(--luxury-orange)",
             }}
           >
-            Saloni Luxury
+            {t("home.carousel.brand.eyebrow")}
           </p>
           <h2
             style={{
@@ -222,9 +105,10 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
               color: "var(--luxury-surface)",
             }}
           >
-            Rompi la routine.
+            {t("home.carousel.brand.titleLine1")}
             <br />
-            <span style={{ color: "var(--luxury-orange)" }}>Prenota</span> il tuo momento di relax.
+            <span style={{ color: "var(--luxury-orange)" }}>{t("home.carousel.brand.titleHighlight")}</span>
+            {t("home.carousel.brand.titleLine2")}
           </h2>
           <p
             style={{
@@ -236,7 +120,7 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
               color: "var(--luxury-surface)",
             }}
           >
-            Parrucchieri, estetica e benessere: trova il salone giusto e prenota in sicurezza.
+            {t("home.carousel.brand.body")}
           </p>
         </>
       );
@@ -292,16 +176,32 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
       }
       role="region"
       aria-roledescription="carousel"
-      aria-label="In evidenza Saloni Luxury"
-      onMouseEnter={nativeApp ? undefined : () => setPaused(true)}
-      onMouseLeave={nativeApp ? undefined : () => setPaused(false)}
-      style={{
-        marginTop: "clamp(2.25rem, 5vw, 3.5rem)",
-        maxWidth: 1120,
-        marginLeft: "auto",
-        marginRight: "auto",
-        position: "relative",
-      }}
+      aria-label={t("home.featuredAria")}
+      onMouseEnter={
+        nativeApp
+          ? undefined
+          : () => {
+              if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) setPaused(true);
+            }
+      }
+      onMouseLeave={
+        nativeApp
+          ? undefined
+          : () => {
+              if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) setPaused(false);
+            }
+      }
+      style={
+        nativeApp
+          ? undefined
+          : {
+              marginTop: "clamp(2.25rem, 5vw, 3.5rem)",
+              maxWidth: 1120,
+              marginLeft: "auto",
+              marginRight: "auto",
+              position: "relative",
+            }
+      }
     >
       <div className="luxury-hero-carousel-viewport">
         <div
@@ -312,7 +212,11 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
             <div
               key={slide.id}
               className="luxury-hero-carousel-slide"
-              style={{ minWidth: "100%", flexShrink: 0 }}
+              style={
+                nativeApp
+                  ? undefined
+                  : { flex: "0 0 100%", width: "100%", minWidth: 0, maxWidth: "100%" }
+              }
               aria-hidden={slideIndex !== index}
             >
               {slide.kind === "brand" ? (
@@ -351,23 +255,38 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
               ) : (
                 <div
                   className="luxury-hero-slide-photo"
-                  style={{
-                    position: "relative",
-                    minHeight: "clamp(240px, 42vw, 360px)",
-                    backgroundImage: editorialBackgroundImage(
-                      "linear-gradient(105deg, rgba(124,45,18,0.88) 0%, rgba(194,65,12,0.5) 42%, rgba(251,146,60,0.2) 100%)",
-                      slide.image,
-                      editorialAllowed,
-                    ),
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    padding: "clamp(1.75rem, 4vw, 2.75rem) clamp(1.5rem, 4vw, 2.5rem)",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                  }}
+                  style={
+                    nativeApp
+                      ? {
+                          backgroundImage: editorialBackgroundImage(
+                            "linear-gradient(105deg, rgba(124,45,18,0.88) 0%, rgba(194,65,12,0.5) 42%, rgba(251,146,60,0.2) 100%)",
+                            slide.image,
+                            editorialAllowed,
+                          ),
+                        }
+                      : {
+                          position: "relative",
+                          minHeight: "clamp(240px, 42vw, 360px)",
+                          backgroundImage: editorialBackgroundImage(
+                            "linear-gradient(105deg, rgba(124,45,18,0.88) 0%, rgba(194,65,12,0.5) 42%, rgba(251,146,60,0.2) 100%)",
+                            slide.image,
+                            editorialAllowed,
+                          ),
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          padding: "clamp(1.75rem, 4vw, 2.75rem) clamp(1.5rem, 4vw, 2.5rem)",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                        }
+                  }
                 >
-                  <div style={{ maxWidth: 520 }} role="group" aria-label={slide.imageAlt}>
+                  <div
+                    className={nativeApp ? "luxury-hero-slide-photo__copy" : undefined}
+                    style={nativeApp ? undefined : { maxWidth: 520 }}
+                    role="group"
+                    aria-label={slide.imageAlt}
+                  >
                     {textBlock(slide)}
                   </div>
                 </div>
@@ -382,7 +301,7 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
               type="button"
               className="luxury-hero-carousel-nav luxury-carousel-prev"
               onClick={() => go(-1)}
-              aria-label="Slide precedente"
+              aria-label={t("home.slidePrev")}
             >
               <span aria-hidden>‹</span>
             </button>
@@ -390,19 +309,19 @@ function HeroStoryCarousel({ nativeApp = false, editorialAllowed = false }: { na
               type="button"
               className="luxury-hero-carousel-nav luxury-carousel-next"
               onClick={() => go(1)}
-              aria-label="Slide successiva"
+              aria-label={t("home.slideNext")}
             >
               <span aria-hidden>›</span>
             </button>
 
-            <div className="luxury-carousel-dots-wrap" role="tablist" aria-label="Seleziona slide">
+            <div className="luxury-carousel-dots-wrap" role="tablist" aria-label={t("home.slideSelect")}>
               {slides.map((s, i) => (
                 <button
                   key={s.id}
                   type="button"
                   role="tab"
                   aria-selected={i === index}
-                  aria-label={`Slide ${i + 1} di ${n}`}
+                  aria-label={t("home.slideOf", { current: i + 1, total: n })}
                   onClick={() => setIndex(i)}
                   className={i === index ? "luxury-carousel-dot is-active" : "luxury-carousel-dot"}
                 />
@@ -444,29 +363,99 @@ export default function HomePage() {
   const isNativeApp = useLuxuryNativeAppShell();
   const editorialAllowed = useEditorialCookieAllowed();
   const mapsAllowed = useMapsCookieAllowed();
-  const trendingGroups = useMemo(
-    () => trendIdeaGroupsForHome({ nativeApp: isNativeApp }),
-    [isNativeApp],
+  const { locale, t, setLocaleFromCountry, profileLocaleLocked } = useLuxuryLocale();
+  const businessTypeFilterLabels = useMemo(
+    (): Record<SalonBusinessTypeId, string> => ({
+      HAIR: t("home.type.hair"),
+      BEAUTY: t("home.type.beauty"),
+      MASSAGE: t("home.type.massage"),
+    }),
+    [t],
   );
+  const trendingGroups = useMemo(() => {
+    const raw = trendIdeaGroupsForHome({ nativeApp: isNativeApp });
+    return raw.map((group) => ({
+      ...group,
+      heading: localizedTrendGroupHeading(locale, group.id, group.heading),
+      items: group.items.map((idea) => {
+        const text = localizedTrendText(locale, group.id, idea.id, {
+          title: idea.title,
+          alt: idea.imageAlt,
+        });
+        return { ...idea, title: text.title, imageAlt: text.alt };
+      }),
+    }));
+  }, [isNativeApp, locale]);
   const trendingGridClass = isNativeApp
     ? "luxury-trending-grid luxury-trending-grid--native-four"
     : "luxury-trending-grid luxury-trending-grid--three";
-  const { isAuthenticated, realmRoles } = useLuxuryAuth();
-  /** Suggerimenti rapidi «Oppure un tocco»: solo account cliente (JWT con ruolo CLIENT). */
-  const canUseQuickGeolocationTags = isAuthenticated && realmRoles.includes("CLIENT");
   const [salonName, setSalonName] = useState("");
-  const [country, setCountry] = useState<CountryCode>("IT");
+  const [country, setCountryState] = useState<CountryCode>(() => {
+    const stored = readStoredSearchCountry();
+    if (stored && COUNTRIES.some((c) => c.code === stored)) return stored;
+    return "IT";
+  });
+  const applyCountry = useCallback(
+    (code: CountryCode) => {
+      setCountryState(code);
+      persistSearchCountry(code);
+      if (!profileLocaleLocked) {
+        setLocaleFromCountry(code);
+      }
+    },
+    [setLocaleFromCountry, profileLocaleLocked],
+  );
   /** Città: testo libero, oppure valore `country|cap|city` se scelto dai suggerimenti. */
   const [cityInput, setCityInput] = useState("");
   const [capInput, setCapInput] = useState("");
   const [businessTypeFilter, setBusinessTypeFilter] = useState<SalonBusinessTypeId | "">("");
   const [quickSuggestionsOpen, setQuickSuggestionsOpen] = useState(false);
   const lastGeoCoordsRef = useRef<{ lat: number; lng: number } | null>(null);
-
-  useEffect(() => {
-    if (!canUseQuickGeolocationTags) setQuickSuggestionsOpen(false);
-  }, [canUseQuickGeolocationTags]);
+  const [quickAvailability, setQuickAvailability] = useState<QuickSuggestAvailability | null>(null);
+  const [quickAvailabilityStatus, setQuickAvailabilityStatus] = useState<
+    "idle" | "loading" | "ready" | "error"
+  >("idle");
   const [formHint, setFormHint] = useState<string | null>(null);
+
+  const quickSuggestGroups = useMemo(
+    () =>
+      localizeQuickSuggestGroups(
+        locale,
+        mergeQuickSuggestGroups(quickAvailabilityStatus === "ready" ? quickAvailability : null),
+      ),
+    [quickAvailability, quickAvailabilityStatus, locale],
+  );
+
+  const loadQuickSuggestNear = useCallback(async () => {
+    setQuickAvailabilityStatus("loading");
+    setFormHint(null);
+    try {
+      const { lat, lng } = await requestGeolocationCoords();
+      lastGeoCoordsRef.current = { lat, lng };
+      const p = new URLSearchParams({
+        nearLat: String(lat),
+        nearLng: String(lng),
+        nearKm: String(QUICK_NEAR_RADIUS_KM),
+      });
+      const data = await apiJson<QuickSuggestAvailability>(
+        `/api/v1/public/organizations/quick-suggest-availability?${p.toString()}`,
+      );
+      setQuickAvailability({
+        curatedQueries: data.curatedQueries ?? [],
+        extras: data.extras ?? [],
+      });
+      setQuickAvailabilityStatus("ready");
+    } catch (err) {
+      setFormHint(geolocationErrorMessage(err));
+      setQuickAvailability(null);
+      setQuickAvailabilityStatus("error");
+    }
+  }, []);
+
+  const openQuickSuggestions = useCallback(() => {
+    setQuickSuggestionsOpen(true);
+    void loadQuickSuggestNear();
+  }, [loadQuickSuggestNear]);
   const [capPreview, setCapPreview] = useState<
     | { status: "idle" }
     | { status: "loading" }
@@ -520,8 +509,11 @@ export default function HomePage() {
     staleTime: 12_000,
   });
 
-  const capDigits = useMemo(() => normalizeCapInput(capInput), [capInput]);
+  const capNormalized = useMemo(() => normalizePostalInput(capInput, country), [capInput, country]);
   const capLen = expectedCapLength(country);
+  const capFreeform = isFreeformPostalCountry(country);
+  const capComplete = isPostalComplete(capNormalized, country);
+  const capResolveMin = minPostalResolveLength(country);
   const staticCitySuggestions = getStaticCityEntries(country);
 
   const dynamicPlaceSuggestionsQ = useQuery({
@@ -566,7 +558,7 @@ export default function HomePage() {
     for (const c of staticCitySuggestions) {
       const name = c.city.trim();
       if (!name.toLowerCase().includes(query)) continue;
-      const capNorm = normalizeCapInput(c.cap);
+      const capNorm = normalizePostalInput(c.cap, country);
       const detail = [capNorm || c.cap, c.province].filter(Boolean).join(" · ");
       push({
         key: `st-${country}-${capNorm || c.cap}-${name}`,
@@ -583,20 +575,20 @@ export default function HomePage() {
     cityInput.trim().length >= 1 && cityPlaceSuggestionRows.length > 0 && !citySuggestDismissed;
 
   const capSuggestionQ = useQuery({
-    queryKey: ["locate", "postal-suggestions", country, capDigits],
-    queryFn: () => locateByPostalSuggestions(capDigits, country, 100),
-    enabled: mapsAllowed && country !== "IT" && capLen > 0 && capDigits.length >= 2,
+    queryKey: ["locate", "postal-suggestions", country, capNormalized],
+    queryFn: () => locateByPostalSuggestions(capNormalized, country, 100),
+    enabled: mapsAllowed && country !== "IT" && capNormalized.length >= 2,
     staleTime: 30_000,
     retry: false,
   });
 
   const capCitySuggestions = useMemo(() => {
-    if (capLen === 0 || capDigits.length === 0) return [];
+    if (capNormalized.length === 0) return [];
     const out: { cap: string; city: string }[] = [];
     const dedupe = new Set<string>();
 
     if (country === "IT") {
-      for (const row of italianLocalitiesByCapPrefix(capDigits)) {
+      for (const row of italianLocalitiesByCapPrefix(capNormalized)) {
         const key = `${row.city.toLowerCase()}|${row.cap}`;
         if (dedupe.has(key)) continue;
         dedupe.add(key);
@@ -611,12 +603,12 @@ export default function HomePage() {
       const key = city.toLowerCase();
       if (dedupe.has(key)) continue;
       dedupe.add(key);
-      out.push({ cap: capDigits, city });
+      out.push({ cap: capNormalized, city });
     }
     for (const c of staticCitySuggestions) {
-      const normalizedCap = normalizeCapInput(c.cap);
+      const normalizedCap = normalizePostalInput(c.cap, country);
       if (!normalizedCap) continue;
-      if (!normalizedCap.startsWith(capDigits)) continue;
+      if (!normalizedCap.startsWith(capNormalized)) continue;
       const city = c.city.trim();
       const key = city.toLowerCase();
       if (dedupe.has(key)) continue;
@@ -624,7 +616,7 @@ export default function HomePage() {
       out.push({ cap: normalizedCap, city });
     }
     return out;
-  }, [capDigits, capLen, country, capSuggestionQ.data, staticCitySuggestions]);
+  }, [capNormalized, country, capSuggestionQ.data, staticCitySuggestions]);
 
   const goSearch = (
     q: string,
@@ -679,29 +671,40 @@ export default function HomePage() {
   };
 
   const resolveCityFromCap = useCallback(async () => {
-    if (capLen === 0) return { city: null as string | null, notFound: false as const };
-    if (capDigits.length !== capLen) return { city: null as string | null, notFound: false as const };
+    if (!capComplete) return { city: null as string | null, notFound: false as const };
     if (country === "IT" && !mapsAllowed) {
-      const localCity = resolveItalianCityForCap(capDigits);
+      const localCity = resolveItalianCityForCap(capNormalized);
       if (!localCity) return { city: null, notFound: true as const };
       return { city: localCity, notFound: false as const };
     }
     if (!mapsAllowed) return { city: null, notFound: true as const };
-    const r = await locateByPostal(capDigits, country);
+    const r = await locateByPostal(capNormalized, country);
     if (!r) return { city: null, notFound: true as const };
     return { city: r.city, notFound: false as const };
-  }, [capDigits, capLen, country, mapsAllowed]);
+  }, [capComplete, capNormalized, country, mapsAllowed]);
 
   const resolveSearchCity = useCallback(async (): Promise<{ city: string; error: string | null }> => {
     const raw = cityInput.trim();
     if (raw) return { city: raw, error: null };
-    if (capDigits.length === 0) return { city: "", error: null };
-    if (capLen === 0) return { city: "", error: null };
-    if (capDigits.length < capLen) {
-      const countryName = COUNTRIES.find((c) => c.code === country)?.name ?? "la nazione selezionata";
+    if (capNormalized.length === 0) return { city: "", error: null };
+    if (!capComplete) {
+      const countryName =
+        localizedCountryName(country, locale, COUNTRIES.find((c) => c.code === country)?.name ?? country);
+      if (capFreeform) {
+        return {
+          city: "",
+          error: t("home.postcodeIncomplete", { min: capResolveMin, country: countryName }),
+        };
+      }
       return {
         city: "",
-        error: `Inserisci il CAP completo (${capLen} cifre per ${countryName}) oppure svuota il campo.`,
+        error: t("home.capIncomplete", { len: capLen, country: countryName }),
+      };
+    }
+    if (!mapsAllowed && country !== "IT") {
+      return {
+        city: "",
+        error: t("home.capNeedMapsShort"),
       };
     }
     try {
@@ -709,26 +712,34 @@ export default function HomePage() {
       if (notFound || !c) {
         return {
           city: "",
-          error: "CAP non trovato per il paese selezionato. Controlla il CAP, scrivi il comune o scegli un suggerimento.",
+          error: t("home.capResolveFail"),
         };
       }
       return { city: c, error: null };
     } catch {
-      return { city: "", error: "Impossibile verificare il CAP in questo momento. Riprova tra poco." };
+      return { city: "", error: t("home.capResolveError") };
     }
-  }, [cityInput, capDigits, capLen, country, resolveCityFromCap]);
+  }, [
+    cityInput,
+    capNormalized,
+    capComplete,
+    capFreeform,
+    capResolveMin,
+    capLen,
+    country,
+    mapsAllowed,
+    resolveCityFromCap,
+    locale,
+    t,
+  ]);
 
   useEffect(() => {
     setFormHint(null);
-    if (capLen === 0) {
-      setCapPreview({ status: "idle" });
-      return;
-    }
     if (cityInput.trim()) {
       setCapPreview({ status: "idle" });
       return;
     }
-    if (capDigits.length !== capLen) {
+    if (!capComplete) {
       setCapPreview({ status: "idle" });
       return;
     }
@@ -742,7 +753,7 @@ export default function HomePage() {
       void (async () => {
         try {
           if (country === "IT" && !mapsAllowed) {
-            const localCity = resolveItalianCityForCap(capDigits);
+            const localCity = resolveItalianCityForCap(capNormalized);
             if (cancelled) return;
             if (localCity) {
               setCapPreview({ status: "ok", city: localCity, displayName: localCity });
@@ -751,7 +762,7 @@ export default function HomePage() {
             }
             return;
           }
-          const r = await locateByPostal(capDigits, country);
+          const r = await locateByPostal(capNormalized, country);
           if (cancelled) return;
           if (r) {
             setCapPreview({ status: "ok", city: r.city, displayName: r.displayName });
@@ -767,62 +778,54 @@ export default function HomePage() {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [capDigits, capLen, country, cityInput, mapsAllowed]);
+  }, [capNormalized, capComplete, country, cityInput, mapsAllowed]);
 
   const runGeoLocateForFilters = useCallback(async (): Promise<{ city: string | null; error: string | null }> => {
-    const env = checkGeolocationEnvironment();
-    if (!env.ok) {
-      setFormHint(env.message);
-      return { city: null, error: env.message };
-    }
-    grantMapsConsentForExplicitGeolocation();
     setGeoLoading(true);
     setFormHint(null);
-    return new Promise((resolve) => {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          try {
-            lastGeoCoordsRef.current = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-            const r = await reverseLocate(pos.coords.latitude, pos.coords.longitude);
-            if (!r || !r.city.trim()) {
-              const msg = "Non abbiamo ricavato comune o CAP da questa posizione. Inserisci i dati a mano.";
-              setFormHint(msg);
-              resolve({ city: null, error: msg });
-              return;
-            }
-            const nextCountry = COUNTRIES.some((c) => c.code === r.countryCode) ? (r.countryCode as CountryCode) : null;
-            if (nextCountry) setCountry(nextCountry);
-            const effectiveCountry: CountryCode = nextCountry ?? country;
-            const resolvedCity = r.city.trim();
-            setCityInput(resolvedCity);
-            let pc = "";
-            if (r.postalCode) {
-              pc = normalizeCapInput(r.postalCode);
-              const len = expectedCapLength(effectiveCountry);
-              if (len > 0 && pc.length > len) pc = pc.slice(0, len);
-            }
-            setCapInput(pc);
-            setCapSuggestDismissed(true);
-            setCitySuggestDismissed(true);
-            resolve({ city: resolvedCity, error: null });
-          } catch {
-            const msg = "Servizio indirizzo non disponibile. Riprova tra poco.";
-            setFormHint(msg);
-            resolve({ city: null, error: msg });
-          } finally {
-            setGeoLoading(false);
-          }
-        },
-        (err) => {
-          const msg = geolocationErrorMessage(err);
-          setFormHint(msg);
-          setGeoLoading(false);
-          resolve({ city: null, error: msg });
-        },
-        { enableHighAccuracy: true, timeout: 18_000, maximumAge: 120_000 },
-      );
-    });
-  }, [country]);
+    try {
+      const { lat, lng } = await requestGeolocationCoords();
+      lastGeoCoordsRef.current = { lat, lng };
+      let r: Awaited<ReturnType<typeof reverseLocate>>;
+      try {
+        r = await reverseLocate(lat, lng);
+      } catch {
+        const msg = t("home.geoServiceDown");
+        setFormHint(msg);
+        return { city: null, error: msg };
+      }
+      if (!r || !r.city.trim()) {
+        const msg = t("home.geoNoPlace");
+        setFormHint(msg);
+        return { city: null, error: msg };
+      }
+      const nextCountry = isSearchCountryCode(r.countryCode) ? (r.countryCode as CountryCode) : null;
+      if (nextCountry) {
+        applyCountry(nextCountry);
+      } else if (r.countryCode && !profileLocaleLocked) {
+        setLocaleFromCountry(r.countryCode);
+      }
+      const effectiveCountry: CountryCode = nextCountry ?? country;
+      const resolvedCity = r.city.trim();
+      setCityInput(resolvedCity);
+      let pc = "";
+      if (r.postalCode) {
+        pc = normalizePostalInput(r.postalCode, effectiveCountry);
+        const len = expectedCapLength(effectiveCountry);
+        if (len > 0 && pc.length > len) pc = pc.slice(0, len);
+      }
+      setCapInput(pc);
+      setCapSuggestDismissed(true);
+      setCitySuggestDismissed(true);
+      return { city: resolvedCity, error: null };
+    } catch (err) {
+      const msg = geolocationErrorMessage(err);
+      setFormHint(msg);
+      return { city: null, error: msg };
+    } finally {
+      setGeoLoading(false);
+    }
+  }, [country, applyCountry, profileLocaleLocked, setLocaleFromCountry, t]);
 
   const handleGeoLocateForFilters = useCallback(() => {
     void runGeoLocateForFilters();
@@ -850,21 +853,21 @@ export default function HomePage() {
         <Link
           to="/nations-cup"
           className="luxury-nations-cup-floater"
-          aria-label={`${NATIONS_CUP_FEATURED_CARD.title}. ${NATIONS_CUP_FEATURED_CARD.subtitle}`}
+          aria-label={`${t("home.nationsCup.title")}. ${t("home.nationsCup.subtitle")}`}
         >
           <NationsCupTrophyIcon className="luxury-nations-cup-floater__cup" />
-          <span className="luxury-nations-cup-floater__title">{NATIONS_CUP_FEATURED_CARD.title}</span>
-          <span className="luxury-nations-cup-floater__badge">{NATIONS_CUP_FEATURED_CARD.badge}</span>
+          <span className="luxury-nations-cup-floater__title">{t("home.nationsCup.title")}</span>
+          <span className="luxury-nations-cup-floater__badge">{t("home.nationsCup.badge")}</span>
         </Link>
         <div className="luxury-home-inner">
           <h1 className="luxury-home-title">
-            <span className="luxury-home-title__text">Trova il tuo salone</span>
+            <span className="luxury-home-title__text">{t("home.title")}</span>
           </h1>
           <p className="luxury-home-lead luxury-home-lead--epigraph">
             <span className="luxury-home-lead__quote" aria-hidden="true">
               «
             </span>
-            <span className="luxury-home-lead__text">Prendersi cura non è vanità: è ascolto.</span>
+            <span className="luxury-home-lead__text">{t("home.lead")}</span>
             <span className="luxury-home-lead__quote luxury-home-lead__quote--end" aria-hidden="true">
               »
             </span>
@@ -872,7 +875,7 @@ export default function HomePage() {
 
           <form onSubmit={onSearch} className="luxury-home-form">
             <label htmlFor="luxury-mega-q" className="visually-hidden">
-              Cerca
+              {t("home.searchLabel")}
             </label>
             <div
               className="luxury-mega-search-wrap"
@@ -894,7 +897,7 @@ export default function HomePage() {
                   id="luxury-mega-q"
                   value={salonName}
                   onChange={(e) => setSalonName(e.target.value)}
-                  placeholder="Cerca salone o servizio…"
+                  placeholder={t("home.searchPlaceholder")}
                   className="luxury-mega-input"
                   autoComplete="organization"
                   enterKeyHint="search"
@@ -907,7 +910,7 @@ export default function HomePage() {
                       : "luxury-mega-submit"
                   }
                   disabled={capLookupSubmitting}
-                  aria-label="Cerca salone"
+                  aria-label={t("home.searchAria")}
                 >
                   {capLookupSubmitting ? (
                     <span className="luxury-mega-submit__loading" aria-hidden>
@@ -916,23 +919,23 @@ export default function HomePage() {
                   ) : isNativeApp ? (
                     <HomeMegaSearchLensIcon />
                   ) : (
-                    "Cerca"
+                    t("common.search")
                   )}
                 </button>
               </div>
               {megaFocused && debouncedSalonName.trim().length >= 1 ? (
-                <div className="luxury-mega-live-sheet" role="listbox" aria-label="Suggerimenti saloni">
+                <div className="luxury-mega-live-sheet" role="listbox" aria-label={t("home.suggestionsAria")}>
                   {liveSalonPreview.isFetching ? (
                     <div className="luxury-mega-live-loading" aria-live="polite">
                       <span className="luxury-mega-live-dot" />
-                      Ricerca in corso…
+                      {t("home.searching")}
                     </div>
                   ) : null}
                   {!liveSalonPreview.isFetching && liveSalonPreview.data && liveSalonPreview.data.length === 0 ? (
                     <div className="luxury-mega-live-empty-state" role="status">
-                      <p className="luxury-mega-live-empty-state__title">Nessun salone trovato</p>
+                      <p className="luxury-mega-live-empty-state__title">{t("home.noSalonTitle")}</p>
                       <p className="luxury-mega-live-empty-state__lead">
-                        Per «{debouncedSalonName.trim()}». Prova altre parole o usa Cerca con CAP e comune.
+                        {t("home.noSalonLead", { query: debouncedSalonName.trim() })}
                       </p>
                     </div>
                   ) : null}
@@ -981,7 +984,7 @@ export default function HomePage() {
                           goSearch(query, undefined, withBusinessTypeFilter());
                         }}
                       >
-                        Vedi tutti
+                        {t("common.seeAll")}
                       </button>
                     </div>
                   ) : null}
@@ -996,35 +999,55 @@ export default function HomePage() {
 
             <div className="luxury-search-filters">
               <div className="luxury-search-filters-panel">
-                <p className="luxury-search-filters-head">Affina la zona</p>
+                <p className="luxury-search-filters-head">{t("home.filtersHead")}</p>
                 <div className="luxury-search-filters-grid">
                   <div className="luxury-filter-field">
                     <label htmlFor="luxury-country" className="luxury-filter-label">
-                      Nazioni
+                      {t("home.nations")}
                     </label>
-                    <select
-                      id="luxury-country"
-                      value={country}
-                      onChange={(e) => {
-                        setCountry(e.target.value as CountryCode);
-                        setCityInput("");
-                        setCapInput("");
-                      }}
-                      className="luxury-soft-select"
-                    >
-                      {COUNTRIES.map((co) => (
-                        <option key={co.code} value={co.code}>
-                          {co.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="luxury-country-select">
+                      <span className="luxury-country-select__flag" aria-hidden>
+                        {countryFlagEmoji(country)}
+                      </span>
+                      <span className="luxury-country-select__name" aria-hidden>
+                        {localizedCountryName(
+                          country,
+                          locale,
+                          COUNTRIES.find((c) => c.code === country)?.name ?? country,
+                        )}
+                      </span>
+                      <select
+                        id="luxury-country"
+                        value={country}
+                        onChange={(e) => {
+                          applyCountry(e.target.value as CountryCode);
+                          setCityInput("");
+                          setCapInput("");
+                        }}
+                        className="luxury-soft-select luxury-soft-select--with-flag"
+                        aria-label={t("home.nationAria", {
+                          name: localizedCountryName(
+                            country,
+                            locale,
+                            COUNTRIES.find((c) => c.code === country)?.name ?? country,
+                          ),
+                        })}
+                      >
+                        {COUNTRIES.map((co) => (
+                          <option key={co.code} value={co.code}>
+                            {countryFlagEmoji(co.code)}{" "}
+                            {localizedCountryName(co.code, locale, co.name)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div
                     ref={cityFieldRef}
                     className={`luxury-filter-field luxury-cap-field${citySuggestOpen ? " luxury-cap-field--suggest-open" : ""}`}
                   >
                     <label htmlFor="luxury-city" className="luxury-filter-label">
-                      Citta o comune
+                      {t("home.cityLabel")}
                     </label>
                     <div className="luxury-cap-input-wrap">
                       <input
@@ -1042,13 +1065,13 @@ export default function HomePage() {
                             setCapInput("");
                           }
                         }}
-                        placeholder="Città o comune"
+                        placeholder={t("home.cityPlaceholder")}
                         className="luxury-cap-text-input"
                         autoComplete="off"
                       />
                     </div>
                     {citySuggestOpen ? (
-                      <ul className="luxury-cap-suggestions" aria-label="Suggerimenti citta e comuni">
+                      <ul className="luxury-cap-suggestions" aria-label={t("home.citySuggestionsAria")}>
                         {cityPlaceSuggestionRows.map((row) => (
                           <li key={row.key}>
                             <button
@@ -1074,16 +1097,16 @@ export default function HomePage() {
                     className={`luxury-filter-field luxury-cap-field${capCitySuggestions.length > 0 && !capSuggestDismissed ? " luxury-cap-field--suggest-open" : ""}`}
                   >
                     <label htmlFor="luxury-cap" className="luxury-filter-label">
-                      CAP
+                      {capFreeform ? t("home.postcodeLabel") : t("home.capLabel")}
                     </label>
                     <div className="luxury-cap-input-row">
                       <div className="luxury-cap-input-wrap">
                         <input
                           id="luxury-cap"
                           type="text"
-                          inputMode="numeric"
+                          inputMode={capFreeform ? "text" : "numeric"}
                           autoComplete="postal-code"
-                          placeholder="CAP"
+                          placeholder={capFreeform ? t("home.postcodePlaceholder") : t("home.capPlaceholder")}
                           value={capInput}
                           onFocus={() => {
                             setCapSuggestDismissed(false);
@@ -1094,7 +1117,7 @@ export default function HomePage() {
                             if (cityInput.trim()) setCityInput("");
                           }}
                           className="luxury-cap-text-input"
-                          aria-describedby={!cityInput.trim() && capDigits.length > 0 ? "luxury-cap-status" : undefined}
+                          aria-describedby={!cityInput.trim() && capNormalized.length > 0 ? "luxury-cap-status" : undefined}
                         />
                       </div>
                       <button
@@ -1102,8 +1125,8 @@ export default function HomePage() {
                         className="luxury-cap-geo-btn"
                         disabled={geoLoading}
                         aria-busy={geoLoading}
-                        title="Compila CAP e comune dalla tua posizione"
-                        aria-label="Geolocalizza: compila CAP e comune dalla posizione attuale"
+                        title={t("home.geoTitle")}
+                        aria-label={t("home.geoAria")}
                         onClick={handleGeoLocateForFilters}
                       >
                         {geoLoading ? (
@@ -1123,7 +1146,7 @@ export default function HomePage() {
                       </button>
                     </div>
                     {capCitySuggestions.length > 0 && !capSuggestDismissed && (
-                      <ul className="luxury-cap-suggestions" aria-label="Suggerimenti localita da CAP">
+                      <ul className="luxury-cap-suggestions" aria-label={t("home.capSuggestionsAria")}>
                         {capCitySuggestions.map((item) => (
                           <li key={`${country}-${item.cap}-${item.city}`}>
                             <button
@@ -1142,29 +1165,32 @@ export default function HomePage() {
                         ))}
                       </ul>
                     )}
-                    {capLen > 0 && !cityInput.trim() && capDigits.length > 0 && (
+                    {!cityInput.trim() && capNormalized.length > 0 && (
                       <p id="luxury-cap-status" className="luxury-cap-hint" role="status">
-                        {capDigits.length < capLen && (
-                          <>CAP: {capDigits.length}/{capLen} cifre — al completamento mostriamo il comune.</>
-                        )}
-                        {capDigits.length === capLen && capPreview.status === "loading" && <>Ricerca del comune…</>}
-                        {capDigits.length === capLen && capPreview.status === "ok" && (
-                          <>
-                            Citta o comune: <strong>{capPreview.city}</strong>
-                          </>
-                        )}
-                        {capDigits.length === capLen && capPreview.status === "not_found" && (
-                          <>Nessun comune trovato per questo CAP e nazione — controlla i dati o scrivi il comune sopra.</>
-                        )}
-                        {capDigits.length === capLen && capPreview.status === "error" && (
-                          <>Verifica del CAP non riuscita. Puoi riprovare o scrivere il comune sopra.</>
-                        )}
+                        {!mapsAllowed && country !== "IT"
+                          ? t("home.capNeedMaps")
+                          : !capComplete && capFreeform
+                            ? t("home.capFreeformHint", { min: capResolveMin })
+                            : !capComplete && capLen > 0
+                              ? t("home.capDigitsHint", {
+                                  current: capNormalized.length,
+                                  total: capLen,
+                                })
+                              : capComplete && capPreview.status === "loading"
+                                ? t("home.capLooking")
+                                : capComplete && capPreview.status === "ok"
+                                  ? t("home.capFound", { city: capPreview.city })
+                                  : capComplete && capPreview.status === "not_found"
+                                    ? t("home.capNotFound")
+                                    : capComplete && capPreview.status === "error"
+                                      ? t("home.capError")
+                                      : null}
                       </p>
                     )}
                   </div>
                   <div className="luxury-filter-field">
                     <label htmlFor="luxury-business-type" className="luxury-filter-label">
-                      Tipologia
+                      {t("home.typology")}
                     </label>
                     <select
                       id="luxury-business-type"
@@ -1172,10 +1198,10 @@ export default function HomePage() {
                       onChange={(e) => setBusinessTypeFilter(e.target.value as SalonBusinessTypeId | "")}
                       className="luxury-soft-select"
                     >
-                      <option value="">Tutte le tipologie</option>
+                      <option value="">{t("home.allTypologies")}</option>
                       {SALON_BUSINESS_TYPE_OPTIONS.map((opt) => (
                         <option key={opt.id} value={opt.id}>
-                          {HOME_BUSINESS_TYPE_FILTER_LABELS[opt.id]}
+                          {businessTypeFilterLabels[opt.id]}
                         </option>
                       ))}
                     </select>
@@ -1189,100 +1215,105 @@ export default function HomePage() {
                 type="button"
                 className="luxury-quick-tags-toggle"
                 id="luxury-quick-tags-trigger"
-                aria-expanded={canUseQuickGeolocationTags ? quickSuggestionsOpen : false}
-                aria-controls={canUseQuickGeolocationTags ? "luxury-quick-tags-panel" : undefined}
-                disabled={!canUseQuickGeolocationTags}
-                title={
-                  canUseQuickGeolocationTags
-                    ? undefined
-                    : "Accedi per trovare il salone più vicino a te"
-                }
+                aria-expanded={quickSuggestionsOpen}
+                aria-controls="luxury-quick-tags-panel"
                 onClick={() => {
-                  if (!canUseQuickGeolocationTags) return;
-                  setQuickSuggestionsOpen((o) => !o);
+                  if (quickSuggestionsOpen) {
+                    setQuickSuggestionsOpen(false);
+                    return;
+                  }
+                  openQuickSuggestions();
                 }}
               >
-                Oppure un tocco
+                {t("home.quickTouch")}
                 <span className="luxury-quick-tags-chevron" aria-hidden>
                   ▾
                 </span>
               </button>
-              {!canUseQuickGeolocationTags ? (
-                <p className="luxury-quick-tags-login-hint">
-                  {isAuthenticated ? (
-                    <>
-                      Per trovare il salone più vicino a te serve un account{" "}
-                      <strong>cliente</strong>.{" "}
-                      <Link to="/registrati" className="luxury-link-inline">
-                        Registrati come cliente
-                      </Link>{" "}
-                      oppure accedi con un profilo cliente.
-                    </>
-                  ) : (
-                    <>
-                      <Link to="/account" className="luxury-link-inline">
-                        Accedi
-                      </Link>{" "}
-                      per trovare il salone più vicino a te.
-                    </>
-                  )}
-                </p>
-              ) : null}
-              {quickSuggestionsOpen && canUseQuickGeolocationTags && (
+              {quickSuggestionsOpen && (
                 <div
                   className="luxury-quick-tags-panel"
                   id="luxury-quick-tags-panel"
                   role="region"
                   aria-labelledby="luxury-quick-tags-trigger"
                 >
-                  <p className="luxury-quick-tags-near-hint">
-                    Con la tua posizione, cerchiamo saloni entro circa <strong>{QUICK_NEAR_RADIUS_KM} km</strong>.
+                  <p className="luxury-quick-tags-near-title">
+                    <span className="luxury-quick-tags-near-title__label">{t("home.quick.nearLabel")}</span>
+                    <span className="luxury-quick-tags-near-title__radius">
+                      {t("home.quick.nearRadius", { km: QUICK_NEAR_RADIUS_KM })}
+                    </span>
                   </p>
-                  {QUICK_SUGGEST_GROUPS.map((group) => (
+                  {quickAvailabilityStatus === "loading" ? (
+                    <p className="luxury-quick-tags-near-hint" role="status">
+                      {t("home.quick.loading")}
+                    </p>
+                  ) : null}
+                  {quickAvailabilityStatus === "error" ? (
+                    <div className="luxury-quick-tags-near-error" role="alert">
+                      <p className="luxury-quick-tags-near-hint">
+                        {formHint?.trim() || t("home.quick.needLocation")}
+                      </p>
+                      <button
+                        type="button"
+                        className="luxury-quick-tags-retry"
+                        onClick={() => void loadQuickSuggestNear()}
+                      >
+                        {t("home.quick.retry")}
+                      </button>
+                    </div>
+                  ) : null}
+                  {quickAvailabilityStatus === "ready" && quickSuggestGroups.length === 0 ? (
+                    <p className="luxury-quick-tags-near-hint" role="status">
+                      {t("home.quick.empty")}
+                    </p>
+                  ) : null}
+                  {quickAvailabilityStatus === "ready"
+                    ? quickSuggestGroups.map((group) => (
                     <div key={group.id} className="luxury-quick-tags-group">
                       <p className="luxury-quick-tags-group-label">{group.label}</p>
                       <div className="luxury-quick-tags-row">
-                        {group.tags.map((t) => (
+                        {group.tags.map((tag) => (
                           <button
-                            key={t.label}
+                            key={`${group.id}-${tag.q}`}
                             type="button"
                             className="luxury-quick-tag"
                             onClick={() => {
                               void (async () => {
-                                const env = checkGeolocationEnvironment();
-                                if (!env.ok) {
-                                  setFormHint(env.message);
-                                  return;
-                                }
                                 setFormHint(null);
                                 setCapLookupSubmitting(true);
                                 try {
-                                  try {
-                                    const { lat, lng } = await requestGeolocationCoords();
-                                    lastGeoCoordsRef.current = { lat, lng };
-                                    goSearch(t.q, undefined, {
-                                      near: { lat, lng, km: QUICK_NEAR_RADIUS_KM },
-                                      sortRating: true,
-                                      salonClientGenders: t.clientGenders,
-                                    });
-                                    setQuickSuggestionsOpen(false);
-                                    return;
-                                  } catch (err) {
-                                    setFormHint(geolocationErrorMessage(err));
-                                    return;
+                                  let lat = lastGeoCoordsRef.current?.lat;
+                                  let lng = lastGeoCoordsRef.current?.lng;
+                                  if (lat == null || lng == null) {
+                                    try {
+                                      const coords = await requestGeolocationCoords();
+                                      lat = coords.lat;
+                                      lng = coords.lng;
+                                      lastGeoCoordsRef.current = coords;
+                                    } catch (err) {
+                                      setFormHint(geolocationErrorMessage(err));
+                                      return;
+                                    }
                                   }
+                                  goSearch(tag.q, undefined, {
+                                    near: { lat, lng, km: QUICK_NEAR_RADIUS_KM },
+                                    sortRating: true,
+                                    salonClientGenders: tag.clientGenders,
+                                  });
+                                  setQuickSuggestionsOpen(false);
                                 } finally {
                                   setCapLookupSubmitting(false);
                                 }
                               })();
                             }}
                           >
-                            {t.label}
+                            {tag.label}
                           </button>
                         ))}
                       </div>
                     </div>
-                  ))}
+                  ))
+                    : null}
                 </div>
               )}
             </div>
@@ -1293,23 +1324,23 @@ export default function HomePage() {
       </section>
 
       <section className="luxury-trending-section">
-        <h2 className="luxury-trending-title">Idee per la tua prossima visita</h2>
+        <h2 className="luxury-trending-title">{t("home.trending.title")}</h2>
 
         <div className="luxury-trending-groups">
           {trendingGroups.map((group) => (
             <div key={group.id} className="luxury-trending-group">
               <h3 className="luxury-trending-subtitle">{group.heading}</h3>
               <div className={trendingGridClass}>
-                {group.items.map((t) => (
+                {group.items.map((idea) => (
                   <Link
-                    key={t.id}
-                    to={`/idee/${group.id}/${t.id}`}
+                    key={idea.id}
+                    to={`/idee/${group.id}/${idea.id}`}
                     className="luxury-trend-card luxury-trend-card--photo"
-                    style={{ backgroundImage: trendCardBg(t.image) }}
-                    aria-label={`${t.title}. ${t.imageAlt}`}
+                    style={{ backgroundImage: trendCardBg(idea.image) }}
+                    aria-label={`${idea.title}. ${idea.imageAlt}`}
                   >
                     <span className="luxury-trend-card-label" aria-hidden="true">
-                      {t.title}
+                      {idea.title}
                     </span>
                   </Link>
                 ))}
@@ -1319,19 +1350,32 @@ export default function HomePage() {
         </div>
 
         <div className="luxury-trending-featured">
-          <h3 className="luxury-trending-subtitle">In evidenza</h3>
-          <div className={trendingGridClass}>
+          <h3 className="luxury-trending-subtitle">{t("home.trending.featured")}</h3>
+          <div className="luxury-trending-grid luxury-trending-grid--pair">
             <Link
               to="/operatori/migliori"
               className="luxury-trend-card luxury-trend-card--operators luxury-trend-card--photo"
               style={{ backgroundImage: trendCardBg(TOP_OPERATORS_FEATURED_CARD.image) }}
-              aria-label={`${TOP_OPERATORS_FEATURED_CARD.title}. ${TOP_OPERATORS_FEATURED_CARD.imageAlt}`}
+              aria-label={`${t("home.topOperators.title")}. ${t("home.topOperators.alt")}`}
             >
               <span className="luxury-trend-card-label" aria-hidden="true">
-                {TOP_OPERATORS_FEATURED_CARD.title}
+                {t("home.topOperators.title")}
               </span>
               <span className="luxury-trend-card-sublabel" aria-hidden="true">
-                {TOP_OPERATORS_FEATURED_CARD.subtitle}
+                {t("home.topOperators.subtitle")}
+              </span>
+            </Link>
+            <Link
+              to="/saloni/sponsorizzati"
+              className="luxury-trend-card luxury-trend-card--sponsored luxury-trend-card--photo"
+              style={{ backgroundImage: trendCardBg(SPONSORED_SALONS_FEATURED_CARD.image) }}
+              aria-label={`${t("home.sponsoredSalons.title")}. ${t("home.sponsoredSalons.alt")}`}
+            >
+              <span className="luxury-trend-card-label" aria-hidden="true">
+                {t("home.sponsoredSalons.title")}
+              </span>
+              <span className="luxury-trend-card-sublabel" aria-hidden="true">
+                {t("home.sponsoredSalons.subtitle")}
               </span>
             </Link>
           </div>
@@ -1343,19 +1387,15 @@ export default function HomePage() {
         <div className="luxury-partner-inner">
           <div className="luxury-partner-copy">
             <h2 id="luxury-partner-heading" className="luxury-partner-title">
-              Hai un salone? Portalo tra i professionisti su Saloni Luxury.
+              {t("home.partner.title")}
             </h2>
-            <p className="luxury-partner-lead">
-              Aumenta la visibilità, gestisci gli appuntamenti e fatti prenotare online da clienti che cercano
-              parrucchieri, centri benessere ed estetica nella loro zona — con un&apos;esperienza chiara per te e per chi
-              entra in salone.
-            </p>
+            <p className="luxury-partner-lead">{t("home.partner.lead")}</p>
             <div className="luxury-partner-cta-row">
               <Link to="/registrati" className="luxury-partner-cta">
-                Registrati come cliente
+                {t("home.partner.ctaClient")}
               </Link>
               <PartnerSignupLink className="luxury-partner-cta luxury-partner-cta--plans">
-                Diventa partner (salone)
+                {t("home.partner.ctaSalon")}
               </PartnerSignupLink>
             </div>
           </div>
@@ -1371,8 +1411,8 @@ export default function HomePage() {
             <div className="luxury-partner-device luxury-partner-device--phone">
               <div className="luxury-partner-toast">
                 <span className="luxury-partner-toast-dot" />
-                Nuova prenotazione
-                <span className="luxury-partner-toast-meta">Oggi · 15:00</span>
+                {t("home.partner.toastTitle")}
+                <span className="luxury-partner-toast-meta">{t("home.partner.toastMeta")}</span>
               </div>
               <div className="luxury-partner-phone-body">
                 <div className="luxury-partner-cal-bar luxury-partner-cal-bar--sm" />

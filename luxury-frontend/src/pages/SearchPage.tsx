@@ -198,7 +198,11 @@ function SearchEmptyState({
   const typesLine = activeTypeLabels.length > 0 ? activeTypeLabels.join(", ") : null;
 
   return (
-    <section className="luxury-search-empty-state" aria-labelledby={titleId} role="status">
+    <section
+      className="luxury-search-empty-state luxury-search-empty-state--docked"
+      aria-labelledby={titleId}
+      role="status"
+    >
       <div className="luxury-search-empty-state__glow" aria-hidden />
       <div className="luxury-search-empty-state__icon" aria-hidden>
         <SearchEmptyIcon />
@@ -434,6 +438,7 @@ export default function SearchPage() {
         </p>
       )}
 
+      <div className="luxury-search-stage">
       {showSkeleton ? (
         <div className="luxury-search-skeleton-grid" aria-hidden>
           {[0, 1, 2, 3].map((k) => (
@@ -574,6 +579,7 @@ export default function SearchPage() {
       ) : null}
 
       {showSearchEmpty ? <SearchEmptyState /> : null}
+      </div>
     </main>
   );
 }

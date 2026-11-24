@@ -2,6 +2,7 @@ import { apiUrl } from "../config/env";
 import { LEGAL_DOCUMENT_VERSION } from "../content/legalEntity";
 import { httpApiErrorMessage } from "./httpApiErrorMessage";
 import { registrationApiHeaders } from "../lib/registrationApiHeaders";
+import { rememberRegistrationPollSecret } from "../lib/emailVerificationConfirmShared";
 
 export type ClientRegistrationPayload = {
   email: string;
@@ -10,6 +11,8 @@ export type ClientRegistrationPayload = {
   lastName: string;
   /** ISO 3166-1 alpha-2 (es. IT, FR). */
   country: string;
+  /** Lingua UI scelta in registrazione (`it`, `en`, …). */
+  preferredLocale?: string;
   phone?: string;
   /** Solo prima installazione: vedi backend `LuxuryAccountRegistrationService`. */
   bootstrapSuperAdmin?: boolean;
@@ -17,6 +20,7 @@ export type ClientRegistrationPayload = {
 
 export type RegistrationCreatedResponse = {
   message: string;
+  pollSecret?: string | null;
 };
 
 /**
@@ -32,6 +36,8 @@ export async function registerClientApi(payload: ClientRegistrationPayload): Pro
     acceptedTermsAndPrivacy: true,
     legalDocumentVersion: LEGAL_DOCUMENT_VERSION,
   };
+  const preferredLocale = payload.preferredLocale?.trim().toLowerCase();
+  if (preferredLocale) body.preferredLocale = preferredLocale;
   const phone = payload.phone?.trim();
   if (phone) body.phone = phone;
   if (payload.bootstrapSuperAdmin === true) {
@@ -54,7 +60,7 @@ export async function registerClientApi(payload: ClientRegistrationPayload): Pro
     const name = e && typeof e === "object" && "name" in e ? String((e as { name: unknown }).name) : "";
     if (name === "AbortError") {
       throw new Error(
-        `Nessuna risposta dal backend entro ${timeoutMs / 1000}s. Controlla che Spring sia avviato e che il proxy Vite inoltri /api (porta 8080), oppure imposta VITE_API_BASE_URL.`,
+        `Nessuna risposta dal backend entro ${timeoutMs / 1000}s. Controlla che Spring sia avviato e che il proxy Vite inoltri /api (porta 8081), oppure imposta VITE_API_BASE_URL.`,
       );
     }
     throw e;
@@ -65,6 +71,7 @@ export async function registerClientApi(payload: ClientRegistrationPayload): Pro
   if (res.ok) {
     try {
       const j = (await res.json()) as RegistrationCreatedResponse;
+      rememberRegistrationPollSecret(payload.email, j.pollSecret);
       if (typeof j.message === "string" && j.message.trim()) {
         return j.message.trim();
       }

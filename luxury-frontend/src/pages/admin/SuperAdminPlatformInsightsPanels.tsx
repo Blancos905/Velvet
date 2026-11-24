@@ -162,9 +162,9 @@ export default function SuperAdminPlatformInsightsPanels({ counts, insights }: P
                 <td>Piano Premium</td>
               </tr>
               <tr>
-                <td>BASE (Free) a pagamento</td>
+                <td>Senza Premium</td>
                 <td>{counts.studioGroupsPayingBase}</td>
-                <td>Piano gratuito attivo</td>
+                <td>Abbonamento Premium non attivo</td>
               </tr>
               <tr>
                 <td>Stripe · paganti</td>

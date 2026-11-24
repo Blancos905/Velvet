@@ -9,7 +9,7 @@ Copiare e adattare nel campo «Note for reviewer» / «Istruzioni per il tester�
 **Saloni Luxury** è un’app companion per titolari di salone e clienti già registrati sulla piattaforma web `https://www.saloniluxury.it`.
 
 - L’interfaccia è caricata in WebView dal sito di produzione (HTTPS).
-- **Non** sono disponibili acquisti o abbonamenti digitali in-app: il piano Premium si attiva solo tramite contratto/partner sul web; in app il titolare Free vede messaggi informativi neutri senza prezzi né link a pagamenti esterni.
+- **Non** usa StoreKit né Google Play Billing. L’unico piano è Premium: 30 giorni di prova senza carta, poi l’abbonamento si attiva con il checkout Stripe sul sito (anche dalla WebView), dopo i dati di fatturazione.
 - Funzioni native: notifiche push (FCM/APNs), geolocalizzazione per ricerca saloni, navigazione sicura (domain guard).
 
 ---
@@ -19,8 +19,7 @@ Copiare e adattare nel campo «Note for reviewer» / «Istruzioni per il tester�
 | Ruolo | Email | Password | Cosa testare |
 |-------|-------|----------|--------------|
 | Cliente B2C | *(creare account demo)* | *(password)* | Ricerca saloni, prenotazione, profilo, elimina account |
-| Titolare salone Free | *(creare account demo)* | *(password)* | Agenda, servizi, notifiche; sezioni Premium mostrano overlay informativo |
-| Titolare salone Premium | *(opzionale)* | *(password)* | Funzioni Premium già attive lato account |
+| Titolare salone Premium | *(creare account demo)* | *(password)* | Agenda, servizi, notifiche, vetrina e chat già attive sull’account |
 
 > Creare account reali su produzione prima dell’invio e inserire credenziali qui.
 
@@ -41,6 +40,7 @@ Copiare e adattare nel campo «Note for reviewer» / «Istruzioni per il tester�
 | Privacy B2B (soci partner) | `https://www.saloniluxury.it/privacy` |
 | Elimina account | `https://www.saloniluxury.it/privacy/elimina-account` |
 | Termini | `https://www.saloniluxury.it/termini` |
+| Licenza gratuita clienti | `https://www.saloniluxury.it/licenza` |
 
 ---
 

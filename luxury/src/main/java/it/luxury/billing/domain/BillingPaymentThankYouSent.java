@@ -11,7 +11,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Idempotenza email «grazie pagamento» (checkout session o fattura Stripe). */
+/** Idempotenza email billing transazionali (thank-you, payment-failed, rinnovo, avviso cancellazione). */
 @Entity
 @Table(
 		name = "billing_payment_thank_you_sent",

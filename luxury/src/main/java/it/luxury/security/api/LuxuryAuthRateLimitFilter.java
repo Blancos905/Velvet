@@ -33,14 +33,21 @@ public class LuxuryAuthRateLimitFilter extends OncePerRequestFilter {
 		this.objectMapper = objectMapper;
 	}
 
-	@Override
-	protected boolean shouldNotFilter(HttpServletRequest request) {
-		if (!securityProperties.rateLimitEnabled()) {
-			return true;
+		@Override
+		protected boolean shouldNotFilter(HttpServletRequest request) {
+			if (!securityProperties.rateLimitEnabled()) {
+				return true;
+			}
+			String path = request.getRequestURI();
+			if (path.startsWith("/api/v1/auth/")) {
+				return false;
+			}
+			if (!"POST".equalsIgnoreCase(request.getMethod())) {
+				return true;
+			}
+			return !"/api/v1/public/client-registration".equals(path)
+					&& !"/api/v1/me/support/requests".equals(path);
 		}
-		String path = request.getRequestURI();
-		return !path.startsWith("/api/v1/auth/");
-	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

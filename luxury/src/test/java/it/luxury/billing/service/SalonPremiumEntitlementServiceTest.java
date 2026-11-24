@@ -23,7 +23,7 @@ class SalonPremiumEntitlementServiceTest {
 	@BeforeEach
 	void setUp() {
 		promotionalTrialService = new SalonPromotionalTrialService();
-		ReflectionTestUtils.setField(promotionalTrialService, "promotionalTrialDays", 60);
+		ReflectionTestUtils.setField(promotionalTrialService, "promotionalTrialDays", 30);
 	}
 
 	@Test
@@ -39,7 +39,7 @@ class SalonPremiumEntitlementServiceTest {
 	}
 
 	@Test
-	void premiumPlanWithinPromotionalTrialIsNotEntitledWhenStripeConfigured() {
+	void premiumPlanWithinPromotionalTrialIsEntitledEvenWhenStripeConfigured() {
 		var props = new LuxuryStripeProperties(true, "sk_test_x", "whsec_x", "price_x", null, null, null);
 		var billingRepo = mock(it.luxury.billing.domain.BillingAccountRepository.class);
 		var service = new SalonPremiumEntitlementService(props, billingRepo, promotionalTrialService);
@@ -47,7 +47,7 @@ class SalonPremiumEntitlementServiceTest {
 		group.applyPlanTier("PREMIUM");
 		ReflectionTestUtils.setField(group, "createdAt", Instant.now().minus(15, ChronoUnit.DAYS));
 		when(billingRepo.findByStudioGroup_Id(group.getId())).thenReturn(Optional.empty());
-		assertFalse(service.hasActivePremium(group));
+		assertTrue(service.hasActivePremium(group));
 	}
 
 	@Test

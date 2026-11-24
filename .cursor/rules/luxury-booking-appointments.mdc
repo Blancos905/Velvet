@@ -1,0 +1,196 @@
+---
+description: Conferma prenotazioni BOOKED, inbox/popup titolare+operatore, agenda collettiva, modali conferma
+globs: luxury/src/main/java/it/luxury/appointment/**,luxury/src/main/java/it/luxury/notification/**,luxury/src/main/java/it/luxury/studio/dto/MeSalonNotificationMessageDto.java,luxury/src/main/java/it/luxury/studio/service/MeSalon*.java,luxury-frontend/src/hooks/useSalonBookingRequestAlerts.ts,luxury-frontend/src/components/LuxuryNotificationPopupHost.tsx,luxury-frontend/src/components/BookingActionConfirmModal.tsx,luxury-frontend/src/pages/account/**/Appointment*,luxury-frontend/src/pages/account/PrenotazioniStaffPickPage.tsx,luxury-frontend/src/pages/account/SalonAgendaBoard.tsx,luxury-frontend/src/pages/account/salon/SalonStudioAgendaPage.tsx,luxury-frontend/src/pages/account/AccountLayout.tsx,luxury-frontend/src/lib/luxuryNotificationPopup.ts,luxury-frontend/src/styles/salon-notifications.css,luxury-frontend/src/styles/luxury-salon-booking-native-app.css
+alwaysApply: false
+---
+
+# Luxury — Prenotazioni, conferma salone e notifiche
+
+## Stati appuntamento
+
+| Stato | Origine tipica |
+|-------|----------------|
+| `BOOKED` | Cliente prenota da vetrina — **in attesa conferma salone/operatore** |
+| `CONFIRMED` | Titolare/staff accetta o walk-in titolare |
+| `CANCELLED` | Annullamento o rifiuto richiesta |
+
+## Chi può confermare
+
+| Attore | API | Scope |
+|--------|-----|--------|
+| **Titolare** | `POST /api/v1/me/salon/appointments/{id}/confirm\|reject` | Qualsiasi appuntamento dello studio (`MeSalonAppointmentsService.confirmForOwner`) |
+| **Operatore** | `POST /api/v1/me/staff/appointments/{id}/confirm\|reject` | Solo appuntamenti con `appointment.operator` = operatore collegato |
+
+Frontend popup e dettaglio: titolare usa sempre base `/me/salon/appointments`; staff usa `/me/staff/appointments` (`LuxuryNotificationPopupHost.respondM`).
+
+## Notifiche alla richiesta cliente
+
+- Creazione consumer → `AppointmentNotificationService.onConsumerBookingCreated` → una riga inbox `BOOKING_CREATED_FOR_SALON` (stato `SENT`).
+- **Push FCM** (`dispatchForScheduledNotificationWithSalonRoles`): copy **diversa** titolare (informativa, con operatore) vs operatore (azione «in attesa di conferma»). Stesso split per cambio orario; disdetta → informativa per entrambi.
+- **Inbox API** (`/me/salon/notifications`): titolare vede **tutto lo studio**; operatore vede solo righe con `appointment.operator` = sé (filtro `operatorId` nel repository). Account **solo CLIENT** (né OWNER né STAFF collegato) → **403** (allineato a recensioni salone), non inbox vuota.
+
+### Notifiche al cliente (risposta salone/operatore **o** auto-conferma)
+
+| Evento | Tipo notifica | Copy tipica |
+|--------|---------------|-------------|
+| Accettazione **manuale** (da `BOOKED`) | `BOOKING_CONFIRMATION` inbox/push/email | «La tua prenotazione presso [salone] è confermata.» |
+| Auto-conferma (`require_booking_confirmation=false`) | **Niente** inbox/push `BOOKING_CONFIRMATION` (il cliente ha già `BookingConfirmedModal`); sì email conferma + promemoria | — |
+| Operatore/titolare **rifiuta** (`BOOKED` → `CANCELLED`) | `BOOKING_REQUEST_REJECTED` | «[Operatore] non ha confermato la richiesta…» |
+| Salone **annulla** appuntamento già confermato | `BOOKING_CANCELLED_BY_SALON` | «Il salone ha annullato…» |
+
+UI vetrina (`BookingConfirmedModal`): `pendingApproval` deriva dallo `status` API (`BOOKED` → «Richiesta inviata»; `CONFIRMED` → «Appuntamento confermato»). Non hardcodare sempre pending.
+
+Popup conferma al cliente dopo Accetta operatore: `ConsumerNotificationAlertPoller` in `App.tsx` (come il poller salone) — gira su **tutta** l'app loggata cliente (home, ricerca, vetrina), non solo sotto `/account`.
+
+Push FCM salone: payload include `appointmentStatus` così un tap su notifica auto-confermata non mostra Accetta/Rifiuta.
+
+### Copy inbox per ruolo (`buildPreviewLine(..., ownerView)`)
+
+| Evento | Titolare (`ownerView=true`) | Operatore (`ownerView=false`) |
+|--------|----------------------------|-------------------------------|
+| Prenotazione | «… ha prenotato … con [operatore]» | «… in attesa di conferma» |
+| Cambio orario | «… ha cambiato l'orario della prenotazione al … con [operatore]» | «… in attesa di conferma» |
+| Disdetta | «… ha annullato … con [operatore]» | stesso tono informativo |
+
+### Inbox titolare anche collegato come operatore (fix 2026-07-04)
+
+In `MeSalonNotificationInboxService.resolveActor`:
+
+- Se `principal.hasAppRole("OWNER")` e lo studio si risolve → actor titolare (`staffOperator = null`), **mai** fallback inbox staff filtrata.
+- Se OWNER ma studio non risolve → `Optional.empty()` (poi `tryRepairIfOwnerWithNoStudio`), **non** usare `resolveLinkedOperatorForInbox`.
+- `resolve()` e `ensureActorForWrite()` eseguono **prima** orphan repair per OWNER.
+
+Test di riferimento: `MeSalonControllerTest.salonNotifications_ownerLinkedAsStaff_seesOtherOperatorsBookingRequests`.
+
+## Agenda titolare (UI)
+
+- Con operatori in elenco: `/account/prenotazioni` = scelta «Chi sei?» **+** card **Agenda completa studio** → `/account/prenotazioni/studio/agenda` (`SalonStudioAgendaPage`).
+- Agenda completa: `GET /me/salon/agenda`, filtro operatore solo in vista per-membro (`SalonStaffAgendaPage` con `operatorId`).
+- Da agenda (titolare e staff): link **Gestisci/Apri** → `/account/prenotazioni/{id}` con pulsanti Accetta/Rifiuta se `BOOKED`.
+
+## Notifiche salone: titolare vs operatore (regola prodotto — non invertire)
+
+Due canali distinti. **Non** dare al titolare lo stesso modale urgente dell'operatore.
+
+| Canale | Titolare OWNER | Operatore STAFF (`STAFF && !OWNER`) |
+|--------|----------------|-------------------------------------|
+| **Inbox API** `/me/salon/notifications` | Tutto lo studio; copy informativa con operatore (`ownerView=true`) | Solo appuntamenti del proprio `operator`; copy «in attesa di conferma» |
+| **Centro notifiche UI** | `/salone/strumenti` (`SalonStandardToolsPage`) — righe con `clientName`, `serviceName`, `operatorName`, orari | `/account/notifiche` (`NotificationsPage`) |
+| **Badge / conteggi** | `useMeSalonNotificationInboxQuery` in `AccountLayout` | Stesso hook |
+| **Notifica browser** | `AccountLayout`: «Nuova notifica nel centro notifiche del salone» (generica, senza dettaglio appuntamento) | Stessa notifica browser generica |
+| **Modale in-app** (`LuxuryNotificationPopupHost`) | **Mai** auto-aperto da `useSalonBookingRequestAlerts` | Sì, per tipi in `isSalonStaffPopupType` (disattivabile: `require_booking_confirmation=false` → auto-conferma, solo notifica) |
+| **Suono insistente** | **Mai** | Solo se `canRespond` o `urgent` nel payload popup |
+| **Push FCM** | Informativa (prenotazione, disdetta); dopo accettazione cambio orario (`BOOKING_UPDATED`) | Azione su prenotazione/cambio orario; informativa su disdetta (o informativa anche su prenotazione se conferma disattivata) |
+
+### Tipi notifica per ruolo (backend + frontend)
+
+| `NotificationType` | Titolare inbox | Titolare popup | Operatore popup |
+|--------------------|----------------|----------------|-----------------|
+| `BOOKING_CREATED_FOR_SALON` | Sì (bucket `BOOKING_CONFIRMATION`) | No | Sì — Accetta/Rifiuta |
+| `BOOKING_RESCHEDULED_BY_CONSUMER` | **No** in inbox finché operatore non risponde; poi `BOOKING_UPDATED` | No | Sì — Accetta/Rifiuta + `RescheduleCompareBlock` |
+| `BOOKING_CANCELLED_BY_CONSUMER` | Sì (bucket `BOOKING_CANCELLED`) | No | Sì — urgente informativo (`urgent`, no `canRespond`) |
+| `BOOKING_UPDATED` | Sì (dopo accettazione operatore o spostamento agenda salone) | No | No (informativo in inbox) |
+| `BOOKING_REJECTED_BY_OPERATOR` | Sì (solo se operatore rifiuta con `notifyOwnerOnOperatorReject`) | No | No |
+
+Push cambio orario: `FcmPushDispatchService` invia `BOOKING_RESCHEDULED_BY_CONSUMER` **solo all'operatore** (`dispatchOperatorOnlyPush`); titolare riceve push `BOOKING_UPDATED` solo dopo `confirmForStaff` → `notifyOwnerAfterRescheduleAccepted`.
+
+## Popup in-app operatore (frontend)
+
+Ruolo viewer: `resolveSalonNotificationViewerRole(isSalonStaff, isSalonTitolare)` → `"staff"` solo se `STAFF && !OWNER`.
+
+### Preferenza operatore Premium: conferma prenotazioni
+
+Campo `staff_operators.require_booking_confirmation` (default `true`), esposto in `GET/PATCH /api/v1/me/staff/operator-profile` come `requireBookingConfirmation`.
+
+| Switch profilo (`/account/profilo`, solo staff Premium) | Comportamento |
+|--------------------------------------------------------|---------------|
+| **ON** (default) | Come oggi: stato `BOOKED` + alert Accetta/Rifiuta + push «Conferma o rifiuta» |
+| **OFF** | Conferma automatica (`CONFIRMED`) + sola notifica informativa allo staff («il cliente ha prenotato»); niente Accetta/Rifiuta. **Cliente:** solo `BookingConfirmedModal` («La prenotazione è confermata…»); **niente** popup/push inbox `BOOKING_CONFIRMATION` («Il salone ha confermato…»). |
+
+Stesso schema per cambio orario cliente: OFF → resta `CONFIRMED` + `BOOKING_UPDATED` informativo (no `BOOKING_RESCHEDULED_BY_CONSUMER`).
+
+Polling: `SalonBookingAlertPoller` (in `App.tsx`) → `useSalonBookingRequestAlerts`.
+
+Helper eleggibilità (`luxuryNotificationPopup.ts`):
+
+- `isSalonStaffPopupType` = `BOOKING_CREATED_FOR_SALON` \| `BOOKING_RESCHEDULED_BY_CONSUMER` \| `BOOKING_CANCELLED_BY_CONSUMER`
+- `canRespondToSalonBookingRequest` = solo `role === "staff"` + tipi richiesta
+- `isSalonUrgentInfoType` = solo `BOOKING_CANCELLED_BY_CONSUMER`
+- `resolveSalonPopupUrgent` = `false` per titolare; per staff = `canRespond` \| `isSalonUrgentInfoType`
+
+| Evento | Operatore STAFF |
+|--------|-----------------|
+| Prenotazione / cambio orario | Modale **urgente** Accetta/Rifiuta (`canRespond`, `urgent`) |
+| Disdetta cliente | Modale urgente **solo informativo** (`urgent`, `canRespond` false) |
+
+### Regole popup operatore (non rompere)
+
+1. **`useSalonBookingRequestAlerts`**: `isPopupEligibleMessage` → **solo** `role === "staff"` && `isSalonStaffPopupType`. Per il titolare: `markSalonAlertNotificationSeen` su tutto al baseline (`shouldBaselineOnFirstLoad` ritorna sempre `true` per owner).
+2. **Non** aprire `LuxuryNotificationPopupHost` al titolare per eventi prenotazione — il titolare usa inbox + badge; accetta/rifiuta da agenda (`/account/prenotazioni/{id}`) se vuole intervenire.
+3. **`shouldSkipAutoPopup`**: solo staff su `/account/notifiche` (evita duplicato col centro notifiche staff).
+4. **`AccountLayout`**: notifica browser generica per `isSalonTitolare \|\| isSalonStaff` quando cresce `inboxAttentionTotal`; al click invalidare `["me","salon","notifications","messages","salon-alerts"]`. **Non** aprire popup da qui per il titolare.
+5. Accetta/Rifiuta nel modale: `payload.canRespond` (solo staff su prenotazione/cambio orario **e** `appointmentStatus` assente o `BOOKED`), non `salonSide` generico. Push FCM include `appointmentStatus` (così auto-conferma `CONFIRMED` non riapre Accetta). API: staff → `/me/staff/appointments/{id}/confirm\|reject`; titolare da dettaglio → `/me/salon/appointments/...`.
+6. Disdetta (`BOOKING_CANCELLED_BY_CONSUMER`): popup **solo operatore**; `urgent` true, `canRespond` false.
+7. **`messageToNotificationPopup` / push open (`useFcmToken`)**: passare sempre `viewerRole` così push aperto da titolare non mostra pulsanti Accetta/Rifiuta. Auto-conferma: inbox `BOOKING_CREATED_FOR_SALON` + `CONFIRMED` → chime informativo, **mai** popup Accetta (`isStaleSalonBookingRequestAlert`).
+8. **Cambio orario** (`BOOKING_RESCHEDULED_BY_CONSUMER` + `canRespond`): mostrare **prima** di Accetta/Rifiuta `RescheduleCompareBlock` (orario precedente da `previousAppointmentStart`, nuovo da `appointmentStart`). Non spostare le azioni sopra il confronto.
+9. **Suono** (`resolveNotificationPopupSoundMode` / `shouldPlayOperatorAlertSound`): suono insistente **solo** se `payload.canRespond` **oppure** `payload.urgent === true` — **non** usare `isSalonInteractiveAlertType` per il suono. `AudioContext` richiede gesture utente (`primeBookingAlertSound`); coda `pendingRequestSound` al primo tap.
+10. **Dopo conferma/rifiuto** (fix 2026-07-20): `AppointmentNotificationService` imposta `staffDeletedAt` sulle righe `BOOKING_CREATED_FOR_SALON` / `BOOKING_RESCHEDULED_BY_CONSUMER` dell'appuntamento — spariscono dall'inbox operatore (il titolare le vede ancora). L'elenco staff filtra anche le legacy già risolte (`appointmentStatus != BOOKED`). Preview operatore: «in attesa di conferma» solo se ancora `BOOKED`.
+
+### Debug rapido (sintomi → dove guardare)
+
+| Sintomo | Verifica |
+|---------|----------|
+| Titolare vede modale Accetta/Rifiuta | `useSalonBookingRequestAlerts` / `isPopupEligibleMessage` — deve restare staff-only; `viewerRole` su push |
+| Operatore non riceve popup richiesta | `SalonBookingAlertPoller` montato? bucket `BOOKING_CONFIRMATION` include `BOOKING_RESCHEDULED_BY_CONSUMER` per staff? filtro `operatorId` inbox |
+| Titolare non vede nuova prenotazione in inbox | `typesForBucket(BOOKING_CONFIRMATION, ownerView=true)` include `BOOKING_CREATED_FOR_SALON`; `resolveActor` non deve usare inbox staff se `OWNER` |
+| Titolare non vede cambio orario in inbox | **Atteso** finché operatore non accetta: notifica è `BOOKING_RESCHEDULED_BY_CONSUMER` (solo operatore); titolare vede `BOOKING_UPDATED` dopo conferma |
+| Suono su notifica titolare | `resolveSalonPopupUrgent` deve essere `false` per owner; titolare non deve passare da `openLuxuryNotificationPopup` automatico |
+| Copy inbox sbagliata per ruolo | `MeSalonNotificationInboxService.buildPreviewLine(..., ownerView)` |
+
+### Payload notifiche appuntamento (fix 2026-07-04)
+
+`MeSalonNotificationMessageDto` / `LuxuryNotificationPopupPayload` espongono campi opzionali per il popup:
+
+| Campo | Origine | Uso |
+|-------|---------|-----|
+| `serviceName` | `appointment.service` | Dettaglio modale |
+| `operatorName` | `appointment.operator` | Dettaglio modale |
+| `appointmentStart` | `appointment.start` (nuovo orario) | Confronto cambio orario |
+| `previousAppointmentStart` | `scheduled_notifications.previous_appointment_start` | Solo `BOOKING_RESCHEDULED_BY_CONSUMER` |
+
+Backend:
+
+- `AppointmentBookingService.rescheduleAsConsumer` cattura `previousStart` **prima** di `setStart`, poi `onConsumerBookingRescheduled(id, previousStart)`.
+- `ScheduledNotification.salonInboxDelivered(appointment, type, previousStart)` persiste la colonna; schema via `ScheduledNotificationSchemaAlignmentRunner` + `deploy/sql/add_scheduled_notifications_previous_appointment_start_*.sql`.
+- Push FCM (`FcmPushDispatchService.pushData`): includere gli stessi campi per popup da notifica push.
+
+Notifiche legacy senza `previousAppointmentStart`: UI mostra solo nuovo orario + messaggio fallback («orario precedente non disponibile»).
+
+## Modali conferma account (fix 2026-07-04)
+
+**Non usare `window.confirm`** per azioni prenotazione in area account (WebView nativa inclusa).
+
+| Azione | Pagina | Componente |
+|--------|--------|------------|
+| Disdetta cliente | `AppointmentDetailPage` | `BookingActionConfirmModal` |
+| Annulla come salone | `AppointmentDetailPage` | `BookingActionConfirmModal` |
+| Rifiuta richiesta `BOOKED` | `AppointmentDetailPage` | `BookingActionConfirmModal` |
+| Conferma slot vetrina | `SalonPage` | modale inline `luxury-booking-confirm-modal__*` |
+
+`BookingActionConfirmModal` riusa le classi `luxury-booking-confirm-modal__*` (`luxury-salon-booking-native-app.css`), stesso linguaggio visivo di «Confermi questo orario?». Stato locale `pendingConfirm` → apre modale → API solo su conferma.
+
+## Bucket inbox e copy
+
+- Bucket `BOOKING_CONFIRMATION` include: `BOOKING_CREATED_FOR_SALON`, `BOOKING_RESCHEDULED_BY_CONSUMER`, `BOOKING_CONFIRMATION`.
+- Preview **titolare**: «ha prenotato … con [operatore]»; preview **operatore**: «… in attesa di conferma» (`MeSalonNotificationInboxService.buildPreviewLine`).
+- Dopo cambio copy/stato: aggiornare `MeSalonControllerTest` (cerca `previewLine`, `ha prenotato`, `in attesa di conferma`).
+
+## Regole modifica
+
+- Nuove prenotazioni consumer → sempre `BOOKED`, non `CONFIRMED`.
+- Conferma → `onBookingConfirmedBySalon` notifica **cliente** (non duplicare inbox salone).
+- Riprogrammazione consumer → salvare sempre `previousAppointmentStart` sulla notifica salone; non ricostruire l'orario precedente dal solo `appointment.start` (già aggiornato).
+- Overlap slot: `assertNoOverlap` + `WorkSchedule` — non bypassare in refactor availability.
+- Dopo prenotazione/riprogrammazione: `refreshOrgAvailabilityAfterBooking` (cache + invalidate `["org","availability", slug]`) così lo slot sparisce subito in UI; non basarsi solo sul refetch manuale.
+- Popup Accetta/Rifiuta operatore: allo smontaggio di `LuxuryNotificationPopupHost` liberare gli ID popup attivi (`clearAllSalonAlertPopupsActive` / `clearSalonAlertPopupActive`), altrimenti il poller non ripropone più l'alert.
+- Conferme distruttive account/prenotazione → modale branded (`BookingActionConfirmModal` o popup notifiche), mai `window.confirm`.

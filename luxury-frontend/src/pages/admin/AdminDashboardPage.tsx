@@ -58,7 +58,7 @@ export default function AdminDashboardPage() {
   const qc = useQueryClient();
   const baseId = useId();
   const [selectedArea, setSelectedArea] = useState<
-    "premium" | "free" | "abbonamenti" | "clienti" | "recensioni" | "profilo" | "statistiche"
+    "premium" | "abbonamenti" | "clienti" | "recensioni" | "profilo" | "statistiche"
   >("premium");
   const [reviewsPage, setReviewsPage] = useState(0);
   const [platformReviewsPage, setPlatformReviewsPage] = useState(0);
@@ -239,14 +239,6 @@ export default function AdminDashboardPage() {
           </button>
           <button
             type="button"
-            className={`luxury-admin-subchip ${selectedArea === "free" ? "is-active" : ""}`}
-            aria-pressed={selectedArea === "free"}
-            onClick={() => setSelectedArea("free")}
-          >
-            Saloni free
-          </button>
-          <button
-            type="button"
             className={`luxury-admin-subchip ${selectedArea === "abbonamenti" ? "is-active" : ""}`}
             aria-pressed={selectedArea === "abbonamenti"}
             onClick={() => setSelectedArea("abbonamenti")}
@@ -322,41 +314,6 @@ export default function AdminDashboardPage() {
           }
           createSuccessMessage="Salone premium creato con successo."
           createErrorDefault="Creazione salone premium fallita."
-          onEditSalon={(row) => {
-            setEditingSalon(row);
-            setEditSalonForm({
-              ownerEmail: row.ownerEmail ?? "",
-              salonName: row.name,
-              salonCity: row.primaryLocationCity ?? "",
-            });
-          }}
-        />
-      ) : null}
-      {selectedArea === "free" && accessToken ? (
-        <AdminSalonPlanSection
-          accessToken={accessToken}
-          apiPlanTier="BASE"
-          idPrefix={`${baseId}-free`}
-          headingId={`${baseId}-free-h`}
-          title="Saloni free (piano BASE)"
-          loadingSalonsLabel="Caricamento saloni free…"
-          createOpenLabel="+ Crea salone FREE (BASE)"
-          createCloseLabel="Chiudi creazione salone free"
-          paginationAriaLabel="Paginazione saloni free"
-          modalCreateTitle="Registrazione — piano Free (BASE)"
-          modalCreateIntro={
-            <p className="luxury-plans-modal__intro">
-              <strong>Questo modulo non è per i clienti che prenotano</strong> (loro hanno ruolo applicativo{" "}
-              <code style={{ fontSize: "0.85em", color: "rgba(253, 186, 116, 0.9)" }}>CLIENT</code>). Qui crei
-              l&apos;accesso titolare (
-              <code style={{ fontSize: "0.85em", color: "rgba(253, 186, 116, 0.9)" }}>OWNER</code>) con piano{" "}
-              <strong>Free</strong> (
-              <code style={{ fontSize: "0.85em", color: "rgba(253, 186, 116, 0.9)" }}>BASE</code> nel backend):
-              l&apos;indirizzo della sede è obbligatorio per ricerca e vetrina.
-            </p>
-          }
-          createSuccessMessage="Salone free creato con successo."
-          createErrorDefault="Creazione salone free fallita."
           onEditSalon={(row) => {
             setEditingSalon(row);
             setEditSalonForm({

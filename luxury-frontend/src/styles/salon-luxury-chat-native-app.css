@@ -133,20 +133,25 @@ html.luxury-native-chat-thread-active.luxury-native-app
 }
 
 .luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__layout--native-thread .luxury-salon-chat__sidebar {
-  display: none;
+  display: none !important;
 }
 
 .luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__layout:not(.luxury-salon-chat__layout--native-thread) .luxury-salon-chat__panel {
-  display: none;
+  display: none !important;
 }
 
 .luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__layout--native-thread .luxury-salon-chat__panel {
   flex: 1;
   min-height: 0;
   max-height: none;
-  display: flex;
+  display: flex !important;
   flex-direction: column;
   background: #000000;
+}
+
+/* In thread: niente picker destinatarî (sono già voci separate in lista). */
+.luxury-native-app .luxury-salon-chat--native-app .luxury-salon-chat__thread-picker {
+  display: none !important;
 }
 
 /* Lista conversazioni */

@@ -112,7 +112,7 @@ export default function SalonBrandLayoutPreviewPage() {
     <SalonStandardSectionGuard>
       <div className="luxury-brand-layout-preview--fullscreen" aria-label="Anteprima layout vetrina">
         <div className="luxury-brand-layout-preview__topbar">
-          <Link to="/account/salone/brand" className="luxury-link-back" style={{ margin: 0 }}>
+          <Link to="/salone/brand" className="luxury-link-back" style={{ margin: 0 }}>
             ← Brand e vetrina
           </Link>
           <div className="luxury-brand-layout-preview__topbar-right">

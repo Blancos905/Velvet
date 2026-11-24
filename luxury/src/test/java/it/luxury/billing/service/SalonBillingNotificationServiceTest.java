@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -120,13 +121,18 @@ class SalonBillingNotificationServiceTest {
 		when(studioGroupRepository.findById(studioGroupId)).thenReturn(Optional.of(group));
 		when(billingAccountRepository.findByStudioGroup_Id(studioGroupId)).thenReturn(Optional.of(account));
 		when(paymentThankYouSentRepository.existsByStripeReference("invoice:in_test")).thenReturn(false);
+		when(paymentThankYouSentRepository.existsByStripeReference("receipt:invoice:in_test")).thenReturn(false);
 
 		service.onInvoicePaid(invoice, "sub_test");
 
 		verify(emailDispatchService).dispatchPaymentThankYou(eq(group), eq(2900L), eq("eur"), isNull());
+		verify(emailDispatchService).dispatchPaymentReceiptPdf(
+				eq(group), eq(2900L), eq("eur"), any(), eq("in_test"));
 		ArgumentCaptor<BillingPaymentThankYouSent> sent = ArgumentCaptor.forClass(BillingPaymentThankYouSent.class);
-		verify(paymentThankYouSentRepository).save(sent.capture());
-		assertEquals("invoice:in_test", sent.getValue().getStripeReference());
+		verify(paymentThankYouSentRepository, times(2)).save(sent.capture());
+		assertEquals(
+				java.util.Set.of("invoice:in_test", "receipt:invoice:in_test"),
+				sent.getAllValues().stream().map(BillingPaymentThankYouSent::getStripeReference).collect(java.util.stream.Collectors.toSet()));
 	}
 
 	@Test

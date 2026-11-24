@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.luxury.publicapi.dto.AppointmentResponses.AppointmentDto;
 import it.luxury.security.auth.LuxuryUserPrincipal;
-import it.luxury.studio.dto.MeStaffOperatorPhotoPatchRequest;
+import it.luxury.studio.dto.MeStaffOperatorSelfPatchRequest;
 import it.luxury.studio.dto.MeStaffOperatorSelfDto;
 import it.luxury.studio.dto.MeStaffSalonDto;
 import it.luxury.studio.dto.OperatorTimeBlockDtos.CreateOperatorTimeBlockRequest;
@@ -63,12 +63,12 @@ public class MeStaffController {
 	}
 
 	@PatchMapping("/operator-profile")
-	@Operation(summary = "Aggiorna la foto dell’operatore collegato a questo account")
+	@Operation(summary = "Aggiorna foto e preferenze dell’operatore collegato a questo account")
 	@PreAuthorize("hasAuthority('ROLE_STAFF')")
 	public MeStaffOperatorSelfDto patchOperatorProfile(
 			@AuthenticationPrincipal LuxuryUserPrincipal principal,
-			@Valid @RequestBody MeStaffOperatorPhotoPatchRequest body) {
-		return meStaffContextService.updateOperatorPhoto(principal, body);
+			@Valid @RequestBody MeStaffOperatorSelfPatchRequest body) {
+		return meStaffContextService.updateOperatorSelf(principal, body);
 	}
 
 	@GetMapping("/agenda")

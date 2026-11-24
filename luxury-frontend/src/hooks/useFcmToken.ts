@@ -14,6 +14,7 @@ import {
   openLuxuryNotificationPopup,
   resolveSalonNotificationViewerRole,
 } from "../lib/luxuryNotificationPopup";
+import { shouldSuppressConsumerBookingConfirmationPopup } from "../lib/suppressConsumerBookingConfirmationPopup";
 
 declare global {
   interface Window {
@@ -86,9 +87,14 @@ export function useFcmToken(): void {
     window.onLuxuryPushNotificationOpen = (raw) => {
       const role = resolveSalonNotificationViewerRole(isSalonStaff, isSalonTitolare);
       const payload = normalizePushNotificationOpen(raw, role);
-      if (payload) {
-        openLuxuryNotificationPopup(payload);
+      if (!payload) return;
+      if (
+        payload.notificationType === "BOOKING_CONFIRMATION"
+        && shouldSuppressConsumerBookingConfirmationPopup(payload.appointmentId)
+      ) {
+        return;
       }
+      openLuxuryNotificationPopup(payload);
     };
 
     syncToken(window.luxuryFcmToken);

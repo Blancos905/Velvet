@@ -96,9 +96,10 @@ public class MeSalonOwnerOrphanRepairService {
 				"IT",
 				salonName);
 		log.warn(
-				"Riparazione directory: creo studio_groups per titolare orfano email={} sub={} (mancava riga dopo registrazione).",
+				"Riparazione directory: creo studio_groups non entitled per titolare orfano email={} sub={} (mancava riga dopo registrazione).",
 				email,
 				sub);
+		// BASE è solo lo stato tecnico «non entitled»: l’unico piano commerciale è Premium (hasActivePremium).
 		salonDirectoryProvisioningService.provisionAfterPartnerRegistration(
 				email, "BASE", salonName, loc, sub, List.of(SalonBusinessType.HAIR),
 				List.of(SalonClientGender.MALE, SalonClientGender.FEMALE));

@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  backend:
+    name: Test backend Java
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          cache-dependency-path: luxury/pom.xml
+      - name: Test del modulo luxury
+        working-directory: luxury
+        run: ./mvnw -B test
+
+  frontend:
+    name: Test e typecheck frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: luxury-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: luxury-frontend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - name: Typecheck
+        run: npx tsc --noEmit --pretty false
+      - name: Typecheck vite.config.ts
+        run: npx tsc --noEmit --pretty false -p tsconfig.node.json
+
+  flutter:
+    name: Analisi Flutter
+    # luxury-app/pubspec.yaml vincola solo il Dart SDK (>=3.5.0 <4.0.0).
+    # Non c'è una versione Flutter pinnata (.fvmrc, .flutter-version, fvm).
+    # Il job resta spento: senza pin l'azione Flutter renderebbe la CI inaffidabile.
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "dart analyze non eseguito"
+
+  lint:
+    name: Ruff ed ESLint sui file cambiati
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: luxury-frontend/package-lock.json
+      - name: Lint dei file della pull request
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "${{ github.base_ref }}"
+          mapfile -t files < <(git diff --name-only --diff-filter=ACMR "origin/${{ github.base_ref }}" HEAD)
+          py=()
+          js=()
+          for f in "${files[@]}"; do
+            [[ -f "$f" ]] || continue
+            case "$f" in
+              */node_modules/*|*/dist/*|*/._*|._*) continue ;;
+            esac
+            case "$f" in
+              *.py) py+=("$f") ;;
+              *.js|*.jsx|*.mjs|*.cjs|*.ts|*.tsx) js+=("$f") ;;
+            esac
+          done
+          if ((${#py[@]})); then
+            python3 -m pip install --disable-pip-version-check ruff
+            echo "Ruff su ${#py[@]} file cambiati:"
+            ruff check "${py[@]}"
+          else
+            echo "Nessun file Python cambiato."
+          fi
+          if ((${#js[@]})); then
+            npm ci --prefix luxury-frontend
+            echo "ESLint su ${#js[@]} file cambiati:"
+            npx --prefix luxury-frontend eslint -c eslint.config.mjs --no-error-on-unmatched-pattern "${js[@]}"
+          else
+            echo "Nessun file JavaScript o TypeScript cambiato."
+          fi

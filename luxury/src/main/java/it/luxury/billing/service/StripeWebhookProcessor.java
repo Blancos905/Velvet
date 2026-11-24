@@ -164,6 +164,9 @@ public class StripeWebhookProcessor {
 			billingNotificationService.findStudioGroupIdForSubscription(subscriptionId)
 					.ifPresent(studioGroupId -> fatturaPaInvoiceService.issueFromStripeInvoice(invoice, studioGroupId));
 		}
+		else if ("invoice.payment_failed".equals(event.getType())) {
+			billingNotificationService.onInvoicePaymentFailed(invoice, subscriptionId);
+		}
 		return billingNotificationService.findStudioGroupIdForSubscription(subscriptionId).orElse(null);
 	}
 

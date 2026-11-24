@@ -1,0 +1,26 @@
+---
+description: Manutenzione database/infrastruttura — analisi completa di infrastructure/, Docker, PostgreSQL, Redis, SQL e backup. Usa quando l'utente dice «manutenzione database», «manutenzione infrastruttura», «database maintenance» o chiede controllo totale di Docker/DB.
+alwaysApply: false
+---
+
+# Manutenzione database / infrastruttura Luxury
+
+Quando l'utente dice **manutenzione database**, **manutenzione infrastruttura**, **database maintenance**, **infrastructure maintenance**, **controllo database**, **controllo docker**, **revisione infrastruttura** o **scan database**:
+
+1. Leggi e segui **per intero** la skill di progetto:
+   `.cursor/skills/manutenzione-database/SKILL.md`
+2. Usa la checklist infrastruttura/DB:
+   `.cursor/skills/manutenzione-database/CHECKLIST.md`
+3. Dalla root del repo esegui subito:
+   ```bash
+   ./luxury-database-maintenance.sh
+   ```
+4. Verifica anche i backup operativi:
+   - `scripts/backup-postgres.sh`
+   - `scripts/backup-redis.sh`
+   - `scripts/backup-database-stack.sh`
+   - `scripts/install-database-backup-cron.sh`
+5. Controlla `infrastructure/docker-compose.prod.yml`, Nginx, `.env.example`, SQL in `luxury/deploy/sql/`, hardening Docker, volumi, restore path e retention backup.
+6. Applica automaticamente le correzioni sicure e locali compatibili con le regole del repo, poi rilancia i check.
+
+Non sostituire questa manutenzione con `luxury-audit.sh` se l'utente ha chiesto specificamente database/infrastruttura.

@@ -111,9 +111,15 @@ function shouldOpenSalonAlertPopup(
 
 function shouldAutoPopupMessage(message: MeSalonNotificationMessage): boolean {
   if (isStaleSalonBookingRequestAlert(message)) return false;
-  if (!isSalonAlertSessionBaselineMessage(message.id)) return true;
-  // Già in inbox al boot: mostra solo richieste prenotazione ancora BOOKED non dismissate.
-  return isSalonBookingRequestType(message.notificationType);
+  if (!isSalonAlertSessionBaselineMessage(message.id)) {
+    // Nuovo messaggio in sessione: popup solo se ancora azione richiesta / urgente.
+    if (isSalonBookingRequestType(message.notificationType)) {
+      return isPendingSalonBookingRequest(message);
+    }
+    return true;
+  }
+  // Già in inbox al boot: solo richieste prenotazione ancora BOOKED non dismissate.
+  return isPendingSalonBookingRequest(message);
 }
 
 function notifySalonAppointmentAlert(message: MeSalonNotificationMessage, title: string): void {
@@ -222,9 +228,22 @@ export function useSalonBookingRequestAlerts(enabled = true): void {
 
   const baselinedRef = useRef(false);
   const alertSoundSeenIdsRef = useRef(new Set<string>());
+  const baselinedForAccountRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!eligible || !messagesQ.data) return;
+
+    // Nuovo account / re-login: rifai baseline (non bloccare alert BOOKED su sessione precedente).
+    if (baselinedForAccountRef.current !== accountStorageKey) {
+      baselinedRef.current = false;
+      baselinedForAccountRef.current = accountStorageKey ?? null;
+      alertSoundSeenIdsRef.current = new Set();
+    }
+
+    // Prima risposta vuota (race post-prenotazione): non chiudere il baseline, ritenta al prossimo poll.
+    if (!baselinedRef.current && messagesQ.data.length === 0 && messagesQ.isFetching) {
+      return;
+    }
 
     if (!baselinedRef.current) {
       baselineSalonAlertSessionMessages(messagesQ.data);
@@ -245,8 +264,21 @@ export function useSalonBookingRequestAlerts(enabled = true): void {
     for (const message of messagesQ.data) {
       if (!message.id) continue;
       if (isStaleSalonBookingRequestAlert(message)) {
+        // Auto-conferma (CONFIRMED + BOOKING_CREATED): chime informativo, mai Accetta/Rifiuta.
+        const status = message.appointmentStatus?.trim().toUpperCase();
+        const autoConfirmInfo =
+          message.notificationType === "BOOKING_CREATED_FOR_SALON" && status === "CONFIRMED";
+        if (autoConfirmInfo && !alertSoundSeenIdsRef.current.has(message.id)) {
+          alertSoundSeenIdsRef.current.add(message.id);
+          emitInAppSound({
+            kind: "chime",
+            source: "notification",
+            dedupeKey: `salon-notif:${message.id}`,
+          });
+        } else {
+          alertSoundSeenIdsRef.current.add(message.id);
+        }
         markSalonAlertNotificationSeen(message.id);
-        alertSoundSeenIdsRef.current.add(message.id);
         continue;
       }
 
@@ -275,5 +307,5 @@ export function useSalonBookingRequestAlerts(enabled = true): void {
       openLuxuryNotificationPopup(popupPayload);
       break;
     }
-  }, [eligible, location.pathname, messagesQ.data, viewerRole]);
+  }, [accountStorageKey, eligible, location.pathname, messagesQ.data, messagesQ.isFetching, viewerRole]);
 }

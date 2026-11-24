@@ -1,0 +1,73 @@
+---
+description: Ruoli JWT Luxury, routing frontend e guard API — clienti, titolari, staff, super admin
+alwaysApply: true
+---
+
+# Luxury — Ruoli e routing
+
+## Ruoli JWT (`LuxuryUserPrincipal`)
+
+| Ruolo JWT | Authority Spring | Chi è |
+|-----------|------------------|-------|
+| `CLIENT` | `ROLE_CLIENT` | Consumatore B2C (default se assente) |
+| `OWNER` | `ROLE_OWNER` | Titolare salone |
+| `STAFF` | `ROLE_STAFF` | Operatore collegato a `StaffOperator` |
+| `ADMIN` | `ROLE_ADMIN` | Super admin Luxury |
+
+- Correlazione titolare: `consumer_profiles.auth_sub` ↔ `studio_groups.owner_auth_sub` (via `StudioGroupOwnerResolver`).
+- Staff collegato: `StaffOperatorRepository.resolveLinkedOperatorId(profileId, subject)`.
+- Un utente può avere più ruoli; frontend: `isSalonStaff = STAFF && !OWNER`.
+- `bootstrapSuperAdmin` sulla registrazione pubblica resta `CLIENT` se un super admin esiste già. Non ci sono email esentate.
+
+## Routing frontend (`App.tsx`)
+
+| Ruolo | Home account | Pannello admin |
+|-------|--------------|----------------|
+| Super admin | redirect → `/admin/dashboard` | `/admin/*` via `AdminProtectedRoute` |
+| Staff | `/account/staff` (hub) · agenda `/account/staff/agenda` (overlay in app) | — |
+| Titolare | `/salone` (hub, solo le due card). I tasti, Panoramica e Anteprima vetrina compresi, aprono l’overlay centrato quasi a schermo intero; in app il foglio resta dal basso. Checkout e successo Stripe restano pagina intera | — |
+| Cliente | hub `/account`. Prenotazioni, chat, notifiche, profilo, saloni di fiducia, recensioni e le altre voci aprono l’overlay centrato come il menu salone; in app il foglio resta dal basso | — |
+
+Cliente e home di ricerca stanno su `/`, `/search` e `/account`. L’admin del salone sta su `/salone` (sotto-pagine `/salone/servizi`, `/salone/staff`, `/salone/clienti`, …). `/admin` resta il super admin della piattaforma. Gli indirizzi vecchi `/account/salone` e `/account/salone/*` reindirizzano a `/salone`.
+
+Le tre aree sono tre origini della stessa app. La home di ricerca (`8080`) ha solo l’accesso cliente. Il salone può registrarsi da lì (`/piani`, conferma email, checkout). Su `/registrati`, dopo l’invio, un ricaricamento resta su «Controlla la tua email» o sul ringraziamento, finché non si torna alla home. A registrazione finita compare l’avviso. Se salone, dipendente o super admin entrano dalla home, vedono l’avviso e non la home: niente suono di notifica. «Vai al tuo profilo» apre il pannello in una finestra nuova, chiude l’avviso e lascia la home di ricerca. «Esci» su quell’avviso chiude la sessione e resta sulla home di ricerca. Dal pannello, «Esci» torna al login di quel pannello e non alla home di ricerca. Il cliente, o un ospite, che apre `/salone`, `/account/staff` o `/admin` dalla home di ricerca torna alla home. L’email ricordata del salone e quella dell’operatore restano distinte. Su `8083` e `8084` non c’è la home di ricerca: niente header del sito clienti, si vede il login e, dopo l’accesso, l’area. L’app nativa resta una sola WebView e non cambia origine.
+
+| Superficie | Locale | Produzione |
+|---|---|---|
+| Clienti e ricerca | http://127.0.0.1:8080 | https://www.saloniluxury.it |
+| Pannello titolare e dipendente | http://127.0.0.1:8083 | https://salone.saloniluxury.it |
+| Super admin | http://127.0.0.1:8084 | https://admin.saloniluxury.it |
+
+In produzione il certificato deve includere `salone.` e `admin.`. Il cookie di refresh ha `Domain=saloniluxury.it`, così il login fatto su un’origine vale anche sulle altre. In locale il cookie resta sull’host `127.0.0.1` e le tre porte lo condividono.
+
+Hub account masthead «Ciao [nome]»: nome di battesimo da `GET /api/v1/me/profile` → `displayName` (prima parola). Al login il profilo viene prefetchato insieme a `/me/salon` (titolare) così il chip non resta vuoto dopo la registrazione Premium.
+
+Immagine profilo cliente: in `/account/profilo` (pannello web e overlay app) si carica con `PATCH /api/v1/me/profile/photo` (data URL; stringa vuota la rimuove). Prima del salvataggio si inquadra con zoom e posizione, come la foto operatore. `GET /api/v1/me/profile` include `photoDataUrl`. Sul hub cliente l’immagine sta a destra del nome, nel saluto «Ciao». Su Android la WebView apre il selettore foto nativo; su iOS lo apre WKWebView.
+
+Super admin su `/account` viene disconnesso o reindirizzato (`ProtectedRoute`).
+
+### App mobile (WebView)
+
+Da pagine pubbliche (`/`, `/search`, vetrina salone, …) il pulsante header **Profilo** apre l’**hub account** (`nativeAppProfileHubPath` / `AppHeaderProfileMenu`), non il dropdown web: griglia con Profilo, Assistenza, Notifiche, Prenotazioni, ecc. Tap su **Prenotazioni**, **Chat**, **Notifiche**, **Profilo**, **Saloni di fiducia**, **Recensioni** (e le altre sotto-pagine) apre `LuxuryNativeAccountOverlay` — in overlay l’hero web (`ClientAccountHeroHeader`) è nascosto: titolo solo nella barra Indietro, contenuto subito visibile senza scroll sotto l’hero.
+
+
+| Area | Base path | `@PreAuthorize` tipico |
+|------|-----------|------------------------|
+| Cliente B2C | `/api/v1/me/appointments`, `/me/salon-clients` | `ROLE_CLIENT` |
+| Chat B2C Premium | `/api/v1/me/salon-clients/chat/**` | `isAuthenticated()` — thread titolare/operatore: vedi regola `luxury-chat` |
+| Titolare | `/api/v1/me/salon/**` | `ROLE_OWNER` |
+| Staff app | `/api/v1/me/staff/**` | `ROLE_STAFF` |
+| Staff sede (header) | `/api/v1/clients`, `/services`, `/operators` | `isAuthenticated()` + `X-Location-Id` |
+| Super admin | `/api/v1/admin/**` | `ROLE_ADMIN` |
+
+Prima di aggiungere endpoint: verifica ruolo minimo e se serve `X-Location-Id` o `StudioGroupOwnerResolver`.
+
+## Chat account (`/account/chat`)
+
+| Ruolo | UI | Deep link tipico |
+|-------|-----|------------------|
+| Cliente | «Le mie chat» — thread salone + operatori (picker) | `/account/chat?salonClientId=` o `?organizationId=` |
+| Titolare Premium | Sidebar anagrafica clienti | `/account/chat?salonClientId=` da `/salone/clienti` |
+| Staff Premium | Solo clienti con appuntamento collegato | stesso link; server forza thread operatore |
+
+Dettaglio thread, read state DB e vincoli: **`.cursor/rules/luxury-chat.mdc`**.

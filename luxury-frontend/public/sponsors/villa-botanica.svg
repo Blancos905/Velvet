@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 72" role="img" aria-label="Villa Botanica">
+  <defs>
+    <linearGradient id="vb-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="55%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#a16207"/>
+    </linearGradient>
+  </defs>
+  <path d="M36 10l18 10v20l-18 12-18-12V20z" fill="rgba(0,0,0,0.28)" stroke="url(#vb-gold)" stroke-width="1.4"/>
+  <path d="M36 22c4 5 6 9 6 13s-2 7-6 9c-4-2-6-5-6-9s2-8 6-13z" fill="url(#vb-gold)"/>
+  <text x="70" y="28" fill="url(#vb-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="10" letter-spacing="0.42em">VILLA</text>
+  <text x="70" y="52" fill="url(#vb-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="22" letter-spacing="0.16em">BOTANICA</text>
+  <path d="M70 34h168" stroke="url(#vb-gold)" stroke-width="0.6" opacity="0.4"/>
+</svg>

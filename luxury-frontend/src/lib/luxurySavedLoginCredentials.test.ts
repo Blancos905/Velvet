@@ -47,22 +47,26 @@ describe("luxurySavedLoginCredentials", () => {
     vi.unstubAllGlobals();
   });
 
-  it("stores email only on web, never password", () => {
-    writeSavedLoginEmail("Owner@Salon.it");
-    writeSavedLoginCredentials("Owner@Salon.it", "secret");
-    expect(localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify({ email: "owner@salon.it" }));
-    expect(readSavedLoginEmail()).toEqual({ email: "owner@salon.it" });
-    expect(readSavedLoginCredentials()).toEqual({ email: "owner@salon.it", password: "" });
+  it("stores email only on web, never password, and keeps salon and staff apart", () => {
+    writeSavedLoginEmail("Owner@Salon.it", "salon");
+    writeSavedLoginCredentials("Owner@Salon.it", "secret", "salon");
+    writeSavedLoginEmail("staff@salon.it", "staff");
+    expect(localStorage.getItem(`${STORAGE_KEY}.salon`)).toBe(JSON.stringify({ email: "owner@salon.it" }));
+    expect(readSavedLoginEmail("salon")).toEqual({ email: "owner@salon.it" });
+    expect(readSavedLoginCredentials("salon")).toEqual({ email: "owner@salon.it", password: "" });
+    expect(readSavedLoginEmail("staff")).toEqual({ email: "staff@salon.it" });
+    expect(readSavedLoginCredentials("staff")).toEqual({ email: "staff@salon.it", password: "" });
   });
 
-  it("migrates legacy payload dropping password on web", () => {
+  it("drops the old shared email so it cannot leak across accounts", () => {
     localStorage.setItem(
       LEGACY_STORAGE_KEY,
       JSON.stringify({ email: "legacy@test.com", password: "secret" }),
     );
-    expect(readSavedLoginEmail()).toEqual({ email: "legacy@test.com" });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ email: "operator@salon.it" }));
+    expect(readSavedLoginEmail("salon")).toBeNull();
     expect(localStorage.getItem(LEGACY_STORAGE_KEY)).toBeNull();
-    expect(localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify({ email: "legacy@test.com" }));
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
   });
 
   it("stores email and password in native app shell", () => {
@@ -77,13 +81,15 @@ describe("luxurySavedLoginCredentials", () => {
       email: "native@test.com",
       password: "secret123",
     });
-    expect(readSavedLoginEmail()).toBeNull();
+    expect(readSavedLoginEmail("salon")).toBeNull();
   });
 
   it("clears stored credentials", () => {
-    writeSavedLoginEmail("clear@test.com");
-    clearSavedLoginCredentials();
-    expect(readSavedLoginEmail()).toBeNull();
+    writeSavedLoginEmail("clear@test.com", "salon");
+    writeSavedLoginEmail("staff@salon.it", "staff");
+    clearSavedLoginCredentials("salon");
+    expect(readSavedLoginEmail("salon")).toBeNull();
+    expect(readSavedLoginEmail("staff")).toEqual({ email: "staff@salon.it" });
 
     vi.stubGlobal("navigator", { userAgent: "SaloniLuxuryApp/1.0" });
     writeSavedLoginCredentials("native@test.com", "secret");

@@ -59,6 +59,7 @@ class FcmPushDispatchServiceTest {
 		when(notification.getId()).thenReturn(notificationId);
 		when(appointment.getId()).thenReturn(APPOINTMENT_ID);
 		when(appointment.getConsumerProfile()).thenReturn(consumer);
+		when(appointment.getStatus()).thenReturn(it.luxury.appointment.domain.AppointmentStatus.CONFIRMED);
 		when(consumer.getId()).thenReturn(CONSUMER_ID);
 		when(userDeviceRepository.findByUserId(CONSUMER_ID))
 				.thenReturn(List.of(new UserDevice(CONSUMER_ID, FCM_TOKEN, it.luxury.notification.domain.DeviceOsType.IOS)));
@@ -67,6 +68,7 @@ class FcmPushDispatchServiceTest {
 
 		ArgumentCaptor<java.util.Map<String, String>> dataCaptor = ArgumentCaptor.forClass(java.util.Map.class);
 		verify(notificationService).sendPushNotification(eq(FCM_TOKEN), eq("Titolo"), eq("Corpo"), dataCaptor.capture());
+		org.assertj.core.api.Assertions.assertThat(dataCaptor.getValue().get("appointmentStatus")).isEqualTo("CONFIRMED");
 	}
 
 	@Test

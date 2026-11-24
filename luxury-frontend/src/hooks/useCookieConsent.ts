@@ -25,9 +25,9 @@ export function useCookieConsent(): CookieConsentPreferences | null {
 }
 
 export function useMapsCookieAllowed(): boolean {
+  const prefs = useCookieConsent();
   // WebView app: anteprima mappa e ricerca geo sono funzioni core (iframe + geocodifica).
   if (isLuxuryNativeAppShell()) return true;
-  const prefs = useCookieConsent();
   if (!prefs) return false;
   return isCookieCategoryAllowed("maps");
 }

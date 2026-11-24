@@ -106,7 +106,8 @@ public class BillingStatusService {
 		if (premiumAccess) {
 			return false;
 		}
-		return "PREMIUM".equals(StudioGroup.canonicalPlanTier(group.getPlanTier()));
+		String tier = StudioGroup.canonicalPlanTier(group.getPlanTier());
+		return "PREMIUM".equals(tier) || "PLUS".equals(tier);
 	}
 
 	private BillingStatusDto fromAccount(

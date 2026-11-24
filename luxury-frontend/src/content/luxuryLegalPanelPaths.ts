@@ -7,6 +7,8 @@ export const LUXURY_LEGAL_PANEL_PATHS = {
   /** Informativa operatori e collaboratori del salone (staff). */
   privacyStaff: "/privacy/staff",
   terms: "/termini",
+  /** Licenza d’uso gratuita per i clienti (sito e app). */
+  freeLicense: "/licenza",
   privacyChoices: "/privacy/scelte",
   cookies: "/privacy/cookie",
   deleteAccount: "/privacy/elimina-account",

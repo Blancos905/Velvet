@@ -190,7 +190,34 @@ public class SuperAdminOverviewActionsService {
 				billingAccount != null ? billingAccount.getSubscriptionStatus() : null,
 				billingAccount != null ? billingAccount.isCancelAtPeriodEnd() : null,
 				billingAccount != null ? billingAccount.getCurrentPeriodEnd() : null,
-				category != null ? category.name() : null);
+				category != null ? category.name() : null,
+				locations.stream().anyMatch(Location::isSponsoredPlacement));
+	}
+
+	/**
+	 * Accende o spegne lo spazio a pagamento «Saloni sponsorizzati» su tutte le sedi dello studio.
+	 * In vetrina pubblica restano solo le sedi visibili e con Premium attivo.
+	 */
+	@Transactional
+	public void setSponsoredPlacement(UUID studioGroupId, Boolean enabled) {
+		if (enabled == null) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"VALIDATION_ERROR",
+					"Indica se il salone è sponsorizzato.");
+		}
+		StudioGroup group = studioGroupRepository.findById(studioGroupId)
+				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Salone non trovato."));
+		List<Location> locations = locationRepository.findByStudioGroup_IdOrderByNameAsc(group.getId());
+		if (locations.isEmpty()) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"SALON_LOCATION_MISSING",
+					"Il salone non ha sedi da mettere in evidenza.");
+		}
+		for (Location location : locations) {
+			location.setSponsoredPlacement(enabled);
+		}
 	}
 
 	@Transactional(readOnly = true)
@@ -272,6 +299,7 @@ public class SuperAdminOverviewActionsService {
 				body.firstName(),
 				body.lastName(),
 				country,
+				null,
 				body.phone(),
 				false,
 				null);
@@ -279,7 +307,13 @@ public class SuperAdminOverviewActionsService {
 
 	@Transactional
 	public void createSalon(SuperAdminCreateSalonRequest body) {
-		String tier = StudioGroup.canonicalPlanTier(body.planTier());
+		if (!"PREMIUM".equalsIgnoreCase(body.planTier() != null ? body.planTier().trim() : "")) {
+			throw new BusinessException(
+					HttpStatus.BAD_REQUEST,
+					"VALIDATION_ERROR",
+					"Il piano disponibile per la creazione di un salone è Premium.");
+		}
+		String tier = "PREMIUM";
 		RegistrationSalonLocation location = new RegistrationSalonLocation(
 				trimToNull(body.salonAddressLine1()),
 				trimToNull(body.salonPostalCode()),
@@ -287,7 +321,7 @@ public class SuperAdminOverviewActionsService {
 				trimToNull(body.salonProvince()),
 				"IT",
 				trimToNull(body.salonName()));
-		ConsumerRegistrationValidator.requireSalonLocationForFreePlan(tier, location);
+		ConsumerRegistrationValidator.requireSalonLocation(location);
 
 		String ownerEmail = body.email().trim().toLowerCase(Locale.ROOT);
 		String ownerSub = accountRegistrationService.registerSalonOwnerImmediate(
@@ -614,7 +648,7 @@ public class SuperAdminOverviewActionsService {
 			@NotBlank @Size(max = 100) String lastName,
 			@Size(max = 40) String phone,
 			@NotBlank @Size(max = 200) String salonName,
-			@NotBlank @Pattern(regexp = "BASE|PREMIUM") String planTier,
+			@NotBlank @Pattern(regexp = "PREMIUM", message = "Il piano disponibile è Premium") String planTier,
 			@Size(max = 200) String salonAddressLine1,
 			@Size(max = 12) String salonPostalCode,
 			@Size(max = 100) String salonCity,
@@ -638,6 +672,10 @@ public class SuperAdminOverviewActionsService {
 			@Email @Size(max = 320) String ownerEmail,
 			@Size(max = 200) String salonName,
 			@Size(max = 100) String salonCity) {
+	}
+
+	public record SuperAdminSponsoredPlacementRequest(
+			@jakarta.validation.constraints.NotNull Boolean enabled) {
 	}
 
 	public record SuperAdminSystemNotificationResult(int deliveredCount) {

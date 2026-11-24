@@ -1,5 +1,5 @@
 /**
- * Clienti operatore staff (`/account/salone/clienti`) — stessa struttura del titolare
+ * Clienti operatore staff (`/salone/clienti`) — stessa struttura del titolare
  * (`luxury-salon-clients-salon.css`) ma con accento GIALLO al posto dell'azzurro.
  * Scoped a `.luxury-clients-dash--salon-side.luxury-clients-dash--staff`.
  * Importato DOPO `luxury-salon-clients-salon.css`.

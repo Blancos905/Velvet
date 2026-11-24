@@ -7,6 +7,7 @@ import it.luxury.common.api.BusinessException;
 import it.luxury.consumer.domain.ConsumerProfile;
 import it.luxury.consumer.domain.ConsumerProfileRepository;
 import it.luxury.consumer.service.LuxuryAccountRegistrationService;
+import it.luxury.notification.service.AccountLifecycleEmailDispatchService;
 import it.luxury.security.auth.LuxuryUserPrincipal;
 import it.luxury.studio.domain.Location;
 import it.luxury.studio.domain.LocationRepository;
@@ -30,6 +31,7 @@ public class MeSalonStaffService {
 	private final LuxuryAccountRegistrationService luxuryAccountRegistrationService;
 	private final AppointmentRepository appointmentRepository;
 	private final ConsumerProfileRepository consumerProfileRepository;
+	private final AccountLifecycleEmailDispatchService accountLifecycleEmailDispatchService;
 
 	public MeSalonStaffService(
 			StudioGroupOwnerResolver studioGroupOwnerResolver,
@@ -37,13 +39,15 @@ public class MeSalonStaffService {
 			StaffOperatorRepository staffOperatorRepository,
 			LuxuryAccountRegistrationService luxuryAccountRegistrationService,
 			AppointmentRepository appointmentRepository,
-			ConsumerProfileRepository consumerProfileRepository) {
+			ConsumerProfileRepository consumerProfileRepository,
+			AccountLifecycleEmailDispatchService accountLifecycleEmailDispatchService) {
 		this.studioGroupOwnerResolver = studioGroupOwnerResolver;
 		this.locationRepository = locationRepository;
 		this.staffOperatorRepository = staffOperatorRepository;
 		this.luxuryAccountRegistrationService = luxuryAccountRegistrationService;
 		this.appointmentRepository = appointmentRepository;
 		this.consumerProfileRepository = consumerProfileRepository;
+		this.accountLifecycleEmailDispatchService = accountLifecycleEmailDispatchService;
 	}
 
 	public List<MeSalonStaffDto> list(LuxuryUserPrincipal principal) {
@@ -77,6 +81,12 @@ public class MeSalonStaffService {
 		saved.setConsumerProfile(account);
 		applyWorkSchedule(saved, body);
 		saved = staffOperatorRepository.save(saved);
+		String salonName = loc.getStudioGroup() != null ? loc.getStudioGroup().getName() : loc.getName();
+		accountLifecycleEmailDispatchService.dispatchStaffInvite(
+				account.getEmail(),
+				account.getDisplayName(),
+				salonName != null ? salonName : "Salone",
+				account.getEmail());
 		return MeSalonStaffDto.from(saved);
 	}
 

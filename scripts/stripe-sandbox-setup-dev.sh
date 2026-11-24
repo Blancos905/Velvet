@@ -23,51 +23,71 @@ if [[ -z "$EMAIL" ]]; then
   exit 1
 fi
 
-echo "→ Creazione sandbox Stripe per $EMAIL …"
-OUT="$("$STRIPE_BIN" sandbox create --email "$EMAIL" 2>&1)"
-echo "$OUT"
-
-SECRET_KEY="$(echo "$OUT" | python3 -c "import sys,json,re; t=sys.stdin.read(); m=re.search(r'\"secret_key\":\\s*\"([^\"]+)\"', t); print(m.group(1) if m else '')")"
-if [[ -z "$SECRET_KEY" ]]; then
-  echo "→ Impossibile leggere secret_key dalla sandbox."
+if ! command -v node >/dev/null 2>&1; then
+  echo "→ Serve Node.js per leggere la risposta di Stripe."
   exit 1
 fi
 
+echo "→ Creazione sandbox Stripe per $EMAIL …"
+OUT="$("$STRIPE_BIN" sandbox create --email "$EMAIL" --non-interactive --color off 2>&1)" || true
+
+SECRET_KEY="$(printf '%s' "$OUT" | node -e '
+let s = "";
+process.stdin.on("data", (d) => { s += d; });
+process.stdin.on("end", () => {
+  const json = s.match(/\{[\s\S]*\}/);
+  if (json) {
+    try {
+      const key = JSON.parse(json[0]).secret_key;
+      if (key) { process.stdout.write(key); return; }
+    } catch { /* testo libero */ }
+  }
+  const line = s.match(/Secret key:\s*(\S+)/);
+  if (line) process.stdout.write(line[1]);
+});
+')"
+if [[ -z "$SECRET_KEY" ]]; then
+  echo "→ Sandbox non creata. Nel terminale esegui: /tmp/stripe login"
+  exit 1
+fi
+echo "→ Sandbox pronta (la chiave non viene stampata)."
+
 PRODUCT_ID="$("$STRIPE_BIN" products create --name "Saloni Luxury Premium" --api-key "$SECRET_KEY" 2>/dev/null \
-  | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")"
+  | node -e 'let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>{process.stdout.write(JSON.parse(s).id||"")})')"
 
 PRICE_ID="$(curl -sS https://api.stripe.com/v1/prices -u "$SECRET_KEY:" \
   -d "product=$PRODUCT_ID" \
-  -d "unit_amount=2000" \
+  -d "unit_amount=4000" \
   -d "currency=eur" \
   -d "recurring[interval]=month" \
-  | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")"
+  | node -e 'let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>{process.stdout.write(JSON.parse(s).id||"")})')"
 
-WHSEC="$("$STRIPE_BIN" listen --api-key "$SECRET_KEY" --forward-to localhost:8080/api/v1/webhooks/stripe --print-secret 2>&1 | tail -1)"
+WHSEC="$("$STRIPE_BIN" listen --api-key "$SECRET_KEY" --forward-to localhost:8081/api/v1/webhooks/stripe --print-secret 2>&1 | tail -1)"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   cp "$ROOT/luxury/spring-dev.local.env.example" "$ENV_FILE"
 fi
 
-python3 - "$ENV_FILE" "$SECRET_KEY" "$PRICE_ID" "$WHSEC" <<'PY'
-import pathlib, re, sys
-path, sk, price, whsec = sys.argv[1:5]
-text = pathlib.Path(path).read_text()
-block = f"""# --- Stripe billing (test mode — sandbox Stripe CLI, scade ~7 giorni: stripe sandbox claim) ---
+node -e '
+const fs = require("fs");
+const [path, sk, price, whsec] = process.argv.slice(1);
+let text = fs.readFileSync(path, "utf8");
+const block = `# --- Stripe billing (test mode — sandbox Stripe CLI, scade ~7 giorni: stripe sandbox claim) ---
 LUXURY_BILLING_ENABLED=true
 LUXURY_FATTURAPA_ENABLED=false
-STRIPE_SECRET_KEY={sk}
-STRIPE_PREMIUM_PRICE_ID={price}
-STRIPE_WEBHOOK_SECRET={whsec}
+STRIPE_SECRET_KEY=${sk}
+STRIPE_PREMIUM_PRICE_ID=${price}
+STRIPE_WEBHOOK_SECRET=${whsec}
 # Webhook forwarder: ./scripts/stripe-listen-dev.sh (terminale separato; usa la stessa STRIPE_SECRET_KEY)
-"""
-if re.search(r"(?m)^# --- Stripe billing.*", text):
-    text = re.sub(r"(?ms)^# --- Stripe billing.*?^# Webhook forwarder:.*\n", block, text, count=1)
-else:
-    text = text.rstrip() + "\n\n" + block
-pathlib.Path(path).write_text(text)
-PY
+`;
+if (/^# --- Stripe billing.*/m.test(text)) {
+  text = text.replace(/^# --- Stripe billing[\s\S]*?^# Webhook forwarder:.*\n/m, block);
+} else {
+  text = text.replace(/\s*$/, "\n\n") + block;
+}
+fs.writeFileSync(path, text);
+' "$ENV_FILE" "$SECRET_KEY" "$PRICE_ID" "$WHSEC"
 
 echo "→ Aggiornato $ENV_FILE"
-echo "→ Riavvia il backend: cd luxury && set -a && source spring-dev.local.env && set +a && ./mvnw spring-boot:run"
+echo "→ Riavvia l'API: docker compose -f infrastructure/docker-compose.dev.yml up -d api"
 echo "→ Webhook (altro terminale): ./scripts/stripe-listen-dev.sh"

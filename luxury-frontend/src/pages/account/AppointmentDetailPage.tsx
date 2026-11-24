@@ -14,6 +14,8 @@ import { useLuxuryAuth } from "../../auth/LuxuryAuthProvider";
 import { STAFF_MEMBER_AGENDA_PATH } from "../../lib/staffMemberAgendaPath";
 import { CLIENT_ACCOUNT_PAGE_SHELL_CLASS } from "../../lib/clientAccountPageShellClasses";
 import { formatPriceEUR } from "../../lib/format";
+import { refreshOrgAvailabilityAfterBooking } from "../../lib/orgAvailabilityRefresh";
+import { suppressConsumerBookingConfirmationPopup } from "../../lib/suppressConsumerBookingConfirmationPopup";
 import "../../styles/luxury-consumer-bookings-page.css";
 import "../../styles/luxury-info-privacy-hero.css";
 import "../../styles/luxury-feedback-client.css";
@@ -70,6 +72,8 @@ type BookingConfirmedLocationState = {
   bookingConfirmed?: {
     startIso: string;
     serviceName?: string;
+    /** Assente = legacy resume: tratta come richiesta in attesa. */
+    pendingApproval?: boolean;
   };
 };
 
@@ -110,10 +114,20 @@ export default function AppointmentDetailPage() {
   const [bookingConfirmedPopup, setBookingConfirmedPopup] = useState<{
     startIso: string;
     serviceName?: string;
+    pendingApproval: boolean;
   } | null>(() => {
     const state = location.state as BookingConfirmedLocationState | null;
     const payload = state?.bookingConfirmed;
-    return payload?.startIso ? payload : null;
+    if (!payload?.startIso) return null;
+    const pendingApproval = payload.pendingApproval !== false;
+    if (!pendingApproval) {
+      suppressConsumerBookingConfirmationPopup(id);
+    }
+    return {
+      startIso: payload.startIso,
+      serviceName: payload.serviceName,
+      pendingApproval,
+    };
   });
   const openReview = searchParams.get("openReview") === "1";
   const rawReturnTo = searchParams.get("returnTo")?.trim() ?? "";
@@ -280,8 +294,12 @@ export default function AppointmentDetailPage() {
         accessToken,
         body: JSON.stringify({ newStart: selectedSlot }),
       });
+      const bookedStart = selectedSlot;
       setSlots([]);
       setSelectedSlot(null);
+      if (a?.locationSlug && bookedStart) {
+        refreshOrgAvailabilityAfterBooking(qc, a.locationSlug, bookedStart);
+      }
       await reload();
       await q.refetch();
       setOkMsg("Orario aggiornato. In attesa di conferma dal salone.");
@@ -303,10 +321,14 @@ export default function AppointmentDetailPage() {
         accessToken,
         body: JSON.stringify({ newStart: selectedSlot }),
       });
+      const bookedStart = selectedSlot;
       setSlots([]);
       setSelectedSlot(null);
       await qc.invalidateQueries({ queryKey: ["me", "salon", "agenda"] });
       await qc.invalidateQueries({ queryKey: ["me", "staff", "agenda"] });
+      if (a.locationSlug && bookedStart) {
+        refreshOrgAvailabilityAfterBooking(qc, a.locationSlug, bookedStart);
+      }
       await q.refetch();
       setOkMsg("Appuntamento modificato con successo.");
     } catch (e) {
@@ -443,7 +465,7 @@ export default function AppointmentDetailPage() {
         <BookingConfirmedModal
           startIso={bookingConfirmedPopup.startIso}
           serviceName={bookingConfirmedPopup.serviceName}
-          pendingApproval
+          pendingApproval={bookingConfirmedPopup.pendingApproval}
           onClose={() => setBookingConfirmedPopup(null)}
         />
       ) : null}

@@ -13,8 +13,20 @@ import {
   messageToNotificationPopup,
   openLuxuryNotificationPopup,
 } from "../lib/luxuryNotificationPopup";
+import { shouldSuppressConsumerBookingConfirmationPopup } from "../lib/suppressConsumerBookingConfirmationPopup";
 
 const CONSUMER_ALERT_BUCKETS = ["BOOKING_CONFIRMATION", "BOOKING_UPDATED", "BOOKING_CANCELLED", "SYSTEM"] as const;
+
+/** Polling più frequente a tab visibile; rallenta in background. */
+const CONSUMER_ALERT_INBOX_POLL_VISIBLE_MS = 3_000;
+const CONSUMER_ALERT_INBOX_POLL_HIDDEN_MS = 20_000;
+const CONSUMER_ALERT_MESSAGES_POLL_VISIBLE_MS = 2_500;
+const CONSUMER_ALERT_MESSAGES_POLL_HIDDEN_MS = 15_000;
+
+function consumerAlertPollInterval(visibleMs: number, hiddenMs: number): number {
+  if (typeof document !== "undefined" && document.hidden) return hiddenMs;
+  return visibleMs;
+}
 
 function alertTitleForMessage(message: MeSalonNotificationMessage): string {
   if (isConsumerAppointmentAlertType(message.notificationType)) {
@@ -25,6 +37,7 @@ function alertTitleForMessage(message: MeSalonNotificationMessage): string {
 
 /**
  * Popup in-app + suono per cliente su nuove notifiche del centro messaggi account.
+ * Attivo ovunque (home/ricerca/vetrina/account) tramite {@link ConsumerNotificationAlertPoller}.
  */
 export function useConsumerNotificationAlerts(enabled = true): void {
   const location = useLocation();
@@ -41,9 +54,10 @@ export function useConsumerNotificationAlerts(enabled = true): void {
     queryKey: ["me", "notifications"],
     queryFn: () => apiJson<MeSalonNotificationInbox>("/api/v1/me/notifications", { accessToken }),
     enabled: eligible,
-    refetchInterval: 20_000,
-    staleTime: 45_000,
-    refetchOnWindowFocus: false,
+    refetchInterval: () =>
+      consumerAlertPollInterval(CONSUMER_ALERT_INBOX_POLL_VISIBLE_MS, CONSUMER_ALERT_INBOX_POLL_HIDDEN_MS),
+    staleTime: 2_000,
+    refetchOnWindowFocus: true,
   });
 
   const attentionTotal = useMemo(() => inboxAttentionTotal(notifInboxQ.data), [notifInboxQ.data]);
@@ -63,9 +77,10 @@ export function useConsumerNotificationAlerts(enabled = true): void {
       return sortMessagesNewestFirst(batches.flat());
     },
     enabled: eligible,
-    refetchInterval: 15_000,
-    staleTime: 10_000,
-    refetchOnWindowFocus: false,
+    refetchInterval: () =>
+      consumerAlertPollInterval(CONSUMER_ALERT_MESSAGES_POLL_VISIBLE_MS, CONSUMER_ALERT_MESSAGES_POLL_HIDDEN_MS),
+    staleTime: 1_500,
+    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {
@@ -77,16 +92,39 @@ export function useConsumerNotificationAlerts(enabled = true): void {
     });
   }, [attentionTotal, eligible, queryClient]);
 
+  /** Al ritorno sulla tab: refetch immediato. */
+  useEffect(() => {
+    if (!eligible || typeof document === "undefined") return;
+    const onVisibilityChange = () => {
+      if (document.visibilityState !== "visible") return;
+      void queryClient.invalidateQueries({ queryKey: ["me", "notifications"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["me", "notifications", "messages", "consumer-alerts"],
+      });
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [eligible, queryClient]);
+
   const baselinedRef = useRef(false);
   const seenIdsRef = useRef(new Set<string>());
   const alertSoundSeenIdsRef = useRef(new Set<string>());
 
   useEffect(() => {
-    if (!eligible || !messagesQ.data) return;
+    if (!eligible) {
+      baselinedRef.current = false;
+      seenIdsRef.current = new Set();
+      alertSoundSeenIdsRef.current = new Set();
+      prevAttentionRef.current = 0;
+      return;
+    }
+    if (!messagesQ.data) return;
 
     const onNotifichePage = location.pathname === "/account/notifiche";
 
     if (!baselinedRef.current) {
+      // Race: prima risposta vuota mentre fetch in corso → non chiudere il baseline.
+      if (messagesQ.data.length === 0 && messagesQ.isFetching) return;
       for (const message of messagesQ.data) {
         if (message.id) {
           seenIdsRef.current.add(message.id);
@@ -114,11 +152,19 @@ export function useConsumerNotificationAlerts(enabled = true): void {
 
       if (onNotifichePage) continue;
       if (seenIdsRef.current.has(message.id)) continue;
+      // Auto-conferma operatore: già mostrato BookingConfirmedModal — niente secondo popup «ha confermato».
+      if (
+        message.notificationType === "BOOKING_CONFIRMATION"
+        && shouldSuppressConsumerBookingConfirmationPopup(message.appointmentId)
+      ) {
+        seenIdsRef.current.add(message.id);
+        continue;
+      }
       seenIdsRef.current.add(message.id);
       openLuxuryNotificationPopup(
         messageToNotificationPopup(message, alertTitleForMessage(message)),
       );
       break;
     }
-  }, [eligible, location.pathname, messagesQ.data]);
+  }, [eligible, location.pathname, messagesQ.data, messagesQ.isFetching]);
 }

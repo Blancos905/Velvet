@@ -23,8 +23,18 @@ luxury/src/main/resources/application-local.properties
 ._*
 .idea/
 *.iml
-.cursor/
+.cursor/*
+!.cursor/hooks.json
+!.cursor/hooks/
+!.cursor/hooks/**
+.cursor/hooks/.verify-pending
+!.cursor/skills/
+!.cursor/skills/**
+!.cursor/rules/
+!.cursor/rules/**
+!.cursor/BUGBOT.md
 scripts/.seed-tmp/
 .npm-cache-codegraph/
+.cache/
 .codegraph/
 

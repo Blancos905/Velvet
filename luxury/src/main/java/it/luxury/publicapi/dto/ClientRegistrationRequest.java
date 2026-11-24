@@ -3,6 +3,7 @@ package it.luxury.publicapi.dto;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -17,10 +18,13 @@ public record ClientRegistrationRequest(
 		@NotBlank
 		@Pattern(regexp = "^[A-Z]{2}$", message = "Paese: usa codice ISO a 2 lettere (es. IT)")
 		String country,
+		@Size(max = 16)
+		@Pattern(regexp = "^(it|en|fr|de|es|pt)$", message = "Lingua UI non supportata")
+		String preferredLocale,
 		@Size(max = 40) String phone,
 		/** Se {@code true}: solo se non esiste ancora super admin (DB/env), crea credenziali piattaforma e ruolo {@code ADMIN}. */
 		Boolean bootstrapSuperAdmin,
-		@AssertTrue(message = "Accetta termini e informativa privacy") Boolean acceptedTermsAndPrivacy,
+			@NotNull @AssertTrue(message = "Accetta termini e informativa privacy") Boolean acceptedTermsAndPrivacy,
 		@Size(max = 40) String legalDocumentVersion
 ) {
 }

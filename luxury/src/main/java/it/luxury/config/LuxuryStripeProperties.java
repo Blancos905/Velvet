@@ -42,7 +42,7 @@ public record LuxuryStripeProperties(
 			checkoutSuccessPath = "/account/billing/success";
 		}
 		if (checkoutCancelPath == null || checkoutCancelPath.isBlank()) {
-			checkoutCancelPath = "/piani/premium-prova";
+			checkoutCancelPath = "/account/billing/checkout";
 		}
 		if (portalReturnPath == null || portalReturnPath.isBlank()) {
 			portalReturnPath = "/account/profilo";

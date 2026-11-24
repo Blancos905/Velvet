@@ -9,7 +9,7 @@ import java.util.Locale;
 /** Branding e testi italiani per Stripe Checkout (allineati al sito Saloni Luxury). */
 final class StripeCheckoutBrandingSupport {
 
-	private static final long PREMIUM_TRIAL_DAYS = 60L;
+	private static final long PREMIUM_TRIAL_DAYS = 30L;
 
 	private StripeCheckoutBrandingSupport() {
 	}
@@ -46,7 +46,7 @@ final class StripeCheckoutBrandingSupport {
 				.setAfterSubmit(
 						SessionCreateParams.CustomText.AfterSubmit.builder()
 								.setMessage(
-										"Dopo la prova l'abbonamento prosegue a 20 €/mese salvo disdetta dal portale Stripe.")
+										"Dopo la prova l'abbonamento prosegue a 40 €/mese salvo disdetta dal portale Stripe.")
 								.build())
 				.build();
 	}

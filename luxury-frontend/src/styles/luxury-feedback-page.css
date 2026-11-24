@@ -409,6 +409,38 @@
   gap: 0.35rem 0.75rem;
 }
 
+.luxury-feedback-page__history-item-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.luxury-feedback-review-delete {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(251, 146, 60, 0.85);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.luxury-feedback-review-delete:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.14);
+  color: #f87171;
+}
+
+.luxury-feedback-review-delete:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
 .luxury-feedback-page__history-salon {
   margin: 0;
   font-size: 0.88rem;

@@ -63,6 +63,26 @@
   outline-offset: 2px;
 }
 
+.luxury-salon-register-box .luxury-salon-register-box__logo-wrap {
+  width: 5.75rem;
+  height: 5.75rem;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  background: #0a0a0a;
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.28),
+    0 0 32px rgba(243, 112, 33, 0.4);
+}
+
+.luxury-salon-register-box__logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 .luxury-salon-register-box .luxury-email-confirm-box__kicker,
 .luxury-salon-register-box .luxury-email-confirm-box__title,
 .luxury-salon-register-box .luxury-email-confirm-box__lead {
@@ -89,6 +109,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.luxury-salon-register-locations__quote,
+.luxury-salon-register-locations__price,
+.luxury-salon-register-locations__confirm,
+.luxury-salon-register-location,
 .luxury-salon-register-box .luxury-plans-field--full,
 .luxury-salon-register-box .luxury-eu-phone-field,
 .luxury-salon-register-box .luxury-plans-fieldset,
@@ -119,6 +143,154 @@
     0 0 0 1px rgba(251, 146, 60, 0.22),
     0 10px 26px rgba(0, 0, 0, 0.28);
   transform: translateY(-1px);
+}
+
+.luxury-salon-register-locations__confirm {
+  justify-self: start;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.32rem 0.72rem;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  text-align: center;
+  text-transform: uppercase;
+  color: #0a0a0a;
+  background: linear-gradient(180deg, #fdba74, #fb923c);
+  border: 1px solid rgba(0, 0, 0, 0.65);
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+}
+
+.luxury-salon-register-locations__confirm:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.luxury-salon-register-locations__confirm:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.luxury-salon-register-locations__quote {
+  margin: 0;
+  padding: 0.8rem 0.95rem;
+  border-radius: 14px;
+  background: rgba(251, 146, 60, 0.12);
+  color: #fff7ed;
+  line-height: 1.45;
+  font-size: 0.95rem;
+}
+
+.luxury-salon-register-locations__price {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  padding: 1rem 1.05rem 0.95rem;
+  border-radius: 1.15rem;
+  text-align: center;
+  border: 1.5px solid rgba(251, 146, 60, 0.55);
+  background:
+    radial-gradient(ellipse 90% 80% at 50% -30%, rgba(249, 115, 22, 0.28), transparent 58%),
+    linear-gradient(165deg, #141414 0%, #0a0a0a 55%, #070707 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 237, 0.08) inset,
+    inset 0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 10px 28px rgba(0, 0, 0, 0.35),
+    0 0 24px rgba(249, 115, 22, 0.16);
+}
+
+.luxury-salon-register-locations__price::before {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #fdba74, #f97316, #fdba74, transparent);
+  box-shadow: 0 0 14px rgba(249, 115, 22, 0.65);
+}
+
+.luxury-salon-register-locations__price-kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fdba74;
+}
+
+.luxury-salon-register-locations__price-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.28rem;
+  margin: 0.35rem 0 0.15rem;
+}
+
+.luxury-salon-register-locations__price-amount {
+  font-size: clamp(2.4rem, 6vw, 3.1rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: #fff7ed;
+  text-shadow: 0 0 22px rgba(249, 115, 22, 0.35);
+}
+
+.luxury-salon-register-locations__price-currency {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fb923c;
+}
+
+.luxury-salon-register-locations__price-period {
+  margin-left: 0.15rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(255, 247, 237, 0.78);
+}
+
+.luxury-salon-register-locations__price-breakdown {
+  margin: 0.45rem auto 0;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(251, 146, 60, 0.4);
+  background: rgba(249, 115, 22, 0.12);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffedd5;
+}
+
+.luxury-salon-register-location {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 0.9rem;
+  margin: 0;
+  padding: 0.9rem 0.8rem 1rem;
+  border: 1px solid rgba(251, 146, 60, 0.35);
+  border-radius: 16px;
+}
+
+.luxury-salon-register-location__legend {
+  grid-column: 1 / -1;
+  padding: 0 0.35rem;
+  color: #fb923c;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+}
+
+.luxury-salon-register-location .luxury-plans-field--full,
+.luxury-salon-register-location > .luxury-plans-salon-types {
+  grid-column: 1 / -1;
 }
 
 .luxury-salon-register-box .luxury-plans-field > span:first-child,
@@ -330,7 +502,8 @@
 
 @media (max-width: 640px) {
   .luxury-salon-register-box--wide .luxury-salon-register-box__form.luxury-plans-modal__form,
-  .luxury-salon-register-box .luxury-plans-password-pair {
+  .luxury-salon-register-box .luxury-plans-password-pair,
+  .luxury-salon-register-location {
     grid-template-columns: 1fr;
   }
 }

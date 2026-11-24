@@ -39,8 +39,9 @@ public class FavoriteLocationService {
 	@Transactional
 	public void add(LuxuryUserPrincipal principal, UUID locationId) {
 		ConsumerProfile p = consumerProfileService.requireActiveProfile(principal);
-		Location loc = locationRepository.findById(locationId)
-				.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Sede non trovata."));
+			Location loc = locationRepository.findById(locationId)
+					.filter(Location::isVisibleToClients)
+					.orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Sede non trovata."));
 		if (favoriteLocationRepository.findByConsumerProfile_IdAndLocation_Id(p.getId(), loc.getId()).isPresent()) {
 			return;
 		}

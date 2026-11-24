@@ -26,6 +26,6 @@ if [[ "${LUXURY_NOTIFICATIONS_FRONTEND_BASE_URL_AUTO:-1}" != "0" ]]; then
 fi
 
 echo "→ Avvio Spring Boot (profilo local). PostgreSQL richiesto su :5432."
-echo "  Health: curl -sf http://127.0.0.1:8080/api/v1/public/health"
+echo "  Health: curl -sf http://127.0.0.1:8081/api/v1/public/health"
 # -q riduce output Maven; -Dmaven.test.skip=true salta compilazione 43 test sources.
 exec ./mvnw -q spring-boot:run -Dmaven.test.skip=true

@@ -17,6 +17,7 @@ import it.luxury.admin.service.SuperAdminOverviewActionsService;
 import it.luxury.admin.service.SuperAdminOverviewActionsService.SuperAdminCreateClientRequest;
 import it.luxury.admin.service.SuperAdminOverviewActionsService.SuperAdminCreateSalonRequest;
 import it.luxury.admin.service.SuperAdminOverviewActionsService.SuperAdminSystemNotificationRequest;
+import it.luxury.admin.service.SuperAdminOverviewActionsService.SuperAdminSponsoredPlacementRequest;
 import it.luxury.admin.service.SuperAdminOverviewActionsService.SuperAdminUpdateSalonRequest;
 import it.luxury.admin.service.SuperAdminOverviewService;
 import it.luxury.admin.service.SuperAdminSupportInboxService;
@@ -219,6 +220,16 @@ public class SuperAdminOverviewController {
 	@SecurityRequirement(name = "bearer-jwt")
 	public void updateSalon(@PathVariable UUID studioGroupId, @RequestBody @Valid SuperAdminUpdateSalonRequest body) {
 		overviewActionsService.updateSalon(studioGroupId, body);
+	}
+
+	@PatchMapping(path = "/salons/{studioGroupId}/sponsored-placement", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@Operation(summary = "Mette o toglie il salone dallo spazio a pagamento «Saloni sponsorizzati»")
+	@SecurityRequirement(name = "bearer-jwt")
+	public void setSponsoredPlacement(
+			@PathVariable UUID studioGroupId,
+			@RequestBody @Valid SuperAdminSponsoredPlacementRequest body) {
+		overviewActionsService.setSponsoredPlacement(studioGroupId, body.enabled());
 	}
 
 	@PostMapping("/salons/{studioGroupId}/owner-session")

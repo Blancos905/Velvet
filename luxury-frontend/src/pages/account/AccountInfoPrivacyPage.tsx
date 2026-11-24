@@ -8,13 +8,11 @@ import {
   INFO_PRIVACY_HERO_ICONS,
   InfoPrivacyAccountHeroHeader,
 } from "../../components/account/InfoPrivacyAccountHeroHeader";
-import { useEffectiveSalonPlanTier } from "../../hooks/useEffectiveSalonPlanTier";
 import { useMeSalonSummaryQuery } from "../../hooks/useMeSalonSummary";
 import { LEGAL_PLATFORM_ADMIN_ACCESS_PARAGRAPH } from "../../content/legalSharedCopy";
 import { useMeStaffSalonQuery } from "../../hooks/useMeStaffSalon";
 import { CLIENT_ACCOUNT_PAGE_SHELL_CLASS } from "../../lib/clientAccountPageShellClasses";
 import { PrivacyPolicyConsumerLayeredContent } from "../legal/PrivacyPolicyConsumerLayeredContent";
-import { SalonFreeOwnerInfoPrivacyContent } from "./SalonFreeOwnerInfoPrivacyContent";
 import { SalonPremiumOwnerInfoPrivacyContent } from "./SalonPremiumOwnerInfoPrivacyContent";
 import { StaffOperatorInfoPrivacyContent } from "./StaffOperatorInfoPrivacyContent";
 import "../../styles/luxury-consumer-bookings-page.css";
@@ -57,23 +55,6 @@ const PREMIUM_OWNER_INFO_PRIVACY_HERO = {
   metaItems: [
     { icon: INFO_PRIVACY_HERO_ICONS.shield, label: "Titolare salone = data controller" },
     { icon: INFO_PRIVACY_HERO_ICONS.user, label: "Clienti, staff e fatturazione" },
-  ],
-} as const;
-
-const FREE_OWNER_INFO_PRIVACY_HERO = {
-  badgePrimary: "Area salone",
-  badgeSecondary: "GDPR art. 13",
-  kickerLabel: "Informativa titolare",
-  kickerChip: "Piano Free",
-  subtitle: (
-    <>
-      Informativa per <strong>titolari con piano Free</strong>: trasparenza sul trattamento dati in{" "}
-      <em>Saloni Luxury</em> — account salone, clienti e documenti ufficiali.
-    </>
-  ),
-  metaItems: [
-    { icon: INFO_PRIVACY_HERO_ICONS.shield, label: "Titolare salone = data controller" },
-    { icon: INFO_PRIVACY_HERO_ICONS.user, label: "Account e documenti" },
   ],
 } as const;
 
@@ -257,7 +238,6 @@ function DefaultAccountInfoPrivacyContent() {
 
 export default function AccountInfoPrivacyPage() {
   const { accessToken, isSalonTitolare, isSalonStaff } = useLuxuryAuth();
-  const salonTier = useEffectiveSalonPlanTier();
   const meSalon = useMeSalonSummaryQuery();
   const staffSalon = useMeStaffSalonQuery();
   const supportQ = useQuery({
@@ -266,26 +246,21 @@ export default function AccountInfoPrivacyPage() {
     enabled: Boolean(accessToken),
   });
 
-  const premiumOwner = isSalonTitolare && salonTier === "PREMIUM" && !isSalonStaff;
-  /** Titolare Free: stesso tema azzurro salone (non viola cliente B2C). */
-  const freeOwner = isSalonTitolare && salonTier === "BASE" && !isSalonStaff;
+  const premiumOwner = isSalonTitolare && !isSalonStaff;
   const staffOperator = isSalonStaff && !isSalonTitolare;
-  const consumerClient = !premiumOwner && !freeOwner && !staffOperator;
-  const salonSideShell =
-    premiumOwner || freeOwner
-      ? ` luxury-info-privacy-hero-page luxury-info-privacy-salon-side ${CLIENT_ACCOUNT_PAGE_SHELL_CLASS}`
-      : staffOperator
-        ? ` luxury-info-privacy-hero-page luxury-info-privacy-staff-side ${CLIENT_ACCOUNT_PAGE_SHELL_CLASS}`
-        : "";
+  const consumerClient = !premiumOwner && !staffOperator;
+  const salonSideShell = premiumOwner
+    ? ` luxury-info-privacy-hero-page luxury-info-privacy-salon-side ${CLIENT_ACCOUNT_PAGE_SHELL_CLASS}`
+    : staffOperator
+      ? ` luxury-info-privacy-hero-page luxury-info-privacy-staff-side ${CLIENT_ACCOUNT_PAGE_SHELL_CLASS}`
+      : "";
 
   return (
     <div
       className={`luxury-account-page-shell luxury-consumer-bookings-dash luxury-consumer-bookings-dash--base44${
         premiumOwner
           ? ` luxury-account-page-shell--info-privacy-premium luxury-info-privacy-premium-page${salonSideShell}`
-          : freeOwner
-            ? ` luxury-account-page-shell--info-privacy-premium luxury-info-privacy-premium-page luxury-info-privacy-free-owner-page${salonSideShell}`
-            : staffOperator
+          : staffOperator
               ? ` luxury-account-page-shell--narrow luxury-info-privacy-staff-page${salonSideShell}`
               : consumerClient
                 ? " luxury-account-page-shell--narrow luxury-info-privacy-consumer-page luxury-info-privacy-hero-page"
@@ -295,8 +270,6 @@ export default function AccountInfoPrivacyPage() {
       <div className="luxury-consumer-bookings-dash__shell">
         {premiumOwner ? (
           <InfoPrivacyAccountHeroHeader {...PREMIUM_OWNER_INFO_PRIVACY_HERO} />
-        ) : freeOwner ? (
-          <InfoPrivacyAccountHeroHeader {...FREE_OWNER_INFO_PRIVACY_HERO} />
         ) : staffOperator ? (
           <InfoPrivacyAccountHeroHeader {...STAFF_INFO_PRIVACY_HERO} />
         ) : consumerClient ? (
@@ -318,11 +291,6 @@ export default function AccountInfoPrivacyPage() {
 
         {premiumOwner ? (
           <SalonPremiumOwnerInfoPrivacyContent
-            supportEmail={supportQ.data?.supportEmail}
-            salonName={meSalon.data?.primaryLocationName}
-          />
-        ) : freeOwner ? (
-          <SalonFreeOwnerInfoPrivacyContent
             supportEmail={supportQ.data?.supportEmail}
             salonName={meSalon.data?.primaryLocationName}
           />

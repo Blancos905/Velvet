@@ -40,7 +40,7 @@ class LuxuryRefreshTokenServiceTest {
 	void setUp() {
 		refreshTokenStore = new InMemoryRefreshTokenStore();
 		LuxurySecurityProperties properties = new LuxurySecurityProperties(
-				"secret", "secret", 24, 15, 30, false, 30, 30);
+				"secret", "secret", 24, 15, 30, 24, false, 30, 30);
 		service = new LuxuryRefreshTokenService(
 				refreshTokenStore,
 				consumerProfileRepository,

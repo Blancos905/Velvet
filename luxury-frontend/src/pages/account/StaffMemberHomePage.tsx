@@ -1,5 +1,6 @@
 import { Link, Navigate } from "react-router-dom";
 import { useLuxuryAuth } from "../../auth/LuxuryAuthProvider";
+import { useLuxuryT } from "../../i18n/useLuxuryLocale";
 import { STAFF_MEMBER_AGENDA_PATH } from "../../lib/staffMemberAgendaPath";
 import "../../styles/luxury-account-salon-services.css";
 import "../../styles/luxury-staff-member-home.css";
@@ -7,6 +8,7 @@ import "../../styles/luxury-staff-member-home.css";
 /** Hub operatore (`/account/staff`) — griglia navigazione + riepilogo; agenda in `/account/staff/agenda`. */
 export default function StaffMemberHomePage() {
   const { isSalonStaff } = useLuxuryAuth();
+  const t = useLuxuryT();
 
   if (!isSalonStaff) {
     return <Navigate to="/account" replace />;
@@ -18,27 +20,23 @@ export default function StaffMemberHomePage() {
         <header className="luxury-staff-member-page__hero">
           <div className="luxury-staff-member-page__hero-glow" aria-hidden />
           <div className="luxury-staff-member-page__hero-inner">
-            <p className="luxury-staff-member-page__kicker">Area personale</p>
+            <p className="luxury-staff-member-page__kicker">{t("account.staff.kicker")}</p>
             <h1 className="luxury-staff-member-page__headline">
-              <span className="luxury-staff-member-page__headline-pre">Ciao </span>
-              <span className="luxury-staff-member-page__headline-accent">membro dello staff</span>
+              <span className="luxury-staff-member-page__headline-pre">{t("account.greeting.hi")} </span>
+              <span className="luxury-staff-member-page__headline-accent">{t("account.staff.headlineAccent")}</span>
             </h1>
-            <p className="luxury-staff-member-page__lead">
-              Prenotazioni, notifiche e chat con i clienti del salone — tutto dalla griglia sopra.
-            </p>
+            <p className="luxury-staff-member-page__lead">{t("account.staff.lead")}</p>
           </div>
         </header>
 
-        <section className="luxury-staff-member-page__hub-card" aria-label="Accesso rapido agenda">
+        <section className="luxury-staff-member-page__hub-card" aria-label={t("account.staff.quickNavAria")}>
           <div className="luxury-staff-member-page__hub-card-glow" aria-hidden />
           <div className="luxury-staff-member-page__hub-card-inner">
-            <p className="luxury-staff-member-page__hub-card-kicker">Agenda</p>
-            <h2 className="luxury-staff-member-page__hub-card-title">Le tue prenotazioni</h2>
-            <p className="luxury-staff-member-page__hub-card-lead">
-              Settimana per settimana: appuntamenti assegnati a te, conferme e cambi orario.
-            </p>
+            <p className="luxury-staff-member-page__hub-card-kicker">{t("account.staff.agendaKicker")}</p>
+            <h2 className="luxury-staff-member-page__hub-card-title">{t("account.staff.agendaTitle")}</h2>
+            <p className="luxury-staff-member-page__hub-card-lead">{t("account.staff.agendaLead")}</p>
             <Link to={STAFF_MEMBER_AGENDA_PATH} className="luxury-staff-member-page__hub-card-cta">
-              Apri la mia agenda
+              {t("account.staff.agendaCta")}
             </Link>
           </div>
         </section>

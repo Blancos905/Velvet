@@ -4,9 +4,11 @@ import { apiJson } from "../../api/client";
 import type { SuperAdminOverviewResponseDto } from "../../api/types";
 import { useAdminAuth } from "../../auth/AdminAuthProvider";
 import { useAdminSupportAlerts } from "../../hooks/useAdminSupportAlerts";
+import { useLuxuryT } from "../../i18n/useLuxuryLocale";
 import { useLuxuryInAppSoundPrime } from "../../hooks/useLuxuryInAppSoundPrime";
 
 export function AdminLayout() {
+  const t = useLuxuryT();
   const { pathname } = useLocation();
   const isProfilePage = pathname === "/admin/profilo" || pathname.endsWith("/admin/profilo");
   const { accessToken, isAdminSession, signOut } = useAdminAuth();
@@ -74,6 +76,13 @@ export function AdminLayout() {
               title="Fatture elettroniche FatturaPA generate dai pagamenti Premium"
             >
               Fatture
+            </NavLink>
+            <NavLink
+              to="/admin/sponsor"
+              className={({ isActive }) => (isActive ? "is-active" : "")}
+              title={t("admin.sponsors.navTitle")}
+            >
+              {t("admin.sponsors.nav")}
             </NavLink>
             <NavLink to="/admin/profilo" className={({ isActive }) => (isActive ? "is-active" : "")}>
               Profilo

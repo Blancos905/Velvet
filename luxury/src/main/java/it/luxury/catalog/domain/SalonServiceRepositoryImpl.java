@@ -35,7 +35,7 @@ public class SalonServiceRepositoryImpl implements SalonServiceRepositoryCustom 
 				select distinct s from SalonService s
 				join fetch s.location l
 				join fetch l.studioGroup g
-				where upper(trim(g.planTier)) in ('PREMIUM', 'STANDARD', 'FULL')
+				where upper(trim(g.planTier)) in ('PREMIUM', 'PLUS', 'STANDARD', 'FULL')
 				  and (
 				""");
 		for (int i = 0; i < needles.size(); i++) {

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" role="img" aria-label="Studio Ambra">
+  <defs>
+    <linearGradient id="sa-gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff7ed"/>
+      <stop offset="35%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#9a3412"/>
+    </linearGradient>
+  </defs>
+  <circle cx="36" cy="36" r="26" fill="rgba(0,0,0,0.28)" stroke="url(#sa-gold)" stroke-width="1.35"/>
+  <path d="M36 18l10 18-10 18-10-18z" fill="url(#sa-gold)"/>
+  <path d="M36 26l5 10-5 10-5-10z" fill="#431407" opacity="0.25"/>
+  <text x="74" y="28" fill="url(#sa-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="10" letter-spacing="0.4em">STUDIO</text>
+  <text x="74" y="52" fill="url(#sa-gold)" font-family="Georgia, 'Times New Roman', serif" font-size="24" letter-spacing="0.18em">AMBRA</text>
+  <path d="M74 34h140" stroke="url(#sa-gold)" stroke-width="0.6" opacity="0.4"/>
+</svg>

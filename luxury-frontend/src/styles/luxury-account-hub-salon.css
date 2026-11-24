@@ -609,3 +609,8 @@
     }
   }
 }
+
+/* Stesse card di prima, solo un filo più piccole, senza cambiare proporzioni. */
+.luxury-account-hub--salon-owner.luxury-account-hub--luxury-plans {
+  zoom: 0.92;
+}

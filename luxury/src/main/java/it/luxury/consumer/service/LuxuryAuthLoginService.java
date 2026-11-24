@@ -5,6 +5,7 @@ import it.luxury.config.LuxurySecurityProperties;
 import it.luxury.consumer.domain.ConsumerProfile;
 import it.luxury.consumer.domain.ConsumerProfileRepository;
 import it.luxury.security.audit.SecurityAuditService;
+import it.luxury.security.auth.LoginDeviceAlertService;
 import it.luxury.security.auth.LuxuryRefreshTokenService;
 import it.luxury.security.auth.LuxuryTokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ public class LuxuryAuthLoginService {
 	private final SalonOwnerRoleAlignmentService salonOwnerRoleAlignmentService;
 	private final SecurityAuditService securityAuditService;
 	private final LuxuryEmailVerificationService luxuryEmailVerificationService;
+	private final LoginDeviceAlertService loginDeviceAlertService;
 
 	public LuxuryAuthLoginService(
 			ConsumerProfileRepository consumerProfileRepository,
@@ -34,7 +36,8 @@ public class LuxuryAuthLoginService {
 			LuxurySecurityProperties securityProperties,
 			SalonOwnerRoleAlignmentService salonOwnerRoleAlignmentService,
 			SecurityAuditService securityAuditService,
-			LuxuryEmailVerificationService luxuryEmailVerificationService) {
+			LuxuryEmailVerificationService luxuryEmailVerificationService,
+			LoginDeviceAlertService loginDeviceAlertService) {
 		this.consumerProfileRepository = consumerProfileRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.luxuryTokenService = luxuryTokenService;
@@ -43,6 +46,7 @@ public class LuxuryAuthLoginService {
 		this.salonOwnerRoleAlignmentService = salonOwnerRoleAlignmentService;
 		this.securityAuditService = securityAuditService;
 		this.luxuryEmailVerificationService = luxuryEmailVerificationService;
+		this.loginDeviceAlertService = loginDeviceAlertService;
 	}
 
 	public AuthLoginResult login(String email, String password, HttpServletRequest request) {
@@ -76,6 +80,7 @@ public class LuxuryAuthLoginService {
 		ConsumerProfile forToken = consumerProfileRepository.findById(p.getId()).orElse(p);
 		LuxuryRefreshTokenService.RefreshTokenPair tokens = luxuryRefreshTokenService.issueForProfile(forToken, request);
 		securityAuditService.record("AUTH_LOGIN", "SUCCESS", forToken.getAuthSub(), forToken.getId(), request, null);
+		loginDeviceAlertService.afterSuccessfulPasswordLogin(forToken, request);
 		return new AuthLoginResult(
 				tokens.accessToken(),
 				tokens.refreshToken(),

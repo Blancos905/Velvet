@@ -53,12 +53,12 @@ export function AppHeaderProfileMenu({
       dropdown.style.bottom = "auto";
     };
     syncDropdownPosition();
+    const dropdown = profileDropdownRef.current;
     window.addEventListener("resize", syncDropdownPosition);
     window.addEventListener("scroll", syncDropdownPosition, true);
     return () => {
       window.removeEventListener("resize", syncDropdownPosition);
       window.removeEventListener("scroll", syncDropdownPosition, true);
-      const dropdown = profileDropdownRef.current;
       if (dropdown) {
         dropdown.style.position = "";
         dropdown.style.top = "";

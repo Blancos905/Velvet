@@ -1,12 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
 import { NationsCupTrophyIcon } from "../components/NationsCupTrophyIcon";
 import { useLuxuryNativeAppShell } from "../hooks/useLuxuryNativeAppShell";
+import { useLuxuryT } from "../i18n/useLuxuryLocale";
 import "../styles/luxury-search-page.css";
 import "../styles/nations-cup-page.css";
 
 export default function NationsCupPage() {
   const navigate = useNavigate();
   const isNativeApp = useLuxuryNativeAppShell();
+  const t = useLuxuryT();
 
   return (
     <main
@@ -19,7 +21,7 @@ export default function NationsCupPage() {
         <button
           type="button"
           className="luxury-search-back"
-          aria-label="Torna alla home"
+          aria-label={t("home.nationsCup.backHomeAria")}
           onClick={() => navigate("/")}
         >
           <svg className="luxury-search-back__icon" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -31,7 +33,7 @@ export default function NationsCupPage() {
               strokeLinejoin="round"
             />
           </svg>
-          Torna alla home
+          {t("home.nationsCup.backHome")}
         </button>
       </div>
 
@@ -41,18 +43,21 @@ export default function NationsCupPage() {
         <div className="luxury-nations-cup-hero__cup-wrap" aria-hidden>
           <NationsCupTrophyIcon className="luxury-nations-cup-hero__cup" />
         </div>
-        <p className="luxury-nations-cup-eyebrow">Saloni Luxury · Italia</p>
+        <p className="luxury-nations-cup-eyebrow">{t("home.nationsCup.eyebrow")}</p>
         <h1 className="luxury-page-title luxury-nations-cup-hero__title">
-          <span className="luxury-search-hero__title-text">Nations Cup</span>
+          <span className="luxury-search-hero__title-text">{t("home.nationsCup.title")}</span>
         </h1>
 
         <p className="luxury-nations-cup-lead">
-          Presto su Saloni Luxury potrai scoprire i migliori <strong>saloni</strong> e{" "}
-          <strong>operatori</strong> d&apos;Italia.
+          {t("home.nationsCup.leadPart1")}
+          <strong>{t("home.nationsCup.leadSalons")}</strong>
+          {t("home.nationsCup.leadPart2")}
+          <strong>{t("home.nationsCup.leadOperators")}</strong>
+          {t("home.nationsCup.leadPart3")}
         </p>
         <span className="luxury-nations-cup-status">
           <span className="luxury-nations-cup-status__dot" aria-hidden />
-          In arrivo
+          {t("home.nationsCup.badge")}
         </span>
       </header>
 
@@ -67,7 +72,7 @@ export default function NationsCupPage() {
               strokeLinecap="round"
             />
           </svg>
-          <span className="luxury-nations-cup-back-link__text">Torna alla ricerca saloni</span>
+          <span className="luxury-nations-cup-back-link__text">{t("home.nationsCup.backSearch")}</span>
           <svg className="luxury-nations-cup-back-link__arrow" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path
               d="M5 12h12M13 6l6 6-6 6"

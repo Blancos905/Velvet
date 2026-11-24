@@ -44,7 +44,8 @@ export const TERMS_OF_SERVICE_DOCUMENT = {
     {
       heading: "4. Piani e funzioni",
       paragraphs: [
-        "Le funzioni disponibili dipendono dal piano (Free o Premium) e dallo stato dell’account. La registrazione al piano Free per titolari salone è disponibile dall’app mobile; il pannello web completo per titolari Free è limitato come descritto nel servizio.",
+        "Le funzioni disponibili dipendono dal piano Premium e dallo stato dell’account. Il piano commerciale per i titolari è Premium; chat, vetrina pubblica e statistiche sono attive solo con abbonamento Premium attivo.",
+        "L’uso del sito e dell’app da parte dei clienti è coperto dalla licenza gratuita d’uso pubblicata su /licenza. Quella licenza non sostituisce il piano Premium dei titolari.",
         "Il piano Premium consente funzioni aggiuntive (brand, vetrina, statistiche, pannello web completo e altre leve descritte nella pagina Piani). I dettagli commerciali e tecnici possono evolvere nel tempo: in caso di modifiche rilevanti per gli abbonamenti a pagamento, Saloni Luxury ne dà comunicazione con congruo preavviso ove richiesto dalla legge applicabile.",
         "Alcune integrazioni o personalizzazioni possono richiedere accordi aggiuntivi con Saloni Luxury.",
       ],

@@ -6,9 +6,16 @@ package it.luxury.consumer.service;
  * @param emailVerificationRequired true se serve conferma email prima del pagamento / attivazione
  * @param premiumCheckoutToken token per Stripe Checkout quando email già verificata o verifica disabilitata
  */
-public record SalonPartnerRegistrationOutcome(boolean emailVerificationRequired, String premiumCheckoutToken) {
+public record SalonPartnerRegistrationOutcome(
+		boolean emailVerificationRequired,
+		String premiumCheckoutToken,
+		String pollSecret) {
+
+	public SalonPartnerRegistrationOutcome(boolean emailVerificationRequired, String premiumCheckoutToken) {
+		this(emailVerificationRequired, premiumCheckoutToken, null);
+	}
 
 	public SalonPartnerRegistrationOutcome(boolean emailVerificationRequired) {
-		this(emailVerificationRequired, null);
+		this(emailVerificationRequired, null, null);
 	}
 }

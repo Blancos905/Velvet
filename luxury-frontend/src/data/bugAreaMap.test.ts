@@ -17,7 +17,7 @@ describe("bugAreaMap", () => {
   });
 
   it("risolve route account salone", () => {
-    const areas = findBugAreasBySurface("/account/salone/statistiche");
+    const areas = findBugAreasBySurface("/salone/statistiche");
     expect(areas.some((entry) => entry.tag === "statistiche")).toBe(true);
   });
 

@@ -4,7 +4,7 @@ import { defineConfig, loadEnv } from "vite";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const apiProxyTarget = (env.VITE_PROXY_API_TARGET ?? "http://127.0.0.1:8080").replace(/\/+$/, "");
+  const apiProxyTarget = (env.VITE_PROXY_API_TARGET ?? "http://127.0.0.1:8081").replace(/\/+$/, "");
 
   /** Stesso proxy in `server` e `preview`: senza questo, `vite preview` su localhost non inoltra `/api` e vedi 404. */
   const proxy = {
@@ -12,8 +12,16 @@ export default defineConfig(({ mode }) => {
       // 127.0.0.1 evita mismatch IPv6 (::1) vs JVM su IPv4 — altrimenti il proxy fallisce e in UI vedi errori
       // senza alcuna richiesta (e nessun log) sul backend Spring.
       // Lab / VM (es. porta 8082): in .env.development impostare VITE_PROXY_API_TARGET=http://192.168.x.x:8082
+      // Dev locale default: profilo Spring `local` → :8081
       target: apiProxyTarget,
       changeOrigin: true,
+      configure: (proxyServer) => {
+        proxyServer.on("proxyReq", (proxyReq) => {
+          // Il browser è same-origin con Vite. Inoltrare Origin fa applicare il CORS di Spring:
+          // un IP hotspot/LAN fuori lista (es. 172.20.x:5173) riceve 403 «Invalid CORS request» sul login.
+          proxyReq.removeHeader("origin");
+        });
+      },
     },
     // Nominatim: il browser non può chiamarlo in modo affidabile (CORS / User-Agent). In dev usiamo il proxy Vite.
     "/nominatim": {
@@ -37,13 +45,37 @@ export default defineConfig(({ mode }) => {
     ? { allow: [process.cwd(), path.resolve(repoRoot)] as string[] }
     : undefined;
 
+  /** Dev APK sideload: header corretti così Chrome Android salva `/dev/*.apk`. */
+  const luxuryDevApkPlugin = {
+    name: "luxury-dev-apk-headers",
+    configureServer(server: { middlewares: { use: (fn: unknown) => void } }) {
+      server.middlewares.use(
+        (
+          req: { url?: string },
+          res: { setHeader: (k: string, v: string) => void },
+          next: () => void,
+        ) => {
+          const pathOnly = (req.url ?? "").split("?")[0] ?? "";
+          if (pathOnly.startsWith("/dev/") && pathOnly.endsWith(".apk")) {
+            const name = pathOnly.split("/").pop() || "saloni-luxury.apk";
+            res.setHeader("Content-Type", "application/vnd.android.package-archive");
+            res.setHeader("Content-Disposition", `attachment; filename="${name}"`);
+            res.setHeader("Cache-Control", "no-store");
+            res.setHeader("Accept-Ranges", "bytes");
+          }
+          next();
+        },
+      );
+    },
+  };
+
   return {
     cacheDir: viteCacheDir,
     /** Pre-bundle esplicito: evita 504 «Outdated Optimize Dep» su react-rnd dopo npm install / HMR. */
     optimizeDeps: {
       include: ["react-rnd", "re-resizable", "react-draggable", "tslib"],
     },
-    plugins: [react()],
+    plugins: [react(), luxuryDevApkPlugin],
     build: {
       rollupOptions: {
         output: {

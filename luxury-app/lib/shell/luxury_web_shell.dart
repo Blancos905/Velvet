@@ -13,24 +13,20 @@ import '../geolocation/luxury_geolocation_web_bridge.dart';
 import '../geolocation/luxury_native_geolocation_service.dart';
 import '../push/luxury_fcm_service.dart';
 import '../push/luxury_fcm_web_bridge.dart';
-import '../config/luxury_subscription_guards.dart';
 import '../deeplink/luxury_app_link_listener.dart';
-import '../free/luxury_free_plan_policy.dart';
 import '../security/luxury_domain_guard.dart';
 import '../session/luxury_salon_session.dart';
 import '../session/luxury_session_controller.dart';
 import '../theme/luxury_premium_shell_theme.dart';
 import '../webview/luxury_ios_webview_keyboard.dart';
-import 'luxury_free_web_bridge.dart';
+import '../webview/luxury_webview_file_selector.dart';
 import 'luxury_native_app_web_bridge.dart';
-import 'luxury_paywall_overlay.dart';
-import 'luxury_paywall_web_bridge.dart';
 import 'luxury_profile_menu_item.dart';
 import 'luxury_profile_menu_sheet.dart';
 import 'luxury_profile_menu_web_bridge.dart';
 import 'luxury_shell_loading_overlay.dart';
 
-/// Carica **luxury-frontend** in WebView; per titolari piano Free applica tema e vincoli solo in app.
+/// Carica **luxury-frontend** in WebView. Tema shell Premium; nessun vincolo di piano.
 class LuxuryWebShell extends StatefulWidget {
   const LuxuryWebShell({
     super.key,
@@ -53,9 +49,7 @@ class _LuxuryWebShellState extends State<LuxuryWebShell> with WidgetsBindingObse
   var _hasFinishedInitialLoad = false;
   var _loadError = false;
   var _mainFrameRetryCount = 0;
-  var _showPaywall = false;
   var _showProfileMenu = false;
-  String? _blockedFeatureTitle;
   String _currentWebPath = '/';
   var _fcmInitialized = false;
   var _webShellActive = true;
@@ -63,8 +57,6 @@ class _LuxuryWebShellState extends State<LuxuryWebShell> with WidgetsBindingObse
   bool get _canUseWebController => _webShellActive && mounted;
 
   LuxurySessionController? get _session => widget.sessionController;
-
-  bool get _isFreeOwner => _session?.isFreeSalonOwner ?? false;
 
   Color get _shellBackground => LuxuryPremiumShellTheme.surface;
 
@@ -109,13 +101,6 @@ class _LuxuryWebShellState extends State<LuxuryWebShell> with WidgetsBindingObse
             return;
           }
           unawaited(_openProfileMenu());
-        },
-      )
-      ..addJavaScriptChannel(
-        LuxuryPaywallWebBridge.channelName,
-        onMessageReceived: (message) {
-          if (!_webShellActive) return;
-          _handlePaywallChannelMessage(message.message);
         },
       )
       ..setNavigationDelegate(
@@ -217,6 +202,7 @@ class _LuxuryWebShellState extends State<LuxuryWebShell> with WidgetsBindingObse
           );
         },
       );
+      await platform.setOnShowFileSelector(luxuryAndroidWebViewFileSelector);
     } else if (platform is WebKitWebViewController) {
       await platform.setOnPlatformPermissionRequest((request) async {
         await request.grant();
@@ -353,7 +339,6 @@ class _LuxuryWebShellState extends State<LuxuryWebShell> with WidgetsBindingObse
   void _onSessionChanged() {
     if (!mounted) return;
     _controller.setBackgroundColor(_shellBackground);
-    _applyFreeModeToWebView();
     _applyProfileMenuToWebView();
     if (_profileMenuItems.isEmpty) {
       _showProfileMenu = false;
@@ -380,7 +365,6 @@ class _LuxuryWebShellState extends State<LuxuryWebShell> with WidgetsBindingObse
     await _controller.runJavaScript(LuxuryFcmWebBridge.flushPendingPushOpenScript);
     await _session?.syncFromWebView(_controller);
     await _refreshWebPathAndShell();
-    await _applyFreeModeToWebView();
     await _applyProfileMenuToWebView();
     await _installSessionSyncWatcher();
   }
@@ -421,7 +405,6 @@ class _LuxuryWebShellState extends State<LuxuryWebShell> with WidgetsBindingObse
     await _session?.syncFromWebView(_controller);
     if (!mounted) return;
     await _refreshWebPathAndShell();
-    await _applyFreeModeToWebView();
     await _applyProfileMenuToWebView();
     if (_profileMenuItems.isEmpty) {
       _showProfileMenu = false;
@@ -432,7 +415,7 @@ class _LuxuryWebShellState extends State<LuxuryWebShell> with WidgetsBindingObse
   Future<void> _refreshWebPathAndShell() async {
     final url = await _controller.currentUrl();
     if (url == null || !mounted) return;
-    final path = LuxuryFreePlanPolicy.normalizePath(Uri.parse(url).path);
+    final path = _normalizeWebPath(Uri.parse(url).path);
     final pathChanged = path != _currentWebPath;
     if (pathChanged) {
       setState(() => _currentWebPath = path);
@@ -500,22 +483,14 @@ class _LuxuryWebShellState extends State<LuxuryWebShell> with WidgetsBindingObse
     return LuxuryProfileMenuWebBridge.itemsForSession(session);
   }
 
-  Future<void> _applyFreeModeToWebView() async {
-    if (_isFreeOwner) {
-      await _controller.runJavaScript(
-        LuxurySubscriptionGuards.installNativeWebViewGuardsScript,
-      );
-      await _controller.runJavaScript(LuxuryFreeWebBridge.applyFreeOwnerModeScript);
-      await _controller.runJavaScript(LuxuryFreeWebBridge.filterNavigationScript);
-      await _controller.runJavaScript(
-        LuxuryFreeWebBridge.applyFreeServiziNoPhotoScript,
-      );
-      await _controller.runJavaScript(
-        LuxuryFreeWebBridge.applyFreeAgendaRestrictionsScript,
-      );
-    } else {
-      await _controller.runJavaScript(LuxuryFreeWebBridge.removeFreeOwnerModeScript);
+  String _normalizeWebPath(String path) {
+    var normalized = path.trim();
+    if (normalized.isEmpty) return '/';
+    if (!normalized.startsWith('/')) normalized = '/$normalized';
+    if (normalized.length > 1 && normalized.endsWith('/')) {
+      normalized = normalized.substring(0, normalized.length - 1);
     }
+    return normalized;
   }
 
   NavigationDecision _onNavigationRequest(NavigationRequest request) {
@@ -544,53 +519,7 @@ class _LuxuryWebShellState extends State<LuxuryWebShell> with WidgetsBindingObse
       return NavigationDecision.prevent;
     }
 
-    if (_isFreeOwner && _isBlockedAccountPath(uri.path)) {
-      _showPaywallForPath(uri.path);
-      return NavigationDecision.prevent;
-    }
-
     return NavigationDecision.navigate;
-  }
-
-  bool _isBlockedAccountPath(String path) {
-    final normalized = LuxuryFreePlanPolicy.normalizePath(path);
-    if (!normalized.startsWith('/account')) {
-      return false;
-    }
-    return !LuxuryFreePlanPolicy.isPathAllowed(normalized);
-  }
-
-  void _showPaywallForPath(String path) {
-    _openPaywall(LuxuryFreePlanPolicy.paywallFeatureTitleForPath(path));
-  }
-
-  void _openPaywall([String? featureTitle]) {
-    if (!mounted) return;
-    setState(() {
-      _showPaywall = true;
-      _blockedFeatureTitle = featureTitle?.trim().isNotEmpty == true ? featureTitle!.trim() : null;
-    });
-  }
-
-  void _handlePaywallChannelMessage(String raw) {
-    var featureTitle = raw.trim();
-    if (featureTitle.startsWith('{')) {
-      try {
-        final decoded = jsonDecode(raw);
-        if (decoded is Map && decoded['feature'] != null) {
-          featureTitle = decoded['feature'].toString().trim();
-        }
-      } catch (_) {}
-    }
-    _openPaywall(featureTitle.isEmpty ? null : featureTitle);
-  }
-
-  void _dismissPaywall() {
-    if (!mounted) return;
-    setState(() {
-      _showPaywall = false;
-      _blockedFeatureTitle = null;
-    });
   }
 
   Future<void> _bootstrapInitialNavigation() async {
@@ -730,10 +659,6 @@ class _LuxuryWebShellState extends State<LuxuryWebShell> with WidgetsBindingObse
       _closeProfileMenu();
       return false;
     }
-    if (_showPaywall) {
-      _dismissPaywall();
-      return false;
-    }
     if (await _controller.canGoBack()) {
       await _controller.goBack();
       return false;
@@ -809,11 +734,6 @@ class _LuxuryWebShellState extends State<LuxuryWebShell> with WidgetsBindingObse
                       ],
                     ),
                   ),
-                ),
-              if (_showPaywall)
-                LuxuryPaywallOverlay(
-                  featureTitle: _blockedFeatureTitle,
-                  onDismiss: _dismissPaywall,
                 ),
               if (_showProfileMenu && _profileMenuItems.isNotEmpty)
                 LuxuryProfileMenuSheet(

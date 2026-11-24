@@ -22,7 +22,6 @@ import { useMeSalonChatUnreadQuery } from "../../hooks/useMeSalonChatUnread";
 import { useMeSalonSummaryQuery } from "../../hooks/useMeSalonSummary";
 import { useSalonShowcaseOwnerMigration } from "../../hooks/useSalonShowcaseOwnerMigration";
 import { useMeStaffSalonQuery } from "../../hooks/useMeStaffSalon";
-import { useConsumerNotificationAlerts } from "../../hooks/useConsumerNotificationAlerts";
 import { useLuxuryEmbeddedPanel } from "../../hooks/useLuxuryEmbeddedPanel";
 import { isLuxuryNativeAppShell } from "../../hooks/useLuxuryNativeAppShell";
 import { openLuxuryNotificationPopup, storePendingNotificationPopup } from "../../lib/luxuryNotificationPopup";
@@ -31,8 +30,11 @@ import { scrollAccountHubToContent, ensureNativeAccountHubScrolledToTop } from "
 import { prefetchCommonAccountRoutes } from "../../lib/prefetchAccountRoutes";
 import { nativeAccountOverlayTitle } from "../../lib/nativeAccountOverlayTitle";
 import {
+  accountRouteOpensOverlay,
+  isBillingStandaloneAccountPath,
   isNativeAccountHubPath,
   nativeAccountHubFallbackPath,
+  normalizeAccountPath,
 } from "../../lib/nativeAccountHubPaths";
 import { STAFF_MEMBER_AGENDA_PATH } from "../../lib/staffMemberAgendaPath";
 import { readSalonClientsNavDebugEnabled } from "../../lib/salonClientsNavDebug";
@@ -59,7 +61,6 @@ import {
   readSalonReviewLastSeenAt,
   writeSalonReviewLastSeenAt,
 } from "../../lib/salonReviewNotifications";
-import { isSalonFreeOwnerBlockedOnWeb } from "../../lib/subscription-guards";
 import { notifyNativeSalonSessionSync } from "../../lib/notifyNativeSalonSessionSync";
 import { readSalonBrandingNameFromAccessToken } from "../../lib/luxuryJwtHintsFromAccessToken";
 import "../../styles/account-hub.css";
@@ -71,10 +72,12 @@ import "../../styles/salon-notifications.css";
 import { AccountHubNavOwnerConsumerLinks } from "./AccountHubNavOwnerConsumerLinks";
 import { AccountHubNavPremiumSalonLinks } from "./AccountHubNavPremiumSalonLinks";
 import { AccountHubNavLink } from "./AccountHubNavLink";
-import { SalonFreeWebPanelGate } from "./SalonFreeWebPanelGate";
 import { accountHubNavBtn as navBtn } from "./accountHubNavBtn";
+import { AdPopupHost } from "../../components/AdPopupHost";
+import { useLuxuryT } from "../../i18n/useLuxuryLocale";
 
 export function AccountLayout() {
+  const t = useLuxuryT();
   const location = useLocation();
   const navigate = useNavigate();
   const embedded = useLuxuryEmbeddedPanel();
@@ -88,7 +91,7 @@ export function AccountLayout() {
   }, []);
 
   useEffect(() => {
-    if (!location.pathname.startsWith("/account")) return;
+    if (!location.pathname.startsWith("/account") && !location.pathname.startsWith("/salone")) return;
     if (embedded) return;
 
     const onHub =
@@ -124,19 +127,19 @@ export function AccountLayout() {
   const isSuperAdminViewingAsSalonOwner = isAdminSession && isSalonTitolare && !isLuxurySuperAdmin;
   const salonTier = useEffectiveSalonPlanTier();
   const isPremiumActive = useSalonPremiumActive();
-  /** Nav Premium: piano registrato PREMIUM (Brand, Statistiche, …). L’accesso alle pagine resta legato al pagamento. */
-  const showPremiumSalonNav = isSalonTitolare && salonTier === "PREMIUM";
+  /** Nav Premium: piano registrato PREMIUM. L’accesso alle pagine resta legato a hasActivePremium. */
+  const showPremiumSalonNav = isSalonTitolare && (salonTier === "PREMIUM" || salonTier === "PLUS");
 
-  /** Free → Premium: aggiorna shell Flutter (togli nav Free bloccata, mostra tasti Premium). */
+  /** Dopo l’attivazione Premium, la shell Flutter rilegge JWT e GET /me/salon. */
   useEffect(() => {
     if (!isNativeApp || !showPremiumSalonNav) return;
     notifyNativeSalonSessionSync();
   }, [isNativeApp, showPremiumSalonNav]);
 
   const salonPlanBadgeLabel =
-    isSalonTitolare && salonTier === "PREMIUM" && !isPremiumActive
-      ? "Premium · attiva abbonamento"
-      : `Piano ${planDisplayName(salonTier)}`;
+    isSalonTitolare && (salonTier === "PREMIUM" || salonTier === "PLUS") && isPremiumActive
+      ? t("account.plan.named", { name: planDisplayName(salonTier) })
+      : t("account.plan.premiumActivate");
   const meSalon = useMeSalonSummaryQuery();
   useSalonShowcaseOwnerMigration();
   const slugForClientsBadgeFallback = meSalon.data?.primaryLocationSlug?.trim() ?? "";
@@ -181,20 +184,23 @@ export function AccountLayout() {
     if (!locId || !Array.isArray(rows)) return 0;
     const last = readSalonClientsLastSeenCount(locId);
     return computeNewSalonClientsBadge(rows.length, last);
-  }, [resolvedLocationIdForClientsBadge, clientsForBadgeQ.data, location.pathname, salonClientsBadgeLsTick]);
+    // Il tick rilegge il conteggio salvato sul dispositivo: non compare nel calcolo come dato della richiesta.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedLocationIdForClientsBadge, clientsForBadgeQ.data, salonClientsBadgeLsTick]);
   const showSalonClientsNavPill =
-    salonClientsNavBadge > 0 && location.pathname !== "/account/salone/clienti";
+    salonClientsNavBadge > 0 && location.pathname !== "/salone/clienti";
   const meProfile = useMeProfileQuery();
   const staffSalon = useMeStaffSalonQuery();
   const staffSalonMenuLabel = isSalonStaff
     ? staffSalon.isPending
       ? "…"
-      : staffSalon.data?.salonDisplayName?.trim() || "Staff salone"
+      : staffSalon.data?.salonDisplayName?.trim() || t("account.plan.staff")
     : "";
   const staffSalonChatEligible =
     isSalonStaff &&
     Boolean(staffSalon.data?.primaryLocationId?.trim()) &&
-    parseSalonPlanTier(staffSalon.data?.planTier) === "PREMIUM";
+    (parseSalonPlanTier(staffSalon.data?.planTier) === "PREMIUM" ||
+      parseSalonPlanTier(staffSalon.data?.planTier) === "PLUS");
   const staffPrimaryLocationIdForBadge = staffSalon.data?.primaryLocationId?.trim() ?? "";
   const staffClientsForBadgeQ = useQuery({
     queryKey: ["catalog", "clients", staffPrimaryLocationIdForBadge, accessToken, "staff-nav-badge"],
@@ -222,20 +228,15 @@ export function AccountLayout() {
     if (!Array.isArray(rows)) return 0;
     const last = readSalonClientsLastSeenCount(staffPrimaryLocationIdForBadge);
     return computeNewSalonClientsBadge(rows.length, last);
-  }, [
-    staffSalonChatEligible,
-    staffPrimaryLocationIdForBadge,
-    staffClientsForBadgeQ.data,
-    location.pathname,
-    staffSalonClientsBadgeLsTick,
-  ]);
+    // Il tick rilegge il conteggio salvato sul dispositivo: non compare nel calcolo come dato della richiesta.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [staffSalonChatEligible, staffPrimaryLocationIdForBadge, staffClientsForBadgeQ.data, staffSalonClientsBadgeLsTick]);
   const showStaffSalonClientsNavPill =
-    staffSalonClientsNavBadge > 0 && location.pathname !== "/account/salone/clienti";
+    staffSalonClientsNavBadge > 0 && location.pathname !== "/salone/clienti";
   const salonReviews = useMeSalonReviewsQuery(
     !isLuxurySuperAdmin && ((isSalonTitolare && !isSalonStaff) || isSalonStaff),
   );
   const notifInbox = useMeSalonNotificationInboxQuery(isSalonTitolare || isSalonStaff);
-  useConsumerNotificationAlerts(!isSalonTitolare && !isSalonStaff && !isLuxurySuperAdmin);
   const consumerNotifInbox = useMeNotificationInboxQuery(!isSalonTitolare && !isSalonStaff && !isLuxurySuperAdmin);
   const pendingClientReviews = useMePendingReviewInvitesQuery(!isSalonTitolare && !isSalonStaff && !isLuxurySuperAdmin);
   /** In coda + inviate in evidenza (stesso totale mostrato nel centro notifiche). */
@@ -254,7 +255,7 @@ export function AccountLayout() {
   /** Sul centro notifiche il numerino si nasconde: stai già guardando l’elenco; la lista resta com’è. */
   const showSalonNotificheNavPill =
     notifInboxAttentionTotal > 0
-    && location.pathname !== "/account/salone/strumenti"
+    && location.pathname !== "/salone/strumenti"
     && location.pathname !== "/account/notifiche";
   const lastAttentionTotalRef = useRef(0);
   const consumerNotifAttentionTotal = useMemo(() => {
@@ -287,6 +288,8 @@ export function AccountLayout() {
   const salonReviewUnreadCount = useMemo(() => {
     const createdAts = salonReviews.data?.map((r) => r.createdAt).filter(Boolean) ?? [];
     return countUnreadSalonReviews(createdAts, readSalonReviewLastSeenAt());
+    // Il tick rilegge l’ultimo visto salvato sul dispositivo.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [salonReviews.data, salonReviewBadgeLsTick]);
   const showSalonReviewsNavPill =
     salonReviewsNavEligible && location.pathname !== "/account/feedback-luxury" && salonReviewUnreadCount > 0;
@@ -310,6 +313,8 @@ export function AccountLayout() {
   const clientReviewPendingCount = useMemo(() => {
     const ids = pendingClientReviews.data?.map((r) => r.appointmentId).filter(Boolean) ?? [];
     return countUnseenClientReviewPending(ids);
+    // Il tick rilegge gli inviti già visti, salvati sul dispositivo.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingClientReviews.data, clientReviewBadgeLsTick]);
   const showClientReviewsNavPill =
     clientReviewsNavEligible && location.pathname !== "/account/feedback-luxury" && clientReviewPendingCount > 0;
@@ -385,7 +390,9 @@ export function AccountLayout() {
     if (!key || !Array.isArray(rows)) return 0;
     const last = readTrustedSalonsLastSeenCount(key);
     return computeNewTrustedSalonsBadge(rows.length, last);
-  }, [trustedAccountKey, trustedSalonMembershipsQ.data, location.pathname, trustedSalonsBadgeLsTick]);
+    // Il tick rilegge il conteggio salvato sul dispositivo: non compare nel calcolo come dato della richiesta.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trustedAccountKey, trustedSalonMembershipsQ.data, trustedSalonsBadgeLsTick]);
   const showTrustedSalonsNavPill =
     isConsumerAccountNav &&
     trustedSalonsNavBadge > 0 &&
@@ -401,7 +408,7 @@ export function AccountLayout() {
     if (!attentionIncreased) return;
 
     const skipBrowserNotification =
-      (!isSalonStaff && location.pathname === "/account/salone/strumenti")
+      (!isSalonStaff && location.pathname === "/salone/strumenti")
       || (isSalonStaff && location.pathname === "/account/notifiche");
 
     if (skipBrowserNotification) return;
@@ -509,6 +516,7 @@ export function AccountLayout() {
     () => resolveLuxuryAccountGreetingName(meProfile.data?.displayName),
     [meProfile.data?.displayName],
   );
+  const clientProfilePhoto = meProfile.data?.photoDataUrl?.trim() || null;
   const meSalonErrorText = meSalon.error instanceof Error ? meSalon.error.message : "errore";
   const meSalonForbidden = /403|forbidden/i.test(meSalonErrorText);
   const isConsumerClient = !isSalonTitolare && !isSalonStaff && !isLuxurySuperAdmin;
@@ -525,9 +533,6 @@ export function AccountLayout() {
   ]
     .filter(Boolean)
     .join(" ");
-
-  const isAccountSubRoute =
-    location.pathname !== "/account" && location.pathname.startsWith("/account/");
 
   const closeNativeAccountOverlay = useCallback(() => {
     const goTop = () => ensureNativeAccountHubScrolledToTop();
@@ -548,7 +553,7 @@ export function AccountLayout() {
 
   if (embedded) {
     return (
-      <div className="luxury-account-hub luxury-account-hub--embedded" aria-label="Pannello account incorporato">
+      <div className="luxury-account-hub luxury-account-hub--embedded" aria-label={t("account.embeddedLabel")}>
         <AccountOutletSuspense>
           <Outlet />
         </AccountOutletSuspense>
@@ -556,33 +561,23 @@ export function AccountLayout() {
     );
   }
 
-  const billingCheckoutPaths = ["/account/billing/checkout", "/account/billing/success"];
-  const isBillingCheckoutRoute = billingCheckoutPaths.some(
-    (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
-  );
+  const isBillingCheckoutRoute = isBillingStandaloneAccountPath(location.pathname);
 
-  const blockFreeOwnerWebPanel =
-    isSalonTitolare && !isNativeApp && !isSuperAdminViewingAsSalonOwner && !isBillingCheckoutRoute;
-  if (blockFreeOwnerWebPanel) {
-    if (meSalon.isPending) {
-      return (
-        <main className="luxury-auth-page">
-          <div className="luxury-auth-card">
-            <p className="luxury-auth-loading">Caricamento account salone…</p>
-          </div>
-        </main>
-      );
-    }
-    if (isSalonFreeOwnerBlockedOnWeb(meSalon.data)) {
-      return <SalonFreeWebPanelGate />;
-    }
-  }
+  const isOwnerHubScreen = normalizeAccountPath(location.pathname) === "/salone";
+  const isConsumerHubScreen = isConsumerClient && normalizeAccountPath(location.pathname) === "/account";
+  const showAccountOverlay = accountRouteOpensOverlay(location.pathname, {
+    isNativeApp,
+    isSalonTitolare,
+    isSalonStaff,
+    isLuxurySuperAdmin,
+  });
 
-  if (isNativeApp && isAccountSubRoute && !isNativeHubScreen && !isBillingCheckoutRoute) {
+  if (showAccountOverlay) {
     return (
       <LuxuryNativeAccountOverlay
         title={nativeAccountOverlayTitle(location.pathname)}
         onClose={closeNativeAccountOverlay}
+        placement={isNativeApp ? "sheet" : "window"}
       >
         <AccountOutletRegion variant="overlay">
           <Outlet />
@@ -594,7 +589,7 @@ export function AccountLayout() {
   /** Checkout Premium e ringraziamento post-Stripe: pagina dedicata, senza hub profilo salone. */
   if (isBillingCheckoutRoute) {
     return (
-      <main className="luxury-auth-page luxury-billing-flow-standalone" aria-label="Checkout Premium">
+      <main className="luxury-auth-page luxury-billing-flow-standalone" aria-label={t("account.checkoutLabel")}>
         <AccountOutletRegion variant="embedded">
           <Outlet />
         </AccountOutletRegion>
@@ -603,54 +598,60 @@ export function AccountLayout() {
   }
 
   return (
-    <div className={accountHubClassName} aria-label="Area account Luxury">
+    <div className={accountHubClassName} aria-label={t("account.areaLabel")}>
       <div className="luxury-account-hub__masthead">
         <div className="luxury-account-hub__masthead-inner">
           <div className="luxury-account-hub__top">
             {isSalonStaff ? (
-              <span className="luxury-account-hub__plan luxury-account-hub__plan--staff">Staff salone</span>
+              <span className="luxury-account-hub__plan luxury-account-hub__plan--staff">{t("account.plan.staff")}</span>
             ) : isSalonTitolare ? (
               <span className="luxury-account-hub__plan">{salonPlanBadgeLabel}</span>
             ) : isLuxurySuperAdmin ? (
-              <span className="luxury-account-hub__plan luxury-account-hub__plan--admin">Amministratore</span>
+              <span className="luxury-account-hub__plan luxury-account-hub__plan--admin">{t("account.plan.admin")}</span>
             ) : (
-              <span className="luxury-account-hub__plan luxury-account-hub__plan--client">Account cliente</span>
+              <span className="luxury-account-hub__plan luxury-account-hub__plan--client">{t("account.plan.client")}</span>
             )}
           </div>
 
           <header className="luxury-account-hub__welcome">
-            <div className="luxury-account-hub__mark-wrap">
-              <SaloniLuxuryLogoMark variant="default" />
+            <div
+              className={
+                "luxury-account-hub__mark-wrap" +
+                (isNativeApp ? " luxury-account-hub__mark-wrap--compact" : "")
+              }
+            >
+              <SaloniLuxuryLogoMark variant="default" compact={isNativeApp} />
             </div>
             <div className="luxury-account-hub__welcome-copy">
-              <p className="luxury-account-hub__welcome-line">Benvenuto in Saloni Luxury</p>
+              <p className="luxury-account-hub__welcome-line">{t("account.welcome")}</p>
               {isSalonStaff ? (
                 <>
-                  <p className="luxury-account-hub__reg">Accesso operatore</p>
+                  <p className="luxury-account-hub__reg">{t("account.staff.access")}</p>
                   <p
                     className="luxury-account-hub__welcome-line"
                     style={{ fontSize: "1.05rem", fontWeight: 600, marginTop: "0.2rem", letterSpacing: "0.01em" }}
                   >
                     {staffSalon.isPending ? (
-                      "Salone…"
+                      t("account.staff.salonPending")
                     ) : staffSalon.data?.salonDisplayName?.trim() ? (
                       <>
-                        Salone <strong>{staffSalon.data.salonDisplayName.trim()}</strong>
+                        {t("account.staff.salonLabel")}{" "}
+                        <strong>{staffSalon.data.salonDisplayName.trim()}</strong>
                       </>
                     ) : staffSalon.isError ? (
-                      <span style={{ fontWeight: 500, opacity: 0.88 }}>Nome salone non disponibile</span>
+                      <span style={{ fontWeight: 500, opacity: 0.88 }}>{t("account.staff.salonUnavailable")}</span>
                     ) : (
-                      <span style={{ fontWeight: 500, opacity: 0.88 }}>Salone non collegato al profilo</span>
+                      <span style={{ fontWeight: 500, opacity: 0.88 }}>{t("account.staff.salonUnlinked")}</span>
                     )}
                   </p>
                   <p className="luxury-account-hub__greeting">
                     {consumerGreeting ? (
                       <>
-                        <span className="luxury-account-hub__greeting-hi">Ciao</span>
+                        <span className="luxury-account-hub__greeting-hi">{t("account.greeting.hi")}</span>
                         <strong className="luxury-account-hub__greeting-name">{consumerGreeting}</strong>
                       </>
                     ) : (
-                      <span className="luxury-account-hub__greeting-hi">Ciao</span>
+                      <span className="luxury-account-hub__greeting-hi">{t("account.greeting.hi")}</span>
                     )}
                   </p>
                 </>
@@ -659,25 +660,25 @@ export function AccountLayout() {
                   <p className="luxury-account-hub__greeting">
                     {consumerGreeting ? (
                       <>
-                        <span className="luxury-account-hub__greeting-hi">Ciao</span>
+                        <span className="luxury-account-hub__greeting-hi">{t("account.greeting.hi")}</span>
                         <strong className="luxury-account-hub__greeting-name">{consumerGreeting}</strong>
                       </>
                     ) : (
-                      <span className="luxury-account-hub__greeting-hi">Ciao</span>
+                      <span className="luxury-account-hub__greeting-hi">{t("account.greeting.hi")}</span>
                     )}
                   </p>
-                  <p className="luxury-account-hub__reg">Il tuo salone</p>
+                  <p className="luxury-account-hub__reg">{t("account.owner.yourSalon")}</p>
                   {titolareSalonGreeting.hasNamedSalon ? (
                     <p className="luxury-account-hub__salon-name">
                       <strong>{titolareSalonGreeting.salonName}</strong>
                     </p>
                   ) : "salonHint" in titolareSalonGreeting && titolareSalonGreeting.salonHint === "pending" ? (
                     <p className="luxury-text-muted" style={{ marginTop: "0.2rem", fontSize: "0.88rem" }}>
-                      Caricamento nome commerciale…
+                      {t("account.owner.loadingName")}
                     </p>
                   ) : (
                     <p className="luxury-text-muted" style={{ marginTop: "0.2rem", fontSize: "0.88rem" }}>
-                      Completa i dati pubblicati da «Il mio salone» quando sei pronto.
+                      {t("account.owner.completeProfile")}
                     </p>
                   )}
                   {"salonHint" in titolareSalonGreeting && titolareSalonGreeting.salonHint === "error" ? (
@@ -729,12 +730,15 @@ export function AccountLayout() {
                 <p className="luxury-account-hub__greeting">
                   {consumerGreeting ? (
                     <>
-                      <span className="luxury-account-hub__greeting-hi">Ciao</span>
+                      <span className="luxury-account-hub__greeting-hi">{t("account.greeting.hi")}</span>
                       <strong className="luxury-account-hub__greeting-name">{consumerGreeting}</strong>
                     </>
                   ) : (
-                    <span className="luxury-account-hub__greeting-hi">Ciao</span>
+                    <span className="luxury-account-hub__greeting-hi">{t("account.greeting.hi")}</span>
                   )}
+                  {clientProfilePhoto ? (
+                    <img className="luxury-account-hub__greeting-photo" src={clientProfilePhoto} alt="" />
+                  ) : null}
                 </p>
               )}
             </div>
@@ -778,9 +782,11 @@ export function AccountLayout() {
               <AccountHubNavLink to="/account/notifiche" className={navBtn()}>
                 Notifiche
               </AccountHubNavLink>
-              <AccountHubNavLink to="/" className={navBtn("luxury-account-hub__btn--ghost")}>
-                Sito pubblico
-              </AccountHubNavLink>
+              {isNativeApp ? (
+                <AccountHubNavLink to="/" className={navBtn("luxury-account-hub__btn--ghost")}>
+                  Sito pubblico
+                </AccountHubNavLink>
+              ) : null}
               <AccountHubNavLink to="/account/info-privacy" className={navBtn()} title="Informazioni sul trattamento dati e privacy.">
                 Info e privacy
               </AccountHubNavLink>
@@ -830,7 +836,7 @@ export function AccountLayout() {
               </AccountHubNavLink>
               {staffSalonChatEligible ? (
                 <AccountHubNavLink
-                  to="/account/salone/clienti"
+                  to="/salone/clienti"
                   className={navBtn()}
                   title="Elenco clienti della tua sede; da ogni scheda apri la chat Luxury."
                 >
@@ -899,11 +905,13 @@ export function AccountLayout() {
         ) : null}
       </nav>
 
-      <div id="luxury-account-hub-body" ref={hubBodyRef} className="luxury-account-hub__body">
-        <AccountOutletRegion>
-          <Outlet />
-        </AccountOutletRegion>
-      </div>
+      {((isSalonTitolare && !isSalonStaff && isOwnerHubScreen) || isConsumerHubScreen) ? null : (
+        <div id="luxury-account-hub-body" ref={hubBodyRef} className="luxury-account-hub__body">
+          <AccountOutletRegion>
+            <Outlet />
+          </AccountOutletRegion>
+        </div>
+      )}
 
       {readSalonClientsNavDebugEnabled() && isSalonTitolare && !isSalonStaff ? (
         <div
@@ -940,7 +948,7 @@ export function AccountLayout() {
           <div>badge computed: {salonClientsNavBadge}</div>
           <div>show pill: {showSalonClientsNavPill ? "yes" : "no"}</div>
           <div>
-            path: {location.pathname} {location.pathname === "/account/salone/clienti" ? "(pill nascosto qui)" : ""}
+            path: {location.pathname} {location.pathname === "/salone/clienti" ? "(pill nascosto qui)" : ""}
           </div>
           <div>
             query: {clientsForBadgeQ.status} / fetch {clientsForBadgeQ.fetchStatus}
@@ -955,6 +963,7 @@ export function AccountLayout() {
           </div>
         </div>
       ) : null}
+      <AdPopupHost />
     </div>
   );
 }

@@ -14,7 +14,6 @@ import sys
 import time
 import urllib.error
 import urllib.request
-import uuid
 from dataclasses import dataclass
 from datetime import date, timedelta
 
@@ -84,7 +83,7 @@ def psql(sql: str) -> str:
 
 def ensure_clients(count: int) -> list[str]:
     existing = psql(
-        f"""
+        """
         SELECT email FROM c1luxury.consumer_profiles
         WHERE email ~ '^cliente[0-9]+@test\\.com$' AND deleted_at IS NULL
         ORDER BY email;
@@ -93,7 +92,6 @@ def ensure_clients(count: int) -> list[str]:
     emails = [e for e in existing.splitlines() if e.strip()]
     if len(emails) >= count:
         return emails[:count]
-    need = count - len(emails)
     psql(
         f"""
         INSERT INTO c1luxury.consumer_profiles (

@@ -85,7 +85,8 @@ public class SalonSeoMetadataService {
 		if (location == null || location.getStudioGroup() == null) {
 			return false;
 		}
-		return salonPremiumEntitlementService.hasActivePremium(location.getStudioGroup());
+		return location.isVisibleToClients()
+				&& salonPremiumEntitlementService.hasActivePremium(location.getStudioGroup());
 	}
 
 	private record RatingSummary(Double average, Long count) {

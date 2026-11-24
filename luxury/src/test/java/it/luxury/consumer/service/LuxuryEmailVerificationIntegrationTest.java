@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -74,7 +75,7 @@ class LuxuryEmailVerificationIntegrationTest {
 	}
 
 	@Test
-	void confirmVerification_idempotentForPremiumAwaitingCheckout() throws Exception {
+	void confirmVerification_premiumStartsTrialWithoutCheckoutToken() throws Exception {
 		String email = "premium-idem-" + UUID.randomUUID() + "@example.com";
 		byte[] raw = new byte[32];
 		for (int i = 0; i < raw.length; i++) {
@@ -83,7 +84,7 @@ class LuxuryEmailVerificationIntegrationTest {
 		String plainToken = toHex(raw);
 		String tokenHash = LuxuryPasswordResetService.sha256Hex(plainToken);
 		String payload =
-				"{\"firstName\":\"A\",\"lastName\":\"B\",\"provisionPlanTier\":\"PREMIUM\",\"salonName\":\"Test\"}";
+				"{\"firstName\":\"A\",\"lastName\":\"B\",\"provisionPlanTier\":\"PREMIUM\",\"salonName\":\"Test\",\"salonCity\":\"Milano\",\"salonBusinessTypes\":[\"HAIR\"],\"salonClientGenders\":[\"FEMALE\"]}";
 
 		PendingRegistration pending = new PendingRegistration(
 				email, "hash", PendingRegistrationKind.SALON_OWNER, payload, "A B");
@@ -97,19 +98,19 @@ class LuxuryEmailVerificationIntegrationTest {
 								.contentType(MediaType.APPLICATION_JSON)
 								.content(objectMapper.writeValueAsString(Map.of("token", plainToken))))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.premiumCheckoutToken").isNotEmpty());
+				.andExpect(jsonPath("$.nextPath").value("/salone"))
+				.andExpect(jsonPath("$.accessToken").isNotEmpty())
+				.andExpect(jsonPath("$.premiumCheckoutToken").value(nullValue()));
 
 		mockMvc.perform(
 						post("/api/v1/auth/email-verification/confirm")
 								.contentType(MediaType.APPLICATION_JSON)
 								.content(objectMapper.writeValueAsString(Map.of("token", plainToken))))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.premiumCheckoutToken").isNotEmpty());
+				.andExpect(status().isBadRequest());
 
-		PendingRegistration after = pendingRegistrationRepository.findByEmailIgnoreCase(email).orElseThrow();
-		assertThat(after.getVerificationTokenHash()).isEqualTo(tokenHash);
-		assertThat(after.getEmailVerifiedAt()).isNotNull();
-		assertThat(consumerProfileRepository.findByEmailIgnoreCase(email)).isEmpty();
+		assertThat(pendingRegistrationRepository.findByEmailIgnoreCase(email)).isEmpty();
+		assertThat(consumerProfileRepository.findByEmailIgnoreCase(email)).isPresent();
+		assertThat(tokenHash).isNotBlank();
 	}
 
 	@Test

@@ -140,16 +140,19 @@ public class LuxuryEmailVerificationService {
 		LuxuryRefreshTokenService.RefreshTokenPair tokens =
 				luxuryRefreshTokenService.issueForProfile(forToken, request);
 		String planTier = StudioGroup.canonicalPlanTier(outcome.salonProvisionPlanTier());
+		boolean plus = "PLUS".equalsIgnoreCase(planTier);
 		boolean premium = "PREMIUM".equalsIgnoreCase(planTier);
 		boolean checkoutRequired = billingRegistrationPlanPolicy.billingCheckoutRequiredForPremiumRegistration(planTier);
-		String nextPath = premium
+		String nextPath = plus || premium
 				? billingRegistrationPlanPolicy.salonOwnerPostConfirmPath(planTier)
-				: "/account/salone";
-		String message = premium
-				? checkoutRequired
-						? "Email confermata. Prosegui con il pagamento Premium per attivare il salone."
-						: "Email confermata. Il tuo salone Premium è attivo: inizia dalla panoramica salone."
-				: "Email confermata. Il tuo salone è attivo.";
+				: "/piani?plan=PREMIUM";
+		String message = plus
+				? "Email confermata. Il tuo salone Plus è attivo: inizia dalla panoramica salone."
+				: premium
+						? checkoutRequired
+								? "Email confermata. Prosegui con il pagamento Premium per attivare il salone."
+								: "Email confermata. Il tuo salone Premium è attivo: inizia dalla panoramica salone."
+						: "Email confermata. Attiva Premium per usare il salone.";
 		return new EmailVerificationConfirmResult(
 				message,
 				tokens.accessToken(),
@@ -167,60 +170,68 @@ public class LuxuryEmailVerificationService {
 	/**
 	 * Sincronizza conferma email nella WebView app quando il link è stato aperto nel browser di sistema.
 	 */
-	@Transactional
-	public Optional<EmailVerificationConfirmResult> pollRegistrationSync(
-			String rawEmail, long registrationAtMs, HttpServletRequest request) {
-		if (!registrationProperties.isEmailVerificationRequired()) {
-			return Optional.empty();
-		}
-		String normEmail = rawEmail != null ? rawEmail.trim().toLowerCase(Locale.ROOT) : "";
-		if (normEmail.isBlank() || registrationAtMs <= 0) {
-			return Optional.empty();
-		}
-
-		Optional<PendingRegistration> verifiedPending =
-				pendingRegistrationService.findEmailVerifiedPendingForSync(normEmail, registrationAtMs);
-		if (verifiedPending.isPresent()) {
-			Optional<EmailVerificationMaterializationOutcome> premiumOutcome =
-					pendingRegistrationService.verifiedPremiumCheckoutOutcome(verifiedPending.get());
-			if (premiumOutcome.isPresent()) {
-				EmailVerificationMaterializationOutcome outcome = premiumOutcome.get();
-				return Optional.of(
-						new EmailVerificationConfirmResult(
-								"Email confermata. Completa il pagamento Premium per attivare il salone.",
-								null,
-								null,
-								0,
-								0,
-								billingRegistrationPlanPolicy.salonOwnerPostConfirmPath(outcome.salonProvisionPlanTier())
-										+ "?token="
-										+ outcome.premiumCheckoutToken(),
-								outcome.premiumCheckoutToken()));
+		/**
+		 * Il poll emette una sessione solo se il client presenta il segreto creato alla registrazione.
+		 * Email e timestamp, da soli, non autorizzano. {@code registrationAtMs} resta nel contratto
+		 * per la WebView già in circolazione e non decide l'esito.
+		 */
+		@Transactional
+		public Optional<EmailVerificationConfirmResult> pollRegistrationSync(
+				String rawEmail, long registrationAtMs, String pollSecret, HttpServletRequest request) {
+			if (!registrationProperties.isEmailVerificationRequired()) {
+				return Optional.empty();
 			}
-			return Optional.empty();
-		}
+			String normEmail = rawEmail != null ? rawEmail.trim().toLowerCase(Locale.ROOT) : "";
+			if (normEmail.isBlank() || pollSecret == null || pollSecret.isBlank()) {
+				return Optional.empty();
+			}
 
-		Optional<ConsumerProfile> profile =
-				consumerProfileRepository.findFirstByEmailIgnoreCaseAndDeletedAtIsNullOrderByCreatedAtDesc(normEmail);
-		if (profile.isEmpty() || profile.get().getEmailVerifiedAt() == null) {
-			return Optional.empty();
-		}
-		if (profile.get().getEmailVerifiedAt().toEpochMilli() < registrationAtMs - 120_000L) {
-			return Optional.empty();
-		}
+			Optional<PendingRegistration> verifiedPending = pendingRegistrationService.findPendingByEmail(normEmail)
+					.filter(row -> row.getEmailVerifiedAt() != null)
+					.filter(row -> pendingRegistrationService.pollSecretMatches(pollSecret, row.getPollSyncSecretHash()));
+			if (verifiedPending.isPresent()) {
+				Optional<EmailVerificationMaterializationOutcome> premiumOutcome =
+						pendingRegistrationService.verifiedPremiumCheckoutOutcome(verifiedPending.get());
+				if (premiumOutcome.isPresent()) {
+					EmailVerificationMaterializationOutcome outcome = premiumOutcome.get();
+					return Optional.of(
+							new EmailVerificationConfirmResult(
+									"Email confermata. Completa il pagamento Premium per attivare il salone.",
+									null,
+									null,
+									0,
+									0,
+									billingRegistrationPlanPolicy.salonOwnerPostConfirmPath(outcome.salonProvisionPlanTier())
+											+ "?token="
+											+ outcome.premiumCheckoutToken(),
+									outcome.premiumCheckoutToken()));
+				}
+				return Optional.empty();
+			}
 
-		if (isSalonOwnerProfile(profile.get())) {
-			String planTier = profile.get().getPlanTier();
+			Optional<ConsumerProfile> profile =
+					consumerProfileRepository.findFirstByEmailIgnoreCaseAndDeletedAtIsNullOrderByCreatedAtDesc(normEmail);
+			if (profile.isEmpty() || profile.get().getEmailVerifiedAt() == null) {
+				return Optional.empty();
+			}
+			if (!pendingRegistrationService.pollSecretMatches(pollSecret, profile.get().getRegistrationPollSecretHash())) {
+				return Optional.empty();
+			}
+			profile.get().setRegistrationPollSecretHash(null);
+			consumerProfileRepository.save(profile.get());
+
+			if (isSalonOwnerProfile(profile.get())) {
+				String planTier = profile.get().getPlanTier();
+				return Optional.of(
+						issueSalonOwnerSessionAfterConfirm(
+								new EmailVerificationMaterializationOutcome(
+										PendingRegistrationKind.SALON_OWNER, normEmail, planTier),
+								request));
+			}
 			return Optional.of(
-					issueSalonOwnerSessionAfterConfirm(
-							new EmailVerificationMaterializationOutcome(
-									PendingRegistrationKind.SALON_OWNER, normEmail, planTier),
-							request));
+					issueClientSessionAfterConfirm(
+							normEmail, "Email confermata. Ora puoi accedere con le tue credenziali.", request));
 		}
-		return Optional.of(
-				issueClientSessionAfterConfirm(
-						normEmail, "Email confermata. Ora puoi accedere con le tue credenziali.", request));
-	}
 
 	public void assertMayLogin(ConsumerProfile profile) {
 		if (!registrationProperties.isEmailVerificationRequired()) {
